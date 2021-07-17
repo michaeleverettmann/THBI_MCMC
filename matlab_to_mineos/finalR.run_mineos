@@ -1,0 +1,22 @@
+#!/bin/csh
+#
+echo "Calculating eigenfunctions with MINEOS"
+#
+set xdir=/Users/zeilon/Work/codes/MINEOS_Dalton/bin
+$xdir/mineos_nohang << ! > finalR.log
+finalR.model
+finalR.asc1
+finalR.eig
+safekeeping/s.modefile.200mhz
+!
+#
+echo "Done eigenfunctions, now calculating velocities"
+#
+$xdir/mineos_q << ! >> finalR.log
+safekeeping/qmod
+finalR.q
+finalR.eig
+
+!
+echo "Done velocity calculation, cleaning up..."
+rm finalR.log
