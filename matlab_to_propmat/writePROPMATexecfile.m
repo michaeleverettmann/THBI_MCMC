@@ -49,7 +49,7 @@ end
 %% write synth.in parameter file
 fid = fopen(execfile,'w');
 fprintf(fid,'#!/bin/csh\n');
-fprintf(fid,'set xdir=/Users/zeilon/Work/codes/PropMatrix/bin\n');
+fprintf(fid,'set xdir=set xdir=/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/PropMat/bin\n'); % TODOPATH
 fprintf(fid,'$xdir/synth <<!\n');
 fprintf(fid,'%s\n',modfile);
 fprintf(fid,'%s\n',ofile0);
