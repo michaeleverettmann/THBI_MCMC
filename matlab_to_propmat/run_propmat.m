@@ -72,7 +72,7 @@ end
 system(['chmod +u+x ' execfile]);
 
 %% do PropMatrix on it
-[status,cmdout] = system(['/usr/local/bin/gtimeout 10 ./',execfile]);
+[status,cmdout] = system(['/usr/local/bin/gtimeout 10 ./',execfile]); 
 
 %% read PropMatrix output
 [traces,tt] = readPROPMATtr(odatfile);

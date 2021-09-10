@@ -1,3 +1,18 @@
+EXAMPLE/inversion_results/**
+
+
+
+# This is just used to hold codes that I later developed and got running. They are elsewhere on my machine. 
+external_code_STORAGE/**
+
+SYNTHETICS/inversion_results/**
+SYNTHETICS/**.mat 
+SYNTHETICS/**.mod 
+
+# Some obnoxious files I never want to keep I think
+**TegPs**
+**TegPs**
+
 **.DS_Store
 **.m~
 **.zip

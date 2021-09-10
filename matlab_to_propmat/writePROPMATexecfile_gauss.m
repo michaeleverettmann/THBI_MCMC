@@ -45,7 +45,7 @@ end
 %% write synth.in parameter file
 fid = fopen(execfile,'w');
 fprintf(fid,'#!/bin/csh\n');
-fprintf(fid,'set xdir=/Users/zeilon/Work/codes/PropMatrix/bin\n');
+fprintf(fid,'set xdir=/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/external_code/PropMat/bin\n'); % /Users/zeilon/Work/codes/PropMatrix/bin\n');
 fprintf(fid,'$xdir/synth <<!\n');
 fprintf(fid,'%s\n',modfile);
 fprintf(fid,'%s\n',ofile0);

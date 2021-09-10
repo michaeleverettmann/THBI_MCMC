@@ -33,7 +33,7 @@ notes = [...
 
 %% ------------------------- START -------------------------
 global projdir THBIpath TRUEmodel
-THBIpath = '/Users/zeilon/Documents/MATLAB/BayesianJointInv';
+THBIpath = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM'; % '/Users/zeilon/Documents/MATLAB/BayesianJointInv';
 projdir = [THBIpath,'/',projname,'/'];
 cd(projdir);
 
