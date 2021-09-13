@@ -1,0 +1,13 @@
+function paths = loadPathsToChange(); 
+global THBIpath
+
+% Star
+
+paths = struct(...
+    'THBIpath', THBIpath, ...
+    'PropMat', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/PropMat', ...
+    'CADMINEOS', '/Users/brennanbrunsvik/bin/CADMINEOS', ...
+    'timeout', '/usr/local/bin/timeout'); 
+
+
+end
