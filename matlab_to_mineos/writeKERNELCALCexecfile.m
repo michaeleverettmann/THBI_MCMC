@@ -42,7 +42,8 @@ fid = fopen(execfile,'w');
 fprintf(fid,'#!/bin/csh\n');
 %
 fprintf(fid,'#\n');
-fprintf(fid,'set xdir=./CADMINEOS/bin\n');
+% fprintf(fid,'set xdir=./CADMINEOS/bin\n');
+fprintf(fid,'set xdir=/Users/brennanbrunsvik/bin/CADMINEOS/bin\n'); % TODOPATH bb2021.09.13
 fprintf(fid,'#\n');
 %% =======================================================================
 fprintf(fid,'echo "=================================================" > %s\n',logfile);
