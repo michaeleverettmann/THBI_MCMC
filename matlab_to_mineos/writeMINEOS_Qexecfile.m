@@ -33,7 +33,7 @@ fprintf(fid,'echo "Q-correcting velocities"\n');
 %
 fprintf(fid,'#\n');
 %
-fprintf(fid,'set xdir=./CADMINEOS/bin\n');
+fprintf(fid,'set xdir=/Users/brennanbrunsvik/bin/CADMINEOS/bin\n'); % TODOPATH
 fprintf(fid,'$xdir/mineos_q << ! >> %s\n',logfile);
 fprintf(fid,'%s\n',qmod);
 fprintf(fid,'%s\n',qfile);

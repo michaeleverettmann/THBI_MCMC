@@ -27,7 +27,8 @@ fprintf(fid,'echo "Calculating eigenfunctions with MINEOS"\n');
 %
 fprintf(fid,'#\n');
 %
-fprintf(fid,'set xdir=./CADMINEOS/bin\n');
+% fprintf(fid,'set xdir=./CADMINEOS/bin\n'); %TODOPATH BB2021.09.10
+fprintf(fid,'set xdir=/Users/brennanbrunsvik/bin/CADMINEOS/bin\n'); %TODOPATH BB2021.09.10
 fprintf(fid,'$xdir/mineos_nohang << ! > %s\n',logfile);
 fprintf(fid,'%s\n',cardfile);
 fprintf(fid,'%s\n',ascfile);
