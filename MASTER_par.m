@@ -25,6 +25,7 @@ else
 end
 
 
+
 notes = [...
     'Not using Ps data, not permitting mantle anisotropy. '...
     'Moho constrained between 30 and 40 km depth - cf SR16. '...
@@ -36,6 +37,9 @@ global projdir THBIpath TRUEmodel
 THBIpath = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM'; % '/Users/zeilon/Documents/MATLAB/BayesianJointInv';
 projdir = [THBIpath,'/',projname,'/'];
 cd(projdir);
+
+% load paths which might change from one to another computer
+% pathsToChange = loadPathsToChange(); bb2021.09.13 Started this but it's going to be a PITA
 
 run([THBIpath,'/a0_STARTUP_BAYES']);
 load('project_details');
