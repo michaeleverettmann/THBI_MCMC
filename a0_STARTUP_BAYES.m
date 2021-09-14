@@ -16,7 +16,11 @@ bayesdir = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/'; % '/Users/ze
 addpath(bayesdir)
 % path of all inversion sub functions
 addpath([bayesdir,'functions']) % inside this folder
+% path of sub functions that I got online but don't know if I can legally
+% distribute. bb2021.09.14
+addpath(genpath([bayesdir, 'functions/functionsExternal'])); 
 % path to fast spline func.
+% Should go to this folder and run the CompileMex something file. 
 addpath('/Users/brennanbrunsvik/MATLAB/fastBSpline'); %  '/Users/zeilon/Dropbox/MATLAB/lib/fastBSpline'); % google "fastBSspline MATLAB" for this
 % path to propagator matrix running dir.
 addpath([bayesdir,'matlab_to_propmat']); % provided

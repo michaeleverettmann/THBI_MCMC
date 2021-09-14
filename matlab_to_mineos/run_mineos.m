@@ -80,10 +80,10 @@ else
     end
     xi = 1 + model.Sanis/100;  % assumes Sanis is a percentage of anis about zero
     phi = 1 + model.Panis/100;  % assumes Panis is a percentage of anis about zero
-    [ vsv,vsh ] = VsvVsh_from_VsXi( model.vs,xi );
-    [ vpv,vph ] = VpvVph_from_VpPhi( model.vp,phi );
+    [ vsv,vsh ] = VsvVsh_from_VsXi( model.VS,xi );
+    [ vpv,vph ] = VpvVph_from_VpPhi( model.VP,phi );
 
-	write_cardfile(cardfile,model.Z,vpv,vsv,model.rho,[],[],vph,vsh);
+	write_cardfile(cardfile,model.z,vpv,vsv,model.rho,[],[],vph,vsh);
     delcard = true; % delete this card file afterwards (you still have the model to re-make it if you want)
 end
 
@@ -212,6 +212,8 @@ delete(qexecfile);
 
 %% Read phase and group velocities
 try
+%     disp([ID,'.q'])
+%     disp(swperiods)
     [phV,grV] = readMINEOS_qfile([ID,'.q'],swperiods);
 catch
     error('some error with extracting phV and grV from q-file')        

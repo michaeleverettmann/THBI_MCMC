@@ -3,7 +3,7 @@ clear all
 %% Setup
 run('../a0_STARTUP_BAYES.m')
 
-proj = struct('name', 'SYNTHETICS'); % bb2021.08.04 changed from EXAMPLE because I don't have the example data files. %,'EXAMPLE');
+proj = struct('name', 'EXAMPLE'); % bb2021.08.04 changed from EXAMPLE because I don't have the example data files. %,'EXAMPLE');
 proj.dir = [fileparts(mfilename('fullpath')),'/'];
 proj.STAinversions = [proj.dir,'inversion_results/'];
 save([proj.dir,'project_details.mat'],'proj')
