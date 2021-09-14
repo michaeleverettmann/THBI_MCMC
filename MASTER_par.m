@@ -161,7 +161,9 @@ end
 
 % ===== Prepare for parallel pool =====
 delete(gcp('nocreate'));
-parpool(min([par.inv.nchains,18]));
+myCluster = parcluster('local');
+maxWorkers = myCluster.NumWorkers; 
+parpool(min([par.inv.nchains,maxWorkers])); % TODOcomp May need to change based on computer. I set so that we only use as many workers as the local parallel profile will allow.  
 TD = parallel.pool.Constant(trudata);
 % (((( If not parallel: ))))
 % TD(1). Value = trudata; par.inv.verbose = 0;
@@ -179,7 +181,7 @@ fprintf('\n ============== STARTING CHAIN(S) ==============\n')
 %% ========================================================================
 t = now;
 % mkdir([resdir,'/chainout']);
-for iii = 1:par.inv.nchains
+for iii = 1:par.inv.nchains % TODOcomp Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 chainstr = mkchainstr(iii);
 
 
