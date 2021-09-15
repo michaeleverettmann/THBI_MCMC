@@ -4,6 +4,7 @@ EXAMPLE/inversion_results/**
 
 # This is just used to hold codes that I later developed and got running. They are elsewhere on my machine. 
 external_code_STORAGE/**
+code_storage_DELETE**/**
 
 SYNTHETICS/inversion_results/**
 SYNTHETICS/**.mat 

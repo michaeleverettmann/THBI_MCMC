@@ -46,7 +46,7 @@ end
 %% write synth.in parameter file
 fid = fopen(execfile,'w');
 fprintf(fid,'#!/bin/csh\n');
-fprintf(fid,['set xdir=' pathsSpec.PropMat '/bin\n']); % TODOPATH should resolve manual path problems. 
+fprintf(fid,['set xdir=' pathsSpec.PropMat '/bin\n']); 
 
 
 fprintf(fid,'$xdir/synth <<!\n');

@@ -44,7 +44,7 @@ fid = fopen(execfile,'w');
 fprintf(fid,'#!/bin/csh\n');
 %
 fprintf(fid,'#\n');
-fprintf(fid,['set xdir=' pathsSpec.CADMINEOS '/bin\n']); % TODOPATH should resolve manual path problems. 
+fprintf(fid,['set xdir=' pathsSpec.CADMINEOS '/bin\n']); 
 fprintf(fid,'#\n');
 %% =======================================================================
 fprintf(fid,'echo "=================================================" > %s\n',logfile);

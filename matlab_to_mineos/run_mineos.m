@@ -36,7 +36,7 @@ parm = struct('R_or_L','R',...
               'l_increment_standard',2,... % 
               'l_increment_failed',5,...
               'maxrunN',5e2,...
-              'qmodpath',[THBIpath '/matlab_to_mineos/safekeeping/qmod']); % TODOPATH bb2021.09.14 if matlab_to_mineos gets moved this will cause a problem. 
+              'qmodpath',[THBIpath '/matlab_to_mineos/safekeeping/qmod']); % bb2021.09.14 if matlab_to_mineos gets moved this will cause a problem. 
           % replace default values with user values, where appropriate. 
 fns = fieldnames(par_mineos);
 for ii = 1:length(fns)
@@ -109,10 +109,7 @@ writeMINEOSmodefile( modefile, modetype,parm.lmin,parm.lmax,parm.fmin,parm.fmax 
 writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
 system(['chmod u+x ' execfile]); % change execfile permissions
-% [status,cmdout] = system(['./functions/gtimeout 100 ./',execfile]); % run execfile Gives a backtrace error
-% [status1, cmdout1] = system(['PATH=/usr/local/bin:$PATH; timeout 1 echo $PATH']); cmdout1% TODOPATH bb2021.09.10 need to add path for timeout. 
-% [status,cmdout] = system(['PATH=/usr/local/bin:$PATH; timeout 100 ./',execfile]); %TODOPATH bb2021.09.10 sometimes system gets not a full PATH variable. So set it, make sure you have access to timeout. 
-[status,cmdout] = system(['/usr/local/bin/timeout 100 ./',execfile]); %TODOPATH make sure your system can see your timeout function
+[status,cmdout] = system([pathsSpec.timeout ' 100 ./',execfile]); % make sure your system can see your timeout function
 
 delete(execfile,modefile); % kill files we don't need
 
@@ -150,8 +147,7 @@ writeMINEOSmodefile( modefile, modetype,lmin,parm.lmax,parm.fmin,parm.fmax )
 writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
 system(['chmod u+x ' execfile]); % change execfile permissions
-% [status,cmdout] = system(['./functions/gtimeout 100 ./',execfile]); % run execfile %TODOPATH
-[status,cmdout] = system(['/usr/local/bin/timeout 100 ./',execfile]); % run execfile %TODOPATH
+[status,cmdout] = system([pathsSpec.timeout ' 100 ./',execfile]); % run execfile 
 
 delete(execfile,modefile); % kill files we don't need
 
@@ -189,8 +185,7 @@ for ief = 1:length(eigfiles)-1
     writeMINEOSeig_recover( execfile,eigfiles{ief},llasts(ief) )
     
     system(['chmod u+x ' execfile]); % change execfile permissions
-%     [status,cmdout] = system(['./functions/gtimeout 100 ./',execfile]); % run execfile % TODOPATH
-    [status,cmdout] = system(['/usr/local/bin/timeout 100 ./',execfile]); % run execfile % TODOPATH
+    [status,cmdout] = system([pathsSpec.timeout ' 100 ./',execfile]); % run execfile 
     
     eigfiles_fix{ief} = [eigfiles{ief},'_fix'];
     delete(execfile);
@@ -201,8 +196,7 @@ qexecfile = [ID,'.run_mineosq'];
 writeMINEOS_Qexecfile( qexecfile,eigfiles_fix,qmod,[ID,'.q'],[ID,'.log'] )
 
 system(['chmod u+x ' qexecfile]); % change qexecfile permissions
-% [status,cmdout] = system(['./functions/gtimeout 100 ./',qexecfile]); % run qexecfile
-[status,cmdout] = system(['/usr/local/bin/timeout 100 ./',qexecfile]); % run qexecfile % TODOPATH
+[status,cmdout] = system([pathsSpec.timeout ' 100 ./',qexecfile]); % run qexecfile 
 
 
 delete(qexecfile);

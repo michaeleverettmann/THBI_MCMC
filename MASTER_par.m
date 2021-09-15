@@ -181,7 +181,8 @@ fprintf('\n ============== STARTING CHAIN(S) ==============\n')
 %% ========================================================================
 t = now;
 % mkdir([resdir,'/chainout']);
-for iii = 1:par.inv.nchains % TODOcomp Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+% parfor iii = 1:par.inv.nchains
+for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 chainstr = mkchainstr(iii);
 
 
@@ -206,8 +207,8 @@ while ifpass==0
 
     %% starting model kernel
     fprintf('\nCreating starting kernels %s\n',chainstr)
-    try
-        [Kbase] = make_allkernels(model,[],TD.Value,['start',chainstr],par);
+    try 
+        [Kbase] = make_allkernels(model,[],TD.Value,['start',chainstr],par); % TODO this code caused a loop that would have failed infinitely. SHould not use a while loop like this. bb2021.09.14 
     catch
         ifpass = false; continue;
     end

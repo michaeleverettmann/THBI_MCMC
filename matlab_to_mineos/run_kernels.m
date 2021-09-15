@@ -71,7 +71,7 @@ kernelfile = [ID,'.frechet'];
 
 
 % standard inputs, don't get re-written
-qmod = parm.qmodpath; % TODOPATH this should resolve any path problems finding qmod. bb2021.09.14
+qmod = parm.qmodpath; % This should resolve any path problems finding qmod. bb2021.09.14
 
 %% =======================================================================
 wd = pwd;
@@ -89,8 +89,7 @@ if ifverbose
     fprintf('    > Calculting kernels from MINEOS output \n    > Will take some time...')
 end
 %tic
-% [status,cmdout] = system(['./functions/gtimeout 100 ./',execfile_k]);
-[status,cmdout] = system(['/usr/local/bin/timeout 100 ./',execfile_k]); % TODOPATH bb2021.09.13
+[status,cmdout] = system([pathsSpec.timeout ' 100 ./',execfile_k]); % TODOPATH bb2021.09.13, didn't double check replacement worked here. 
 
 %fprintf('Kernel computation itself %s%s took %.5f s\n',ID,parm.R_or_L(1),toc)
 if ifverbose

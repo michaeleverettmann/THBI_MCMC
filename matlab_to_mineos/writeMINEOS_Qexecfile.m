@@ -33,7 +33,7 @@ fprintf(fid,'echo "Q-correcting velocities"\n');
 %
 fprintf(fid,'#\n');
 %
-fprintf(fid,['set xdir=' pathsSpec.CADMINEOS '/bin\n']); % TODOPATH should resolve manual path problems. 
+fprintf(fid,['set xdir=' pathsSpec.CADMINEOS '/bin\n']); 
 fprintf(fid,'$xdir/mineos_q << ! >> %s\n',logfile);
 fprintf(fid,'%s\n',qmod);
 fprintf(fid,'%s\n',qfile);

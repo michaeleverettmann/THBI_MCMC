@@ -56,10 +56,11 @@ addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for
 % javaaddpath('/Users/brennanbrunsvik/MATLAB/TauP-master/gradle/wrapper/gradle-wrapper.jar')
 % javaaddpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup/lib/TauP-2.1.1.jar'); 
 
-
+global pathsSpec % Some special paths which you list here once. When transferring this code to another computer, change the path accordingly here and only here. 
+% '/Users/brennanbrunsvik/bin/CADMINEOS'
 pathsSpec = struct('CADMINEOS', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/CADMINEOS',...
-                   'PropMat', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/PropMat'); 
-global pathsSpec
+                   'PropMat', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/PropMat',...
+                   'timeout', '/usr/local/bin/timeout'); 
 
 % turn warning back on
 warning('on','MATLAB:dispatcher:nameConflict');
