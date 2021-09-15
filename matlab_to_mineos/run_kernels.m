@@ -4,7 +4,7 @@ function [SW_V_kernels] = run_kernels(swperiods,par_mineos,eigfiles,ifdelete,ifp
 % Function to calculate perturbational phase velocity kernels, having
 % previously run MINEOS
 
-global THBIpath
+global THBIpath pathsSpec
 
 tic1 = now;
 

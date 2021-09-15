@@ -198,6 +198,7 @@ while fail_chain>=20
 
 %% Initiate model
 ifpass = 0;
+numFails = 0; 
 % only let starting model out of the loop if it passes conditions
 while ifpass==0
     while ifpass==0 % first make sure the starting model satisfies conditions
@@ -209,11 +210,12 @@ while ifpass==0
     end
 
     %% starting model kernel
-    fprintf('\nCreating starting kernels %s\n',chainstr)
+    fprintf('\nCreating starting kernels %s, have tried %1.0f times\n',chainstr, numFails)
     try 
         [Kbase] = make_allkernels(model,[],TD.Value,['start',chainstr],par); % TODO this code caused a loop that would have failed infinitely. SHould not use a while loop like this. bb2021.09.14 
     catch
         ifpass = false; continue;
+        numFails = numFails + 1; 
     end
 
     model0_perchain{iii} = model0;
