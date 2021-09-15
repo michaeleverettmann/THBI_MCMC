@@ -1,6 +1,9 @@
 clear % clear all to make sure we use values below
 close all
 
+% Disable any warnings; 
+warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...
+
 global run_params
 
 if isempty(run_params)
