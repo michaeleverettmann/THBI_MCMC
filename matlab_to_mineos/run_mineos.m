@@ -5,6 +5,10 @@ function [phV,grV,eigfiles_fix] = run_mineos(model,swperiods,par_mineos,ifdelete
 % velocities at a bunch of input periods. If you keep the output files
 % around (ifdelete==false) then they can be used to calculate perturbation
 % kernels with the complementary run_kernelcalc.m script
+global MINEOSDIR THBIpath pathsSpec 
+MINEOSDIR = [pathsSpec.CADMINEOS '/bin'];  % bb2021.09.14 Changing Jon's "MINEOSDIR", which he had reference the cadmineos bin. I dont recall it being in use, but it might be somewhere, so Im keeping it alive. 
+
+
 tic1 = now;
 
 if nargin < 3 || isempty(par_mineos)
@@ -32,8 +36,7 @@ parm = struct('R_or_L','R',...
               'l_increment_standard',2,... % 
               'l_increment_failed',5,...
               'maxrunN',5e2,...
-              'qmodpath','/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_mineos/safekeeping/qmod'); %TODOPATH links to qmod, which just has some numbers. Is in whichever matlab to mineos folder you are using. 
-%               'qmodpath','./matlab_to_mineos-master/safekeeping/qmod');
+              'qmodpath',[THBIpath '/matlab_to_mineos/safekeeping/qmod']); % TODOPATH bb2021.09.14 if matlab_to_mineos gets moved this will cause a problem. 
           % replace default values with user values, where appropriate. 
 fns = fieldnames(par_mineos);
 for ii = 1:length(fns)
@@ -58,12 +61,6 @@ qmod= parm.qmodpath;
 
 %% =======================================================================
 wd = pwd;
-global MINEOSDIR
-% MINEOSDIR = '/Users/brennanbrunsvik/bin/CADMINEOS/bin'; % TODOPATH bb2021.09.10 I'm removing Jon's trick to get to mineos folder here, for now, untill I get the rest of the code working on my machine. 
-if isempty(MINEOSDIR)
-    MINEOSDIR =  extractBefore(mfilename('fullpath'),mfilename); % I'm not really sure if this is the right mineos path for me. TODOPATH bb2021.09.10
-end
-% cd(MINEOSDIR);
 
 
 %% write MINEOS executable and input files format

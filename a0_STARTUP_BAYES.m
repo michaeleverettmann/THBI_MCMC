@@ -56,6 +56,11 @@ addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for
 % javaaddpath('/Users/brennanbrunsvik/MATLAB/TauP-master/gradle/wrapper/gradle-wrapper.jar')
 % javaaddpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup/lib/TauP-2.1.1.jar'); 
 
+
+pathsSpec = struct('CADMINEOS', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/CADMINEOS',...
+                   'PropMat', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/PropMat'); 
+global pathsSpec
+
 % turn warning back on
 warning('on','MATLAB:dispatcher:nameConflict');
 

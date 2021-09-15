@@ -3,6 +3,9 @@ function [SW_V_kernels] = run_kernels(swperiods,par_mineos,eigfiles,ifdelete,ifp
 % 
 % Function to calculate perturbational phase velocity kernels, having
 % previously run MINEOS
+
+global THBIpath
+
 tic1 = now;
 
 if nargin < 2 || isempty(par_mineos)
@@ -35,8 +38,8 @@ parm = struct('R_or_L','R',...
               'fmax',200.05,...       % max frequency (mHz) - gets reset by min period 
               'l_increment_standard',2,... % 
               'l_increment_failed',5,...
-              'qmodpath','/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_mineos/safekeeping/qmod'); %TODOPATH links to qmod, which just has some numbers. Is in whichever matlab to mineos folder you are using. 
-%               'qmodpath','./matlab_to_mineos-master/safekeeping/qmod');% replace default values with user values, where appropriate. 
+              'qmodpath',[THBIpath '/matlab_to_mineos/safekeeping/qmod']); % bb2021.09.14 making properly dynamic paths again
+
 fns = fieldnames(par_mineos);
 for ii = 1:length(fns)
     parm.(fns{ii}) = par_mineos.(fns{ii});
@@ -68,7 +71,7 @@ kernelfile = [ID,'.frechet'];
 
 
 % standard inputs, don't get re-written
-qmod = parm.qmodpath; % TODOPATH % './matlab_to_mineos-master/safekeeping/qmod';
+qmod = parm.qmodpath; % TODOPATH this should resolve any path problems finding qmod. bb2021.09.14
 
 %% =======================================================================
 wd = pwd;
