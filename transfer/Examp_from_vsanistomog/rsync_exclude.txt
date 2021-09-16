@@ -1,0 +1,14 @@
+K**.mat
+#H_smth.mat
+L_resid_Sdelays100.mat
+model.mat
+par.mat
+progress.mat
+rpath**.mat
+semblance.mat 
+figs/*
+results/*
+results**
+.git/*
+notinuse/*
+**workspace.mat**

@@ -1,9 +1,10 @@
+
+# Stuff from the .gitignore. Just copy pasted. 
 EXAMPLE/inversion_results/**
 
 
 
 # This is just used to hold codes that I later developed and got running. They are elsewhere on my machine. 
-# There are some modifications, though. 
 external_code_STORAGE/**
 code_storage_DELETE**/**
 
@@ -27,9 +28,12 @@ SYNTHETICS/**.mod
 **.html 
 **.fig 
 **.asv
+
 **.mat 
-
-
 papers_etc/** 
 SYNTHETICS/**.mat 
 SYNTHETICS/**/**.mat
+
+# No need to bog transfer speed down by including github stuff on the ERI computer. 
+.gitignore 
+.git/**
