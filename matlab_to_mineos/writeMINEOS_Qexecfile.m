@@ -12,7 +12,7 @@ function writeMINEOS_Qexecfile( execfile,eigfiles,qmod,qfile,logfile )
 %  qfile     - name of output q file, with Qs and group + phase velocities
 %  logfile   - name of file to print screen output to
 
-global pathsSpec
+global pathsCADMINEOS
 
 if exist(execfile,'file')==2
     delete(execfile); % kill if it is there 
@@ -33,7 +33,7 @@ fprintf(fid,'echo "Q-correcting velocities"\n');
 %
 fprintf(fid,'#\n');
 %
-fprintf(fid,['set xdir=' pathsSpec.CADMINEOS '/bin\n']); 
+fprintf(fid,['set xdir=' pathsCADMINEOS '/bin\n']); 
 fprintf(fid,'$xdir/mineos_q << ! >> %s\n',logfile);
 fprintf(fid,'%s\n',qmod);
 fprintf(fid,'%s\n',qfile);

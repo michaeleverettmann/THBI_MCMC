@@ -18,7 +18,7 @@ function ikernelfiles = writeKERNELCALCexecfile(swperiods,R_or_L,ph_gr,execfile,
 %  ikprefix  - prefix for output individual kernel files at each freq.
 %  logfile   - name of file to print screen output to
 
-global pathsSpec
+global pathsCADMINEOS
 
 ikernelfiles = cell({});
 
@@ -44,7 +44,7 @@ fid = fopen(execfile,'w');
 fprintf(fid,'#!/bin/csh\n');
 %
 fprintf(fid,'#\n');
-fprintf(fid,['set xdir=' pathsSpec.CADMINEOS '/bin\n']); 
+fprintf(fid,['set xdir=' pathsCADMINEOS '/bin\n']); 
 fprintf(fid,'#\n');
 %% =======================================================================
 fprintf(fid,'echo "=================================================" > %s\n',logfile);

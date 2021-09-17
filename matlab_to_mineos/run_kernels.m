@@ -4,7 +4,7 @@ function [SW_V_kernels] = run_kernels(swperiods,par_mineos,eigfiles,ifdelete,ifp
 % Function to calculate perturbational phase velocity kernels, having
 % previously run MINEOS
 
-global THBIpath pathsSpec
+global THBIpath pathstimeout
 
 tic1 = now;
 
@@ -89,7 +89,7 @@ if ifverbose
     fprintf('    > Calculting kernels from MINEOS output \n    > Will take some time...')
 end
 %tic
-[status,cmdout] = system([pathsSpec.timeout ' 100 ./',execfile_k]); % TODOPATH bb2021.09.13, didn't double check replacement worked here. 
+[status,cmdout] = system([pathstimeout ' 15 ./',execfile_k]); % TODOPATH bb2021.09.13, didn't double check replacement worked here. 
 
 %fprintf('Kernel computation itself %s%s took %.5f s\n',ID,parm.R_or_L(1),toc)
 if ifverbose

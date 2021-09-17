@@ -17,7 +17,7 @@ function writePROPMATexecfile( execfile, modfile,ifile,ofile0,ofile1,ofile2,oimf
 %  obsdist   - observation distance (km)
 %  ocomps    - output format: 1 = x,y,z  or 2 = R,T,U 
 
-global pathsSpec
+global pathsPropMat
 
 if nargin < 10
     PS = 'Ps';
@@ -45,7 +45,7 @@ end
 %% write synth.in parameter file
 fid = fopen(execfile,'w');
 fprintf(fid,'#!/bin/csh\n');
-fprintf(fid,['set xdir=' pathsSpec.PropMat '/bin\n']); 
+fprintf(fid,['set xdir=' pathsPropMat '/bin\n']); 
 fprintf(fid,'$xdir/synth <<!\n');
 fprintf(fid,'%s\n',modfile);
 fprintf(fid,'%s\n',ofile0);

@@ -5,8 +5,8 @@ function [phV,grV,eigfiles_fix] = run_mineos(model,swperiods,par_mineos,ifdelete
 % velocities at a bunch of input periods. If you keep the output files
 % around (ifdelete==false) then they can be used to calculate perturbation
 % kernels with the complementary run_kernelcalc.m script
-global MINEOSDIR THBIpath pathsSpec 
-MINEOSDIR = [pathsSpec.CADMINEOS '/bin'];  % bb2021.09.14 Changing Jon's "MINEOSDIR", which he had reference the cadmineos bin. I dont recall it being in use, but it might be somewhere, so Im keeping it alive. 
+global MINEOSDIR THBIpath pathstimeout pathsCADMINEOS
+MINEOSDIR = [pathsCADMINEOS '/bin'];  % bb2021.09.14 Changing Jon's "MINEOSDIR", which he had reference the cadmineos bin. I dont recall it being in use, but it might be somewhere, so Im keeping it alive. 
 
 
 tic1 = now;
@@ -109,7 +109,7 @@ writeMINEOSmodefile( modefile, modetype,parm.lmin,parm.lmax,parm.fmin,parm.fmax 
 writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
 system(['chmod u+x ' execfile]); % change execfile permissions
-[status,cmdout] = system([pathsSpec.timeout ' 100 ./',execfile]); % make sure your system can see your timeout function
+[status,cmdout] = system([pathstimeout ' 15 ./',execfile]); % make sure your system can see your timeout function
 
 delete(execfile,modefile); % kill files we don't need
 
@@ -147,7 +147,7 @@ writeMINEOSmodefile( modefile, modetype,lmin,parm.lmax,parm.fmin,parm.fmax )
 writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
 system(['chmod u+x ' execfile]); % change execfile permissions
-[status,cmdout] = system([pathsSpec.timeout ' 100 ./',execfile]); % run execfile 
+[status,cmdout] = system([pathstimeout ' 15 ./',execfile]); % run execfile 
 
 delete(execfile,modefile); % kill files we don't need
 
@@ -185,7 +185,7 @@ for ief = 1:length(eigfiles)-1
     writeMINEOSeig_recover( execfile,eigfiles{ief},llasts(ief) )
     
     system(['chmod u+x ' execfile]); % change execfile permissions
-    [status,cmdout] = system([pathsSpec.timeout ' 100 ./',execfile]); % run execfile 
+    [status,cmdout] = system([pathstimeout ' 15 ./',execfile]); % run execfile 
     
     eigfiles_fix{ief} = [eigfiles{ief},'_fix'];
     delete(execfile);
@@ -196,7 +196,7 @@ qexecfile = [ID,'.run_mineosq'];
 writeMINEOS_Qexecfile( qexecfile,eigfiles_fix,qmod,[ID,'.q'],[ID,'.log'] )
 
 system(['chmod u+x ' qexecfile]); % change qexecfile permissions
-[status,cmdout] = system([pathsSpec.timeout ' 100 ./',qexecfile]); % run qexecfile 
+[status,cmdout] = system([pathstimeout ' 15 ./',qexecfile]); % run qexecfile 
 
 
 delete(qexecfile);
