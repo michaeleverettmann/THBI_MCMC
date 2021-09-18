@@ -1,0 +1,1 @@
+# This script should point to and run all scripts I use to compile codes on HPC. 

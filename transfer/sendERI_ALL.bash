@@ -1,0 +1,1 @@
+# This script should point to and run each of the scripts I use to transfer stuff from personal computer to HPC. 

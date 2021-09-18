@@ -1,21 +1,8 @@
-
-# Stuff from the .gitignore. Just copy pasted. 
-EXAMPLE/inversion_results/**
-
-
-
-# This is just used to hold codes that I later developed and got running. They are elsewhere on my machine. 
 external_code_STORAGE/**
-code_storage_DELETE**/**
-
-SYNTHETICS/inversion_results/**
-SYNTHETICS/**.mat 
-SYNTHETICS/**.mod 
-
-# Some obnoxious files I never want to keep I think
-**TegPs**
-**TegPs**
-
+code_storage_DELETE_when_know_its_not_needed/**
+papers_etc/**
+**.a 
+**.o
 **.DS_Store
 **.m~
 **.zip
@@ -25,15 +12,10 @@ SYNTHETICS/**.mod
 **.pdf
 **.svg
 **.tif
-**.html 
-**.fig 
+**.html
+# **.mat # Might need some .mat files. 
+**.fig
 **.asv
-
-**.mat 
-papers_etc/** 
-SYNTHETICS/**.mat 
-SYNTHETICS/**/**.mat
-
-# No need to bog transfer speed down by including github stuff on the ERI computer. 
-.gitignore 
-.git/**
+# Inversion .mat files that take a lot of space. 
+**cvfrechet 
+# **prior.mat # Actually might want to keep this. Usually no need to recalculate? 

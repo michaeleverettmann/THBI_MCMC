@@ -6,8 +6,10 @@ Sometimes, it's easiest to set up a Jupyter server on ERI/other computer and ssh
 Open Jupyter on the remote machines terminal. 
 jupyter lab --no-browser --port=8080
 
-Connect local computer to the 8080 port at remote computer using local machines terminal
+Connect local computer to the 8080 port at remote computer using local machines terminal (change computer name to whatever you need... e.g.) 
 ssh -N -L 8080:localhost:8080 brunsvik@anvil.eri.ucsb.edu
+ssh -N -L 8080:localhost:8080 brunsvik@tong.eri.ucsb.edu
+
 
 
 Paste one of the returned links from terminal into my local machines browser. Should be good to go!
