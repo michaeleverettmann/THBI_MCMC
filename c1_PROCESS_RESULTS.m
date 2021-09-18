@@ -197,36 +197,41 @@ pause(0.05)
 chi2_alldata = nan(nchains,length(par.inv.datatypes));
 
 % gather average rms errors of each chain
-for iii=1:nchains
-    if goodchains(iii)==false, chi2_alldata(iii,:) = nan; continue; end % already know it's bad
-    for id = 1:length(par.inv.datatypes)
-        % assign structures
-        if nchains>1, mf = misfits{iii}; else mf = misfits; end
-        if isempty(mf), goodchains(iii)=false; continue; end
-        ind = mf.iter > par.inv.burnin & mf.iter~=0;
-        dtype = par.inv.datatypes{id};
-        % work out chi2 for this dtype (average across all data streams for this dtype)
-        chi2 = [mf.chi2.(dtype)]';
-        chi2_alldata(iii,id) = mean(sum(chi2(ind,:),2)); 
-        % work out if the chain got stuck - if there is no change to the
-        % data over many iterations - must be stuck for 600 iterations to
-        % signify
-        Nstuck = 600;
-        if any(any(diff(chi2(ind,:),ceil(Nstuck./par.inv.saveperN),1)==0)) 
-            if strcmp(dtype,'HKstack_P'), continue; end % don't do for HK stack - may stick for ages!
-            fprintf('Chain %s stuck\n',mkchainstr(iii));
-            chi2_alldata(iii,id) = nan; 
+if nchains < 3 % bb2021.09.17 I copied this (if nchains... else... end) from Jon's version of the code, where the else block is all that was in Zach's. If you have too few chains, they often fail here due to some... glitch? 
+    warning('BRENNAN WARNING: nchains is less than 3. Thus, NOT rejecting chains. Only use this few of chains if you are debugging.')
+    goodchains = 1:nchains;
+else
+    for iii=1:nchains
+        if goodchains(iii)==false, chi2_alldata(iii,:) = nan; continue; end % already know it's bad
+        for id = 1:length(par.inv.datatypes)
+            % assign structures
+            if nchains>1, mf = misfits{iii}; else mf = misfits; end
+            if isempty(mf), goodchains(iii)=false; continue; end
+            ind = mf.iter > par.inv.burnin & mf.iter~=0;
+            dtype = par.inv.datatypes{id};
+            % work out chi2 for this dtype (average across all data streams for this dtype)
+            chi2 = [mf.chi2.(dtype)]';
+            chi2_alldata(iii,id) = mean(sum(chi2(ind,:),2)); 
+            % work out if the chain got stuck - if there is no change to the
+            % data over many iterations - must be stuck for 600 iterations to
+            % signify
+            Nstuck = 600;
+            if any(any(diff(chi2(ind,:),ceil(Nstuck./par.inv.saveperN),1)==0)) 
+                if strcmp(dtype,'HKstack_P'), continue; end % don't do for HK stack - may stick for ages!
+                fprintf('Chain %s stuck\n',mkchainstr(iii));
+                chi2_alldata(iii,id) = nan; 
+            end
         end
     end
-end
 
-% goodchains = true(nchains,1);
-for id = 1:length(par.inv.datatypes)
-    mean_chi2_dtp = nanmean(chi2_alldata(:,id));
-    std_chi2_gdtp = nanstd(chi2_alldata(chi2_alldata(:,id)<mean_chi2_dtp,id));
-    goodchains = goodchains & (chi2_alldata(:,id) < mean_chi2_dtp + 5*std_chi2_gdtp);
+    % goodchains = true(nchains,1);
+    for id = 1:length(par.inv.datatypes)
+        mean_chi2_dtp = nanmean(chi2_alldata(:,id));
+        std_chi2_gdtp = nanstd(chi2_alldata(chi2_alldata(:,id)<mean_chi2_dtp,id)); % bb2021.09.17 Might get debugging problems here if nanstd(f) calculates on f where f has only 1 non nan value. 
+        goodchains = goodchains & (chi2_alldata(:,id) < mean_chi2_dtp + 5*std_chi2_gdtp); % bb2021.09.17 chains might fail here if you are using small iteration chains for debugging. 
+    end
+    goodchains=find(goodchains);
 end
-goodchains=find(goodchains);
 
 %% GET TARGET MODEL for comparison
 global TRUEmodel

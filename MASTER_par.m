@@ -506,6 +506,7 @@ delete(gcp('nocreate'));
 %% ========================================================================
 %% ========================================================================
 c0_SAVE_OUTPUT(resdir,misfits_perchain,allmodels_perchain);
+
 fprintf('Duration of entire run: %.0f s\n',(now-t)*86400)
 plot_invtime(misfits_perchain,[resdir,'/invTime.pdf']);
 
