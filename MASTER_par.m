@@ -5,6 +5,7 @@ close all
 warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...
 
 global run_params
+paths = getPaths(); 
 
 if isempty(run_params)
     projname = 'AK'; % SYNTHETICS, LAB_tests, or US, for now
@@ -36,15 +37,14 @@ notes = [...
 ];
 
 %% ------------------------- START -------------------------
-global projdir THBIpath TRUEmodel
-THBIpath = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM'; % '/Users/zeilon/Documents/MATLAB/BayesianJointInv';
-projdir = [THBIpath,'/',projname,'/'];
+global projdir TRUEmodel
+projdir = [paths.THBIpath,'/',projname,'/'];
 cd(projdir);
 
 % load paths which might change from one to another computer
 % pathsToChange = loadPathsToChange(); bb2021.09.13 Started this but it's going to be a PITA
 
-run([THBIpath,'/a0_STARTUP_BAYES']);
+run([paths.THBIpath,'/a0_STARTUP_BAYES']);
 load('project_details');
 addpath([proj.dir,'matguts/']);
 

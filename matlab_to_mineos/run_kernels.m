@@ -4,7 +4,7 @@ function [SW_V_kernels] = run_kernels(swperiods,par_mineos,eigfiles,ifdelete,ifp
 % Function to calculate perturbational phase velocity kernels, having
 % previously run MINEOS
 
-global THBIpath pathstimeout
+paths = getPaths(); 
 
 tic1 = now;
 
@@ -38,7 +38,7 @@ parm = struct('R_or_L','R',...
               'fmax',200.05,...       % max frequency (mHz) - gets reset by min period 
               'l_increment_standard',2,... % 
               'l_increment_failed',5,...
-              'qmodpath',[THBIpath '/matlab_to_mineos/safekeeping/qmod']); % bb2021.09.14 making properly dynamic paths again
+              'qmodpath',[paths.THBIpath '/matlab_to_mineos/safekeeping/qmod']); % bb2021.09.14 making properly dynamic paths again
 
 fns = fieldnames(par_mineos);
 for ii = 1:length(fns)
@@ -89,7 +89,7 @@ if ifverbose
     fprintf('    > Calculting kernels from MINEOS output \n    > Will take some time...')
 end
 %tic
-[status,cmdout] = system([pathstimeout ' 15 ./',execfile_k]); % TODOPATH bb2021.09.13, didn't double check replacement worked here. 
+[status,cmdout] = system([paths.timeout ' 15 ./',execfile_k]); % TODOPATH bb2021.09.13, didn't double check replacement worked here. 
 
 %fprintf('Kernel computation itself %s%s took %.5f s\n',ID,parm.R_or_L(1),toc)
 if ifverbose

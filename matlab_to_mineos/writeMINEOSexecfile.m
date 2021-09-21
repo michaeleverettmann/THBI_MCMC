@@ -11,7 +11,7 @@ function writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,logfile
 %  ascfile    - name of output ascii file
 %  logfile   - name of file to print screen output to
 
-global pathsCADMINEOS
+paths = getPaths(); 
 
 if exist(execfile,'file')==2
     delete(execfile); % kill if it is there 
@@ -27,7 +27,7 @@ fprintf(fid,'echo "Calculating eigenfunctions with MINEOS"\n');
 %
 fprintf(fid,'#\n');
 %
-fprintf(fid,['set xdir=' pathsCADMINEOS '/bin\n']); % TODOPATH should resolve manual path problems. 
+fprintf(fid,['set xdir=' paths.CADMINEOS '/bin\n']); % TODOPATH should resolve manual path problems. 
 fprintf(fid,'$xdir/mineos_nohang << ! > %s\n',logfile);
 fprintf(fid,'%s\n',cardfile);
 fprintf(fid,'%s\n',ascfile);

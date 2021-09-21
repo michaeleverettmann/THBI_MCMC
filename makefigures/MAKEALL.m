@@ -18,9 +18,9 @@ notes = [...
         ];
 
 %% ------------------------- START ------------------------- 
-global projdir THBIpath TRUEmodel
-THBIpath = '/Users/zeilon/Documents/MATLAB/BayesianJointInv';
-projdir = [THBIpath,'/',projname,'/'];
+global projdir TRUEmodel
+paths = getPaths(); 
+projdir = [paths.THBIpath,'/',projname,'/'];
 avardir = sprintf('STA_inversions/%s_dat%.0f/',sta,datN);
 
 sta = 'EYMN';

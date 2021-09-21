@@ -57,15 +57,7 @@ addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for
 % javaaddpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup/lib/TauP-2.1.1.jar'); 
 
 % Some special paths which you list here once. When transferring this code to another computer, change the path accordingly here and only here. 
-% function setPaths(); 
-% paths = struct('CADMINEOS', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/CADMINEOS',...
-%                    'PropMat', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/PropMat',...
-%                    'timeout', '/usr/local/bin/timeout',...
-%                    'THBIpath', '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM'); 
-% save('somewhere/paths.mat', 'paths'); 
-% end
 paths = getPaths(); 
-
 
 % turn warning back on
 warning('on','MATLAB:dispatcher:nameConflict');

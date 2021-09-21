@@ -2,7 +2,8 @@ function [trudata,par] = a2_LOAD_DATA(par)
 % function to load data (differs depending on which synth or real)
 
 fprintf('LOADING data\n')
-global THBIpath TRUEmodel %#ok<NUSED>
+global TRUEmodel %#ok<NUSED>
+paths = getPaths(); 
 
 %% -----------------------------------------------------------------
 %% EXAMPLE

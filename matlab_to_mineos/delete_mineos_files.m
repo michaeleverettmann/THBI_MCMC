@@ -20,12 +20,6 @@ kernelfile = [ID,'.cvfrechet']; %if exist(kernelfile,'file')~=2, kernelfile = ''
 
 % preamble
 wd = pwd;
-global MINEOSDIR
-if isempty(MINEOSDIR)
-    MINEOSDIR =  extractBefore(mfilename('fullpath'),mfilename);
-end
-% cd(MINEOSDIR);
-%% do the deleting
 
 delete([ID,'_*.asc'])
 delete([ID,'_*.eig'])
