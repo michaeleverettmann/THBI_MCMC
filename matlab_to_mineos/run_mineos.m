@@ -33,7 +33,7 @@ parm = struct('R_or_L','R',...
               'fmax',200.05,...       % max frequency (mHz) - gets reset by min period 
               'l_increment_standard',2,... % 
               'l_increment_failed',5,...
-              'maxrunN',5e2,...
+              'maxrunN',5e2,... % bb2021.09.21 changing temporarily from 5e2 to 5e1. Why would we want 500 failed iterations? That takes forever. 
               'qmodpath',[paths.THBIpath '/matlab_to_mineos/safekeeping/qmod']); % bb2021.09.14 if matlab_to_mineos gets moved this will cause a problem. 
           % replace default values with user values, where appropriate. 
 fns = fieldnames(par_mineos);
@@ -127,12 +127,13 @@ lrun = lrun + 1; lrunstr = num2str(lrun);
 lmin = llast + parm.l_increment_standard;
 
 if ifverbose
-    fprintf('\n        %4u modes done, failed after mode %u... restarting at %u',max(round(llast-lfirst+1)),llast,lmin)
+    fprintf('\n        %4u modes done, failed after mode %u... restarting at %u. Run=%1.0f',max(round(llast-lfirst+1)),llast,lmin,lrun)
 end
 
 if lrun > parm.maxrunN
-    fprintf('More than %u tries; breaking mineos eig loop\n',parm.maxrunN);
-    error;
+%     fprintf('More than %u tries; breaking mineos eig loop\n',parm.maxrunN);
+    error('bb2021.09.21 error: More than %u tries; breaking mineos eig loop\n',parm.maxrunN);
+    asdfas;lkadf % Delete this - I was worried parfor was ignoring "error"
 end
 
 

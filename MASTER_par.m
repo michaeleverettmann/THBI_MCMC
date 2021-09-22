@@ -100,7 +100,8 @@ if strcmp(projname,'SYNTHETICS') || strcmp(projname,'LAB_tests')
 end
 
 par.inv.BWclust = BWclust;
-par.inv.verbose=false;
+% par.inv.verbose=false; % bb2021.09.21 Not sure why this was set to
+% false...
 ifsavedat = false;
 
 %% get saving things ready
@@ -167,7 +168,7 @@ delete(gcp('nocreate'));
 myCluster = parcluster('local');
 maxWorkers = myCluster.NumWorkers; 
 parpool(min([par.inv.nchains,maxWorkers])); % TODOcomp May need to change based on computer. I set so that we only use as many workers as the local parallel profile will allow.  
-TD = parallel.pool.Constant(trudata);
+TD = parallel.pool.Constant(trudata); PR = parallel.pool.Constant(par);
 % (((( If not parallel: ))))
 % TD(1). Value = trudata; par.inv.verbose = 0;
 
@@ -184,10 +185,15 @@ fprintf('\n ============== STARTING CHAIN(S) ==============\n')
 %% ========================================================================
 t = now;
 % mkdir([resdir,'/chainout']);
-for iii = 1:par.inv.nchains
+parfor iii = 1:par.inv.nchains
 % for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 chainstr = mkchainstr(iii);
-
+diaryFile = sprintf('diary_%s_iter_%1.0f.txt', chainstr, iii); 
+diary off; 
+delete(diaryFile); 
+pause(0.01); % Because delete seems to fully execute after turning diary on...
+diary(diaryFile);
+par = PR.Value;
 
 %% Fail-safe to restart chain if there's a succession of failures
 fail_chain=20;
@@ -210,7 +216,7 @@ while ifpass==0
     end
 
     %% starting model kernel
-    fprintf('\nCreating starting kernels %s, have tried %1.0f times, fail_chain=%1.0f\n',chainstr, numFails, fail_chain)
+%     fprintf('\nCreating starting kernels %s, have tried %1.0f times, fail_chain=%1.0f\n',chainstr, numFails, fail_chain)
     try 
         [Kbase] = make_allkernels(model,[],TD.Value,['start',chainstr],par); % TODO this code caused a loop that would have failed infinitely. SHould not use a while loop like this. bb2021.09.14 
     catch e 
@@ -225,8 +231,7 @@ while ifpass==0
     model0_perchain{iii} = model0;
 
 end % now we have a starting model!
-
-
+diary off % Ending diary early for debugging. 
 % figure(22); clf; hold on
 % contourf(trudata.HKstack_P.K,trudata.HKstack_P.H,trudata.HKstack_P.Esum',20,'linestyle','none')
 % set(gca,'ydir','reverse')
