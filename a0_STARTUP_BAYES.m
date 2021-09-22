@@ -43,7 +43,7 @@ addpath('/Users/brennanbrunsvik/MATLAB/EilonmyFUNCTIONS'); % bb2021.08.04 added 
 % Some things needed for TauP
 javaaddpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup/lib/MatTauP-2.1.1.jar'); 
 javaaddpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup/lib/TauP-2.1.1.jar');
-addpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup'); % This might break shit. It's Seizmo. 
+addpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup'); % This might break things. It's Seizmo. 
 addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for_seizmo'); % bb2021.08.04 Just taking the absolutely necessary Seizmo tools. 
 
 
@@ -56,20 +56,22 @@ addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for
 % javaaddpath('/Users/brennanbrunsvik/MATLAB/TauP-master/gradle/wrapper/gradle-wrapper.jar')
 % javaaddpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup/lib/TauP-2.1.1.jar'); 
 
-% Some special paths which you list here once. When transferring this code to another computer, change the path accordingly here and only here. 
-% function setPaths(); 
-% paths = struct('CADMINEOS', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/CADMINEOS',...
-%                    'PropMat', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/PropMat',...
-%                    'timeout', '/usr/local/bin/timeout',...
-%                    'THBIpath', '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM'); 
-% save('somewhere/paths.mat', 'paths'); 
-% end
-paths = getPaths(); 
-
-
 % turn warning back on
 warning('on','MATLAB:dispatcher:nameConflict');
 
 global prem_anisotropic prem_isotropic
 prem_anisotropic = prem_perfect('SPVW',0.25);
 prem_isotropic = prem;
+
+% Some special paths which you list here once. Using this set and get paths
+% approach means we don't have to use global variables, which work poorly
+% (if at all) with parfor. 
+setPaths(); 
+paths = getPaths(); 
+function setPaths(); 
+paths = struct('CADMINEOS', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/CADMINEOS',...
+                   'PropMat', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/PropMat',...
+                   'timeout', '/usr/local/bin/timeout',...
+                   'THBIpath', '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM'); 
+save([paths.THBIpath '/misc/paths.mat']); 
+end
