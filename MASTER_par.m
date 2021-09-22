@@ -185,7 +185,7 @@ fprintf('\n ============== STARTING CHAIN(S) ==============\n')
 %% ========================================================================
 t = now;
 % mkdir([resdir,'/chainout']);
-parfor iii = 1:par.inv.nchains
+for iii = 1:par.inv.nchains
 % for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 chainstr = mkchainstr(iii);
 diaryFile = sprintf('diary_%s_iter_%1.0f.txt', chainstr, iii); 

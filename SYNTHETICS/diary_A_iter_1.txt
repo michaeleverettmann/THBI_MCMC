@@ -1,0 +1,12 @@
+    > Running MINEOS normal mode summation code. 
+    > Will take some time... success!
+Kernels startAR took 8.93716 s
+    > Calculting kernels from MINEOS output 
+    > Will take some time... success!
+Kernels startAR took 2.54654 s
+    > Running MINEOS normal mode summation code. 
+    > Will take some time... success!
+Kernels startAL took 1.77672 s
+    > Calculting kernels from MINEOS output 
+    > Will take some time... success!
+Kernels startAL took 1.64907 s

@@ -5,8 +5,13 @@ warning('off','MATLAB:dispatcher:nameConflict');
 % set time zone:
 setenv('TZ','America/Los_Angeles')
 
-basedir = '/Users/brennanbrunsvik/MATLAB/'; % BB Confident in this path % '/Users/zeilon/Documents/MATLAB/'; % change these to your values
-bayesdir = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/'; % '/Users/zeilon/Documents/MATLAB/BayesianJointInv/'; % 2021.08.04_TODO % change these to your values
+% Get home directory. Everything should be placed about this. 
+% Try to keep paths relative to home the same on EVERY computer. 
+[~,hd] = system('echo ~'); 
+hd = strip(hd); 
+
+basedir = [hd '/MATLAB/']; % BB Confident in this path % '/Users/zeilon/Documents/MATLAB/'; % change these to your values
+bayesdir = [hd '/Documents/UCSB/ENAM/THBI_ENAM/']; % '/Users/zeilon/Documents/MATLAB/BayesianJointInv/'; % 2021.08.04_TODO % change these to your values
 
 % You'll likely need to get all of these functions - email me if not
 % obvious. Some turn out not to be used any more, so comment out and then
@@ -21,30 +26,30 @@ addpath([bayesdir,'functions']) % inside this folder
 addpath(genpath([bayesdir, 'functions/functionsExternal'])); 
 % path to fast spline func.
 % Should go to this folder and run the CompileMex something file. 
-addpath('/Users/brennanbrunsvik/MATLAB/fastBSpline'); %  '/Users/zeilon/Dropbox/MATLAB/lib/fastBSpline'); % google "fastBSspline MATLAB" for this
+addpath([hd '/MATLAB/fastBSpline']); %  '/Users/zeilon/Dropbox/MATLAB/lib/fastBSpline'); % google "fastBSspline MATLAB" for this
 % path to propagator matrix running dir.
 addpath([bayesdir,'matlab_to_propmat']); % provided
 % path to mineos running dir.
 addpath([bayesdir,'matlab_to_mineos']); % bb2021.08.04 changed basedir to bayesdir. Pretty sure basedir was a typo. % provided
 % path to seiz models
-addpath('/Users/brennanbrunsvik/MATLAB/seizmo/models'); %'~/Dropbox/MATLAB/lib/seizmo/models') % Google "MATLAB seizmo" for this
+addpath([hd '/MATLAB/seizmo/models']); %'~/Dropbox/MATLAB/lib/seizmo/models') % Google "MATLAB seizmo" for this
 % path to HV kernels functions
 % addpath('~/Work/codes/HV_Tanimoto/matlab_to_HVkernel') % BB commented out 2021.08.04 % only if doing ellipticity ratios
 % path to Rayleigh wave dispersion curve dir
-addpath('/Users/brennanbrunsvik/MATLAB/seis_tools-master/surface_waves'); % '/Users/zeilon/Dropbox/MATLAB/seis_tools/surface_waves'); % on my github
+addpath([hd '/MATLAB/seis_tools-master/surface_waves']); % '/Users/zeilon/Dropbox/MATLAB/seis_tools/surface_waves'); % on my github
 % path to gaussfit dir
 % addpath('~/Dropbox/MATLAB/lib/gaussfit'); % BB commented 2021.08.04 % don't think used any more
 
-addpath('/Users/brennanbrunsvik/MATLAB/seis_tools-master'); % bb2021.08.04 Adding because some functions were missing that are here. I'm worried this might break something though. Why was it not already added? 
+addpath([hd '/MATLAB/seis_tools-master']); % bb2021.08.04 Adding because some functions were missing that are here. I'm worried this might break something though. Why was it not already added? 
 % addpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup_alt'); % bb2021.08.04 Need taup
 
-addpath('/Users/brennanbrunsvik/MATLAB/EilonmyFUNCTIONS'); % bb2021.08.04 added to get "maxab"
+addpath([hd '/MATLAB/EilonmyFUNCTIONS']); % bb2021.08.04 added to get "maxab"
 
 % Some things needed for TauP
-javaaddpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup/lib/MatTauP-2.1.1.jar'); 
-javaaddpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup/lib/TauP-2.1.1.jar');
-addpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup'); % This might break things. It's Seizmo. 
-addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for_seizmo'); % bb2021.08.04 Just taking the absolutely necessary Seizmo tools. 
+javaaddpath([hd '/MATLAB/seizmo/mattaup/lib/MatTauP-2.1.1.jar']); 
+javaaddpath([hd '/MATLAB/seizmo/mattaup/lib/TauP-2.1.1.jar']);
+addpath([hd '/MATLAB/seizmo/mattaup']); % This might break things. It's Seizmo. 
+addpath([hd '/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for_seizmo']); % bb2021.08.04 Just taking the absolutely necessary Seizmo tools. 
 
 
 % addpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup'); % bb2021.08.04 Need taup. 
@@ -66,12 +71,12 @@ prem_isotropic = prem;
 % Some special paths which you list here once. Using this set and get paths
 % approach means we don't have to use global variables, which work poorly
 % (if at all) with parfor. 
-setPaths(); 
-paths = getPaths(); 
-function setPaths(); 
-paths = struct('CADMINEOS', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/CADMINEOS',...
-                   'PropMat', '/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/PropMat',...
+setPaths(hd); 
+% paths = getPaths(); 
+function setPaths(hd); 
+paths = struct('CADMINEOS', [hd '/Documents/repositories/Peoples_codes/CADMINEOS'],...
+                   'PropMat', [hd '/Documents/repositories/Peoples_codes/PropMat'],...
                    'timeout', '/usr/local/bin/timeout',...
-                   'THBIpath', '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM'); 
+                   'THBIpath', [hd '/Documents/UCSB/ENAM/THBI_ENAM']); 
 save([paths.THBIpath '/misc/paths.mat']); 
 end
