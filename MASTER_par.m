@@ -1,9 +1,6 @@
 clear % clear all to make sure we use values below
 close all
 
-% Disable any warnings; 
-warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...
-
 global run_params
 paths = getPaths(); 
 
@@ -185,8 +182,12 @@ fprintf('\n ============== STARTING CHAIN(S) ==============\n')
 %% ========================================================================
 t = now;
 % mkdir([resdir,'/chainout']);
-for iii = 1:par.inv.nchains
+parfor iii = 1:par.inv.nchains
 % for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+    
+% Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
+warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    
+    
 chainstr = mkchainstr(iii);
 diaryFile = sprintf('diary_%s_iter_%1.0f.txt', chainstr, iii); 
 diary off; 
@@ -216,9 +217,11 @@ while ifpass==0
     end
 
     %% starting model kernel
-%     fprintf('\nCreating starting kernels %s, have tried %1.0f times, fail_chain=%1.0f\n',chainstr, numFails, fail_chain)
+    fprintf('\nCreating starting kernels %s, have tried %1.0f times, fail_chain=%1.0f\n',chainstr, numFails, fail_chain)
     try 
-        [Kbase] = make_allkernels(model,[],TD.Value,['start',chainstr],par); % TODO this code caused a loop that would have failed infinitely. SHould not use a while loop like this. bb2021.09.14 
+        [Kbase] = make_allkernels(model,[],TD.Value,['start',chainstr],par,...
+            'maxrunN',5); % TODO this code caused a loop that would have failed infinitely. SHould not use a while loop like this. bb2021.09.14 
+        %bb2021.09.23 Adding argument 5 where if run_mineos fails 5 (or some other small number of)times on the starting model, just toss it. No need to frett with getting a model to work with Mineos if no time is yet invested into inverting that model. 
     catch e 
         disp('Error in while - try,catch loop in MASTER_par.m')
         fprintf(1,'The identifier was:\n%s',e.identifier);
@@ -231,7 +234,7 @@ while ifpass==0
     model0_perchain{iii} = model0;
 
 end % now we have a starting model!
-diary off % Ending diary early for debugging. 
+% diary off % Ending diary early for debugging. 
 % figure(22); clf; hold on
 % contourf(trudata.HKstack_P.K,trudata.HKstack_P.H,trudata.HKstack_P.Esum',20,'linestyle','none')
 % set(gca,'ydir','reverse')
@@ -501,7 +504,7 @@ if isfield(TD.Value,'SW_Ray')
     SWs_perchain{iii} = preSW;
 end
 
-
+diary off
 end % parfor loop
 delete(gcp('nocreate'));
 

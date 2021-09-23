@@ -89,7 +89,7 @@ if ifverbose
     fprintf('    > Calculting kernels from MINEOS output \n    > Will take some time...')
 end
 %tic
-[status,cmdout] = system([paths.timeout ' 15 ./',execfile_k]); % TODOPATH bb2021.09.13, didn't double check replacement worked here. 
+[status,cmdout] = system([paths.timeout ' 100 ./',execfile_k]); % TODOPATH bb2021.09.13, didn't double check replacement worked here. 
 
 %fprintf('Kernel computation itself %s%s took %.5f s\n',ID,parm.R_or_L(1),toc)
 if ifverbose

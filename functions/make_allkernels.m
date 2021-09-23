@@ -1,4 +1,12 @@
-function [Kbase] = make_allkernels(model,Kbase,data,ID,par)
+function [Kbase] = make_allkernels(model,Kbase,data,ID,par,options)
+    arguments
+        model
+        Kbase
+        data
+        ID
+        par
+        options.maxrunN
+    end
 % [Kbase] = make_allkernels(model,Kbase,periods,ID,par)
 %   Function to make all surface wave kernels
 
@@ -19,7 +27,7 @@ for id = 1:length(par.inv.datatypes)
         Kbase = populate_Kbase( Kbase,dtype,HVr_new,[],{HVK_new} );    
     else
         par_mineos = struct('R_or_L',pdtyp{2},'phV_or_grV',pdtyp{3},'ID',ID);
-        [phV,grV,eigfiles] = run_mineos(model,data.(dtype).periods,par_mineos,0,0,par.inv.verbose);
+        [phV,grV,eigfiles] = run_mineos(model,data.(dtype).periods,par_mineos,0,0,par.inv.verbose,options.maxrunN);
         K = run_kernels(data.(dtype).periods,par_mineos,eigfiles,1,0,par.inv.verbose);
         Kbase = populate_Kbase( Kbase,dtype,phV,grV,{K} );
     end
