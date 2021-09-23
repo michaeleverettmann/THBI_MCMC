@@ -1,6 +1,6 @@
 function [traces,tt,status,cmdout] = run_propmat(LAYmodel,ID,ph,samprate,inc,synthperiod,nsamps,cutf,sourc)
 % [traces,tt,status,cmdout] = run_propmat(LAYmodel,ID,ph,samprate,inc,synthperiod,nsamps,cutf,sourc)
-% 
+paths = getPaths(); 
 % Function to run the propagator matrix code for a given layerised model. 
 demoPlot = false; % whether to plot the propmat results
 
@@ -73,7 +73,7 @@ end
 system(['chmod +u+x ' execfile]);
 
 %% do PropMatrix on it
-[status,cmdout] = system(['/usr/local/bin/gtimeout 10 ./',execfile]); 
+[status,cmdout] = system([paths.timeout ' 15 ./',execfile]); 
 
 %% read PropMatrix output
 [traces,tt] = readPROPMATtr(odatfile);

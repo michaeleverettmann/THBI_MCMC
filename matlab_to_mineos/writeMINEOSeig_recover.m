@@ -8,7 +8,7 @@ function writeMINEOSeig_recover( execfile,eigfile,l_last )
 %  eigfile   - name of eigenfunctions output binary file to fix
 %  l_last    - last successful mode in this eig file
 
-
+paths = getPaths(); 
 
 if exist(execfile,'file')==2
     delete(execfile); % kill if it is there 
@@ -20,7 +20,7 @@ fprintf(fid,'#!/bin/csh\n');
 %
 fprintf(fid,'#\n');
 %
-fprintf(fid,'set xdir=./CADMINEOS/bin\n');
+fprintf(fid,['set xdir=' paths.CADMINEOS '/bin\n']); 
 fprintf(fid,'$xdir/eig_recover << !\n');
 fprintf(fid,'%s\n',eigfile);
 fprintf(fid,'%u\n',l_last);

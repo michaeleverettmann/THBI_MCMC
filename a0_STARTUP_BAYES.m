@@ -74,9 +74,18 @@ prem_isotropic = prem;
 setPaths(hd); 
 % paths = getPaths(); 
 function setPaths(hd); 
+% system('FILE=/usr/local/bin/timeout;if test -f "$FILE"; then; echo "$FILE exists.";fi')
+if isfile('/usr/local/bin/timeout'); % Would be better to do system('which timeout'), but system does not have the normal $PATH, and cannot always find timeout. 
+    timeoutpath = '/usr/local/bin/timeout'; 
+elseif isfile('/usr/bin/timeout'); 
+    timeoutpath = '/usr/bin/timeout'; 
+else
+    error('Brennan warning: cannot find timeout path on your computer. Needed for Mineos. Find it in shell script using which timeout or which gtimeout, then enter it as timeoutpath.')
+end
+
 paths = struct('CADMINEOS', [hd '/Documents/repositories/Peoples_codes/CADMINEOS'],...
                    'PropMat', [hd '/Documents/repositories/Peoples_codes/PropMat'],...
-                   'timeout', '/usr/local/bin/timeout',...
+                   'timeout', timeoutpath,...
                    'THBIpath', [hd '/Documents/UCSB/ENAM/THBI_ENAM']); 
 save([paths.THBIpath '/misc/paths.mat']); 
 end
