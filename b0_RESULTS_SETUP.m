@@ -2,8 +2,8 @@ function [ misfits,allmodels,savedat,log_likelihood ] = b0_RESULTS_SETUP(par )
 % [ misfits,allmodels,savedat ] = b0_RESULTS_SETUP(par )
 % 
 %  Function to set up the results structures for the inversion
-
 %% OUTPUT
+
 o=[];
 Nsave = ceil(par.inv.niter/par.inv.saveperN);
 nn = nan(Nsave,1);
@@ -21,6 +21,7 @@ misfits = struct('globmaxL',0,'lastL',0,'lastlogL',-Inf,... % minimum global err
 %       rms  = the root mean squared error for each dat type, i.e. sqrt(E2/N)
 %       E2   = the normalised, weighted, sum of squared errors
              
+
              
 % log likelihood
 log_likelihood = -Inf;

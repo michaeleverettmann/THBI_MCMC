@@ -1,4 +1,15 @@
-function [phV,grV,eigfiles_fix] = run_mineos(model,swperiods,par_mineos,ifdelete,ifplot,ifverbose)
+function [phV,grV,eigfiles_fix] = run_mineos(model,swperiods,par_mineos,ifdelete,ifplot,ifverbose,maxrunN)
+% Note: Cannot actually use the arguments - options approach since the
+% function is already built to work using nargin. .... Matlab...
+%     arguments 
+%         model
+%         swperiods
+%         par_mineos
+%         ifdelete
+%         ifplot
+%         ifverbose
+%         options.maxrunN = 5e2 % This was default value Zach/Jon had. But when we are trying to initiate a model and it fails, no need to try 500 times before we decide it fails. 
+%     end
 % [phV,grV] = run_mineos(model,swperiods,par_mineos,ifdelete,ifplot,ifverbose)
 % 
 % Function to run the MINEOS for a given model and extract the phase
@@ -21,6 +32,9 @@ end
 if nargin < 6 || isempty(ifverbose)
     ifverbose = true;
 end
+if nargin < 7 || isempty(maxrunN) 
+    maxrunN = 5e2; 
+end
 
 %% parameters
 % default parameters
@@ -33,7 +47,7 @@ parm = struct('R_or_L','R',...
               'fmax',200.05,...       % max frequency (mHz) - gets reset by min period 
               'l_increment_standard',2,... % 
               'l_increment_failed',5,...
-              'maxrunN',5e2,... % bb2021.09.21 changing temporarily from 5e2 to 5e1. Why would we want 500 failed iterations? That takes forever. 
+              'maxrunN',maxrunN,... % bb2021.09.21 changing temporarily from 5e2 to 5e1. Why would we want 500 failed iterations? That takes forever. 
               'qmodpath',[paths.THBIpath '/matlab_to_mineos/safekeeping/qmod']); % bb2021.09.14 if matlab_to_mineos gets moved this will cause a problem. 
           % replace default values with user values, where appropriate. 
 fns = fieldnames(par_mineos);
@@ -107,7 +121,7 @@ writeMINEOSmodefile( modefile, modetype,parm.lmin,parm.lmax,parm.fmin,parm.fmax 
 writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
 system(['chmod u+x ' execfile]); % change execfile permissions
-[status,cmdout] = system([paths.timeout ' 15 ./',execfile]); % make sure your system can see your timeout function
+[status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % make sure your system can see your timeout function
 
 delete(execfile,modefile); % kill files we don't need
 
@@ -146,7 +160,7 @@ writeMINEOSmodefile( modefile, modetype,lmin,parm.lmax,parm.fmin,parm.fmax )
 writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
 system(['chmod u+x ' execfile]); % change execfile permissions
-[status,cmdout] = system([paths.timeout ' 15 ./',execfile]); % run execfile 
+[status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % run execfile 
 
 delete(execfile,modefile); % kill files we don't need
 
@@ -184,7 +198,7 @@ for ief = 1:length(eigfiles)-1
     writeMINEOSeig_recover( execfile,eigfiles{ief},llasts(ief) )
     
     system(['chmod u+x ' execfile]); % change execfile permissions
-    [status,cmdout] = system([paths.timeout ' 15 ./',execfile]); % run execfile 
+    [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % run execfile 
     
     eigfiles_fix{ief} = [eigfiles{ief},'_fix'];
     delete(execfile);
@@ -195,7 +209,8 @@ qexecfile = [ID,'.run_mineosq'];
 writeMINEOS_Qexecfile( qexecfile,eigfiles_fix,qmod,[ID,'.q'],[ID,'.log'] )
 
 system(['chmod u+x ' qexecfile]); % change qexecfile permissions
-[status,cmdout] = system([paths.timeout ' 15 ./',qexecfile]); % run qexecfile 
+% error('Brennan stopping here for debugging on ERI machines')
+[status,cmdout] = system([paths.timeout ' 100 ./',qexecfile]); % run qexecfile 
 
 
 delete(qexecfile);
