@@ -1,20 +1,23 @@
 %% Script to establish a database of stations and events for body wave study
 clear all
 ifrunall = true;
+ifdownloadseed = false; 
 
-proj = struct('name','NWUS');
-proj.dir = ['~/Documents/MATLAB/BayesianJointInv/',proj.name];
+run('../a0_STARTUP_BAYES.m')
+paths = getPaths(); 
+proj = struct('name','ENAM');
+proj.dir = [paths.THBIpath '/' proj.name];
 
 %% Station parameters
-sta_latlims = [40 55]; % [min_lat max_lat] for stations
-sta_lonlims = [-130 -85]; % [min_lon max_lon] for stations
+sta_latlims = [29.5 43.5]; % [min_lat max_lat] for stations
+sta_lonlims = [-88.2 -65.4]; % [min_lon max_lon] for stations
 sta_chans = 'BH*,HH*'; % channel codes to search for
 starttime = '1970-01-01 00:00:00';
-startbytime = '2010-01-01 00:00:00';
-min_longevity_yrs = 10;
+startbytime = '2030-01-01 00:00:00';
+min_longevity_yrs = 0.6;
 
 %% Event parameters
-mag_lims = [5.7 7.4];
+mag_lims = [5.0 7.8];
 dep_lims = [0 1000]; % set to [0 1000] by default (km)
 gc_lims  = [30 75];
 % startafter = '1990-01-01 00:00:00'; % earliest evtime (yyyy-mm-dd HH:MM:SS)
@@ -25,7 +28,7 @@ samprate = 40;
 datwind =  [-100 100];
 
 %% ID for IRIS DMC request
-IRIS_ID = 'zeilon';
+IRIS_ID = 'bbrunsvik';
 
 
 %% GET TO WORK
@@ -44,8 +47,8 @@ if exist(proj.infodir,'dir')~=7, mkdir(proj.infodir); end
 proj.respdir = [proj.dir,'INFO/RESP/'];
 if exist(proj.respdir,'dir')~=7, mkdir(proj.respdir); end
 % data files directory 
-proj.rawdatadir = ['/Volumes/data/THBI/',proj.name,'/STAsrawdat/'];
-proj.STAinversions = ['/Volumes/data/THBI/',proj.name,'/STASinv/'];
+proj.rawdatadir = paths.rawdatadir;
+proj.STAinversions = paths.STAinversions;
 if exist(proj.rawdatadir,'dir')~=7, mkdir(proj.rawdatadir); end
 if exist(proj.STAinversions,'dir')~=7, mkdir(proj.STAinversions); end
 
@@ -77,7 +80,7 @@ if ~ifrunall
 end
 
 %% Get station + channel information
-javaaddpath('/Users/zeilon/Documents/MATLAB/IRIS-WS-2.0.15.jar')
+% bb2021.09.27 Make sure you have IRIS-WS-2.0.18.jar or something similar added to java path for this part. Should have been added to the path in a0_STARTUP_BAYES.M
 % save station request info
 stations_request = struct('lat_lims',sta_latlims,'lon_lims',sta_lonlims,'chans',sta_chans,...
                           'starttime',starttime,'startbytime',startbytime,'min_longevity_yrs',min_longevity_yrs);
@@ -87,6 +90,11 @@ stations_IRIS = irisFetch.Stations('station','*','*','*','BH?',...
     'boxcoordinates',[sta_latlims,sta_lonlims],'StartAfter',starttime,'StartBefore',startbytime);
 %only include stations satisfying longevity
 starter = datenum({stations_IRIS.StartDate}');
+for ed = 1:length(stations_IRIS); % This isn't vectorized because it's a cell function and that was a pain. bb2021.09.27
+    if length(stations_IRIS(ed).EndDate) < 3; % We get [] for active stations. I chose length < 3 arbitrarily. Even 1 should work, but 3 feels safer.  
+        stations_IRIS(ed).EndDate = '2099-12-31 00:00:00.000'; 
+    end
+end
 ender = datenum({stations_IRIS.EndDate}'); ender(ender>now)= now;
 stations_IRIS = stations_IRIS((ender - starter)/365.25 >= min_longevity_yrs)
 
@@ -139,14 +147,16 @@ if ~ifrunall
     return
 end
 
-%% Response SAC_PZ files
-% Build and send BREQFAST request file for dataless seed                     
-addpath('~/Dropbox/MATLAB/seis_tools/breqfasting/');
-breq_fast_request([proj.name,'_dataless'],IRIS_ID,{stations_IRIS.StationCode}','*',{stations_IRIS.NetworkCode}','',{stations_IRIS.StartDate}',{stations_IRIS.EndDate}','dataless_SEED',[proj.name,'_dataless_request']);
-movefile([proj.name,'_dataless_request'],proj.respdir);
-return 
-%% ======= WAIT FOR NOTIFICATION THAT DATALESS SEED IS ON SERVER ======= %%
-% Download and process dataless seed  
-breq_fast_dataless_PZprocess([proj.name,'_dataless'],IRIS_ID,proj.respdir,{'BH*','HH*'},1 )     
-return
+if ifdownloadseed; 
+    %% Response SAC_PZ files
+    % Build and send BREQFAST request file for dataless seed                     
+    addpath('~/Dropbox/MATLAB/seis_tools/breqfasting/');
+    breq_fast_request([proj.name,'_dataless'],IRIS_ID,{stations_IRIS.StationCode}','*',{stations_IRIS.NetworkCode}','',{stations_IRIS.StartDate}',{stations_IRIS.EndDate}','dataless_SEED',[proj.name,'_dataless_request']);
+    movefile([proj.name,'_dataless_request'],proj.respdir);
+    return 
+    %% ======= WAIT FOR NOTIFICATION THAT DATALESS SEED IS ON SERVER ======= %%
+    % Download and process dataless seed  
+    breq_fast_dataless_PZprocess([proj.name,'_dataless'],IRIS_ID,proj.respdir,{'BH*','HH*'},1 )     
+    return
+end
                         

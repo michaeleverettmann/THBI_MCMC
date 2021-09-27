@@ -1,4 +1,6 @@
 %% script to put various things on path neded for inversion 
+% Because this is so project dependent, probably will need to put in in the proj.name folder eventually. 
+proj = struct('name', 'ENAM'); % Subfolder where this inversions stuff is stored. 
 
 % turn off warning about name conflict with matlab builtin isstring
 warning('off','MATLAB:dispatcher:nameConflict');
@@ -7,7 +9,7 @@ setenv('TZ','America/Los_Angeles')
 
 % Get home directory. Everything should be placed about this. 
 % Try to keep paths relative to home the same on EVERY computer. 
-[~,hd] = system('echo ~'); 
+[~,hd] = system('echo ~'); % TODO use getenv('HOME') to get home directory
 hd = strip(hd); 
 
 basedir = [hd '/MATLAB/']; % BB Confident in this path % '/Users/zeilon/Documents/MATLAB/'; % change these to your values
@@ -48,6 +50,8 @@ addpath([hd '/MATLAB/EilonmyFUNCTIONS']); % bb2021.08.04 added to get "maxab"
 % Some things needed for TauP
 javaaddpath([hd '/MATLAB/seizmo/mattaup/lib/MatTauP-2.1.1.jar']); 
 javaaddpath([hd '/MATLAB/seizmo/mattaup/lib/TauP-2.1.1.jar']);
+javaaddpath([hd '/MATLAB/iris/IRIS-WS-2.0.18.jar']); % bb2021.09.27 moving this path from evdata1_database.m. Should be just for downloading station data from IRIS. 
+
 addpath([hd '/MATLAB/seizmo/mattaup']); % This might break things. It's Seizmo. 
 addpath([hd '/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for_seizmo']); % bb2021.08.04 Just taking the absolutely necessary Seizmo tools. 
 
@@ -71,9 +75,9 @@ prem_isotropic = prem;
 % Some special paths which you list here once. Using this set and get paths
 % approach means we don't have to use global variables, which work poorly
 % (if at all) with parfor. 
-setPaths(hd); 
+setPaths(hd,proj); 
 % paths = getPaths(); 
-function setPaths(hd); 
+function setPaths(hd,proj); 
 % system('FILE=/usr/local/bin/timeout;if test -f "$FILE"; then; echo "$FILE exists.";fi')
 if isfile('/usr/local/bin/timeout'); % Would be better to do system('which timeout'), but system does not have the normal $PATH, and cannot always find timeout. 
     timeoutpath = '/usr/local/bin/timeout'; 
@@ -86,6 +90,8 @@ end
 paths = struct('CADMINEOS', [hd '/Documents/repositories/Peoples_codes/CADMINEOS'],...
                    'PropMat', [hd '/Documents/repositories/Peoples_codes/PropMat'],...
                    'timeout', timeoutpath,...
-                   'THBIpath', [hd '/Documents/UCSB/ENAM/THBI_ENAM']); 
+                   'THBIpath', [hd '/Documents/UCSB/ENAM/THBI_ENAM'],...
+                   'rawdatadir', ['/Volumes/data/',proj.name,'/THBI/STAsrawdat/'],...
+                   'STAinversions', ['/Volumes/data/',proj.name,'/THBI/STASinv/'] ); 
 save([paths.THBIpath '/misc/paths.mat']); 
 end

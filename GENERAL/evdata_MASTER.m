@@ -4,7 +4,7 @@ close all
 if exist('ALLrequests','dir')~=7, mkdir('ALLrequests'); end
 
 
-evdata1_stations
+evdata1_stations % evdata1_database.m is the new version of this I guess? it does produce stainfo, so maybe... 
 stainfo_master = stainfo;
 
 % request data
