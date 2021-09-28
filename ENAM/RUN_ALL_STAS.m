@@ -63,9 +63,9 @@ end
 
 function execute_MASTER_par
     global run_params
-    try
-        MASTER_par;
-    catch
-         1;
-    end
+%     try
+    MASTER_par;
+%     catch
+%          1;
+%     end
 end
