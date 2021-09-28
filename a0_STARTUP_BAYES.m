@@ -93,5 +93,9 @@ paths = struct('CADMINEOS', [hd '/Documents/repositories/Peoples_codes/CADMINEOS
                    'THBIpath', [hd '/Documents/UCSB/ENAM/THBI_ENAM'],...
                    'rawdatadir', ['/Volumes/data/',proj.name,'/THBI/STAsrawdat/'],...
                    'STAinversions', ['/Volumes/data/',proj.name,'/THBI/STASinv/'] ); 
+paths.rawdatadir = [paths.THBIpath '/data/STAsrawdat/']; % bb2021.09.28 if this takes too much local storage, put it on external drives. 
+paths.STAinversions = [paths.THBIpath '/data/STASinv/']; % bb2021.09.28 if this takes too much local storage, put it on external drives. 
+% 'rawdatadir', ['/Volumes/data/',proj.name,'/THBI/STAsrawdat/'],... % bb2021.09.28 Could use these locations to keep data on NAS. Not so important though if you aren't downloading a bunch of waveform data I think. 
+% 'STAinversions', ['/Volumes/data/',proj.name,'/THBI/STASinv/'] ); 
 save([paths.THBIpath '/misc/paths.mat']); 
 end

@@ -15,17 +15,17 @@ try
 catch
     run([proj.dir,'/project_details.m']);
 end
-load([proj.infodir,'stations.mat']);
+load([proj.infodir,'stations.mat']); % bb2021.09.28 Get this using evdata1_database.m
 
 %% specify details of this run
-generation = 30; % generation of solution and data processing
+generation = 1; % generation of solution and data processing
 gc = 1;
 BWclust = 1;
-STAMP = 'NWUS_CCP_HK';
+STAMP = 'ENAM_trial';
 
 onesta = '';
 
-overwrite = false;
+overwrite = true;
 
 %% put parameters in place for running all stations
 global run_params

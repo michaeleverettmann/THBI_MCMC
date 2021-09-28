@@ -141,7 +141,7 @@ stainfo.chandips = chandips;
 stainfo.chanazs = chanazs;
 
                         
-save([proj.infodir,'/stations'],'stainfo','stations_IRIS','stations_request');
+save([proj.infodir,'stations'],'stainfo','stations_IRIS','stations_request');
 
 if ~ifrunall
     return
