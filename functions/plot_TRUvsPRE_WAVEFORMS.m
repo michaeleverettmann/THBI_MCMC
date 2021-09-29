@@ -114,7 +114,7 @@ switch pdtyp{1}
         xlabel(xa2, sprintf('Time from %s arrival',pdtyp{2}(1)),'fontsize',18)
         
         if strcmp(pdtyp{3},'ccp')
-            set([xa1,xa2],'xlim',minmax(trudata.(dtype)(itr).zz))
+            set([xa1,xa2],'xlim',minmax(trudata.(dtype)(itr).zz')); 
             xlabel(xa2,'Depth of conversion (km)','fontsize',18)
         end
     

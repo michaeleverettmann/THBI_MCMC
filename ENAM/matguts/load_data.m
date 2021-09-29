@@ -1,5 +1,6 @@
 function [ trudata,zeroDstr ] = load_data( par )
 %[ trudata,cheatstr ] = load_data( par )
+paths = getPaths(); 
 
 if nargin < 6
     baz = [];
@@ -18,7 +19,8 @@ BWavardir = par.data.avardir;
 sta = par.data.stadeets.sta;
 nwk = par.data.stadeets.nwk;
 
-seismoddir = '/Volumes/data/models_seismic/';
+seismoddir = [paths.models_seismic '/']; 
+% seismoddir = '/Volumes/data/models_seismic/';
 % if ~exist(seismoddir,'dir')
 %     try
 %         seismoddir = '/Volumes/eilon_data/models_seismic/';

@@ -63,10 +63,11 @@ xlim(ax4,[0,max(xmx)])
 
 
 %% GET TARGET MODEL for comparison
+% disp('plot_SUITE_of_MODELS.m - bb2021.09.28 commented code to load shen and ritzwoller 1d profile. We are using PREM profile for reference. will need to fix paths here to get shen and ritzwoller plot')
 if nargin > 4 && ~isempty(lalo)
 % read 1D profile from Shen and Ritzwoller model
-    ncfile = '~/Work/data/models_seismic/SR16_3d_Vs/US.2016.nc';
-    if ~exist(ncfile), ncfile = regexprep(ncfile,'~','/Volumes/zeilon'); end
+    paths = getPaths(); 
+    ncfile = [paths.models_seismic '/SR16_3d_Vs/US.2016.nc']; % bb2021.09.28 not tested yet, may have a typo. 
     [ model ] = read_seismodel_nc( ncfile );
 
     vs = squeeze(model.Vsv(mindex(model.lon,mod(lalo(2),360)),mindex(model.lat,lalo(1)),:));

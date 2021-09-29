@@ -2,6 +2,7 @@ close all
 clear all
 %% Setup
 run('../a0_STARTUP_BAYES.m')
+evdata1_database; disp('Temporary - downloading station info in RUN_ALL_STAS.m') 
 
 paths = getPaths(); 
 proj = struct('name','ENAM');
@@ -38,7 +39,8 @@ run_params.STAMP = STAMP;
 run_params.overwrite = overwrite;
 
 %% ==================  LOOP OVER STATIONS IN DB  ================== 
-for is = 1:stainfo.nstas % done 30-end, need to do before and after...
+% for is = 1:stainfo.nstas % done 30-end, need to do before and after...
+for is = [1]; disp('Only doing 1 station right now!!!!')
     
     if exist('onesta') && ~isempty(onesta)
         if ~strcmp(stainfo.stas{is},onesta), continue; end
