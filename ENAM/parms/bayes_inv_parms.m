@@ -65,7 +65,7 @@
 %                  'Nsavestate',100               ,... % Niter per which the state of the parallel inversion is saved in .mat file
 %                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
 %                  'BWclust',1                     ,... % option to use only one c x    
-%                  'datatypes',{{'RF_Sp_ccp'}})  
+%                  'datatypes',{{'SW_Ray_phV', 'RF_Sp_ccp'}})  
 % %                  'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}})  
 %                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
 %                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
@@ -88,7 +88,7 @@ inv = struct(    'verbose',true                  ,... % option to spit out more 
                  'Nsavestate',15                 ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x    
-                 'datatypes',{{'SW_Ray_phV', 'RF_Sp_ccp'}})  
+                 'datatypes',{{'SW_Lov_phV'}})  
 
 %                  'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}})  
                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 

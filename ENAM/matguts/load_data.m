@@ -217,7 +217,7 @@ if any(strcmp(allpdytp(:,1),'SW'))
 
     %% -------- Love waves
 	if any(strcmp(allpdytp(strcmp(allpdytp(:,1),'SW'),2),'Lov'))
-        [Lperiods,LphV]  = Lph_dispcurve_latlon( slat,slon); % grab composite of AN and EQ
+        [Lperiods,LphV]  = Lph_dispcurve_latlon( slat,slon); % 
 
         if ~isempty(LphV)
             [Lperiods,iT] = sort(Lperiods);
