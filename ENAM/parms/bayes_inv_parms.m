@@ -22,35 +22,35 @@
 %                  'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}});  
 %                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
 %                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
-%                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
+%                                 %          'RF_x_y' with x='Sp/Ps' and y=' /ccp';}}
 %                                 %          'HKstack_x' with x='P'
-
-disp('NOT REAL SYNTHETIC\nUsing fast, debuging options (few iterations). See: bays_inv_parms.m')                                
-inv = struct(    'verbose',true                 ,... % option to spit out more information+plots
-                 'niter',50                    ,... % Number of iterations
-                 'burnin',20                    ,... % don't record results before burnin iterations
-                 'cooloff',100                    ,... % # of iterations over which temperature declines as erf
-                 'tempmax',5                     ,... % maximum multiple of all standard deviations
-                 'saveperN',1                   ,... % save only every saveperN iterations    % bb2021.09.14 savig each one, since I have 100 iterations, this way we can still do probability math (taking the 5 most poorly performing models... otherwise, we get code errors later on).    
-                 'bestNmod2keep',-5000           ,... % keep only the best N models in each chain, defined here
-                 'kerneltolmax',1.5              ,... % kernel max. tolerance - max norm of perturbation before re-calc kernels
-                 'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-                 'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-                 'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-                 'nchains',1                    ,... % number of chains to start in parallel
-                 'Nsavestate',15               ,... % Niter per which the state of the parallel inversion is saved in .mat file
-                 'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
-                 'BWclust',1                     ,... % option to use only one c x    
-                 'datatypes',{{'RF_Sp_ccp'}})  
-
-%                  'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}})  
-                                % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
-                                %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
-                                %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
-                                %          'HKstack_x' with x='P'
-                                
-% disp('5000 iterations, 28 chains. See: bays_inv_parms.m')                                
-% inv = struct(    'verbose',false                 ,... % option to spit out more information+plots
+% 
+% disp('NOT REAL SYNTHETIC\nUsing fast, debuging options (few iterations). See: bays_inv_parms.m')                                
+% inv = struct(    'verbose',true                 ,... % option to spit out more information+plots
+%                  'niter',50                    ,... % Number of iterations
+%                  'burnin',20                    ,... % don't record results before burnin iterations
+%                  'cooloff',20                    ,... % # of iterations over which temperature declines as erf
+%                  'tempmax',5                     ,... % maximum multiple of all standard deviations
+%                  'saveperN',1                   ,... % save only every saveperN iterations    % bb2021.09.14 savig each one, since I have 100 iterations, this way we can still do probability math (taking the 5 most poorly performing models... otherwise, we get code errors later on).    
+%                  'bestNmod2keep',-5000           ,... % keep only the best N models in each chain, defined here
+%                  'kerneltolmax',1.5              ,... % kernel max. tolerance - max norm of perturbation before re-calc kernels
+%                  'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
+%                  'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
+%                  'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
+%                  'nchains',28                    ,... % number of chains to start in parallel
+%                  'Nsavestate',15               ,... % Niter per which the state of the parallel inversion is saved in .mat file
+%                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
+%                  'BWclust',1                     ,... % option to use only one c x    
+%                  'datatypes',{{'RF_Sp_ccp'}})  
+% 
+% %                  'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}})  
+%                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
+%                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
+%                                 %          'RF_x_y' with x='Sp/Ps' and y=' /ccp';}}
+%                                 %          'HKstack_x' with x='P'
+%                                 
+% disp('NOT REAL SYNTHETIC\nUsing fast, debuging options (few iterations). See: bays_inv_parms.m')                                
+% inv = struct(    'verbose',true                 ,... % option to spit out more information+plots
 %                  'niter',5000                    ,... % Number of iterations
 %                  'burnin',2000                    ,... % don't record results before burnin iterations
 %                  'cooloff',1500                    ,... % # of iterations over which temperature declines as erf
@@ -64,36 +64,38 @@ inv = struct(    'verbose',true                 ,... % option to spit out more i
 %                  'nchains',28                    ,... % number of chains to start in parallel
 %                  'Nsavestate',100               ,... % Niter per which the state of the parallel inversion is saved in .mat file
 %                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
-%                  'BWclust',1                     ,... % option to use only one c x             
+%                  'BWclust',1                     ,... % option to use only one c x    
+%                  'datatypes',{{'RF_Sp_ccp'}})  
+% %                  'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}})  
+%                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
+%                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
+%                                 %          'RF_x_y' with x='Sp/Ps' and y=' /ccp';}}
+%                                 %          'HKstack_x' with x='P'     
+
+disp('Surface wave trials')                                
+inv = struct(    'verbose',true                  ,... % option to spit out more information+plots
+                 'niter',50                      ,... % Number of iterations
+                 'burnin',20                     ,... % don't record results before burnin iterations
+                 'cooloff',20                    ,... % # of iterations over which temperature declines as erf
+                 'tempmax',5                     ,... % maximum multiple of all standard deviations
+                 'saveperN',1                    ,... % save only every saveperN iterations    % bb2021.09.14 savig each one, since I have 100 iterations, this way we can still do probability math (taking the 5 most poorly performing models... otherwise, we get code errors later on).    
+                 'bestNmod2keep',-5000           ,... % keep only the best N models in each chain, defined here
+                 'kerneltolmax',1.5              ,... % kernel max. tolerance - max norm of perturbation before re-calc kernels
+                 'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
+                 'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
+                 'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
+                 'nchains',3                    ,... % number of chains to start in parallel
+                 'Nsavestate',15                 ,... % Niter per which the state of the parallel inversion is saved in .mat file
+                 'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
+                 'BWclust',1                     ,... % option to use only one c x    
+                 'datatypes',{{'SW_Ray_phV', 'RF_Sp_ccp'}})  
+
 %                  'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}})  
-%                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
-%                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
-%                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
-%                                 %          'HKstack_x' with x='P'
-
-% disp('NOT REAL SYNTHETIC\nUsing fast, fast run this mac, only 4 chains. See: bays_inv_parms.m')                                
-% % Inversion parms
-% inv = struct(    'verbose',false                 ,... % option to spit out more information+plots
-%                  'niter',1000                   ,... % Number of iterations
-%                  'burnin',7000                   ,... % don't record results before burnin iterations
-%                  'cooloff',4000                  ,... % # of iterations over which temperature declines as erf
-%                  'tempmax',5                     ,... % maximum multiple of all standard deviations
-%                  'saveperN',30                   ,... % save only every saveperN iterations       
-%                  'bestNmod2keep',-5000           ,... % keep only the best N models in each chain, defined here
-%                  'kerneltolmax',1.5              ,... % kernel max. tolerance - max norm of perturbation before re-calc kernels
-%                  'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-%                  'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-%                  'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-%                  'nchains',4                    ,... % number of chains to start in parallel
-%                  'Nsavestate',2500               ,... % Niter per which the state of the parallel inversion is saved in .mat file
-%                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
-%                  'BWclust',1                     ,... % option to use only one c x             
-%                  'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}});  
-%                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
-%                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
-%                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
-%                                 %          'HKstack_x' with x='P'
-
+                                % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
+                                %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
+                                %          'RF_x_y' with x='Sp/Ps' and y=' /ccp';}}
+                                %          'HKstack_x' with x='P'
+                                
 %% Model parms
 modl = struct([]);
 

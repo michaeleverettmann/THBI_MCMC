@@ -195,7 +195,7 @@ end
 if any(strcmp(allpdytp(:,1),'SW'))
 
     %% Phase velocity data
-    if ~exist(seismoddir,'dir'); error('bb2021.09.27 where is seismodir?'); end % , seismoddir = regexprep(seismoddir,'~','/Volumes/zeilon'); end 
+%     if ~exist(seismoddir,'dir'); error('bb2021.09.27 where is seismodir?'); end % , seismoddir = regexprep(seismoddir,'~','/Volumes/zeilon'); end 
     addpath(seismoddir);
 
     slat = par.data.stadeets.Latitude;

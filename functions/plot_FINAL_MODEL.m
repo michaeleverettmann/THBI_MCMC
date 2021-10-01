@@ -68,22 +68,22 @@ end
 set(ax2,'ydir','reverse','fontsize',14,'yticklabel','',...
     'ytick',[0:25:max(Zdh)],'ylim',[0 max(Zdh)],'xlim',[0 1.05*max(nm/sum(nm))],...
     'color','none','box','on');
-title(ax2,'Disc.','fontsize',20)
-xlabel(ax2,'fraction','fontsize',16)
+title(ax2,'Disc.','fontsize',20);
+xlabel(ax2,'fraction','fontsize',16);
 
 %% model anisotropy histograms
 %crust
 X = midpts(linspace(0.90,1.1,40));
 No = hist(posterior.xicrust(:,end),X)/posterior.Nstored;
 bar(ax3(1),X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
-set(ax3(1),'fontsize',14,'xlim',[0.90,1.1],'ylim',[0 1.05*max(No)],'ytick',[])
-xlabel(ax3(1),'Crust anis (%)','fontsize',16)
+set(ax3(1),'fontsize',14,'xlim',[0.90,1.1],'ylim',[0 1.05*max(No)],'ytick',[]);
+xlabel(ax3(1),'Crust anis (%)','fontsize',16);
 %mantle
 X = midpts(linspace(0.90,1.1,40));
 No = hist(posterior.ximant(:,end),X)/posterior.Nstored;
 bar(ax3(2),X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
-set(ax3(2),'fontsize',14,'xlim',[0.90,1.1],'ylim',[0 1.05*max(No)],'ytick',[])
-xlabel(ax3(2),'Mantle anis (%)','fontsize',16)
+set(ax3(2),'fontsize',14,'xlim',[0.90,1.1],'ylim',[0 1.05*max(No)],'ytick',[]); 
+xlabel(ax3(2),'Mantle anis (%)','fontsize',16); 
 
 
 %% GET TARGET MODEL for comparison

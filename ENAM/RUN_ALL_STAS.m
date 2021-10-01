@@ -22,7 +22,7 @@ load([proj.infodir,'stations.mat']); % bb2021.09.28 Get this using evdata1_datab
 generation = 1; % generation of solution and data processing
 gc = 1;
 BWclust = 1;
-STAMP = 'ENAM_trial';
+STAMP = 'ENAM_trial_US_CEH';
 
 onesta = '';
 
@@ -38,9 +38,12 @@ run_params.datN = generation;
 run_params.STAMP = STAMP;
 run_params.overwrite = overwrite;
 
+tempSta = and(string({stations_IRIS.NetworkCode})=='US', string({stations_IRIS.StationCode})=='CEH'); 
+tempStaInd = find(tempSta); 
+
 %% ==================  LOOP OVER STATIONS IN DB  ================== 
 % for is = 1:stainfo.nstas % done 30-end, need to do before and after...
-for is = [1]; disp('Only doing 1 station right now!!!!')
+for is = tempStaInd; disp('Only doing 1 station right now!!!!')
     
     if exist('onesta') && ~isempty(onesta)
         if ~strcmp(stainfo.stas{is},onesta), continue; end
