@@ -255,7 +255,12 @@ end
 if any(strcmp(allpdytp(:,1),'HKstack'))
 	fprintf('\n pulling out EARS H-K stack\n')
     EARSdir = [seismoddir,'US_EARS'];
-    load(sprintf('%s/EARS_HKStack_%s_%s.mat',EARSdir,nwk,sta));
+    try; 
+        hkstack = load(sprintf('%s/EARS_HKStack_%s_%s.mat',EARSdir,nwk,sta));
+        hkstack = hkstack.hkstack; 
+    catch
+        error('bb2021.10.01 Dont have h-k stack for station %s.%s. Should make code to handle this situation', nwk, sta)
+    end    
     if isempty(hkstack.Nobs)
         fprintf('\t Not sure how many EQ in EARS obs - assigning 100\n');
         hkstack.Nobs = 100;
