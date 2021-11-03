@@ -1,9 +1,0 @@
-#!/bin/csh
-#
-echo "Calculating HV ratios and kernels"
-#
-set xdir=/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/HV_ellipticity/bin
-$xdir/HVkernel << ! > test1.log
-test1.model
-test1.out
-!

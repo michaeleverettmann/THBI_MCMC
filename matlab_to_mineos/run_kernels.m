@@ -12,7 +12,7 @@ if nargin < 2 || isempty(par_mineos)
     par_mineos = [];
 end
 if nargin < 3 || isempty(eigfiles)
-    eigfiles = {[ID,'_0.eig']};
+    eigfiles = {[par_mineos.ID,'_0.eig']}; % brb2021.11.03 TODO This will break if you do not provide par_mineos! Previously, it just utilized the (undefined) variable ID, which is supposed to come from par_mineos. 
 end
 if nargin < 4 || isempty(ifdelete)
     ifdelete = true;
