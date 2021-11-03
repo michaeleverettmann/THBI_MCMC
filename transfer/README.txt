@@ -15,4 +15,4 @@ ssh -N -L 8080:localhost:8080 brunsvik@tong.eri.ucsb.edu
 Paste one of the returned links from terminal into my local machines browser. Should be good to go!
 
 Might be a good way to run matlab scripts over ssh
-nohup matlab -nodisplay -nodesktop -nosplash -batch "run('RUN_ALL_STAS.m')"
+rm nohup.out; nohup matlab -nodisplay -nodesktop -nosplash -batch "run('RUN_ALL_STAS.m')"

@@ -1,6 +1,10 @@
 % must be in this directory to run
 clear 
+addpath('../'); 
+run('../../a0_STARTUP_BAYES.m'); 
 load examplemodel.mat
+TRUEmodel.Vs = TRUEmodel.VS; % It's not clear now if we use VS or vs... will fix this later. bb2021.10.04
+TRUEmodel.Vp = TRUEmodel.VP; 
 swperiods = [16,20,24,28,32,36,40,50,60,70,80,90]'; Np = length(swperiods);
 % HVtool
 [HVr,HVK,phV,grV] = run_HVkernel(TRUEmodel,swperiods,'test1',1,1,1);

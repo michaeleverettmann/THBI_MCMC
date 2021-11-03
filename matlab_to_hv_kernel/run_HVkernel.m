@@ -22,7 +22,7 @@ if nargin < 6 || isempty(ifverbose)
     ifverbose = true;
 end
 
-
+paths = getPaths(); 
 
 %% filenames
 if ~ischar(ID), ID = num2str(ID);end
@@ -34,7 +34,7 @@ logfile = [ID,'.log'];
 
 %% =======================================================================
 wd = pwd;
-cd('/Users/zeilon/Work/codes/HV_Tanimoto/matlab_to_HVkernel'); % TODOpath
+cd([paths.THBIpath '/matlab_to_hv_kernel']); 
 
 
 %% model is an input file or a matlab structure?
@@ -54,7 +54,8 @@ system(['chmod u+x ' execfile]);
 if ifverbose
     fprintf('    > Running HV kernel computation code. \n    > Will take some time...')
 end
-[status,cmdout] = system(['/opt/local/bin/gtimeout 100 ./',execfile]);
+% [status,cmdout] = system(['/opt/local/bin/gtimeout 100 ./',execfile]);
+[status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % TODOPath
 if ifverbose
      fprintf(' success!\n')
 end
@@ -64,8 +65,8 @@ if status~=124
     [HVr,HVK,phV,grV] = readHVkernel_ofile(ofile,swperiods,ifplot);
     HVr = -1./HVr;
     catch
-        fprintf('some error - check model file layers not too thin!\n')
-        error
+%         fprintf(
+        error('some error - check model file layers not too thin!\n')
     end
     phV = phV(:);
     grV = grV(:);

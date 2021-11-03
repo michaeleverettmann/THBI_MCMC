@@ -25,6 +25,7 @@ fprintf('\n =========== STARTING PARALLEL CHAINS ===========\n')
 %% ========================================================================
 t = now;
 parfor iii = 1:Nchains 
+sprintf('Prior chain %1.0f', iii)
 % for iii= 1:Nchains; 
 % disp('IMPORTANT: NOT RUNNING PARALLEL NOW IN a3_BUILD_EMPIRICAL_PRIOR.m')
 

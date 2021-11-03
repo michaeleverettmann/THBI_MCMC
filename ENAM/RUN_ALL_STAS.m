@@ -22,7 +22,7 @@ load([proj.infodir,'stations.mat']); % bb2021.09.28 Get this using evdata1_datab
 generation = 1; % generation of solution and data processing
 gc = 1;
 BWclust = 1;
-STAMP = 'ENAM_trial_US_CEH';
+STAMP = 'ENAM_trial_US_LSCT';
 
 onesta = '';
 
@@ -38,7 +38,8 @@ run_params.datN = generation;
 run_params.STAMP = STAMP;
 run_params.overwrite = overwrite;
 
-tempSta = and(string({stations_IRIS.NetworkCode})=='US', string({stations_IRIS.StationCode})=='CEH'); 
+% tempSta = and(string({stations_IRIS.NetworkCode})=='US', string({stations_IRIS.StationCode})=='CEH'); 
+tempSta = and(string(stainfo.nwk)=='US', string(stainfo.stas)=='LSCT'); 
 tempStaInd = find(tempSta); 
 
 %% ==================  LOOP OVER STATIONS IN DB  ================== 
