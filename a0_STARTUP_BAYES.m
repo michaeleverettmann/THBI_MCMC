@@ -101,7 +101,9 @@ paths.STAinversions = [paths.THBIpath '/data/STASinv/']; % bb2021.09.28 if this 
 % 'rawdatadir', ['/Volumes/data/',proj.name,'/THBI/STAsrawdat/'],... % bb2021.09.28 Could use these locations to keep data on NAS. Not so important though if you aren't downloading a bunch of waveform data I think. 
 % 'STAinversions', ['/Volumes/data/',proj.name,'/THBI/STASinv/'] ); 
 % save([paths.THBIpath '/misc/paths.mat']); 
-matlab.io.saveVariablesToScript('pathsAutoGen.m', 'paths')
+% [status, cmdout] = system('rm ./*pathsAutoGen.m')
+delete('pathsAutoGen.m')
+matlab.io.saveVariablesToScript([paths.THBIpath '/pathsAutoGen.m'], 'paths')
 
 addpath(paths.models_seismic); % bb2021.11.02 Needed for some functions which access data. I thought this was already added somewhere but I don't see where. 
 end

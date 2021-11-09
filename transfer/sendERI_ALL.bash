@@ -11,5 +11,7 @@ transferFolds=\
 for fold in $transferFolds
 do 
     cd $fold
+    echo '**********'
+    echo $fold 
     ./sendERI.bash
 done

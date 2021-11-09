@@ -1,5 +1,6 @@
 clear 
-% load TRUEmodel.mat
+addpath('../'); 
+run('../../a0_STARTUP_BAYES.m'); 
 load examplemodel.mat
 swperiods = [16,20,24,28,32,36,40,50,60,70,80,90]'; Np = length(swperiods);
 TRUEmodel.Vs = TRUEmodel.VS; % It's not clear now if we use VS or vs... will fix this later. bb2021.10.04
@@ -23,6 +24,8 @@ figure(11), clf,
 hold on
 plot(swperiods,[phV_1(:),phV_2(:)],'linewidth',2)
 plot(swperiods,[grV_1(:),grV_2(:)],'linewidth',2)
+title('Phase and group velocities Mineos and H/V. Should look similar.')
+exportgraphics(gcf, 'executionTest.pdf')
 
 %% Report the differences 
 disp('****************')
@@ -35,6 +38,7 @@ disp('(grv_HVkernel - grv_mineos)/phv_HVkernel, at each period, =:')
 (grV_1 - grV_2)./phV_1
 disp('If these are sufficiently similar, you are maybe good to go?')
 disp('****************')
+disp('Also check out executionTest.pdf to verify MINEOS and H/V codes gave similar results. ')
 
 %% Compare kernels
 figure(88), clf; set(gcf,'pos',[680 385 999 713]);
