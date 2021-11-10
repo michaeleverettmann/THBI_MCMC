@@ -42,7 +42,8 @@ if ischar(model) && exist(model,'file')==2
     modfile = model;
     delcard = false;
 else
-	writeHVkernel_modfile(modfile,model.Z,model.Vp,model.Vs,model.rho,[],[],1./swperiods);
+% 	writeHVkernel_modfile(modfile,model.Z,model.Vp,model.Vs,model.rho,[],[],1./swperiods);
+	writeHVkernel_modfile(modfile,model.z,model.VP,model.VS,model.rho,[],[],1./swperiods);
     delcard =true;
 end
 

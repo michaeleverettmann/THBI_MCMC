@@ -230,7 +230,7 @@ if any(strcmp(allpdytp(:,1),'SW'))
 
     %% -------- Rayleigh HV ratios
 	if any(strcmp(allpdytp(strcmp(allpdytp(:,1),'SW'),2),'HV'))
-        [ HVratios,HVstds,HVperiods] = disp_curve_HV( round_level([slat,slon],0.1),0,[],10,1.5);
+        [ HVratios,HVstds,HVperiods] = disp_curve_HV( round_level([slat,slon],0.1),0,paths.models_seismic,10,1.5);
 
         [HVperiods,iT] = sort(HVperiods);
         HVratios = HVratios(iT);

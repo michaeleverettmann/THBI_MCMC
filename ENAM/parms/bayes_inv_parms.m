@@ -38,9 +38,9 @@
 %                  'Nsavestate',15                 ,... % Niter per which the state of the parallel inversion is saved in .mat file
 %                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
 %                  'BWclust',1                     ,... % option to use only one c x    
-%                  'datatypes',{{'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'}})  
-% %                  'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}})  
-%                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
+%                  'datatypes',{{'SW_HV'}})  
+% %                  'datatypes',{{'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'}})  
+%                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV', or x=HV; 
 %                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
 %                                 %          'RF_x_y' with x='Sp/Ps' and y=' /ccp';}}
 %                                 %          'HKstack_x' with x='P'
@@ -79,10 +79,10 @@ inv = struct(    'verbose',false                 ,... % option to spit out more 
                  'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'nchains',28                    ,... % number of chains to start in parallel
-                 'Nsavestate',1000               ,... % Niter per which the state of the parallel inversion is saved in .mat file
+                 'Nsavestate',100                ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x             
-                 'datatypes',{{'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'}})  
+                 'datatypes',{{'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}})  
                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
