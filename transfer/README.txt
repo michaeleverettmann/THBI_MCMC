@@ -9,6 +9,8 @@ jupyter lab --no-browser --port=8080
 Connect local computer to the 8080 port at remote computer using local machines terminal (change computer name to whatever you need... e.g.) 
 ssh -N -L 8080:localhost:8080 brunsvik@anvil.eri.ucsb.edu
 ssh -N -L 8080:localhost:8080 brunsvik@tong.eri.ucsb.edu
+ssh -N -L 8080:localhost:8080 brunsvik@bellows.eri.ucsb.edu
+
 
 
 
