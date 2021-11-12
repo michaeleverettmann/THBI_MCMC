@@ -38,7 +38,7 @@ cd(projdir);
 % pathsToChange = loadPathsToChange(); bb2021.09.13 Started this but it's going to be a PITA
 
 run([paths.THBIpath,'/a0_STARTUP_BAYES']);
-load('project_details');
+load('project_details'); %TODO_STATION_NETWORK bb2021.11.12
 addpath([proj.dir,'matguts/']);
 
 
@@ -185,8 +185,8 @@ parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor
 % Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
 warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    
     
-chainstr = mkchainstr(iii);
-diaryFile = sprintf('diary_%s_iter_%1.0f.txt', chainstr, iii); 
+chainstr = [nwk '.' sta '_' mkchainstr(iii)];%TODO_STATION_NETWORK bb2021.11.12
+diaryFile = sprintf('diary_%s_iter_%1.0f.txt', chainstr, iii); %TODO_STATION_NETWORK bb2021.11.12
 diary off; 
 delete(diaryFile); 
 pause(0.01); % Because delete seems to fully execute after turning diary on...
