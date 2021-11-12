@@ -1,7 +1,7 @@
 function [ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,data )
 %[ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,data )
 
-ID = 'finalmod';
+ID = [par.data.stadeets.nwk '.' par.data.stadeets.sta '_finalmod'];
 
 %% ===================  PUT INTO DATA STRUCTURE  ===================
 final_predata = data;

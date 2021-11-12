@@ -1,6 +1,6 @@
 #/bin/bash 
 staList='batch/staList.txt'
-pid='batch/process_ID.txt'
+pid='batch/run_info/process_ID.txt'
 
 cd .. 
 
@@ -10,7 +10,7 @@ task(){
 network=$(echo $line | head -n1 | awk '{print $1;}')
 station=$(echo $line | head -n1 | awk '{print $2;}')
 echo Running: $network $station
-nohup matlab -nodisplay -nosplash -nodesktop -r "network='$network'; station='$station'; RUN_one_station" &> nohup$network.$station.out 
+nohup matlab -nodisplay -nosplash -nodesktop -r "network='$network'; station='$station'; RUN_one_station" &> batch/run_info/nohup$network.$station.out 
 }
 
 echo '************** New Run **************' !>> $pid
