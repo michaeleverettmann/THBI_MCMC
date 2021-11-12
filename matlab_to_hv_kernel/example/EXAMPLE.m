@@ -21,3 +21,5 @@ hp = plot(swperiods,HVr,'o-','Linewidth',2);
 set(gca,'fontsize',16)
 xlabel('Period (s)','fontsize',18,'fontweight','bold');
 ylabel('H/V ratio','fontsize',18,'fontweight','bold');
+
+exportgraphics(figure(3), 'sens_kers_HV.pdf')

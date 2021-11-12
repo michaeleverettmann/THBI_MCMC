@@ -27,11 +27,7 @@ end
 
 
 
-notes = [...
-    'NOTRELEVANTYETNot using Ps data, not permitting mantle anisotropy. '...
-    'Moho constrained between 30 and 40 km depth - cf SR16. '...
-    'Relaxed condition of no negative crustal velocity gradients. '...
-];
+notes = ['']; 
 
 %% ------------------------- START -------------------------
 global projdir TRUEmodel
@@ -51,7 +47,7 @@ addpath([proj.dir,'matguts/']);
 run parms/bayes_inv_parms
 if strcmp(projname,'SYNTHETICS')
     if isfield(par.synth,'noisetype') && strcmp(par.synth.noisetype,'real'), sta=['SYNTH_',sta]; else sta = 'SYNTH'; end
-    par.stadeets = struct('sta',sta','nwk','--');
+    par.stadeets = struct('sta',sta','nwk','--'); 
 
 	% noise details, if "real"
 	noisesta = 'RSSD';
