@@ -68,7 +68,7 @@
                                 
                                 
 % inv = struct(    'verbose',false                 ,... % option to spit out more information+plots
-%                  'niter',8000                    ,... % Number of iterations
+%                  'niter',8000                     ,... % Number of iterations
 %                  'burnin',2000                    ,... % don't record results before burnin iterations
 %                  'cooloff',1500                    ,... % # of iterations over which temperature declines as erf
 %                  'tempmax',5                     ,... % maximum multiple of all standard deviations

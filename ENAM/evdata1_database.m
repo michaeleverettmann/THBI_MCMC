@@ -1,5 +1,6 @@
 %% Script to establish a database of stations and events for body wave study
-clear all
+% Don't use clear at the beginning of this script. Sometimes I run it after
+% already having provided network/station name in RUN_one_sta.m
 ifrunall = true;
 ifdownloadseed = false; 
 

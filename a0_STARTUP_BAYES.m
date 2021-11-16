@@ -1,4 +1,7 @@
 %% script to put various things on path neded for inversion 
+% Don't use clear at the beginning of this script. Sometimes I run it after
+% already having provided network/station name in RUN_one_sta.m
+
 % Because this is so project dependent, probably will need to put in in the proj.name folder eventually. 
 proj = struct('name', 'ENAM'); % Subfolder where this inversions stuff is stored. 
 

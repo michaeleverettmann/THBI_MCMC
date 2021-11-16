@@ -1,19 +1,21 @@
 % function RUN_one_station(net, sta) % Can comment out the function part of this and run as normal script, if you define net and sta. But have to move run_param
 %
 
-%%%%% Important! Must define network and station before runnig this! 
-% network = 'US' ; 
-% station = 'CEH'; 
-% network = input('Network? (use quotes):')
-disp('Network and station') 
-disp(network) 
-disp(station)
-
-% close all
-% clear all
-%% Setup
+%% setup data and stuff. 
+% evdata1_database; disp('Temporary - downloading station info in RUN_ALL_STAS.m') 
+RUN_prep_data; warning('bb2021.11.15. Doing RUN_prep_data in RUN_one_station - but this only needs to be ran once, not for every station.') % Gets event data and data paths on this computer. 
 run('../a0_STARTUP_BAYES.m')
 
+
+%%%%% Important! Must define network and station before runnig this! 
+% network_manual = 'US' ; disp('resetting to US.CEH')
+% station_manual = 'CEH'; disp('resetting to US.CEH')
+% network = input('Network? (use quotes):')
+disp('Network and station') 
+disp(network_manual) 
+disp(station_manual)
+
+% Paths stuff
 paths = getPaths(); 
 proj = struct('name','ENAM');
 proj.dir = [paths.THBIpath '/' proj.name];
@@ -48,7 +50,7 @@ run_params.datN = generation;
 run_params.STAMP = STAMP;
 run_params.overwrite = overwrite;
 
-tempSta = and(string(stainfo.nwk)==network, string(stainfo.stas)==station); 
+tempSta = and(string(stainfo.nwk)==network_manual, string(stainfo.stas)==station_manual); 
 
 tempStaInd = find(tempSta); 
 

@@ -4,13 +4,17 @@ pid='batch/run_info/process_ID.txt'
 
 cd .. 
 
+# First, make sure we have the correct station files and paths on this computer. (otherwise paths might be generated on different computer than what you are using. )
+matlab -nodisplay -nosplash -nodesktop -r "RUN_prep_data; exit"
+
 # The task to run for each parallel iteration. 
 # Get network and station name, then either run or submit request to run inversion. 
 task(){
 network=$(echo $line | head -n1 | awk '{print $1;}')
 station=$(echo $line | head -n1 | awk '{print $2;}')
 echo Running: $network $station
-nohup matlab -nodisplay -nosplash -nodesktop -r "network='$network'; station='$station'; RUN_one_station" &> batch/run_info/nohup$network.$station.out 
+pwd
+nohup matlab -nodisplay -nosplash -nodesktop -r "network_manual='$network'; station_manual='$station'; RUN_one_station" &> batch/run_info/nohup$network.$station.out 
 }
 
 echo '************** New Run **************' !>> $pid
