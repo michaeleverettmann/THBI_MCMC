@@ -1,0 +1,8 @@
+Several example Slurm scripts. 
+https://help.rc.ufl.edu/doc/Sample_SLURM_Scripts 
+
+Manual. Explanation of all options. 
+https://slurm.schedmd.com/sbatch.html
+
+To cancel my task, and make sure I only cancel tasks that I started: e.g.
+scancel --user=brunsvik 12405

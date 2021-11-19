@@ -160,6 +160,10 @@ end
 delete(gcp('nocreate'));
 myCluster = parcluster('local');
 maxWorkers = myCluster.NumWorkers; 
+% % Use the following two lines if you want more parallel chains than you have cores. 
+% % myCluster.NumWorkers = max(maxWorkers, par.inv.nchains); % bb2021.11.18 temporary, for testing purposes. 
+% % maxWorkers = myCluster.NumWorkers; 
+
 parpool(min([par.inv.nchains,maxWorkers])); % TODOcomp May need to change based on computer. I set so that we only use as many workers as the local parallel profile will allow.  
 TD = parallel.pool.Constant(trudata); PR = parallel.pool.Constant(par);
 % (((( If not parallel: ))))
@@ -179,6 +183,11 @@ fprintf('\n ============== STARTING CHAIN(S) ==============\n')
 t = now;
 % mkdir([resdir,'/chainout']);
 % parfor iii = 1:par.inv.nchains
+
+if profileRun;  % Start profiling parfor iterations, where most calculations happen. 
+    mpiprofile on; 
+end
+
 parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 % disp('Not in parallel!!!')
     
@@ -503,6 +512,14 @@ end
 
 diary off
 end % parfor loop
+
+if profileRun; % Get results from profiling. 
+    mpiprofile off; 
+    mpiStats = mpiprofile('info'); 
+    save mpiProfileData mpiStats; % Save profile results. Can transfer from HPC and bring to local computer for viewing. 
+    % Use this to see the results: load('mpiProfileData'); mpiprofile('viewer', mpiStats);
+end % Start profiling parfor iterations, where most calculations happen. 
+
 delete(gcp('nocreate'));
 
 %% ========================================================================

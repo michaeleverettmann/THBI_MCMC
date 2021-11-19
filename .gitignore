@@ -19,6 +19,8 @@ data/**
 **.asc 
 **.mode
 **.run_mineos
+**vel_profile 
+**pathsAutoGen.m 
 
 
 **.DS_Store
