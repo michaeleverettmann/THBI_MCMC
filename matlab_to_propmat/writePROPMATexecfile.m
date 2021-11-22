@@ -38,7 +38,7 @@ elseif strcmp(PS,'Sp')
     excite = '0 1 0';
 end
 
-if exist(execfile,'file')==2
+if exist(execfile,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow
     delete(execfile); % kill if it is there 
 end
 

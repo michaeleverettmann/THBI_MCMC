@@ -134,7 +134,7 @@ plot_TRU_WAVEFORMS(trudata);
 
 %% ===========================  PRIOR  ===========================
 % see if prior exists already
-if exist([proj.dir,'prior.mat'],'file')
+if exist([proj.dir,'prior.mat'],'file') 
     a = load([proj.dir,'prior.mat']);
     % only do prior if par has changed
     redoprior = par_equiv_prior(par,a.par);
@@ -189,7 +189,7 @@ if profileRun;  % Start profiling parfor iterations, where most calculations hap
 end
 
 parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-% disp('Not in parallel!!!')
+% warning('BB2021.11.22 Not in parallel!!!')
     
 % Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
 warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    

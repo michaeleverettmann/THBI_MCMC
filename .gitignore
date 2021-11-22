@@ -21,6 +21,7 @@ data/**
 **.run_mineos
 **vel_profile 
 **pathsAutoGen.m 
+**nohup**.out
 
 
 **.DS_Store
@@ -53,3 +54,16 @@ junk/**
 external_code_STORAGE/**
 code_storage_DELETE**/**
 ENAM/batch/process_ID.txt
+
+**process_ID.txt
+ENAM/process_ID_**
+
+ENAM/finalmod.model
+ENAM/finalmodR.log
+ENAM/old_running_files/**
+matlab_to_hv_kernel/startB.log
+matlab_to_hv_kernel/startB.run_HVker
+matlab_to_hv_kernel/startB.out
+matlab_to_hv_kernel/startB.model
+
+**pathsAutoGen.m

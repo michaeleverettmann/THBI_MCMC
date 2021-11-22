@@ -139,13 +139,13 @@ if ifdelete
     delete([ID,'.q'])
     delete([ID,'_*.eig'])
     delete([ID,'_*.eig_fix'])
-    if exist([ID,'.log'],'file')==2, delete([ID,'.log']); end
+    if exist([ID,'.log'],'file')==2, delete([ID,'.log']); end %TODOEXIST bb2021.11.22 exist is SUPER slow
 	delete(execfile_k,stripfile,tabfile,[tabfile,'_hdr'],[tabfile,'_hdr.branch']);
-    if exist(kernelfile,'file')==2,delete(regexprep(kernelfile,'cv','gv'));end
-    if exist(regexprep(kernelfile,'.fre','.cvfre'),'file')==2,delete(regexprep(kernelfile,'.fre','.cvfre'));end
-    if exist(regexprep(kernelfile,'.fre','.gvfre'),'file')==2,delete(regexprep(kernelfile,'.fre','.gvfre'));end
+    if exist(kernelfile,'file')==2,delete(regexprep(kernelfile,'cv','gv'));end %TODOEXIST bb2021.11.22 exist is SUPER slow
+    if exist(regexprep(kernelfile,'.fre','.cvfre'),'file')==2,delete(regexprep(kernelfile,'.fre','.cvfre'));end %TODOEXIST bb2021.11.22 exist is SUPER slow
+    if exist(regexprep(kernelfile,'.fre','.gvfre'),'file')==2,delete(regexprep(kernelfile,'.fre','.gvfre'));end %TODOEXIST bb2021.11.22 exist is SUPER slow
 	for ip = 1:size(ikernelfiles,2)*size(ikernelfiles,1), delete(ikernelfiles{ip}); end
-    if exist(logfile,'file')==2, delete(logfile); end
+    if exist(logfile,'file')==2, delete(logfile); end %TODOEXIST bb2021.11.22 exist is SUPER slow
 end
 cd(wd);
 

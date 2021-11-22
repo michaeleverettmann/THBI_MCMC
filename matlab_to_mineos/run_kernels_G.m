@@ -4,6 +4,8 @@ function [SW_V_kernels] = run_kernels_G(swperiods,R_or_L,ph_or_gr,ID,ifanis,ifde
 % Function to calculate perturbational phase velocity kernels, having
 % previously run MINEOS
 
+warning('bb2021.11.22: I wasnt using this function at this date. Its horribly slow due to exist() calls. Replace those with java.io.exist()')
+
 if nargin < 3 || isempty(R_or_L)
     R_or_L = 'R';
 end

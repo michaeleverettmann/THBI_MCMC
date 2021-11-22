@@ -18,6 +18,8 @@ function ikernelfiles = writeKERNELCALCexecfile(swperiods,R_or_L,ph_gr,execfile,
 %  ikprefix  - prefix for output individual kernel files at each freq.
 %  logfile   - name of file to print screen output to
 
+warning('bb2021.11.22: I wasnt using this function at this date. Its horribly slow due to exist() calls. Replace those with java.io.exist()')
+
 ikernelfiles = cell({});
 
 if exist(execfile,'file')==2

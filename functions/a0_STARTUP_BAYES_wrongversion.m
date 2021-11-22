@@ -29,7 +29,7 @@ addpath([bayesdir,'matlab_to_mineos']); % bb2021.08.04 changed basedir to bayesd
 % path to seiz models
 addpath('/Users/brennanbrunsvik/MATLAB/seizmo/models'); %'~/Dropbox/MATLAB/lib/seizmo/models') % Google "MATLAB seizmo" for this
 % path to HV kernels functions
-% addpath('~/Work/codes/HV_Tanimoto/matlab_to_HVkernel') % BB commented out 2021.08.04 % only if doing ellipticity ratios
+% addpath('~/Work/codes/HV_Tanimoto/matlab_to_HVkernel') % BB commented out 2021.08.04 % only if doing ellipticity ratios % bb2021.11.02 This folder was moved inside the THBI folder. 
 % path to Rayleigh wave dispersion curve dir
 addpath('/Users/brennanbrunsvik/MATLAB/seis_tools-master/surface_waves'); % '/Users/zeilon/Dropbox/MATLAB/seis_tools/surface_waves'); % on my github
 % path to gaussfit dir

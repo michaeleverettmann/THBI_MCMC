@@ -39,7 +39,16 @@ elseif strcmp(PS,'Sp')
     excite = '0 1 0';
 end
 
-if exist(execfile,'file')==2
+% %%% Temporary. Testing.  time consumption of different options in profiler. bb2021.11.22
+% exist(execfile,'file')==2; % Test old approach. 
+% exist([pwd '/' execfile],'file')==2; % Test if we give specific directory. Maybe still slow if file not present? 
+% java.io.File(execfile, 'file').exists % Java option - Stackexchange test suggests 400x speedup. 
+% java.io.File([pwd '/' execfile], 'file').exists % Just for fun. 
+% %%% End Temporary testing. 
+
+
+% if exist(execfile,'file')==2 % timeit( @() (exist(execfile,'file')==2) ) ; % timeit( @() java.io.File(execfile, 'file').exists ) ; % timeit( @() delete(execfile))
+if exist(execfile,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow % timeit( @() (exist(execfile,'file')==2) ) ; % timeit( @() java.io.File(execfile, 'file').exists ) ; % timeit( @() delete(execfile))
     delete(execfile); % kill if it is there
 end
 
