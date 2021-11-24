@@ -27,20 +27,20 @@ delete([ID,'_*.eig_fix'])
 
 %TODOEXIST bb2021.11.22 exist is SUPER slow
 % bb2021.11.22 Due to all these exist bits, delete_mineos_files.m was a VERY time consuming function. 
-if exist(execfile,'file')==2, delete(execfile); end
-if exist(cardfile,'file')==2, delete(cardfile); end
-if exist(eigfile,'file')==2, delete(eigfile); end
-if exist(eigfile_fix,'file')==2, delete(eigfile); end
-if exist(qfile,'file')==2, delete(qfile); end
-if exist(stripfile,'file')==2, delete(stripfile); end
-if exist(tabfile,'file')==2, delete(tabfile); end
-if exist(kernelfile,'file')==2, delete(kernelfile); end
-if exist(tabfile,'file')==2, delete(tabfile); end
-if exist(tabfile_hdr,'file')==2, delete(tabfile_hdr); end
-if exist(branchfile,'file')==2, delete(branchfile); end
+if java.io.File([pwd '/' execfile],'file').exists, delete(execfile); end
+if java.io.File([pwd '/' cardfile],'file').exists, delete(cardfile); end
+if java.io.File([pwd '/' eigfile],'file').exists, delete(eigfile); end
+if java.io.File([pwd '/' eigfile_fix],'file').exists, delete(eigfile); end
+if java.io.File([pwd '/' qfile],'file').exists, delete(qfile); end
+if java.io.File([pwd '/' stripfile],'file').exists, delete(stripfile); end
+if java.io.File([pwd '/' tabfile],'file').exists, delete(tabfile); end
+if java.io.File([pwd '/' kernelfile],'file').exists, delete(kernelfile); end
+if java.io.File([pwd '/' tabfile],'file').exists, delete(tabfile); end
+if java.io.File([pwd '/' tabfile_hdr],'file').exists, delete(tabfile_hdr); end
+if java.io.File([pwd '/' branchfile],'file').exists, delete(branchfile); end
 %TODOEXIST bb2021.11.22 exist is SUPER slow
 
-if exist(execfile_k,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow
+if java.io.File([pwd '/' execfile_k]).exists %TODOEXIST bb2021.11.22 exist is SUPER slow
 %     try
 % %     delete(execfile_k,stripfile,tabfile,kernelfile,[tabfile,'_hdr'],[tabfile,'_hdr.branch']);
 %     catch
@@ -50,8 +50,8 @@ if exist(execfile_k,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow
         delete(ikernelfiles{ip}); 
     end
 end
-if exist(execfile_k,'file')==2, delete(execfile_k); end %TODOEXIST bb2021.11.22 exist is SUPER slow
-if exist(logfile,'file')==2, delete(logfile); end %TODOEXIST bb2021.11.22 exist is SUPER slow
+if java.io.File([pwd '/' execfile_k]).exists, delete(execfile_k); end %TODOEXIST bb2021.11.22 exist is SUPER slow
+if java.io.File([pwd '/' logfile]).exists, delete(logfile); end %TODOEXIST bb2021.11.22 exist is SUPER slow
 
 % postamble
 cd(wd);

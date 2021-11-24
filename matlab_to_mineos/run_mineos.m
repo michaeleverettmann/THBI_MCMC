@@ -76,7 +76,7 @@ wd = pwd;
 
 
 %% write MINEOS executable and input files format
-if ischar(model) && exist(model,'file')==2 % input model is a card file, not a matlab structure %TODOEXIST bb2021.11.22 exist is SUPER slow
+if ischar(model) && java.io.File([pwd '/' model]).exists; % exist(model,'file')==2 % input model is a card file, not a matlab structure %TODOEXIST bb2021.11.22 exist is SUPER slow
     cardfile = model; % 'model' is just the path to the cardfile
     delcard = false; % do not delete the card file you fed in
 else
@@ -236,7 +236,7 @@ if ifdelete
     delete([ID,'.q'])
     delete([ID,'_*.eig'])
     delete([ID,'_*.eig_fix'])
-    if exist([ID,'.log'],'file')==2, delete([ID,'.log']); end %TODOEXIST bb2021.11.22 exist is SUPER slow
+    if java.io.File([pwd '/' ID '.log']).exists, delete([ID,'.log']); end %TODOEXIST bb2021.11.22 exist is SUPER slow
     if delcard, delete(cardfile); end
 end
 cd(wd);

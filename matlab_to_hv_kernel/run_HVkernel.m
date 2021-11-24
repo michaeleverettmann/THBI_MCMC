@@ -38,7 +38,7 @@ cd([paths.THBIpath '/matlab_to_hv_kernel']);
 
 
 %% model is an input file or a matlab structure?
-if ischar(model) && exist(model,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow
+if ischar(model) && java.io.File([pwd '/' model]).exists; %exist(model,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow
     modfile = model;
     delcard = false;
 else
@@ -80,7 +80,7 @@ end
 %% delete files
 if ifdelete
     delete(execfile,ofile);
-    if exist(logfile,'file')==2, delete(logfile); end %TODOEXIST bb2021.11.22 exist is SUPER slow
+    if java.io.File([pwd '/' logfile]).exists, delete(logfile); end %TODOEXIST bb2021.11.22 exist is SUPER slow
     if delcard, delete(modfile); end
 end
 cd(wd);

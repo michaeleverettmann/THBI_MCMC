@@ -13,7 +13,7 @@ function writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,logfile
 
 paths = getPaths(); 
 
-if exist(execfile,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow
+if java.io.File([pwd '/' execfile]).exists; % exist(execfile,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow
     delete(execfile); % kill if it is there 
 end
 
