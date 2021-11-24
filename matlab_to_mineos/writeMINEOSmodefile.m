@@ -27,7 +27,7 @@ end
 
 
 
-if exist(modefile,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow
+if java.io.File([pwd '/' modefile]).exists ; % exist(modefile,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow
     delete(modefile); % kill if it is there 
 end
 

@@ -38,7 +38,7 @@ elseif strcmp(PS,'Sp')
     excite = '0 1 0';
 end
 
-if exist(execfile,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow
+if java.io.File([pwd '/' execfile]).exists %TODOEXIST bb2021.11.22 exist is SUPER slow %TODO_nottested
     delete(execfile); % kill if it is there 
 end
 
