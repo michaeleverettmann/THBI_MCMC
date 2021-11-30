@@ -120,7 +120,8 @@ modefile = [ID,'_',lrunstr,'.mode'];
 writeMINEOSmodefile( modefile, modetype,parm.lmin,parm.lmax,parm.fmin,parm.fmax )
 writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
-system(['chmod u+x ' execfile]); % change execfile permissions
+% system(['chmod u+x ' execfile]); % change execfile permissions
+fileattrib(execfile, '+x'); 
 [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % make sure your system can see your timeout function
 
 delete(execfile,modefile); % kill files we don't need
@@ -159,7 +160,8 @@ modefile = [ID,'_',lrunstr,'.mode'];
 writeMINEOSmodefile( modefile, modetype,lmin,parm.lmax,parm.fmin,parm.fmax )
 writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
-system(['chmod u+x ' execfile]); % change execfile permissions
+% system(['chmod u+x ' execfile]); % change execfile permissions
+fileattrib(execfile, '+x'); 
 [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % run execfile 
 
 delete(execfile,modefile); % kill files we don't need
@@ -197,7 +199,8 @@ for ief = 1:length(eigfiles)-1
     execfile = [ID,'_',lrunstrs{ief},'.eig_recover'];
     writeMINEOSeig_recover( execfile,eigfiles{ief},llasts(ief) )
     
-    system(['chmod u+x ' execfile]); % change execfile permissions
+    % system(['chmod u+x ' execfile]); % change execfile permissions
+    fileattrib(execfile, '+x'); 
     [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % run execfile 
     
     eigfiles_fix{ief} = [eigfiles{ief},'_fix'];
@@ -208,7 +211,8 @@ end
 qexecfile = [ID,'.run_mineosq'];
 writeMINEOS_Qexecfile( qexecfile,eigfiles_fix,qmod,[ID,'.q'],[ID,'.log'] )
 
-system(['chmod u+x ' qexecfile]); % change qexecfile permissions
+% system(['chmod u+x ' qexecfile]); % change qexecfile permissions
+fileattrib(qexecfile, '+x'); 
 % error('Brennan stopping here for debugging on ERI machines')
 [status,cmdout] = system([paths.timeout ' 100 ./',qexecfile]); % run qexecfile 
 

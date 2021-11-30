@@ -1,3 +1,2 @@
 US CEH
-US CNNC
 # For some reason have to have a final line that isn't used. 

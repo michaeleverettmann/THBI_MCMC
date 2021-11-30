@@ -82,7 +82,8 @@ wd = pwd;
     
 %% write kernel calc executable
 ikernelfiles = writeKERNELCALCexecfile(swperiods,parm.R_or_L(1),ph_gr,execfile_k,stripfile,eigfiles,qmod,tabfile,qfile,kernelfile,ID,logfile);
-system(['chmod u+x ' execfile_k]);
+% system(['chmod u+x ' execfile_k]);
+fileattrib(execfile_k, '+x'); 
 
 %% do the kernel calculating
 if ifverbose

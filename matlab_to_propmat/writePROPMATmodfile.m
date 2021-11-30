@@ -74,22 +74,45 @@ N = wmod.rho .* xs.^2; % if no anis, xs just shear modulus
 F = wmod.eta.*(A - 2*L);     % if no anis, is just lambda
 
 %% write model  file
-fid = fopen(modfile,'w');
+layStr = ''; 
 for kk = 1:nlay
 %     fprintf(fid,'%6.0f %6.1f %6.1f %6.1f  %1.0f  %4.2f %4.2f %3.0f %2.0f %3.0f %2.0f\n',...
 %         1e3*wmod.thick(kk),1e3*wmod.rho(kk),1e3*wmod.alph(kk),1e3*wmod.beta(kk),wmod.iso(kk),wmod.Panis(kk),wmod.Sanis(kk),wmod.tr(kk),wmod.pl(kk),wmod.strk(kk),wmod.dip(kk));
-    
     % data line
-    fprintf(fid,'layer %.0f\n',kk);                                    % layer description
-    fprintf(fid,'%-2.0f %4.2f %6.1f\n',anisflag(kk),wmod.rho(kk),wmod.thick(kk)); % layer# density thickness(km)
-    fprintf(fid,'%7.3f %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(kk),A(kk)-2*N(kk), F(kk),0,0,0);
-    fprintf(fid,'        %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(kk),F(kk),0,0,0);
-    fprintf(fid,'                %7.3f %7.3f %7.3f %7.3f\n',C(kk),0,0,0);
-    fprintf(fid,'                        %7.3f %7.3f %7.3f\n',L(kk),0,0);
-    fprintf(fid,'                                %7.3f %7.3f\n',L(kk),0);
-    fprintf(fid,'                                        %7.3f\n',N(kk));
+    layStr = [layStr, sprintf('layer %.0f\n',kk)];                                    % layer description
+    layStr = [layStr, sprintf('%-2.0f %4.2f %6.1f\n',anisflag(kk),wmod.rho(kk),wmod.thick(kk))]; % layer# density thickness(km)
+    layStr = [layStr, sprintf('%7.3f %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(kk),A(kk)-2*N(kk), F(kk),0,0,0)];
+    layStr = [layStr, sprintf('        %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(kk),F(kk),0,0,0)];
+    layStr = [layStr, sprintf('                %7.3f %7.3f %7.3f %7.3f\n',C(kk),0,0,0)];
+    layStr = [layStr, sprintf('                        %7.3f %7.3f %7.3f\n',L(kk),0,0)];
+    layStr = [layStr, sprintf('                                %7.3f %7.3f\n',L(kk),0)];
+    layStr = [layStr, sprintf('                                        %7.3f\n',N(kk))];
+    % bb2021.11.26 Replacing the repetetive fprintf calls to avoid a loop repetitively accessing a hard drive. 
 end
 % half space at the bottom
+
+%%% TODOdelete - only here to see if writing to ram is more quick than to
+%%% ssd Here seeing if it matters what order things are written in for
+%%% mpiprofile
+% fid = fopen('/Volumes/RAMDiskBB/propmat_modfile_junk.txt','w');
+try 
+fid = fopen('/dev/shm/brunsvikRam/propmat_modfile_junk.txt','w');% Possible option for Linux. 
+fprintf(fid, layStr); 
+fprintf(fid,'layer halfspace\n');                                    % layer description
+fprintf(fid,'%-2.0f %4.2f %6.1f\n',anisflag(nlay),wmod.rho(nlay),1); % layer# density thickness(km)
+fprintf(fid,'%7.3f %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(nlay),A(nlay)-2*N(nlay), F(nlay),0,0,0);
+fprintf(fid,'        %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(nlay),F(nlay),0,0,0);
+fprintf(fid,'                %7.3f %7.3f %7.3f %7.3f\n',C(nlay),0,0,0);
+fprintf(fid,'                        %7.3f %7.3f %7.3f\n',L(nlay),0,0);
+fprintf(fid,'                                %7.3f %7.3f\n',L(nlay),0);
+fprintf(fid,'                                        %7.3f\n',N(nlay));
+    
+fclose(fid);
+end
+%%%
+
+fid = fopen(modfile,'w');
+fprintf(fid, layStr); 
 fprintf(fid,'layer halfspace\n');                                    % layer description
 fprintf(fid,'%-2.0f %4.2f %6.1f\n',anisflag(nlay),wmod.rho(nlay),1); % layer# density thickness(km)
 fprintf(fid,'%7.3f %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(nlay),A(nlay)-2*N(nlay), F(nlay),0,0,0);
@@ -101,6 +124,26 @@ fprintf(fid,'                                        %7.3f\n',N(nlay));
     
     
 fclose(fid);
+
+%%% TODOdelete - only here to see if writing to ram is more quick than to
+%%% ssd Here seeing if it matters what order things are written in for
+%%% mpiprofile
+% fid = fopen('/Volumes/RAMDiskBB/propmat_modfile_junk.txt','w');
+try
+fid = fopen('/dev/shm/brunsvikRam/propmat_modfile_junk.txt','w');% Possible option for Linux. 
+fprintf(fid, layStr); 
+fprintf(fid,'layer halfspace\n');                                    % layer description
+fprintf(fid,'%-2.0f %4.2f %6.1f\n',anisflag(nlay),wmod.rho(nlay),1); % layer# density thickness(km)
+fprintf(fid,'%7.3f %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(nlay),A(nlay)-2*N(nlay), F(nlay),0,0,0);
+fprintf(fid,'        %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(nlay),F(nlay),0,0,0);
+fprintf(fid,'                %7.3f %7.3f %7.3f %7.3f\n',C(nlay),0,0,0);
+fprintf(fid,'                        %7.3f %7.3f %7.3f\n',L(nlay),0,0);
+fprintf(fid,'                                %7.3f %7.3f\n',L(nlay),0);
+fprintf(fid,'                                        %7.3f\n',N(nlay));
+    
+fclose(fid);
+end
+%%%
 
 
 end

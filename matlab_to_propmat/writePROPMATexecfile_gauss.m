@@ -47,10 +47,11 @@ end
 % %%% End Temporary testing. 
 
 
-% if exist(execfile,'file')==2 % timeit( @() (exist(execfile,'file')==2) ) ; % timeit( @() java.io.File(execfile, 'file').exists ) ; % timeit( @() delete(execfile))
-if java.io.File([pwd '/' execfile]).exists; % exist(execfile,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow % timeit( @() (exist(execfile,'file')==2) ) ; % timeit( @() java.io.File(execfile, 'file').exists ) ; % timeit( @() delete(execfile))
-    delete(execfile); % kill if it is there
-end
+% bb2021.11.24 Don't need to check if the file exists because we open with w option, which overwrites the file. 
+% if java.io.File([pwd '/' execfile]).exists; % exist(execfile,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow % timeit( @() (exist(execfile,'file')==2) ) ; % timeit( @() java.io.File(execfile, 'file').exists ) ; % timeit( @() delete(execfile))
+%     delete(execfile); % kill if it is there
+% end
+
 
 %% write synth.in parameter file
 fid = fopen(execfile,'w');

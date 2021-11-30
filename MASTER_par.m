@@ -184,12 +184,26 @@ t = now;
 % mkdir([resdir,'/chainout']);
 % parfor iii = 1:par.inv.nchains
 
+
+%%% % TODO temporary, for checking speed of ram for storange instead of drive. 
+% TODOdelete
+% Note: can probably change to /dev/smb to be consistent between both Mac
+% and Linux, without ever needing root privlage. 
+% mountRamVolume(); Replace with function later. 
+% % ramMb = 400; % integer number of Mb to dedicate to ram volume. 
+% % mountPoint = ['/dev/smb']; % Folder where ram volume will be placed. Eventually add network and station name, for independent station runs. 
+% % sysStr = ['diskutil erasevolume HFS+ "' mountPoint '" `hdiutil attach -nomount ram://' num2str(round(2048*ramMb)) '`']; % command to make ram disk
+% % system(sysStr)
+% Linux version below
+% [cmd1, cmd2] = system(['mkdir RAMDiskBB']); 
+%%%
+
 if profileRun;  % Start profiling parfor iterations, where most calculations happen. 
     mpiprofile on; 
 end
 
-parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-% warning('BB2021.11.22 Not in parallel!!!')
+for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+warning('BB2021.11.22 Not in parallel!!!')
     
 % Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
 warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    

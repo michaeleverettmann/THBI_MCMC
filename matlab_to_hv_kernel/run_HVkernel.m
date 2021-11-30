@@ -48,7 +48,7 @@ else
 end
 
 writeHVkernel_execfile( execfile,modfile,ofile,logfile);
-system(['chmod u+x ' execfile]);
+fileattrib(execfile, '+x'); 
 
 
 %% do MINEOS on it
