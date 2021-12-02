@@ -99,8 +99,8 @@ inv = struct(    'verbose',false                 ,... % option to spit out more 
                  'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-                 'nchains',1                    ,... % number of chains to start in parallel
-                 'Nsavestate',10                ,... % Niter per which the state of the parallel inversion is saved in .mat file
+                 'nchains',16                     ,... % number of chains to start in parallel
+                 'Nsavestate',10                 ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x             
                  'datatypes',{{'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}})  
@@ -108,7 +108,7 @@ inv = struct(    'verbose',false                 ,... % option to spit out more 
                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
                                 %          'HKstack_x' with x='P'
-warning('BB2021.11.22 Only 1 chain!')
+% warning('BB2021.11.22 Only 1 chain!')
 % inv.verbose = true
 
 profileRun = true; 

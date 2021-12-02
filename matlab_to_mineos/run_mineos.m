@@ -18,6 +18,8 @@ function [phV,grV,eigfiles_fix] = run_mineos(model,swperiods,par_mineos,ifdelete
 % kernels with the complementary run_kernelcalc.m script
 paths = getPaths(); 
 
+% TODOram cd to paths.ramDir
+
 tic1 = now;
 
 if nargin < 3 || isempty(par_mineos)
@@ -100,6 +102,7 @@ end
 [ model_info ] = read_cardfile( cardfile );
 skiplines = model_info.nlay + 5; % can skip at least this many lines at the beginning of the .asc output file(s)
 save([ID,'vel_profile'],'model_info');
+% TODOram use something like system(['cp ', ID,'vel_profile' paths.execution_path/ENAM ' &' ]) so this runs in background taking velocity profile out of the ram
 
 % compute max frequency (mHz) - no need to compute past the minimum period desired
 parm.fmax = 1000./min(swperiods)+1; % need to go a bit beyond ideal min period..
@@ -244,6 +247,8 @@ if ifdelete
     if delcard, delete(cardfile); end
 end
 cd(wd);
+
+% TODOram change directory back to mainDir
 
 %% plot
 if ifplot

@@ -95,20 +95,20 @@ end
 %%% ssd Here seeing if it matters what order things are written in for
 %%% mpiprofile
 % fid = fopen('/Volumes/RAMDiskBB/propmat_modfile_junk.txt','w');
-try 
-fid = fopen('/dev/shm/brunsvikRam/propmat_modfile_junk.txt','w');% Possible option for Linux. 
-fprintf(fid, layStr); 
-fprintf(fid,'layer halfspace\n');                                    % layer description
-fprintf(fid,'%-2.0f %4.2f %6.1f\n',anisflag(nlay),wmod.rho(nlay),1); % layer# density thickness(km)
-fprintf(fid,'%7.3f %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(nlay),A(nlay)-2*N(nlay), F(nlay),0,0,0);
-fprintf(fid,'        %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(nlay),F(nlay),0,0,0);
-fprintf(fid,'                %7.3f %7.3f %7.3f %7.3f\n',C(nlay),0,0,0);
-fprintf(fid,'                        %7.3f %7.3f %7.3f\n',L(nlay),0,0);
-fprintf(fid,'                                %7.3f %7.3f\n',L(nlay),0);
-fprintf(fid,'                                        %7.3f\n',N(nlay));
-    
-fclose(fid);
-end
+% try 
+% fid = fopen('/dev/shm/brunsvikRam/propmat_modfile_junk.txt','w');% Possible option for Linux. 
+% fprintf(fid, layStr); 
+% fprintf(fid,'layer halfspace\n');                                    % layer description
+% fprintf(fid,'%-2.0f %4.2f %6.1f\n',anisflag(nlay),wmod.rho(nlay),1); % layer# density thickness(km)
+% fprintf(fid,'%7.3f %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(nlay),A(nlay)-2*N(nlay), F(nlay),0,0,0);
+% fprintf(fid,'        %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(nlay),F(nlay),0,0,0);
+% fprintf(fid,'                %7.3f %7.3f %7.3f %7.3f\n',C(nlay),0,0,0);
+% fprintf(fid,'                        %7.3f %7.3f %7.3f\n',L(nlay),0,0);
+% fprintf(fid,'                                %7.3f %7.3f\n',L(nlay),0);
+% fprintf(fid,'                                        %7.3f\n',N(nlay));
+%     
+% fclose(fid);
+% end
 %%%
 
 fid = fopen(modfile,'w');
@@ -129,20 +129,20 @@ fclose(fid);
 %%% ssd Here seeing if it matters what order things are written in for
 %%% mpiprofile
 % fid = fopen('/Volumes/RAMDiskBB/propmat_modfile_junk.txt','w');
-try
-fid = fopen('/dev/shm/brunsvikRam/propmat_modfile_junk.txt','w');% Possible option for Linux. 
-fprintf(fid, layStr); 
-fprintf(fid,'layer halfspace\n');                                    % layer description
-fprintf(fid,'%-2.0f %4.2f %6.1f\n',anisflag(nlay),wmod.rho(nlay),1); % layer# density thickness(km)
-fprintf(fid,'%7.3f %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(nlay),A(nlay)-2*N(nlay), F(nlay),0,0,0);
-fprintf(fid,'        %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(nlay),F(nlay),0,0,0);
-fprintf(fid,'                %7.3f %7.3f %7.3f %7.3f\n',C(nlay),0,0,0);
-fprintf(fid,'                        %7.3f %7.3f %7.3f\n',L(nlay),0,0);
-fprintf(fid,'                                %7.3f %7.3f\n',L(nlay),0);
-fprintf(fid,'                                        %7.3f\n',N(nlay));
-    
-fclose(fid);
-end
+% try
+% fid = fopen('/dev/shm/brunsvikRam/propmat_modfile_junk.txt','w');% Possible option for Linux. 
+% fprintf(fid, layStr); 
+% fprintf(fid,'layer halfspace\n');                                    % layer description
+% fprintf(fid,'%-2.0f %4.2f %6.1f\n',anisflag(nlay),wmod.rho(nlay),1); % layer# density thickness(km)
+% fprintf(fid,'%7.3f %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(nlay),A(nlay)-2*N(nlay), F(nlay),0,0,0);
+% fprintf(fid,'        %7.3f %7.3f %7.3f %7.3f %7.3f\n',A(nlay),F(nlay),0,0,0);
+% fprintf(fid,'                %7.3f %7.3f %7.3f %7.3f\n',C(nlay),0,0,0);
+% fprintf(fid,'                        %7.3f %7.3f %7.3f\n',L(nlay),0,0);
+% fprintf(fid,'                                %7.3f %7.3f\n',L(nlay),0);
+% fprintf(fid,'                                        %7.3f\n',N(nlay));
+%     
+% fclose(fid);
+% end
 %%%
 
 

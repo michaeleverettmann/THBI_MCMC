@@ -190,10 +190,10 @@ t = now;
 % Note: can probably change to /dev/smb to be consistent between both Mac
 % and Linux, without ever needing root privlage. 
 % mountRamVolume(); Replace with function later. 
-% % ramMb = 400; % integer number of Mb to dedicate to ram volume. 
-% % mountPoint = ['/dev/smb']; % Folder where ram volume will be placed. Eventually add network and station name, for independent station runs. 
-% % sysStr = ['diskutil erasevolume HFS+ "' mountPoint '" `hdiutil attach -nomount ram://' num2str(round(2048*ramMb)) '`']; % command to make ram disk
-% % system(sysStr)
+% % % % ramMb = 1000; % integer number of Mb to dedicate to ram volume. 
+% % % % mountPoint = ['brunsvikRAM']; % Folder where ram volume will be placed. Eventually add network and station name, for independent station runs. 
+% % % % sysStr = ['diskutil erasevolume HFS+ "' mountPoint '" `hdiutil attach -nomount ram://' num2str(round(2048*ramMb)) '`']; % command to make ram disk
+% % % % system(sysStr)
 % Linux version below
 % [cmd1, cmd2] = system(['mkdir RAMDiskBB']); 
 %%%
@@ -202,8 +202,11 @@ if profileRun;  % Start profiling parfor iterations, where most calculations hap
     mpiprofile on; 
 end
 
-for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-warning('BB2021.11.22 Not in parallel!!!')
+mainDir = pwd; % Keep track of where the main folder is, where we want to return after changing directory back from ram drive. 
+cd(paths.ramDrive); 
+
+parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+% warning('BB2021.11.22 Not in parallel!!!')
     
 % Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
 warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    
@@ -510,7 +513,6 @@ if newK||resetK, delete_mineos_files(ID,'R'); end
 if newK||resetK, delete_mineos_files(ID,'L'); end
 
 end % on iterations
-
 %% -------------------------- End iteration  ------------------------------
 end % on the fail_chain while...
 % ----------
@@ -525,7 +527,15 @@ if isfield(TD.Value,'SW_Ray')
 end
 
 diary off
+
+% bb2021.12.02 Temporary only get stuff off of ram at the very end. Should
+% run this command more frequently. 
+[status, result] = system(['rsync ' paths.ramDrive '/' chainstr '*vel_profile ' mainDir]); 
+[status, result] = system(['rsync ' paths.ramDrive '/diary_' chainstr '* ' mainDir]); 
+
 end % parfor loop
+
+cd(mainDir); 
 
 if profileRun; % Get results from profiling. 
     mpiprofile off; 
