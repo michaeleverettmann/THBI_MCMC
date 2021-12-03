@@ -43,14 +43,14 @@ ocomps = 2; % 1 is [x,y,z], 2 is [r,t,z]
 
 %% filenames
 if ~ischar(ID), ID = num2str(ID);end
-modfile = [ID,'.mod'];
-execfile = [ID,'.cmd'];
-odatfile = [ID,'.rtz'];
-ifile = [ID,'_synth.in'];
-ofile0 = [ID,'_synth.out0'];
-ofile1 = [ID,'_synth.out1'];
-ofile2 = [ID,'_synth.out2'];
-oimagout = [ID,'_imag.out'];
+modfile =    [ ID,'.mod'];
+execfile =   [ ID,'.cmd'];
+odatfile =   [ ID,'.rtz'];
+ifile =      [ ID,'_synth.in'];
+ofile0 =     [ ID,'_synth.out0'];
+ofile1 =     [ ID,'_synth.out1'];
+ofile2 =     [ ID,'_synth.out2'];
+oimagout =   [ ID,'_imag.out'];
 
 %% =======================================================================
 
