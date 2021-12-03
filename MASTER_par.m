@@ -184,28 +184,17 @@ t = now;
 % mkdir([resdir,'/chainout']);
 % parfor iii = 1:par.inv.nchains
 
-
-%%% % TODO temporary, for checking speed of ram for storange instead of drive. 
-% TODOdelete
-% Note: can probably change to /dev/smb to be consistent between both Mac
-% and Linux, without ever needing root privlage. 
-% mountRamVolume(); Replace with function later. 
-% % % % ramMb = 1000; % integer number of Mb to dedicate to ram volume. 
-% % % % mountPoint = ['brunsvikRAM']; % Folder where ram volume will be placed. Eventually add network and station name, for independent station runs. 
-% % % % sysStr = ['diskutil erasevolume HFS+ "' mountPoint '" `hdiutil attach -nomount ram://' num2str(round(2048*ramMb)) '`']; % command to make ram disk
-% % % % system(sysStr)
-% Linux version below
-% [cmd1, cmd2] = system(['mkdir RAMDiskBB']); 
-%%%
-
 if profileRun;  % Start profiling parfor iterations, where most calculations happen. 
     mpiprofile on; 
 end
 
-mainDir = pwd; % Keep track of where the main folder is, where we want to return after changing directory back from ram drive. 
-cd(paths.ramDrive); 
+mainDir = [paths.execPath '/' nwk '_' sta]; % Keep track of where the main folder is, where we want to return after changing directory back from ram drive. 
+% TODO might cause problems to change to new directory because of prior.mat (which loads from absolute directory though, maybe ok) and project_details.mat) which might be different for different stations? 
+if ~ exist(mainDir); mkdir(mainDir); end % This is where we will cd to for final processing, and save final results. using exist here is ok, because we only do it once per stations.  NOTE don't need if exists, but it's REALLY important to not accidentally overwrite the whole folder. 
+cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
+mkdir([nwk '_' sta]); cd([nwk '_' sta]); 
 
-parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 % warning('BB2021.11.22 Not in parallel!!!')
     
 % Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
@@ -302,6 +291,7 @@ end
 %% SAVE inv state every Nsavestate iterations
 if rem(ii,par.inv.Nsavestate)==0
     save_inv_state(resdir,chainstr,allmodels,misfits)
+    [ram_copy_stats] = ram_to_HD(paths, chainstr, mainDir); % Copy current results from ram to hard disk. 
 end
 
 try
@@ -520,6 +510,7 @@ fprintf('\n ================= ENDING ITERATIONS %s =================\n',chainstr
 % save([resdir,'/chainout/',chainstr],'model0','misfits','allmodels')
 
 save_inv_state(resdir,chainstr,allmodels,misfits)
+[ram_copy_stats] = ram_to_HD(paths, chainstr, mainDir); % Copy final results from ram to hard disk. 
 misfits_perchain{iii} = misfits;
 allmodels_perchain{iii} = allmodels;
 if isfield(TD.Value,'SW_Ray')
@@ -527,11 +518,6 @@ if isfield(TD.Value,'SW_Ray')
 end
 
 diary off
-
-% bb2021.12.02 Temporary only get stuff off of ram at the very end. Should
-% run this command more frequently. 
-[status, result] = system(['rsync ' paths.ramDrive '/' chainstr '*vel_profile ' mainDir]); 
-[status, result] = system(['rsync ' paths.ramDrive '/diary_' chainstr '* ' mainDir]); 
 
 end % parfor loop
 

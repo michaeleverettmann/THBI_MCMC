@@ -99,7 +99,7 @@ inv = struct(    'verbose',false                 ,... % option to spit out more 
                  'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-                 'nchains',16                     ,... % number of chains to start in parallel
+                 'nchains',3                     ,... % number of chains to start in parallel
                  'Nsavestate',10                 ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x             

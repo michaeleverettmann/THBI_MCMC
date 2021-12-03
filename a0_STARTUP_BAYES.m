@@ -79,9 +79,15 @@ prem_isotropic = prem;
 % Some special paths which you list here once. Using this set and get paths
 % approach means we don't have to use global variables, which work poorly
 % (if at all) with parfor. 
-setPaths(hd,proj); 
+
+
+% Initiate ram drive and keep track of where this folder is. 
+ramDrive = make_ram_drive() 
+
+setPaths(hd,proj,ramDrive); 
+
 % paths = getPaths(); 
-function setPaths(hd,proj); 
+function setPaths(hd,proj,ramDrive); 
 % system('FILE=/usr/local/bin/timeout;if test -f "$FILE"; then; echo "$FILE exists.";fi')
 if isfile('/usr/local/bin/timeout'); % Would be better to do system('which timeout'), but system does not have the normal $PATH, and cannot always find timeout. 
     timeoutpath = '/usr/local/bin/timeout'; 
@@ -96,10 +102,11 @@ paths = struct('CADMINEOS', [hd '/Documents/repositories/Peoples_codes/CADMINEOS
                    'HV_ellipticity', [hd '/Documents/repositories/Peoples_codes/HV_ellipticity'],...
                    'timeout', timeoutpath,...
                    'THBIpath', [hd '/Documents/UCSB/ENAM/THBI_ENAM'],...
+                   'execPath', [hd '/Documents/UCSB/ENAM/THBI_ENAM/ENAM'],... % Just where we started executing everything. TODO might want to not make this automatically, in case we run from the wrong folder. 
                    'rawdatadir', ['/Volumes/data/',proj.name,'/THBI/STAsrawdat/'],...
                    'STAinversions', ['/Volumes/data/',proj.name,'/THBI/STASinv/'],...
                    'models_seismic', [hd '/Documents/repositories/data/models_seismic'], ...
-                   'ramDrive', '/dev/shm/brunsvikRam'); % TODO This will have to be set to automatically change depending on the computer.  /dev/shm/brunsvikRam /Volumes/brunsvikRAM
+                   'ramDrive', ramDrive); % TODO This will have to be set to automatically change depending on the computer.  /dev/shm/brunsvikRam /Volumes/brunsvikRAM
 paths.rawdatadir = [paths.THBIpath '/data/STAsrawdat/']; % bb2021.09.28 if this takes too much local storage, put it on external drives. 
 paths.STAinversions = [paths.THBIpath '/data/STASinv/']; % bb2021.09.28 if this takes too much local storage, put it on external drives. 
 % 'rawdatadir', ['/Volumes/data/',proj.name,'/THBI/STAsrawdat/'],... % bb2021.09.28 Could use these locations to keep data on NAS. Not so important though if you aren't downloading a bunch of waveform data I think. 
