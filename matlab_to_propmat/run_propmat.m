@@ -71,8 +71,6 @@ elseif strcmp(sourc,'sine')
     writePROPMATexecfile(       execfile,modfile,ifile,ofile0,ofile1,ofile2,oimagout,odatfile,inc,ph,synthperiod,obsdist,ocomps)
 end
 fileattrib(execfile, '+x'); 
-% system(['chmod +u+x ' execfile]); bb2021.11.24 seeing what happens if I put this in the writepropmatexecfile* files. 
-
 
 %% do PropMatrix on it
 [status,cmdout] = system([paths.timeout ' 15 ./',execfile]); 

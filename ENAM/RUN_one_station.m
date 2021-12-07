@@ -10,7 +10,6 @@ run('../a0_STARTUP_BAYES.m')
 %%%%% Important! Must define network and station before runnig this! 
 % network_manual = 'US' ; disp('resetting to US.CEH')
 % station_manual = 'CEH'; disp('resetting to US.CEH')
-% network = input('Network? (use quotes):')
 disp('Network and station') 
 disp(network_manual) 
 disp(station_manual)

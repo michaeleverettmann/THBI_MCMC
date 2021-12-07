@@ -93,8 +93,6 @@ if strcmp(projname,'SYNTHETICS') || strcmp(projname,'LAB_tests')
 end
 
 par.inv.BWclust = BWclust;
-% par.inv.verbose=false; % bb2021.09.21 Not sure why this was set to
-% false...
 ifsavedat = false;
 
 %% get saving things ready
@@ -151,18 +149,14 @@ if redoprior
 end
 
 %% ---------------------------- INITIATE ----------------------------
-%% ---------------------------- INITIATE ----------------------------
-%% ---------------------------- INITIATE ----------------------------
-% profile clear
-% profile on
 
 % ===== Prepare for parallel pool =====
 delete(gcp('nocreate'));
 myCluster = parcluster('local');
 maxWorkers = myCluster.NumWorkers; 
 % % Use the following two lines if you want more parallel chains than you have cores. 
-% % myCluster.NumWorkers = max(maxWorkers, par.inv.nchains); % bb2021.11.18 temporary, for testing purposes. 
-% % maxWorkers = myCluster.NumWorkers; 
+% myCluster.NumWorkers = max(maxWorkers, par.inv.nchains); 
+% maxWorkers = myCluster.NumWorkers; 
 
 parpool(min([par.inv.nchains,maxWorkers])); % TODOcomp May need to change based on computer. I set so that we only use as many workers as the local parallel profile will allow.  
 TD = parallel.pool.Constant(trudata); PR = parallel.pool.Constant(par);
@@ -200,8 +194,8 @@ parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor
 % Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
 warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    
     
-chainstr = [nwk '.' sta '_' mkchainstr(iii)];%TODO_STATION_NETWORK bb2021.11.12
-diaryFile = sprintf('diary_%s.txt', chainstr); %TODO_STATION_NETWORK bb2021.11.12
+chainstr = [nwk '.' sta '_' mkchainstr(iii)];
+diaryFile = sprintf('diary_%s.txt', chainstr); % Use a diary file to keep track of parallel inversions seperately. %TODO_STATION_NETWORK bb2021.11.12
 diary off; 
 delete(diaryFile); 
 pause(0.01); % Because delete seems to fully execute after turning diary on...
@@ -291,7 +285,7 @@ end
 %% SAVE inv state every Nsavestate iterations
 if rem(ii,par.inv.Nsavestate)==0
     save_inv_state(resdir,chainstr,allmodels,misfits)
-%     [ram_copy_stats] = ram_to_HD(paths, chainstr, mainDir, nwk, sta); % Copy current results from ram to hard disk. 
+%     [ram_copy_stats] = ram_to_HD(paths, chainstr, mainDir, nwk, sta); % bb2021.12.07 this is time consuming if done often. Just do at end of inversion. Copy current results from ram to hard disk. 
 end
 
 try
@@ -510,7 +504,6 @@ fprintf('\n ================= ENDING ITERATIONS %s =================\n',chainstr
 % save([resdir,'/chainout/',chainstr],'model0','misfits','allmodels')
 
 save_inv_state(resdir,chainstr,allmodels,misfits)
-% % [ram_copy_stats] = ram_to_HD(paths, chainstr, mainDir, nwk, sta); % Copy final results from ram to hard disk. 
 misfits_perchain{iii} = misfits;
 allmodels_perchain{iii} = allmodels;
 if isfield(TD.Value,'SW_Ray')
@@ -522,15 +515,14 @@ diary off
 end % parfor loop
 [ram_copy_stats] = ram_to_HD(paths, mainDir, nwk, sta); % Copy final results from ram to hard disk. 
 
-cd(mainDir); 
+cd(mainDir); % Get back out of ram and go to stations hard drive folder 
 
 if profileRun; % Get results from profiling. 
     mpiprofile off; 
     mpiStats = mpiprofile('info'); 
-%     save mpiProfileData mpiStats; % Save profile results. Can transfer from HPC and bring to local computer for viewing. 
-    save(['mpiProfileData_' nwk '_' sta], 'mpiStats')
+    save(['mpiProfileData_' nwk '_' sta], 'mpiStats');  % Save profile results. Can transfer from HPC and bring to local computer for viewing. 
     % Use this to see the results: load('mpiProfileData'); mpiprofile('viewer', mpiStats);
-end % Start profiling parfor iterations, where most calculations happen. 
+end 
 
 delete(gcp('nocreate'));
 

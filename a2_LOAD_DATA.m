@@ -149,7 +149,7 @@ trudata = dofTHBI(trudata);
 % plot_TRUvsPRE(trudata,trudata);
 save([par.res.resdir,'/trudata_USE'],'trudata');
 
-if ~exist('sta','var') %TODOEXIST bb2021.11.22 exist is SUPER slow
+if ~exist('sta','var') %TODOEXIST bb2021.11.22 exist is SUPER slow - It's ok since you don't load data often. 
         sta = 'SYN';
 end 
 

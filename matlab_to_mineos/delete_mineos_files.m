@@ -36,20 +36,8 @@ if java.io.File([pwd '/' kernelfile],'file').exists, delete(kernelfile); end
 if java.io.File([pwd '/' tabfile],'file').exists, delete(tabfile); end
 if java.io.File([pwd '/' tabfile_hdr],'file').exists, delete(tabfile_hdr); end
 if java.io.File([pwd '/' branchfile],'file').exists, delete(branchfile); end
-% % % Alternate form of above :: I think these files are generally not present. The java file exists is so fast, and system call is fairly slow. I think it will save time to do the java test followed by delete... I left an alternative code below anyway. bb2021.11.24
-% % system(['rm -f ' pwd '/' execfile      ]); % Using -f means will delete file if it exists and not return error if it doesn't exist. Easier to read, maybe faster. 
-% % system(['rm -f ' pwd '/' cardfile      ]);
-% % system(['rm -f ' pwd '/' eigfile       ]);
-% % system(['rm -f ' pwd '/' eigfile_fix   ]);
-% % system(['rm -f ' pwd '/' qfile         ]);
-% % system(['rm -f ' pwd '/' stripfile     ]);
-% % system(['rm -f ' pwd '/' tabfile       ]);
-% % system(['rm -f ' pwd '/' kernelfile    ]);
-% % % system(['rm -f ' pwd '/' tabfile       ]); % This was present twice...
-% % system(['rm -f ' pwd '/' tabfile_hdr   ]);
-% % system(['rm -f ' pwd '/' branchfile    ]);
 
-if java.io.File([pwd '/' execfile_k]).exists %TODOEXIST bb2021.11.22 exist is SUPER slow
+if java.io.File([pwd '/' execfile_k]).exists % bb2021.12.07 not sure why commented try catch here.
 %     try
 % %     delete(execfile_k,stripfile,tabfile,kernelfile,[tabfile,'_hdr'],[tabfile,'_hdr.branch']);
 %     catch
@@ -59,8 +47,6 @@ if java.io.File([pwd '/' execfile_k]).exists %TODOEXIST bb2021.11.22 exist is SU
         delete(ikernelfiles{ip}); 
     end
 end
-% % system(['rm -f ' pwd '/' execfile_k    ]);
-% % system(['rm -f ' pwd '/' logfile       ]);
 if java.io.File([pwd '/' execfile_k]).exists, delete(execfile_k); end 
 if java.io.File([pwd '/' logfile]).exists, delete(logfile); end 
 

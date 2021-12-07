@@ -18,8 +18,6 @@ function [phV,grV,eigfiles_fix] = run_mineos(model,swperiods,par_mineos,ifdelete
 % kernels with the complementary run_kernelcalc.m script
 paths = getPaths(); 
 
-% TODOram cd to paths.ramDir
-
 tic1 = now;
 
 if nargin < 3 || isempty(par_mineos)
@@ -102,7 +100,6 @@ end
 [ model_info ] = read_cardfile( cardfile );
 skiplines = model_info.nlay + 5; % can skip at least this many lines at the beginning of the .asc output file(s)
 save([ID,'vel_profile'],'model_info');
-% TODOram use something like system(['cp ', ID,'vel_profile' paths.execution_path/ENAM ' &' ]) so this runs in background taking velocity profile out of the ram
 
 % compute max frequency (mHz) - no need to compute past the minimum period desired
 parm.fmax = 1000./min(swperiods)+1; % need to go a bit beyond ideal min period..
@@ -123,7 +120,6 @@ modefile = [ID,'_',lrunstr,'.mode'];
 writeMINEOSmodefile( modefile, modetype,parm.lmin,parm.lmax,parm.fmin,parm.fmax )
 writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
-% system(['chmod u+x ' execfile]); % change execfile permissions
 fileattrib(execfile, '+x'); 
 [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % make sure your system can see your timeout function
 
@@ -163,7 +159,6 @@ modefile = [ID,'_',lrunstr,'.mode'];
 writeMINEOSmodefile( modefile, modetype,lmin,parm.lmax,parm.fmin,parm.fmax )
 writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
-% system(['chmod u+x ' execfile]); % change execfile permissions
 fileattrib(execfile, '+x'); 
 [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % run execfile 
 
@@ -202,7 +197,6 @@ for ief = 1:length(eigfiles)-1
     execfile = [ID,'_',lrunstrs{ief},'.eig_recover'];
     writeMINEOSeig_recover( execfile,eigfiles{ief},llasts(ief) )
     
-    % system(['chmod u+x ' execfile]); % change execfile permissions
     fileattrib(execfile, '+x'); 
     [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % run execfile 
     
@@ -214,9 +208,7 @@ end
 qexecfile = [ID,'.run_mineosq'];
 writeMINEOS_Qexecfile( qexecfile,eigfiles_fix,qmod,[ID,'.q'],[ID,'.log'] )
 
-% system(['chmod u+x ' qexecfile]); % change qexecfile permissions
 fileattrib(qexecfile, '+x'); 
-% error('Brennan stopping here for debugging on ERI machines')
 [status,cmdout] = system([paths.timeout ' 100 ./',qexecfile]); % run qexecfile 
 
 
@@ -243,12 +235,10 @@ if ifdelete
     delete([ID,'.q'])
     delete([ID,'_*.eig'])
     delete([ID,'_*.eig_fix'])
-    if java.io.File([pwd '/' ID '.log']).exists, delete([ID,'.log']); end %TODOEXIST bb2021.11.22 exist is SUPER slow
+    if java.io.File([pwd '/' ID '.log']).exists, delete([ID,'.log']); end 
     if delcard, delete(cardfile); end
 end
 cd(wd);
-
-% TODOram change directory back to mainDir
 
 %% plot
 if ifplot

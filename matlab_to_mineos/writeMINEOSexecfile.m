@@ -13,10 +13,6 @@ function writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,logfile
 
 paths = getPaths(); 
 
-% if java.io.File([pwd '/' execfile]).exists; % exist(execfile,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow
-%     delete(execfile); % kill if it is there 
-% end
-
 %% write synth.in parameter file
 fid = fopen(execfile,'w');
 fprintf(fid,'#!/bin/csh\n');
