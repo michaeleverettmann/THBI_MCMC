@@ -192,16 +192,16 @@ mainDir = [paths.execPath '/' nwk '_' sta]; % Keep track of where the main folde
 % TODO might cause problems to change to new directory because of prior.mat (which loads from absolute directory though, maybe ok) and project_details.mat) which might be different for different stations? 
 if ~ exist(mainDir); mkdir(mainDir); end % This is where we will cd to for final processing, and save final results. using exist here is ok, because we only do it once per stations.  NOTE don't need if exists, but it's REALLY important to not accidentally overwrite the whole folder. 
 cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
-mkdir([nwk '_' sta]); cd([nwk '_' sta]); 
+mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
 
-for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 % warning('BB2021.11.22 Not in parallel!!!')
     
 % Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
 warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    
     
 chainstr = [nwk '.' sta '_' mkchainstr(iii)];%TODO_STATION_NETWORK bb2021.11.12
-diaryFile = sprintf('diary_%s_iter_%1.0f.txt', chainstr, iii); %TODO_STATION_NETWORK bb2021.11.12
+diaryFile = sprintf('diary_%s.txt', chainstr); %TODO_STATION_NETWORK bb2021.11.12
 diary off; 
 delete(diaryFile); 
 pause(0.01); % Because delete seems to fully execute after turning diary on...
@@ -291,7 +291,7 @@ end
 %% SAVE inv state every Nsavestate iterations
 if rem(ii,par.inv.Nsavestate)==0
     save_inv_state(resdir,chainstr,allmodels,misfits)
-    [ram_copy_stats] = ram_to_HD(paths, chainstr, mainDir); % Copy current results from ram to hard disk. 
+%     [ram_copy_stats] = ram_to_HD(paths, chainstr, mainDir, nwk, sta); % Copy current results from ram to hard disk. 
 end
 
 try
@@ -510,7 +510,7 @@ fprintf('\n ================= ENDING ITERATIONS %s =================\n',chainstr
 % save([resdir,'/chainout/',chainstr],'model0','misfits','allmodels')
 
 save_inv_state(resdir,chainstr,allmodels,misfits)
-[ram_copy_stats] = ram_to_HD(paths, chainstr, mainDir); % Copy final results from ram to hard disk. 
+% % [ram_copy_stats] = ram_to_HD(paths, chainstr, mainDir, nwk, sta); % Copy final results from ram to hard disk. 
 misfits_perchain{iii} = misfits;
 allmodels_perchain{iii} = allmodels;
 if isfield(TD.Value,'SW_Ray')
@@ -520,13 +520,15 @@ end
 diary off
 
 end % parfor loop
+[ram_copy_stats] = ram_to_HD(paths, mainDir, nwk, sta); % Copy final results from ram to hard disk. 
 
 cd(mainDir); 
 
 if profileRun; % Get results from profiling. 
     mpiprofile off; 
     mpiStats = mpiprofile('info'); 
-    save mpiProfileData mpiStats; % Save profile results. Can transfer from HPC and bring to local computer for viewing. 
+%     save mpiProfileData mpiStats; % Save profile results. Can transfer from HPC and bring to local computer for viewing. 
+    save(['mpiProfileData_' nwk '_' sta], 'mpiStats')
     % Use this to see the results: load('mpiProfileData'); mpiprofile('viewer', mpiStats);
 end % Start profiling parfor iterations, where most calculations happen. 
 
