@@ -34,7 +34,7 @@ logfile = [ID,'.log'];
 
 %% =======================================================================
 wd = pwd;
-cd([paths.THBIpath '/matlab_to_hv_kernel']); 
+cd([paths.THBIpath '/matlab_to_hv_kernel']); % bb2021.12.07 Why is this cd here? cd should be super slow, but I haven't seen this line come up in profilers...
 
 
 %% model is an input file or a matlab structure?
@@ -48,7 +48,7 @@ else
 end
 
 writeHVkernel_execfile( execfile,modfile,ofile,logfile);
-system(['chmod u+x ' execfile]);
+fileattrib(execfile, '+x'); 
 
 
 %% do MINEOS on it
@@ -66,7 +66,6 @@ if status~=124
     [HVr,HVK,phV,grV] = readHVkernel_ofile(ofile,swperiods,ifplot);
     HVr = -1./HVr;
     catch
-%         fprintf(
         error('some error - check model file layers not too thin!\n')
     end
     phV = phV(:);

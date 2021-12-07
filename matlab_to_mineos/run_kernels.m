@@ -75,14 +75,13 @@ qmod = parm.qmodpath; % This should resolve any path problems finding qmod. bb20
 
 %% =======================================================================
 wd = pwd;
-%cd('/Users/jon/Documents/Work/Codes/matlab_to_mineos-master');
 
 %% CALCULATE AND READ IN PERTURBATION KERNELS 
 %(frechet derivatves of parm perturbation)
     
 %% write kernel calc executable
 ikernelfiles = writeKERNELCALCexecfile(swperiods,parm.R_or_L(1),ph_gr,execfile_k,stripfile,eigfiles,qmod,tabfile,qfile,kernelfile,ID,logfile);
-system(['chmod u+x ' execfile_k]);
+fileattrib(execfile_k, '+x'); 
 
 %% do the kernel calculating
 if ifverbose
@@ -148,8 +147,6 @@ if ifdelete
     if java.io.File([pwd '/' logfile]).exists, delete(logfile); end %TODOEXIST bb2021.11.22 exist is SUPER slow
 end
 cd(wd);
-
-
 
 if ifverbose
 	fprintf('Kernels %s took %.5f s\n',ID,(now-tic1)*86400)

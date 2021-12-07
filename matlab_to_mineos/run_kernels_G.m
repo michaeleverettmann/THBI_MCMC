@@ -69,7 +69,8 @@ grV = grV(:);
     
 %% write kernel calc executable
 ikernelfiles = writeKERNELCALCexecfile_G(swperiods,R_or_L(1),ph_gr,execfile_k,stripfile,eigfile,qmod,tabfile,qfile,kernelfile,ID,logfile);
-system(['chmod u+x ' execfile_k]);
+% system(['chmod u+x ' execfile_k]);
+fileattrib(execfile_k, '+x'); 
 
 %% do the kernel calculating
 if ifverbose

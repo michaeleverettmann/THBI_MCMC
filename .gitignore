@@ -1,5 +1,7 @@
 EXAMPLE/inversion_results/**
 
+ENAM/optimization_tests/**
+
 
 SYNTHETICS/inversion_results/**
 SYNTHETICS/**.mat 

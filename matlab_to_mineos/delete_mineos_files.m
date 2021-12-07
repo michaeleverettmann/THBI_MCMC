@@ -25,8 +25,6 @@ delete([ID,'_*.asc'])
 delete([ID,'_*.eig'])
 delete([ID,'_*.eig_fix'])
 
-%TODOEXIST bb2021.11.22 exist is SUPER slow
-% bb2021.11.22 Due to all these exist bits, delete_mineos_files.m was a VERY time consuming function. 
 if java.io.File([pwd '/' execfile],'file').exists, delete(execfile); end
 if java.io.File([pwd '/' cardfile],'file').exists, delete(cardfile); end
 if java.io.File([pwd '/' eigfile],'file').exists, delete(eigfile); end
@@ -38,9 +36,8 @@ if java.io.File([pwd '/' kernelfile],'file').exists, delete(kernelfile); end
 if java.io.File([pwd '/' tabfile],'file').exists, delete(tabfile); end
 if java.io.File([pwd '/' tabfile_hdr],'file').exists, delete(tabfile_hdr); end
 if java.io.File([pwd '/' branchfile],'file').exists, delete(branchfile); end
-%TODOEXIST bb2021.11.22 exist is SUPER slow
 
-if java.io.File([pwd '/' execfile_k]).exists %TODOEXIST bb2021.11.22 exist is SUPER slow
+if java.io.File([pwd '/' execfile_k]).exists % bb2021.12.07 not sure why commented try catch here.
 %     try
 % %     delete(execfile_k,stripfile,tabfile,kernelfile,[tabfile,'_hdr'],[tabfile,'_hdr.branch']);
 %     catch
@@ -50,8 +47,8 @@ if java.io.File([pwd '/' execfile_k]).exists %TODOEXIST bb2021.11.22 exist is SU
         delete(ikernelfiles{ip}); 
     end
 end
-if java.io.File([pwd '/' execfile_k]).exists, delete(execfile_k); end %TODOEXIST bb2021.11.22 exist is SUPER slow
-if java.io.File([pwd '/' logfile]).exists, delete(logfile); end %TODOEXIST bb2021.11.22 exist is SUPER slow
+if java.io.File([pwd '/' execfile_k]).exists, delete(execfile_k); end 
+if java.io.File([pwd '/' logfile]).exists, delete(logfile); end 
 
 % postamble
 cd(wd);

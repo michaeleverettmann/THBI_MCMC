@@ -25,12 +25,6 @@ if nargin < 6 || isempty(fmax)
     fmax = 200.05;
 end
 
-
-
-if java.io.File([pwd '/' modefile]).exists ; % exist(modefile,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow
-    delete(modefile); % kill if it is there 
-end
-
 switch modetype
     case {'S','Spheroidal','spheroidal','Rayleigh','rayleigh'}
         jcom = 3;

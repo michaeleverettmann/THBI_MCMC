@@ -14,11 +14,6 @@ function writeMINEOS_Qexecfile( execfile,eigfiles,qmod,qfile,logfile )
 
 paths = getPaths(); 
 
-if java.io.File([pwd '/' execfile]).exists; % exist(execfile,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow
-    delete(execfile); % kill if it is there 
-end
-
-
 if isstring(eigfiles)
     eigfiles = {eigfiles};
 end

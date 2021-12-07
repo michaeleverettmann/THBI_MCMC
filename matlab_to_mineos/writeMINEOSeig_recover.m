@@ -10,10 +10,6 @@ function writeMINEOSeig_recover( execfile,eigfile,l_last )
 
 paths = getPaths(); 
 
-if java.io.File([pwd '/' execfile]).exists % exist(execfile,'file')==2 %TODOEXIST bb2021.11.22 exist is SUPER slow %TODO_nottested
-    delete(execfile); % kill if it is there 
-end
-
 %% write synth.in parameter file
 fid = fopen(execfile,'w');
 fprintf(fid,'#!/bin/csh\n');

@@ -93,8 +93,6 @@ if strcmp(projname,'SYNTHETICS') || strcmp(projname,'LAB_tests')
 end
 
 par.inv.BWclust = BWclust;
-% par.inv.verbose=false; % bb2021.09.21 Not sure why this was set to
-% false...
 ifsavedat = false;
 
 %% get saving things ready
@@ -151,18 +149,14 @@ if redoprior
 end
 
 %% ---------------------------- INITIATE ----------------------------
-%% ---------------------------- INITIATE ----------------------------
-%% ---------------------------- INITIATE ----------------------------
-% profile clear
-% profile on
 
 % ===== Prepare for parallel pool =====
 delete(gcp('nocreate'));
 myCluster = parcluster('local');
 maxWorkers = myCluster.NumWorkers; 
 % % Use the following two lines if you want more parallel chains than you have cores. 
-% % myCluster.NumWorkers = max(maxWorkers, par.inv.nchains); % bb2021.11.18 temporary, for testing purposes. 
-% % maxWorkers = myCluster.NumWorkers; 
+% myCluster.NumWorkers = max(maxWorkers, par.inv.nchains); 
+% maxWorkers = myCluster.NumWorkers; 
 
 parpool(min([par.inv.nchains,maxWorkers])); % TODOcomp May need to change based on computer. I set so that we only use as many workers as the local parallel profile will allow.  
 TD = parallel.pool.Constant(trudata); PR = parallel.pool.Constant(par);
@@ -188,14 +182,20 @@ if profileRun;  % Start profiling parfor iterations, where most calculations hap
     mpiprofile on; 
 end
 
+mainDir = [paths.execPath '/' nwk '_' sta]; % Keep track of where the main folder is, where we want to return after changing directory back from ram drive. 
+% TODO might cause problems to change to new directory because of prior.mat (which loads from absolute directory though, maybe ok) and project_details.mat) which might be different for different stations? 
+if ~ exist(mainDir); mkdir(mainDir); end % This is where we will cd to for final processing, and save final results. using exist here is ok, because we only do it once per stations.  NOTE don't need if exists, but it's REALLY important to not accidentally overwrite the whole folder. 
+cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
+mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
+
 parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 % warning('BB2021.11.22 Not in parallel!!!')
     
 % Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
 warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    
     
-chainstr = [nwk '.' sta '_' mkchainstr(iii)];%TODO_STATION_NETWORK bb2021.11.12
-diaryFile = sprintf('diary_%s_iter_%1.0f.txt', chainstr, iii); %TODO_STATION_NETWORK bb2021.11.12
+chainstr = [nwk '.' sta '_' mkchainstr(iii)];
+diaryFile = sprintf('diary_%s.txt', chainstr); % Use a diary file to keep track of parallel inversions seperately. %TODO_STATION_NETWORK bb2021.11.12
 diary off; 
 delete(diaryFile); 
 pause(0.01); % Because delete seems to fully execute after turning diary on...
@@ -285,6 +285,7 @@ end
 %% SAVE inv state every Nsavestate iterations
 if rem(ii,par.inv.Nsavestate)==0
     save_inv_state(resdir,chainstr,allmodels,misfits)
+%     [ram_copy_stats] = ram_to_HD(paths, chainstr, mainDir, nwk, sta); % bb2021.12.07 this is time consuming if done often. Just do at end of inversion. Copy current results from ram to hard disk. 
 end
 
 try
@@ -496,7 +497,6 @@ if newK||resetK, delete_mineos_files(ID,'R'); end
 if newK||resetK, delete_mineos_files(ID,'L'); end
 
 end % on iterations
-
 %% -------------------------- End iteration  ------------------------------
 end % on the fail_chain while...
 % ----------
@@ -511,14 +511,18 @@ if isfield(TD.Value,'SW_Ray')
 end
 
 diary off
+
 end % parfor loop
+[ram_copy_stats] = ram_to_HD(paths, mainDir, nwk, sta); % Copy final results from ram to hard disk. 
+
+cd(mainDir); % Get back out of ram and go to stations hard drive folder 
 
 if profileRun; % Get results from profiling. 
     mpiprofile off; 
     mpiStats = mpiprofile('info'); 
-    save mpiProfileData mpiStats; % Save profile results. Can transfer from HPC and bring to local computer for viewing. 
+    save(['mpiProfileData_' nwk '_' sta], 'mpiStats');  % Save profile results. Can transfer from HPC and bring to local computer for viewing. 
     % Use this to see the results: load('mpiProfileData'); mpiprofile('viewer', mpiStats);
-end % Start profiling parfor iterations, where most calculations happen. 
+end 
 
 delete(gcp('nocreate'));
 

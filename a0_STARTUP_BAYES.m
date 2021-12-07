@@ -1,4 +1,7 @@
 %% script to put various things on path neded for inversion 
+% bb This is one of the only files where you should have to change paths if
+% you move things to another computer. 
+
 % Don't use clear at the beginning of this script. Sometimes I run it after
 % already having provided network/station name in RUN_one_sta.m
 
@@ -79,10 +82,19 @@ prem_isotropic = prem;
 % Some special paths which you list here once. Using this set and get paths
 % approach means we don't have to use global variables, which work poorly
 % (if at all) with parfor. 
-setPaths(hd,proj); 
-% paths = getPaths(); 
-function setPaths(hd,proj); 
-% system('FILE=/usr/local/bin/timeout;if test -f "$FILE"; then; echo "$FILE exists.";fi')
+
+
+% Initiate ram drive and keep track of where this folder is. 
+ramDrive = make_ram_drive() 
+
+setPaths(hd,proj,ramDrive); 
+
+function setPaths(hd,proj,ramDrive); 
+% bb2021.09?.? Important change. This function helps us keep track of
+% different paths throughout the inversion. It makes transferring the code
+% between comptuers much much easier. 
+
+% Need timeout. Might be in different places depending on the computer. 
 if isfile('/usr/local/bin/timeout'); % Would be better to do system('which timeout'), but system does not have the normal $PATH, and cannot always find timeout. 
     timeoutpath = '/usr/local/bin/timeout'; 
 elseif isfile('/usr/bin/timeout'); 
@@ -91,21 +103,22 @@ else
     error('Brennan warning: cannot find timeout path on your computer. Needed for Mineos. Find it in shell script using which timeout or which gtimeout, then enter it as timeoutpath.')
 end
 
-paths = struct('CADMINEOS', [hd '/Documents/repositories/Peoples_codes/CADMINEOS'],...
-                   'PropMat', [hd '/Documents/repositories/Peoples_codes/PropMat'],...
+paths = struct(    'CADMINEOS',      [hd '/Documents/repositories/Peoples_codes/CADMINEOS'],...
+                   'PropMat',        [hd '/Documents/repositories/Peoples_codes/PropMat'],...
                    'HV_ellipticity', [hd '/Documents/repositories/Peoples_codes/HV_ellipticity'],...
-                   'timeout', timeoutpath,...
-                   'THBIpath', [hd '/Documents/UCSB/ENAM/THBI_ENAM'],...
-                   'rawdatadir', ['/Volumes/data/',proj.name,'/THBI/STAsrawdat/'],...
-                   'STAinversions', ['/Volumes/data/',proj.name,'/THBI/STASinv/'],...
-                   'models_seismic', [hd '/Documents/repositories/data/models_seismic']); 
-paths.rawdatadir = [paths.THBIpath '/data/STAsrawdat/']; % bb2021.09.28 if this takes too much local storage, put it on external drives. 
-paths.STAinversions = [paths.THBIpath '/data/STASinv/']; % bb2021.09.28 if this takes too much local storage, put it on external drives. 
+                   'timeout',         timeoutpath,...
+                   'THBIpath',       [hd '/Documents/UCSB/ENAM/THBI_ENAM'],...
+                   'execPath',       [hd '/Documents/UCSB/ENAM/THBI_ENAM/ENAM'],... % Just where we started executing everything. TODO might want to not make this automatically, in case we run from the wrong folder. 
+                   'models_seismic', [hd '/Documents/repositories/data/models_seismic'], ...
+                   'ramDrive',        ramDrive); % TODO This will have to be set to automatically change depending on the computer.  /dev/shm/brunsvikRam /Volumes/brunsvikRAM
+
+paths.rawdatadir =    [paths.THBIpath '/data/STAsrawdat/']; % bb2021.09.28 if this takes too much local storage, put it on external drives. 
+paths.STAinversions = [paths.THBIpath '/data/STASinv/'   ]; % bb2021.09.28 if this takes too much local storage, put it on external drives. 
 % 'rawdatadir', ['/Volumes/data/',proj.name,'/THBI/STAsrawdat/'],... % bb2021.09.28 Could use these locations to keep data on NAS. Not so important though if you aren't downloading a bunch of waveform data I think. 
 % 'STAinversions', ['/Volumes/data/',proj.name,'/THBI/STASinv/'] ); 
 % save([paths.THBIpath '/misc/paths.mat']); 
 % [status, cmdout] = system('rm ./*pathsAutoGen.m')
-delete('pathsAutoGen.m')
+delete('pathsAutoGen.m') % Delete and recreate pathsAutoGen.m for each computer. 
 matlab.io.saveVariablesToScript([paths.THBIpath '/pathsAutoGen.m'], 'paths')
 
 addpath(paths.models_seismic); % bb2021.11.02 Needed for some functions which access data. I thought this was already added somewhere but I don't see where. 
