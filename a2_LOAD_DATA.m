@@ -27,7 +27,12 @@ elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
     save([par.res.resdir,'/trumodel'],'TRUEmodel');
 
     % make synth data
+%     [ junkdata ] = z1_SYNTH_DATA(par,0);
+%     [predata,laymodel1] = b3__INIT_PREDATA(TRUEmodel,par,junkdata,0 );
+%     predata = b3_FORWARD_MODEL_BW(TRUEmodel,laymodel1,par,predata,'test_bb2021_12_07',0 ); 
+%     predata = b3_FORWARD_MODEL_RF_ccp(   TRUEmodel,laymodel1,par,predata,'test_bb2021_12_07',0 );
     [ trudata ] = z1_SYNTH_DATA(par,0); % in ZRT format
+    
     if strcmp(par.synth.noisetype,'real')
         [ trudata,par ] = z2_NOISIFY_SYNTH( trudata, par,par.synth.noise_sta_deets );
     end

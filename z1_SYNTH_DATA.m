@@ -22,6 +22,8 @@ else
 end
 
 %% ===================  CALCULATE RECEIVER FUNCTIONS  ===================
+if any(string(pdtyps(:,1))=='BW') || any(string(pdtyps(:,1))=='RF') || any(string(pdtyps(:,1))=='HKstack'); % bb2021.12.07 test to stop calculating bw data when it's not wanted. 
+
 gcarcs = par.synth.gcarcs;
 np = 0;
 ns = 0;
@@ -97,7 +99,7 @@ if strcmp(par.synth.noisetype,'gaussian') || strcmp(par.synth.noisetype,'gauss')
     trudat_sp_PSV = trudat_sp_PSV + random('norm',0,par.synth.noise_sigma_BW_Sp,size(trudat_sp_PSV)); 
 end
 
-if ifplot
+if true
 	figure(58),clf,set(gcf,'pos',[2 275 1047 830])
     %Ps
     subplot(411),plot(tt_ps,trudat_ps_PSV(:,1),'k','linewidth',2), xlim(par.datprocess.Ps.Twin.def), ylabel('Z tru','fontsize',18), title('Ps TRUE','fontsize',22)
@@ -105,6 +107,7 @@ if ifplot
     %Sp
     subplot(413),plot(tt_sp,trudat_sp_PSV(:,1),'k','linewidth',2), xlim(par.datprocess.Sp.Twin.def), ylabel('Z tru','fontsize',18), title('Sp TRUE','fontsize',22)
     subplot(414),plot(tt_sp,trudat_sp_PSV(:,2),'r','linewidth',2), xlim(par.datprocess.Sp.Twin.def), ylabel('R tru','fontsize',18)
+    
 end
 
 % save
@@ -114,13 +117,43 @@ if gcarc>65 % don't do if too close - inhomogeneous
 ns = ns+1;
 SpRF(ns,1) = struct('PSV',trudat_sp_PSV,'tt',tt_sp,'gcarc',gcarc,'rayp',rayps,'inc',S_inc,'samprate',samprate,'nsamp',length(tt_sp),'sigma',par.mod.data.prior_sigma.BW.Sp.def,'Vp_surf',Vp_surf,'Vs_surf',Vs_surf);
 end
-clear trudat_ps_PSV trudat_ps_ZRT 
-clear trudat_sp_PSV trudat_ps_ZRT
+% clear trudat_ps_PSV trudat_ps_ZRT 
+% clear trudat_sp_PSV trudat_ps_ZRT
 
 end % loop over gcarcs
 
 %% ===================  MAKE DATA STRUCTURE  ===================
-data = struct('BW_Ps',PsRF,'BW_Sp',SpRF);
+% data = struct('BW_Ps',PsRF,'BW_Sp',SpRF);
+data = struct(); 
+if any(string(par.inv.datatypes)=='BW_Ps')
+    data.BW_Ps = PsRF; 
+end
+if any(string(par.inv.datatypes)=='BW_Sp')
+    data.BW_Sp = SpRF; 
+end
+
+%% ==================== Get H-kappa stack using P wave receiver function ==
+if any(string(pdtyps(:,1))=='HKstack'); % Use the Ps receiver function to get h-kappa stack
+    phase_wts = [.7, .2, .1]; % Zhu and Kanamori 2000 weights. Ordered as w1, w2, w3, but I'm not sure I Zach used the same ordering in HKstack.m bb2021.12.08
+    [HK_A, HK_H, HK_K] = HKstack(PsRF.PSV(:,2), PsRF.tt, PsRF.rayp/111, phase_wts, ...
+        PsRF.Vs_surf, linspace(25, 70, 200)',linspace(1.6, 2.1, 200)); 
+    % TODO what is Vs_surf? Average vs? Why named surf? 
+    % TODO change H vector. Is 25 to 70 in IRIS ears It seems... Might just
+    % load a real HK stack and use those same values. 
+    % PsRF.inc is P_inc. 
+%     S_inc0 = rayp2inc(rayps,TLM.Vs(1),6371-TLM.zlayb(1))/ 
+    
+    HKstack_P = struct('H', HK_H, 'K', HK_K', 'Esum', HK_A, ...
+        'Nobs', length(gcarcs), 'dof', length(gcarcs) ); 
+    % Not sure what dof is. Not sure how to establish Nobs, or if it even
+    % matters. 
+    % For IRIS ears data loaded from Zach's functions, K is first
+    % dimension, H is second
+    data.HKstack_P = HKstack_P; 
+end
+
+end % doing body waves
+
 
 %% ===================  CALCULATE PHASE VELOCITIES  ===================
 % % Use Menke phV solver method on layered model 
@@ -138,7 +171,7 @@ for id = 1:length(par.inv.datatypes)
         truSWdat.HVr = run_HVkernel(TRUEmodel,SWperiods,'initmod',1,0,par.inv.verbose);
     else
         par_mineos = struct('R_or_L',pdtyp{2},'phV_or_grV',pdtyp{3},'ID','synthmod');
-        [truSWdat.phV,truSWdat.grV] = run_mineos(TRUEmodel,SWperiods,par_mineos,1,0,par.inv.verbose); % All paths in run_mineos should be generated automatically. Only change the paths in a0_STARTUP_BAYES.m bb2021.09.14
+        [truSWdat.phV,truSWdat.grV] = run_mineos(TRUEmodel,SWperiods,par_mineos,1,0,par.inv.verbose); 
     end
 
     % add noise

@@ -45,9 +45,23 @@ addpath([proj.dir,'matguts/']);
 
 %% PARMS
 run parms/bayes_inv_parms
+
+% if exist('external_data_types', 'var') && external_data_types; 
+%     % For this block, external_data_types and this_data_type have to be
+%     % created before running MASTER_par.m 
+%     % They should only serve to manually modify par.inv.datatypes after
+%     % running bayes_inv_parms. 
+%     par.inv.datatypes = this_data_type; % bb2021.12.07 Thinking of way to loop over each data type in solo. 
+% end
+
 if strcmp(projname,'SYNTHETICS')
-    if isfield(par.synth,'noisetype') && strcmp(par.synth.noisetype,'real'), sta=['SYNTH_',sta]; else sta = 'SYNTH'; end
-    par.stadeets = struct('sta',sta','nwk','--'); 
+% % %     bb2021.12.07 Removing the re-definitions of sta. I want synthetic test charactaristic, not noise, to define sta. 
+% % %     if isfield(par.synth,'noisetype') && strcmp(par.synth.noisetype,'real'); 
+% % %         sta=['SYNTH_',sta]; 
+% % %     else
+% % %         sta = 'SYNTH'; 
+% % %     end
+    par.stadeets = struct('sta',sta','nwk',nwk'); 
 
 	% noise details, if "real"
 	noisesta = 'RSSD';
@@ -188,8 +202,8 @@ if ~ exist(mainDir); mkdir(mainDir); end % This is where we will cd to for final
 cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
 mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
 
-parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-% warning('BB2021.11.22 Not in parallel!!!')
+for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+warning('BB2021.11.22 Not in parallel!!!')
     
 % Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
 warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    
