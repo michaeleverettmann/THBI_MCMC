@@ -147,7 +147,7 @@ for iii = 1:nchains
     col1 = [0 0.447 0.741];
     col2 = [0.85 0.325 0.098];
 
-    ytk1 = round_level(linspace(ch2_min,ch2_max,5),5);
+    ytk1 = unique(round_level(linspace(ch2_min,ch2_max,5),5));
     set(ax1,'Yscale','log','ylim',[ch2_min ch2_max],'ytick',ytk1,'Fontsize',16,'ycolor',col1);
     ytk2 = unique(round_level(linspace(pdm_min+1,pdm_max-10,5),5));
     set(ax2,'Yscale','log','ylim',[pdm_min pdm_max],'ytick',ytk2,'yticklabel',ytk2,'xtick',[],'Fontsize',16,'ycolor',col2);

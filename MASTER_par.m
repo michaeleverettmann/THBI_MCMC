@@ -45,6 +45,7 @@ addpath([proj.dir,'matguts/']);
 
 %% PARMS
 run parms/bayes_inv_parms
+[par, inv] = update_bayes_inv_parms(par, STAMP); % Modify this function to make different tests. 
 
 % if exist('external_data_types', 'var') && external_data_types; 
 %     % For this block, external_data_types and this_data_type have to be
@@ -202,8 +203,9 @@ if ~ exist(mainDir); mkdir(mainDir); end % This is where we will cd to for final
 cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
 mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
 
-for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-warning('BB2021.11.22 Not in parallel!!!')
+parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+% warning('BB2021.11.22 Not in parallel!!!')
+accept_info = struct(); % bb2022.01.05 Temporary tests...
     
 % Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
 warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    
@@ -425,7 +427,7 @@ try
 
 %% ========================  ACCEPTANCE CRITERION  ========================
     [ ifaccept ] = b6_IFACCEPT( log_likelihood1,log_likelihood,temp,p_bd*ifpass,Pm_prior1,Pm_prior);
-
+    
     % ======== PLOT ========  if accept
     if ifaccept && par.inv.verbose && fail_chain==0
         plot_TRUvsPRE( TD.Value,predata);  pause(0.001);
@@ -433,6 +435,19 @@ try
             plot_MOD_TRUEvsTRIAL( TRUEmodel, model1 ); pause(0.001);
         end
     end
+    
+%% ========== TEMPORARY ====== make some plots and get insight into why acceptance does/doesn't happen
+    accept_info(ii).ifaccept = ifaccept; 
+    accept_info(ii).misfit = misfit1; 
+    accept_info(ii).log_likelihood = log_likelihood1; 
+    accept_info(ii).sig_hk = model1.datahparm.sig_HKstack_P; 
+    accept_info(ii).model = model1; 
+    accept_info(ii).predat_save = predat_save1; 
+    accept_info(ii).iter = ii; 
+    accept_info(ii).temp = temp; 
+    accept_info(1) .trudata = trudata; % Inefficient, but this is just for testing. 
+    %%% TODO remove these lines eventually. 
+
 
 %% ========================  IF ACCEPT ==> CHANGE TO NEW MODEL  =========================
     if ifaccept
@@ -517,12 +532,20 @@ end % on the fail_chain while...
 fprintf('\n ================= ENDING ITERATIONS %s =================\n',chainstr)
 % save([resdir,'/chainout/',chainstr],'model0','misfits','allmodels')
 
+% % % plot_h_kappa_progress(trudata, allmodels, resdir, iii)
+% % % plot_h_kappa_progress2(trudata, allmodels, resdir, iii, accept_info)
+
+
 save_inv_state(resdir,chainstr,allmodels,misfits)
 misfits_perchain{iii} = misfits;
 allmodels_perchain{iii} = allmodels;
 if isfield(TD.Value,'SW_Ray')
     SWs_perchain{iii} = preSW;
 end
+
+
+
+% save('accept_info', 'accept_info.mat'); 
 
 diary off
 
@@ -617,7 +640,7 @@ save([resdir,'/final_predata'],'final_predata');
 
 [ final_misfit ] = b4_CALC_MISFIT( trudata,final_predata,par,0 );
 [ final_log_likelihood,final_misfit ] = b5_CALC_LIKELIHOOD( final_misfit,trudata,final_model.hyperparms,par );
-plot_TRUvsPRE( trudata,final_predata,1,[resdir,'/final_true_vs_pred_data.pdf']);
+plot_TRUvsPRE( trudata,final_predata,1,[resdir,'/final_true_vs_pred_data.pdf'], allmodels_collated);
 plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,1,[resdir,'/final_true_vs_pred_data_wavs.pdf']);
 
 
@@ -632,5 +655,5 @@ if ifsavedat
     plot_FIG1_FIT_DATA( trudata,savedat,par,1,[resdir,'/fig1_FIT_DATA.pdf'])
 end
 
-clear('TRUEmodel')
+% clear('TRUEmodel')
 % return

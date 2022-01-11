@@ -1,4 +1,4 @@
-function axs = plot_TRUvsPRE( trudata,predata,ifsave,ofile)
+function axs = plot_TRUvsPRE( trudata,predata,ifsave,ofile, allmodels_collated)
 %plot_TRUvsPRE( trudata,predata,ifsave,ofile )
 %   
 % function to plot predicted and true seismograms (Vertical and Radial)
@@ -11,6 +11,10 @@ end
 if nargin < 4 || isempty(ofile)
     ofile='true_vs_predicted_data';
 end
+
+% if nargin < 5 
+%     allmodels_collated = nan; 
+% end
 
 figure(57),clf,set(gcf,'pos',[015 576 1750 600])
 ax1 = axes('position',[0.03 0.53 0.235 0.4]); hold on
@@ -106,18 +110,36 @@ switch pdtyp{1}
    
 %% HKstack        
     case {'HKstack'}
+%         clf; 
+%         ax7 = axes(); 
+%         ax7a = copyobj(ax7, gcf); % ax7a.Visible = 'off';
+%         axes(ax7); 
         contourf(ax7,trudata.(dtype).K,trudata.(dtype).H,trudata.(dtype).Esum',30,'linestyle','none');
         colorbar(ax7,'southoutside')
+%         colormap('cool'); 
         
         plot(predata.HKstack_P.K,predata.HKstack_P.H,'ok','linewidth',2,...
             'markerfacecolor','r','markersize',7)
-        
+        caxis([min(min(predata.HKstack_P.Esum)),...
+            max(max(predata.HKstack_P.Esum))]'); 
         title(ax7, regexprep(dtype,'_','-'),'fontsize',22)
         xlabel(ax7, 'Vp/Vs ratio','fontsize',16)
         ylabel(ax7, 'Moho depth','fontsize',16)
         set(ax7,'fontsize',13,'ydir','reverse')
         
-        
+        if exist('allmodels_collated', 'var'); % If you passed the allmodels_collated variable, plot each attempted h-k value.
+            
+%             axes(ax7a); 
+% %             cla; 
+%             colormap('hot')
+            thing = scatter([allmodels_collated.vpvs], [allmodels_collated.zmoh],...
+                30, ...
+                [[allmodels_collated.iter]...
+                / max([allmodels_collated.iter])...
+                * max(max(predata.HKstack_P.Esum))]); 
+        end       
+%         linkaxes([ax7,ax7a])
+
 
 end
 

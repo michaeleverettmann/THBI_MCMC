@@ -125,32 +125,47 @@ end % loop over gcarcs
 %% ===================  MAKE DATA STRUCTURE  ===================
 % data = struct('BW_Ps',PsRF,'BW_Sp',SpRF);
 data = struct(); 
-if any(string(par.inv.datatypes)=='BW_Ps')
+if any(string(par.inv.datatypes)=='BW_Ps') || any(string(par.inv.datatypes)=='RF_Ps') || any(string(par.inv.datatypes)=='HKstack_P')
     data.BW_Ps = PsRF; 
 end
-if any(string(par.inv.datatypes)=='BW_Sp')
+if any(string(par.inv.datatypes)=='BW_Sp') || any(string(par.inv.datatypes)=='RF_Sp')
     data.BW_Sp = SpRF; 
 end
 
-%% ==================== Get H-kappa stack using P wave receiver function ==
-if any(string(pdtyps(:,1))=='HKstack'); % Use the Ps receiver function to get h-kappa stack
-    phase_wts = [.7, .2, .1]; % Zhu and Kanamori 2000 weights. Ordered as w1, w2, w3, but I'm not sure I Zach used the same ordering in HKstack.m bb2021.12.08
-    [HK_A, HK_H, HK_K] = HKstack(PsRF.PSV(:,2), PsRF.tt, PsRF.rayp/111, phase_wts, ...
-        PsRF.Vs_surf, linspace(25, 70, 200)',linspace(1.6, 2.1, 200)); 
-    % TODO what is Vs_surf? Average vs? Why named surf? 
-    % TODO change H vector. Is 25 to 70 in IRIS ears It seems... Might just
-    % load a real HK stack and use those same values. 
-    % PsRF.inc is P_inc. 
-%     S_inc0 = rayp2inc(rayps,TLM.Vs(1),6371-TLM.zlayb(1))/ 
-    
-    HKstack_P = struct('H', HK_H, 'K', HK_K', 'Esum', HK_A, ...
-        'Nobs', length(gcarcs), 'dof', length(gcarcs) ); 
-    % Not sure what dof is. Not sure how to establish Nobs, or if it even
-    % matters. 
-    % For IRIS ears data loaded from Zach's functions, K is first
-    % dimension, H is second
-    data.HKstack_P = HKstack_P; 
-end
+% %% ==================== Get H-kappa stack using P wave receiver function ==
+% if any(string(pdtyps(:,1))=='HKstack'); % Use the Ps receiver function to get h-kappa stack
+%     phase_wts = [.7, .2, .1]; % Zhu and Kanamori 2000 weights. Ordered as w1, w2, w3, but I'm not sure I Zach used the same ordering in HKstack.m bb2021.12.08
+% %     [HK_A, HK_H, HK_K] = HKstack(PsRF.PSV(:,2), PsRF.tt, PsRF.rayp/111, phase_wts, ...
+% %         PsRF.Vs_surf, linspace(25, 70, 200)',linspace(1.6, 2.1, 200)); 
+%     [HK_A, HK_H, HK_K] = HKstack(PsRF.PSV(:,2), PsRF.tt, PsRF.rayp/111, phase_wts, ...
+%         PsRF.Vs_surf, linspace(10, 70, 200)',linspace(1.5, 2.1, 201)); 
+% %     warning('10 to 60 km h kappa')
+%     
+%     figure(1); clf; hold on; 
+%     subplot(1,1,1); 
+%     thing = surf(HK_K, HK_H, HK_A, 'EdgeAlpha', 0)
+%     xlabel('kappa'); ylabel('H'); title('Synthetic H-kappa stack'); 
+%     set(gca, 'ydir', 'reverse'); 
+%     colorbar(); 
+%     
+%     % TODO what is Vs_surf? Average vs? Why named surf? 
+%     % TODO change H vector. Is 25 to 70 in IRIS ears It seems... Might just
+%     % load a real HK stack and use those same values. 
+%     % PsRF.inc is P_inc. 
+% %     S_inc0 = rayp2inc(rayps,TLM.Vs(1),6371-TLM.zlayb(1))/ 
+%     
+% %     HKstack_P = struct('H', HK_H, 'K', HK_K', 'Esum', HK_A, ...
+% %         'Nobs', length(gcarcs), 'dof', length(gcarcs) ); 
+%     HKstack_P = struct('H', HK_H, 'K', HK_K', 'Esum', HK_A, ...
+%         'Nobs', 7, ...
+%         'dof' , 7 ); 
+%     warning('bb2021.12.20 artifically setting 7 h-kappa observations')
+%     % Not sure what dof is. Not sure how to establish Nobs, or if it even
+%     % matters. 
+%     % For IRIS ears data loaded from Zach's functions, K is first
+%     % dimension, H is second
+%     data.HKstack_P = HKstack_P; 
+% end
 
 end % doing body waves
 

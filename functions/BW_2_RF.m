@@ -14,6 +14,13 @@ for idt = 1:length(trudtypes)
 
     dtype = trudtypes{idt};
 	RFdtype = regexprep(dtype,'BW','RF');
+    
+    if strcmp(RFdtype, 'RF_Ps') & any(string(par.inv.datatypes)=='HKstack_P'); 
+        % We want to do Ps receiver functions for HKstack, not for receiver function itself though. 
+        % Pretend we do want RF_Ps for now...
+        % Should not save to par permanently
+        par.inv.datatypes{end+1} = 'RF_Ps'; 
+    end
  
     pdt = parse_dtype( trudtypes{idt} );
     if strcmp(pdt{1},'BW') && any(ismember(par.inv.datatypes,RFdtype))

@@ -45,6 +45,9 @@ elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
         trudata = BW_2_RF(trudata,par);
     end
     
+    % Use receiver functions to make h-kappa stacks. 
+    [ trudata ] = z1_SYNTH_DATA_h_kappa(par,trudata,0);
+    
 %% -----------------------------------------------------------------
 %% LAB TESTING
 elseif strcmp(par.proj.name,'LAB_tests')
@@ -148,7 +151,7 @@ end
 
 %% DEGREES OF FREEDOM
 fprintf('Computing degrees of freedom (N) for each data type\n');
-trudata = dofTHBI(trudata);
+trudata = dofTHBI(trudata, par);
 
 % plot_TRU_WAVEFORMS(trudata);
 % plot_TRUvsPRE(trudata,trudata);

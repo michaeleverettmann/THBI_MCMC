@@ -190,11 +190,20 @@ end
 %% ===================  HK-stack: put in values  ====================
 if any(strcmp(pdtyps(:,1),'HKstack'))
     HKdat = par.inv.datatypes{find(strcmp(pdtyps(:,1),'HKstack'),1,'first')};
-    ik = mindex(predata.(HKdat).K,model.vpvs);
-    ih = mindex(predata.(HKdat).H,model.zmoh);
-    predata.(HKdat).H = model.zmoh;
-    predata.(HKdat).K = model.vpvs;
-    predata.(HKdat).E_by_Emax = predata.(HKdat).Esum(ik,ih)/maxgrid(predata.(HKdat).Esum);
+    
+    if (model.vpvs > max(predata.(HKdat).K)) || (model.vpvs < min(predata.(HKdat).K)) ...
+            || (model.zmoh > max(predata.(HKdat).H)) || (model.zmoh < min(predata.(HKdat).H)); 
+        predata.(HKdat).H = model.zmoh;
+        predata.(HKdat).K = model.vpvs;
+        predata.(HKdat).E_by_Emax = min(min(predata.(HKdat).Esum));
+    else
+        ik = mindex(predata.(HKdat).K,model.vpvs);
+        ih = mindex(predata.(HKdat).H,model.zmoh);
+        predata.(HKdat).H = model.zmoh;
+        predata.(HKdat).K = model.vpvs;
+        predata.(HKdat).E_by_Emax = predata.(HKdat).Esum(ik,ih)/maxgrid(predata.(HKdat).Esum);
+    end
+    
 end
 
 

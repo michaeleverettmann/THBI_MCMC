@@ -119,9 +119,9 @@
 
 disp('NOT REAL SYNTHETIC\nUsing fast, debuging options (few iterations). See: bays_inv_parms.m')                                
 inv = struct(    'verbose',false                 ,... % option to spit out more information+plots
-                 'niter',300                    ,... % Number of iterations
-                 'burnin',100                    ,... % don't record results before burnin iterations
-                 'cooloff',100                    ,... % # of iterations over which temperature declines as erf
+                 'niter',12000                    ,... % Number of iterations
+                 'burnin',4000                    ,... % don't record results before burnin iterations
+                 'cooloff',3000                    ,... % # of iterations over which temperature declines as erf
                  'tempmax',5                     ,... % maximum multiple of all standard deviations
                  'saveperN',10                   ,... % save only every saveperN iterations    % bb2021.09.14 savig each one, since I have 100 iterations, this way we can still do probability math (taking the 5 most poorly performing models... otherwise, we get code errors later on).    
                  'bestNmod2keep',-5000           ,... % keep only the best N models in each chain, defined here
@@ -129,11 +129,11 @@ inv = struct(    'verbose',false                 ,... % option to spit out more 
                  'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-                 'nchains',8                    ,... % number of chains to start in parallel
+                 'nchains',16                    ,... % number of chains to start in parallel
                  'Nsavestate',10               ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x  
-                 'datatypes',{{'HKstack_P'}})  
+                 'datatypes',{{'SW_HV'}})  
 %                  'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}})  
                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
@@ -180,7 +180,7 @@ modl.sed = struct(...
     ... shear velocity of the sediments
                      'vsmax',3.3                 ,... % max sed velocity, km/s
                      'vsmin',2.8                 ,... % min sed velocity, km/s
-                     'vsstd',0.0                 );  % std of sed velocity for perturbation, km/s
+                     'vsstd',0.00                 );  % std of sed velocity for perturbation, km/s
 
 modl.crust = struct(...
     ... thickness of the crust
@@ -241,7 +241,7 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
                            'ccp',0.1             ,... %    ccp stack
                            'lo',0.1))            ,... %    low-f
                   	 'HKstack',struct(            ... %  H-K stack
-                    	   'P',0.5)              ,... %    P combination
+                    	   'P',.3)              ,... %    P combination
                   	 'SW',struct(                 ... %  Surface waves
                     	'Ray',struct(             ... %   Rayleigh waves
                            'phV',0.05            ,... %    phase velocities
@@ -271,7 +271,7 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
                            'ccp',1e-2             ,... %    ccp stack
                            'lo',1e-2))           ,... %    low-f
                   	 'HKstack',struct(            ... %  H-K stack
-                    	   'P',0.2)             ,... %    P combination
+                    	   'P',0.02)             ,... %    P combination
                   	 'SW',struct(                 ... %  Surface waves
                     	'Ray',struct(             ... %   Rayleigh waves
                            'phV',1e-4            ,... %    phase velocities
@@ -282,7 +282,9 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
                            'phV',1e-4            ,... %    phase velocities
                            'grV',1e-4)))         ,... %    group velocities
                                                   ...  
-                  'logstd_sigma',0.05            );   % LOGSTD
+                  'logstd_sigma',0.05,            ...
+                  'deg_of_freedom',struct(       ...
+                      'h_kappa', 15)) ;   % LOGSTD
 
                  
 %% Forward calc. parms

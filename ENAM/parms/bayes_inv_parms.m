@@ -131,11 +131,11 @@
 %                                 %          'HKstack_x' with x='P'
 
 inv = struct(    'verbose',false                 ,... % option to spit out more information+plots
-                 'niter',12000                     ,... % Number of iterations
-                 'burnin',4000                    ,... % don't record results before burnin iterations
-                 'cooloff',3000                    ,... % # of iterations over which temperature declines as erf
-                 'tempmax',5                     ,... % maximum multiple of all standard deviations
-                 'saveperN',30                   ,... % save only every saveperN iterations    % bb2021.09.14 savig each one, since I have 100 iterations, this way we can still do probability math (taking the 5 most poorly performing models... otherwise, we get code errors later on).    
+                 'niter',600                     ,... % Number of iterations
+                 'burnin',100                    ,... % don't record results before burnin iterations
+                 'cooloff',100                   ,... % # of iterations over which temperature declines as erf
+                 'tempmax',9                     ,... % maximum multiple of all standard deviations
+                 'saveperN',10                   ,... % save only every saveperN iterations    % bb2021.09.14 savig each one, since I have 100 iterations, this way we can still do probability math (taking the 5 most poorly performing models... otherwise, we get code errors later on).    
                  'bestNmod2keep',-5000           ,... % keep only the best N models in each chain, defined here
                  'kerneltolmax',1.5              ,... % kernel max. tolerance - max norm of perturbation before re-calc kernels
                  'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
@@ -145,7 +145,7 @@ inv = struct(    'verbose',false                 ,... % option to spit out more 
                  'Nsavestate',100                ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x             
-                 'datatypes',{{'HKstack_P'}})  
+                 'datatypes',{{'HKstack_P'}}) 
                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
@@ -171,12 +171,12 @@ modl.sed = struct(...
     ... shear velocity of the sediments
                      'vsmax',3.3                 ,... % max sed velocity, km/s
                      'vsmin',2.8                 ,... % min sed velocity, km/s
-                     'vsstd',0.0                 );  % std of sed velocity for perturbation, km/s
+                     'vsstd',0.00                 );  % std of sed velocity for perturbation, km/s
 
 modl.crust = struct(...
     ... thickness of the crust
-                     'hmax',60                   ,... %60 max xtal crust thickness, km % Shen and Ritzwoller 2016 Don't show anything above ~55 km in eastern US. bb2021.10.26
-                     'hmin',10                   ,... %10 min xtal crust thickness, km % bb2021.10.26 Going VERY shallow because we will go offshore, expecting down to about 7 km thickness (Shuck et al., 2019). We don't want priors to thicken the offshore crust. 
+                     'hmax',70                   ,... %60 max xtal crust thickness, km % Shen and Ritzwoller 2016 Don't show anything above ~55 km in eastern US. bb2021.10.26
+                     'hmin',25                   ,... %10 min xtal crust thickness, km % bb2021.10.26 Going VERY shallow because we will go offshore, expecting down to about 7 km thickness (Shuck et al., 2019). We don't want priors to thicken the offshore crust. 
                      'hstd',2.5                    ,... % std of xtal crust thickness, for perturbation, km
                 ... gaussian prior probability for crust thickness - mean=30, std=10
                      'h_pprior',@(h) 1,...exp(-(h-30).^2/4.^2),... % prior probability 
@@ -232,7 +232,7 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
                            'ccp',0.1             ,... %    ccp stack
                            'lo',0.1))            ,... %    low-f
                   	 'HKstack',struct(            ... %  H-K stack
-                    	   'P',0.5)              ,... %    P combination
+                    	   'P',.3)              ,... %    P combination
                   	 'SW',struct(                 ... %  Surface waves
                     	'Ray',struct(             ... %   Rayleigh waves
                            'phV',0.05            ,... %    phase velocities
@@ -262,7 +262,7 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
                            'ccp',1e-2             ,... %    ccp stack
                            'lo',1e-2))           ,... %    low-f
                   	 'HKstack',struct(            ... %  H-K stack
-                    	   'P',0.2)             ,... %    P combination
+                    	   'P',0.02)             ,... %    P combination
                   	 'SW',struct(                 ... %  Surface waves
                     	'Ray',struct(             ... %   Rayleigh waves
                            'phV',1e-4            ,... %    phase velocities
@@ -273,7 +273,9 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
                            'phV',1e-4            ,... %    phase velocities
                            'grV',1e-4)))         ,... %    group velocities
                                                   ...  
-                  'logstd_sigma',0.05            );   % LOGSTD
+                  'logstd_sigma',0.05,            ...
+                  'deg_of_freedom',struct(       ...
+                      'h_kappa', 15)) ;   % LOGSTD
 
                  
 %% Forward calc. parms

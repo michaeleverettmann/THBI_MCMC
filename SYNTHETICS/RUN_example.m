@@ -17,6 +17,7 @@ generation = 0; % generation of solution and data processing
 gc = '';
 BWclust = '';
 STAMP = 'examplerun';
+% STAMP = 'adding_sediment_pt1'; 
 
 onesta = '';
 

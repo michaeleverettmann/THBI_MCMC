@@ -37,6 +37,7 @@ for iii = 1:nchains
     % get time unit for cumtimes
     timestr = {'s','min','hr','day'}; 
     timenrm = [1,60,60*60,24*60*60];
+    ituse = 3; % By default, assume we are plotting in hours. Update if needed. Somehow this variable is not always populated below. bb2022.01.10
     for it = 1:length(timestr)
         if max(cumtimes)>timenrm(it), ituse = it; end
     end
