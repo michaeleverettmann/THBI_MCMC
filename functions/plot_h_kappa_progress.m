@@ -1,5 +1,5 @@
 function plot_h_kappa_progress(trudata, allmodels, resdir, chainNo)
-
+warning('bb2022.10.19. plot_h_kappa_progress no longer in use. Move to plot_h_kappa_progress2'); 
 % Extract some info
 hStack = trudata.HKstack_P.H; 
 kStack = trudata.HKstack_P.K;  

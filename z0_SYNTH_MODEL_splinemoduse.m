@@ -29,10 +29,16 @@ k_mantle = length(mknots);
 % sharper LAB
 
 vpvs_crust = 1.8;
+% vpvs_crust = 1.6; warning('Changing synthetic vpvs_crust')
+
 
 xi_crust = 1.05;
 xi_mantle = 0.95;
 
+
+% xi_crust = 1.;
+% xi_mantle = 1.;
+% warning("removing anisotropy from the synthetic model")
 
 %% DERIVATIVE PARMS
 % DEPTHS
@@ -113,6 +119,16 @@ if any(isnan(TLM.rho))
     error('NaN densities')
 end
 
+%% ====== Calculate average VS in crust. For h-kappa stacks === brb2022.02.08
+
+z2 = TRUEmodel.z; % Need to operate on z a little bit. 
+indLay = z2(2:end) == z2(1:end-1); % Layers indecies. 
+indLay = find(indLay)+1; % Bottom of layers. 
+z2(indLay) = z2(indLay) + 0.01; % Need unique points. 
+timeToDep = cumtrapz(z2, 1./TRUEmodel.vs); % Time it would take a vertically travelling ray to go from surface to some depth. 
+
+TRUEmodel.vsAvCrust = h_crust / interp1(z2, timeToDep, h_crust); % "Average" travel time in crust. 
+% brb2022.02.09: This assumes a station with zero elevation. It should be fine for most synthetic tests. TODO we do have an optional elevation value in the synthetic model. I should verify that z includes z<0 - if so, no code change is needed. 
 
 %% PLOT FINAL MODEL
 if ifplot

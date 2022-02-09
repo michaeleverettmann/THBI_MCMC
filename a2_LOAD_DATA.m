@@ -23,7 +23,7 @@ elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
     fprintf(' > Creating custom model and synthetic data\n')
     
     % make synth model
-    z0_SYNTH_MODEL_splinemoduse(par,0);  %close(95)
+    [model,laymodel] = z0_SYNTH_MODEL_splinemoduse(par,0);  %close(95)
     save([par.res.resdir,'/trumodel'],'TRUEmodel');
 
     % make synth data
@@ -46,7 +46,7 @@ elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
     end
     
     % Use receiver functions to make h-kappa stacks. 
-    [ trudata ] = z1_SYNTH_DATA_h_kappa(par,trudata,0);
+    [ trudata ] = z1_SYNTH_DATA_h_kappa(par,trudata,model,0);
     
 %% -----------------------------------------------------------------
 %% LAB TESTING

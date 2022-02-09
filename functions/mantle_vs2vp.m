@@ -18,13 +18,15 @@ end
 
 function vpvs = ak135vpvs(Zkm)
 
-% values are taken from ak135 function with no crust
+
+% values are taken from ak135 function with continental crust
+% http://rses.anu.edu.au/seismology/ak135/ak135f.html
 % columns are Z, vpvs_nocrust
 a = [
-     0.000      1.7970
-    20.000      1.7957
-    20.0001     1.7957
-    35.000      1.7946
+     0.000      1.6763
+    20.000      1.6763
+    20.0001     1.6883
+    35.000      1.6883
     35.0001     1.7946
     77.500      1.7918
    120.000      1.7889

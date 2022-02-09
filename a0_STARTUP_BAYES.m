@@ -29,6 +29,7 @@ bayesdir = [hd '/Documents/UCSB/ENAM/THBI_ENAM/']; % '/Users/zeilon/Documents/MA
 addpath(bayesdir)
 % path of all inversion sub functions
 addpath([bayesdir,'functions']) % inside this folder
+addpath([bayesdir,'functions/hKappaFunk']) % For doing some things with h-kappa stacks. 
 % path of sub functions that I got online but don't know if I can legally
 % distribute. bb2021.09.14
 addpath(genpath([bayesdir, 'functions/functionsExternal'])); 

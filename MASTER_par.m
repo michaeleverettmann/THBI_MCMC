@@ -204,8 +204,9 @@ cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup.
 mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
 
 parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+% % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 % warning('BB2021.11.22 Not in parallel!!!')
-accept_info = struct(); % bb2022.01.05 Temporary tests...
+accept_info = struct(); % bb2022.01.05 Temporary tests for h-kappa inversion. 
     
 % Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
 warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    
@@ -231,7 +232,7 @@ numFails = 0;
 % only let starting model out of the loop if it passes conditions
 while ifpass==0
     while ifpass==0 % first make sure the starting model satisfies conditions
-        model0 = b1_INITIATE_MODEL(par);
+        model0 = b1_INITIATE_MODEL(par,[],[],TD.Value);
         model = model0;
         model = expand_dathparms_to_data( model,TD.Value,par );
         ifpass = a1_TEST_CONDITIONS( model, par );
@@ -285,6 +286,7 @@ time0 = now;
 
 while ii < par.inv.niter
 ii = ii+1;
+par.ii = ii; % bb2022.10.18 Keep track of ii in par for easily plotting how inversion is changing with ii. 
 
 %% SAVE model every saveperN
 if mod(ii,par.inv.saveperN)==0 && log_likelihood ~= -Inf
@@ -343,8 +345,14 @@ try
         model1 = model; ptbnorm = 0; ifpass = 1; p_bd = 1; Pm_prior1 = Pm_prior; log_likelihood1 = -Inf;
         ptb{ii,1} = 'start';
     else
-		[model1, ptb{ii,1}, p_bd ] = b2_PERTURB_MODEL(model,par,temp);
-		ifpass = a1_TEST_CONDITIONS( model1, par, par.inv.verbose  );
+        %%%% brb2022.02.08 Start section where trying double perturbations.
+        [model1, ptb{ii,1}, p_bd        ] = b2_PERTURB_MODEL(model,par,temp);
+% % % 		[model1, ptb{ii,1}, p_bd_first  ] = b2_PERTURB_MODEL(model,par,temp);
+% % %         [model1, ptb{ii,1}, p_bd_second ] = b2_PERTURB_MODEL(model1,par,temp); % bb2022.01.10 test to see what happens if we perterb model twice. 
+% % % 		p_bd = p_bd_first * p_bd_second; % Multiply these probabilities together... 
+        %%%% brb2022.02.08 End section where trying double perturbations.
+
+        ifpass = a1_TEST_CONDITIONS( model1, par, par.inv.verbose  );
 		if p_bd==0, if par.inv.verbose, fprintf('  nope\n'); end; break; end
 		if ~ifpass, if par.inv.verbose, fprintf('  nope\n'); end; break; end
 
@@ -424,9 +432,16 @@ try
     predat_save1 = predata0;
 
     end % while ifpass
-
+       
 %% ========================  ACCEPTANCE CRITERION  ========================
     [ ifaccept ] = b6_IFACCEPT( log_likelihood1,log_likelihood,temp,p_bd*ifpass,Pm_prior1,Pm_prior);
+    
+% % % %     sprintf('Accept: %1.0f --- %3.1f -> %3.1f Log likelihood  --- p_bd %3.1f',...
+% % % %         ifaccept, log_likelihood, log_likelihood1, p_bd)
+    dLog = (log_likelihood1-log_likelihood); 
+    if ((log_likelihood1 - log_likelihood) < -10) && ifaccept; 
+        disp('Accepted a shitty model')
+    end
     
     % ======== PLOT ========  if accept
     if ifaccept && par.inv.verbose && fail_chain==0
@@ -445,7 +460,10 @@ try
     accept_info(ii).predat_save = predat_save1; 
     accept_info(ii).iter = ii; 
     accept_info(ii).temp = temp; 
-    accept_info(1) .trudata = trudata; % Inefficient, but this is just for testing. 
+    accept_info(ii).ptbnorm = ptbnorm; 
+    accept_info(ii).Pm_prior1 = Pm_prior1; 
+    accept_info(ii).p_bd = p_bd; 
+    if ii == 1; accept_info(1) .trudata = trudata; end; % Inefficient, but this is just for testing. 
     %%% TODO remove these lines eventually. 
 
 
@@ -484,11 +502,27 @@ try
 
 %% =========  reset kernel at end of burn in or after too many iter =======
     resetK = false;
-    if (newK && ifaccept) == false && ii == par.inv.burnin % reset kernel at end of burn in (and we didn't just reset it tacitly)
+% %     if (newK && ifaccept) == false && ii == par.inv.burnin % reset kernel at end of burn in (and we didn't just reset it tacitly)
+% %             fprintf('\n RECALCULATING %s KERNEL - end of burn in\n',chainstr);
+% %             resetK = true;
+% %     end
+% %     if (newK && ifaccept) == false && nchain > par.inv.maxnkchain % reset kernel if chain too long (and we didn't just reset it tacitly)
+% %             fprintf('\n RECALCULATING %s KERNEL at iter %.0f - chain too long\n',chainstr,ii);
+% %             resetK = true;
+% %     end
+% bb2022.01.12 I think the ifaccept part of the if... is making us reset
+% our likelihood below even if we are currently stuck with a model that
+% failed ifaccept. 
+%(newK == false) % Don't reset if we already reset just above... 
+%(ifaccept == true) % Don't reset on this model since we didn't even accept it. Otherwise our likelihood is reset.
+% mightReset = ( (newK && ifaccept) == false ); % Zach's old version
+    mightReset = (newK == false) && (ifaccept == true); 
+    if mightReset && ii == par.inv.burnin % reset kernel at end of burn in (and we didn't just reset it tacitly)
+            % bb2022.10.12 TODO Need to find way to run kernel on first accepted model after burnin
             fprintf('\n RECALCULATING %s KERNEL - end of burn in\n',chainstr);
             resetK = true;
     end
-    if (newK && ifaccept) == false && nchain > par.inv.maxnkchain % reset kernel if chain too long (and we didn't just reset it tacitly)
+    if mightReset && nchain > par.inv.maxnkchain % reset kernel if chain too long (and we didn't just reset it tacitly)
             fprintf('\n RECALCULATING %s KERNEL at iter %.0f - chain too long\n',chainstr,ii);
             resetK = true;
     end
@@ -532,8 +566,13 @@ end % on the fail_chain while...
 fprintf('\n ================= ENDING ITERATIONS %s =================\n',chainstr)
 % save([resdir,'/chainout/',chainstr],'model0','misfits','allmodels')
 
-% % % plot_h_kappa_progress(trudata, allmodels, resdir, iii)
-% % % plot_h_kappa_progress2(trudata, allmodels, resdir, iii, accept_info)
+try; 
+    % % % plot_h_kappa_progress(trudata, allmodels, resdir, iii)
+    plot_h_kappa_progress2(trudata, allmodels, resdir, iii, accept_info, ...
+        par, trudata.HKstack_P.Esum)
+catch
+    warning('bb2022.10.14 Could not plot h kappa inversion for some reason.')
+end
 
 
 save_inv_state(resdir,chainstr,allmodels,misfits)

@@ -47,8 +47,12 @@ for iii = 1:nchains
     plot(ax2,iters,avgtimes,'-o','linewidth',1.5,'color',basecol);
     plot(ax2,[0 max(mf.iter)],(max(mf.time)./max(mf.iter))*[1 1],'--r','linewidth',1.5);
     
-    set(ax1,'xlim',[0 max(iters)],'fontsize',16)
-	set(ax2,'xlim',[0 max(iters)],'fontsize',16)
+    try % brb2022.02.09 I put this try-catch here because somehow some glitch would cause the whole inversion to shut down. TODO solve the glitch. 
+        set(ax1,'xlim',[0 max(iters)],'fontsize',16)
+        set(ax2,'xlim',[0 max(iters)],'fontsize',16)
+    catch
+        warning('Somehow cant set xlim in plot_invtime.m'); 
+    end
 end
     
 xlabel(ax2,'Iteration','fontsize',20,'interpreter','latex')
