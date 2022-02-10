@@ -1,4 +1,4 @@
-function trudata = dofTHBI(trudata)
+function trudata = dofTHBI(trudata,par)
 % trudata = dofTHBI(trudata)
 % 
 % Function to compute "N", or degrees of freedom, for each datatype:
@@ -27,6 +27,12 @@ for id = 1:length(dtypes)
     end
     
     
+end
+
+if isfield(trudata, 'HKstack_P')
+    trudata.HKstack_P.Nobs = par.mod.data.deg_of_freedom.h_kappa; 
+    trudata.HKstack_P.dof  = par.mod.data.deg_of_freedom.h_kappa; 
+    warning('bb2021.12.22 setting hk structure: Nobs, dof to a constant from par file.')
 end
 
 end

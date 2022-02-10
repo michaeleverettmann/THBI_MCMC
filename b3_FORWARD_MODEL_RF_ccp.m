@@ -81,7 +81,8 @@ if isreal(asind(laymodel.Vs*sind(S_inc)./laymodel.Vs(end))) %
     else
         laymodel_Suse = laymodel;
     end
-    [predat_sp,tt_sp] = run_propmat(laymodel_Suse,ID,'Sp',samprate, S_inc, par.forc.synthperiod,par.forc.nsamps);
+    [predat_sp,tt_sp] = run_propmat(laymodel_Suse,ID,'Sp',samprate, S_inc,...
+        par.forc.synthperiod,par.forc.nsamps);
     % pad with zeros
     tt_sp = [tt_sp(1) + [-1000:-1]'./samprate; tt_sp ;tt_sp(end) + [1:1000]'./samprate];
     predat_sp = [zeros(1000,3);predat_sp;zeros(1000,3)];

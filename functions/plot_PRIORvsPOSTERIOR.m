@@ -11,7 +11,7 @@ if nargin<5 || isempty(ofile)
 end
  
 %% Set up plot
-figure(19), clf, set(gcf,'pos',[43 141 1774 961]);
+figure(19), clf, set(gcf,'pos',[100 100 1440 796]);
 cls = get(groot,'defaultAxesColorOrder');
 
 %% Moho depth

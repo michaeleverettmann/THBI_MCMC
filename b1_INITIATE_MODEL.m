@@ -1,4 +1,4 @@
-function model = b1_INITIATE_MODEL(par,selev,ifplot)
+function model = b1_INITIATE_MODEL(par,selev,ifplot,hkStack)
 % model = b1_INITIATE_MODEL(par)
 % 
 % Function to make the nstas x 1-D model as per the parameters defined in
@@ -25,10 +25,21 @@ if nargin <3 || isempty(ifplot)
 end
 
 mod = par.mod;
+if ~par.mod.starting.HKappa.startAtHK || nargin <4 || isempty(hkStack); 
+    h_crust            = random('unif',mod.crust.hmin,mod.crust.hmax);
+    vpvs_crust         = random('unif',mod.crust.vpvsmin,mod.crust.vpvsmax);
+else; 
+    disp('Getting starting model h and k from HK stack')
+    Esum               = hkStack.HKstack_P.Esum;
+    h                  = hkStack.HKstack_P.H; 
+    k                  = hkStack.HKstack_P.K; 
+    [rowMin, colMin]   = find(max(max(Esum))==Esum); % Kappa is first dimension
+    vpvs_crust         = k(rowMin);
+    h_crust            = h(colMin);
+end
 
 %% resolve important values from prior distributions
 h_sed = random('unif',mod.sed.hmin,mod.sed.hmax);
-h_crust = random('unif',mod.crust.hmin,mod.crust.hmax);
 
 % k_crust = mod.crust.kmin + ceil(random('unid',mod.crust.kmax-mod.crust.kmin+1)/2)-1;
 % k_mantle = mod.mantle.kmin + ceil(random('unid',mod.mantle.kmax-mod.mantle.kmin+1)/3)-1;
@@ -40,8 +51,6 @@ k_mantle = sample_Jeffreys( 1,mod.mantle.kmax,mod.mantle.kmin);
 vs_sed = random('unif',mod.sed.vsmin,mod.sed.vsmax,2,1);
 kvs_crust = random('unif',mod.crust.vsmin,mod.crust.vsmax,k_crust+1,1);
 kvs_mantle = random('unif',mod.mantle.vsmin,mod.mantle.vsmax,k_mantle+1,1);
-
-vpvs_crust = random('unif',mod.crust.vpvsmin,mod.crust.vpvsmax);
 
 xi_crust = random('unif',mod.crust.ximin,mod.crust.ximax);
 xi_mantle = random('unif',mod.mantle.ximin,mod.mantle.ximax);

@@ -17,6 +17,9 @@ if p_bd == 0
     return
 end
 
+
+% sprintf('log likelihood %s', num2str(log_likelihood))
+% sprintf('previous log likelihood %s', num2str(last_loglikelihood))
 % definitely accept if better (with caveats for prior prob)
 if log_likelihood + log(Pm_prior) + log(p_bd) >= last_loglikelihood + log(last_Pm_prior)
     ifaccept = true; 

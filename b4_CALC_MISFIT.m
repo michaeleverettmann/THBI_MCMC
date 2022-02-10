@@ -53,9 +53,12 @@ for id = 1:length(par.inv.datatypes)
 
     % HKstack
     elseif strcmp(pdt{1},'HKstack')
-        % a is deliberate dummy - not sure how to calc error here
-        misfit.E2.(dtype) = 1./predata.(dtype).E_by_Emax; % pick out error value
-
+        
+        % Use external function to go from E to error. Will use at other places throughout the inversion. 
+        misfit.E2.(dtype) = hKappaError(par.datprocess.HKappa.scale_error,...
+                                        predata.(dtype).E_by_Emax, ...
+                                        par.datprocess.HKappa.min_error); 
+                                        
     end % end on data type
 end
 

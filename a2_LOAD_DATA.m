@@ -23,11 +23,16 @@ elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
     fprintf(' > Creating custom model and synthetic data\n')
     
     % make synth model
-    z0_SYNTH_MODEL_splinemoduse(par,0);  %close(95)
+    [model,laymodel] = z0_SYNTH_MODEL_splinemoduse(par,0);  %close(95)
     save([par.res.resdir,'/trumodel'],'TRUEmodel');
 
     % make synth data
+%     [ junkdata ] = z1_SYNTH_DATA(par,0);
+%     [predata,laymodel1] = b3__INIT_PREDATA(TRUEmodel,par,junkdata,0 );
+%     predata = b3_FORWARD_MODEL_BW(TRUEmodel,laymodel1,par,predata,'test_bb2021_12_07',0 ); 
+%     predata = b3_FORWARD_MODEL_RF_ccp(   TRUEmodel,laymodel1,par,predata,'test_bb2021_12_07',0 );
     [ trudata ] = z1_SYNTH_DATA(par,0); % in ZRT format
+    
     if strcmp(par.synth.noisetype,'real')
         [ trudata,par ] = z2_NOISIFY_SYNTH( trudata, par,par.synth.noise_sta_deets );
     end
@@ -39,6 +44,9 @@ elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
     if any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
         trudata = BW_2_RF(trudata,par);
     end
+    
+    % Use receiver functions to make h-kappa stacks. 
+    [ trudata ] = z1_SYNTH_DATA_h_kappa(par,trudata,model,0);
     
 %% -----------------------------------------------------------------
 %% LAB TESTING
@@ -143,7 +151,7 @@ end
 
 %% DEGREES OF FREEDOM
 fprintf('Computing degrees of freedom (N) for each data type\n');
-trudata = dofTHBI(trudata);
+trudata = dofTHBI(trudata, par);
 
 % plot_TRU_WAVEFORMS(trudata);
 % plot_TRUvsPRE(trudata,trudata);
