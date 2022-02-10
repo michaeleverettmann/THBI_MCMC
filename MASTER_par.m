@@ -203,9 +203,10 @@ if ~ exist(mainDir); mkdir(mainDir); end % This is where we will cd to for final
 cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
 mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
 
-parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-% % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-% warning('BB2021.11.22 Not in parallel!!!')
+% % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+warning('BB2021.11.22 Not in parallel!!!')
+
 accept_info = struct(); % bb2022.01.05 Temporary tests for h-kappa inversion. 
     
 % Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
@@ -240,7 +241,8 @@ while ifpass==0
     end
 
     %% starting model kernel
-    fprintf('\nCreating starting kernels %s, have tried %1.0f times, fail_chain=%1.0f\n',chainstr, numFails, fail_chain)
+    fprintf('\nCreating starting kernels %s, have tried %1.0f times, fail_chain=%1.0f\n',...
+        chainstr, numFails, fail_chain)
     try 
         [Kbase] = make_allkernels(model,[],TD.Value,['start',chainstr],par,...
             'maxrunN',5); % TODO this code caused a loop that would have failed infinitely. SHould not use a while loop like this. bb2021.09.14 
