@@ -2,7 +2,7 @@ function [ data ] = z1_SYNTH_DATA_h_kappa(par,trudata,trumodel,ifplot)
 %% brb2022.02.08 Function to calculate synthetic h-kappa stack from
 % synthetic receiver functions. 
 
-% ifplot = true; warning('brb2022.02.08 remoe ifplot')
+% ifplot = true; warning('brb2022.02.08 remove ifplot')
 
 samprate = par.synth.samprate;
 data = trudata; 
@@ -36,13 +36,16 @@ if any(string(pdtyps(:,1))=='HKstack'); % Use the Ps receiver function to get h-
     
     
     if ifplot; 
-        figure(198); clf; hold on; 
+        figure(198); clf; hold on; set(gcf,'color','w');
         subplot(1,1,1); hold on; 
         xlabel('kappa'); ylabel('H'); title('Synthetic H-kappa stack'); 
         set(gca, 'ydir', 'reverse');         
         sf = pcolor(HK_K, HK_H, HK_A'); %Can't use surf. It's 3d. It always covers other plotting objects. 
         sf.EdgeAlpha = 0; 
         colorbar(); 
+        xlim([min(HK_K), max(HK_K)]); 
+        ylim([min(HK_H), max(HK_H)]); 
+        
         
         % An unfinished attempt to interpolate to find the exact point of maximum h-k energy. 
 %         F = griddedInterpolant({HK_K, HK_H},HK_A,'spline');
