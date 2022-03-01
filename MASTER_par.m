@@ -205,7 +205,16 @@ mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep
 
 % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-warning('BB2021.11.22 Not in parallel!!!')
+% warning('BB2021.11.22 Not in parallel!!!')
+
+
+%%% Initialize several variables. Necessary for refactoring code. 
+predata = []; 
+newK = false; % Maybe make true. 
+SW_precise = []; 
+laymodel1 = []; 
+non_acceptk = 0; % How often have we rejected the current baseline model. 
+%%% End initializing several varibales. 
 
 accept_info = struct(); % bb2022.01.05 Temporary tests for h-kappa inversion. 
     
@@ -229,8 +238,9 @@ while fail_chain>=20
 
 %% initiate model
 [ifpass, numFails, model0, model,...
-    Pm_prior, par, Kbase, model0_perchain] = initiate_model(...
-        par, TD, chainstr, fail_chain, model0_perchain, iii); 
+    Pm_prior, par, Kbase] = initiate_model(...
+        par, TD, chainstr, fail_chain, iii); 
+model0_perchain{iii} = model0;
 
 
 %% ========================================================================
@@ -309,10 +319,25 @@ try
     while ifpass == false % only keep calculating if model passes (otherwise save and move on)
 
 %% ===========================  PERTURB  ===========================
-    if ii==1; log_likelihood1 = -Inf; end
+    if ii==1; log_likelihood1 = -Inf; model1 = model; ptbnorm = nan; ...
+            Pm_prior1k = Pm_prior; end
+    if non_acceptk == 0; p_bd = 1; end; %!%!
+    
+%     [model1,ptbnorm,ifpass,p_bd,Pm_prior1,...
+%         ptb,modptb,nchain,breakTrue]...
+%         = perturb_model(model, Pm_prior, ptb, ii, par, temp, Kbase,nchain); 
+%     dis(non_acceptk)
+    
     [model1,ptbnorm,ifpass,p_bd,Pm_prior1,...
-        ptb,modptb,nchain,breakTrue]...
-        = perturb_model(model, Pm_prior, ptb, ii, par, temp, Kbase,nchain); 
+    ptb,modptb,nchain,breakTrue,non_acceptk]...
+    = delay_reject(model, Pm_prior, ptb, ii, par, temp, Kbase,nchain,...
+        model1,ptbnorm,p_bd,Pm_prior1k,non_acceptk); 
+%     non_acceptk_array(ii) = non_acceptk; 
+    
+%     disp(non_acceptk)
+%     fprintf('non_acceptk = %1.0f, ifaccept = %1.0f', non_acceptk, 
+    
+    
     if breakTrue; break; end;
 
 %% ===========================  FORWARD MODEL  ===========================
@@ -361,17 +386,22 @@ try
     else
         fail_chain = 0;
     end
+    
+    % Factored. Not working yet. 
+% % %     ID = [chainstr,num2str(ii,'%05.f'),num2str(randi(99),'_%02.f')];
+% % %     [predata,predata0,laymodel1,fail_chain,breakTrue,newK,SW_precise] = forward_model(...
+% % %     ID,ptb,ii,predata,model1,par,TD,laymodel1,fail_chain,ptbnorm,newK,SW_precise); 
+% % %     if breakTrue; break; end 
+   
 
 %% =========================  CALCULATE MISFIT  ===========================
 
     % SW weights, if applicable
     [ SWwt ] = make_SW_weight( par,Kbase,TD.Value );
-
     [ misfit1 ] = b4_CALC_MISFIT( TD.Value,predata,par,0,SWwt ); % misfit has structures of summed errors
 
 %% =======================  CALCULATE LIKELIHOOD  =========================
     [ log_likelihood1,misfit1 ] = b5_CALC_LIKELIHOOD( misfit1,TD.Value,model1.datahparm,par);
-
 %     fprintf('MISFITS: Sp %5.2e  Ps %5.2e  SW %5.2e\n',misfit.SpRF,misfit.PsRF,misfit.SW)
 %     fprintf('CHI2S:   Sp %5.2e  Ps %5.2e  SW %5.2e\n',misfit.chi2_sp,misfit.chi2_ps,misfit.chi2_SW)
 
@@ -382,7 +412,23 @@ try
        
 %% ========================  ACCEPTANCE CRITERION  ========================
     [ ifaccept ] = b6_IFACCEPT( log_likelihood1,log_likelihood,temp,p_bd*ifpass,Pm_prior1,Pm_prior);
+    %!%!
     
+    if (ifaccept && non_acceptk == 2); 
+        disp('Accepted the second perturbation') 
+    end
+    
+    if (~ifaccept); 
+        if (non_acceptk == 1); % Didn't accept a model, but we only perturbed it once. Without increasing ii, perturb the again and try iterating again. 
+            ii = ii - 1; % Step back an iteration. After "continue", ii = ii + 1, so this just keeps us on the same iteration. 
+            continue; 
+        elseif (non_acceptk == 2); 
+            ; 
+        end
+    end
+    
+%     fprintf('ifaccept = %1.0f, non_acceptk = %1.0f', ifaccept,
+%     non_acceptk) %!%!
 % % % %     sprintf('Accept: %1.0f --- %3.1f -> %3.1f Log likelihood  --- p_bd %3.1f',...
 % % % %         ifaccept, log_likelihood, log_likelihood1, p_bd)
     dLog = (log_likelihood1-log_likelihood); 
@@ -410,6 +456,7 @@ try
     accept_info(ii).ptbnorm = ptbnorm; 
     accept_info(ii).Pm_prior1 = Pm_prior1; 
     accept_info(ii).p_bd = p_bd; 
+    accept_info(ii).non_acceptk = non_acceptk; 
     if ii == 1; accept_info(1) .trudata = trudata; end; % Inefficient, but this is just for testing. 
     %%% TODO remove these lines eventually. 
 
@@ -424,6 +471,8 @@ try
         end
 
         % save new model!
+%         sprintf('ACCEPTED, non_acceptk = %1.0f', non_acceptk)
+        non_acceptk = 0; %!%! We accepted a new model. So we have now rejected the current model 0 times. 
         model = model1;
         log_likelihood = log_likelihood1;
         Pm_prior = Pm_prior1;
@@ -439,6 +488,8 @@ try
         end
 
     else
+%         non_acceptk = non_acceptk + 1;  %!%! We rejected the baseline model 1 more time. 
+%         sprintf('not accepted, non_acceptk = %1.0f', non_acceptk)
         if par.inv.verbose, fprintf('  --FAIL--\n'); end
         if newK, delete_mineos_files(ID,'R'); end
         if newK, delete_mineos_files(ID,'L'); end
@@ -449,20 +500,6 @@ try
 
 %% =========  reset kernel at end of burn in or after too many iter =======
     resetK = false;
-% %     if (newK && ifaccept) == false && ii == par.inv.burnin % reset kernel at end of burn in (and we didn't just reset it tacitly)
-% %             fprintf('\n RECALCULATING %s KERNEL - end of burn in\n',chainstr);
-% %             resetK = true;
-% %     end
-% %     if (newK && ifaccept) == false && nchain > par.inv.maxnkchain % reset kernel if chain too long (and we didn't just reset it tacitly)
-% %             fprintf('\n RECALCULATING %s KERNEL at iter %.0f - chain too long\n',chainstr,ii);
-% %             resetK = true;
-% %     end
-% bb2022.01.12 I think the ifaccept part of the if... is making us reset
-% our likelihood below even if we are currently stuck with a model that
-% failed ifaccept. 
-%(newK == false) % Don't reset if we already reset just above... 
-%(ifaccept == true) % Don't reset on this model since we didn't even accept it. Otherwise our likelihood is reset.
-% mightReset = ( (newK && ifaccept) == false ); % Zach's old version
     mightReset = (newK == false) && (ifaccept == true); 
     if mightReset && ii == par.inv.burnin % reset kernel at end of burn in (and we didn't just reset it tacitly)
             % bb2022.10.12 TODO Need to find way to run kernel on first accepted model after burnin
@@ -489,10 +526,7 @@ try
             predata = b3_FORWARD_MODEL_SW_kernel( model,Kbase,par,predata );
             fail_reset = fail_reset+1;
         end
-        % need to also reset likelihood and misfit to the new, precise data
-        % (likelihood may have been artificially high due to kernel forward
-        % calc. approximation - if so, need to undo this, or chain will get
-        % stuck once we reset kernels).
+        % need to also reset likelihood and misfit to the new, precise data (likelihood may have been artificially high due to kernel forward  calc. approximation - if so, need to undo this, or chain will get stuck once we reset kernels).
         [log_likelihood,misfit] = b8_LIKELIHOOD_RESET(par,predata,TD.Value,Kbase,model.datahparm);
         Pm_prior = calc_Pm_prior(model,par);
         nchain = 0;
@@ -514,9 +548,9 @@ fprintf('\n ================= ENDING ITERATIONS %s =================\n',chainstr
 % save([resdir,'/chainout/',chainstr],'model0','misfits','allmodels')
 
 try; 
-    % % % plot_h_kappa_progress(trudata, allmodels, resdir, iii)
     plot_h_kappa_progress2(trudata, allmodels, resdir, iii, accept_info, ...
         par, trudata.HKstack_P.Esum)
+
 catch
     warning('bb2022.10.14 Could not plot h kappa inversion for some reason.')
 end
@@ -537,7 +571,6 @@ diary off
 
 end % parfor loop
 [ram_copy_stats] = ram_to_HD(paths, mainDir, nwk, sta); % Copy final results from ram to hard disk. 
-
 cd(mainDir); % Get back out of ram and go to stations hard drive folder 
 
 if profileRun; % Get results from profiling. 
@@ -628,6 +661,7 @@ save([resdir,'/final_predata'],'final_predata');
 [ final_log_likelihood,final_misfit ] = b5_CALC_LIKELIHOOD( final_misfit,trudata,final_model.hyperparms,par );
 plot_TRUvsPRE( trudata,final_predata,1,[resdir,'/final_true_vs_pred_data.pdf'], allmodels_collated);
 plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,1,[resdir,'/final_true_vs_pred_data_wavs.pdf']);
+save([resdir,'/final_misfit'],'final_misfit');
 
 
 plot_FIG2_FIT_MODEL( final_model,posterior,prior,par,1,[resdir,'/fig2_FIT_MODEL.pdf']);

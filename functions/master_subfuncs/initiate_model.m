@@ -1,6 +1,6 @@
 function [ifpass, numFails, model0, model,...
-    Pm_prior, par, Kbase, model0_perchain] = initiate_model(...
-        parOrig, TD, chainstr, fail_chain, model0_perchain, iii); 
+    Pm_prior, par, Kbase] = initiate_model(...
+        parOrig, TD, chainstr, fail_chain, iii); 
     
 par = parOrig; 
 
@@ -32,8 +32,6 @@ while ifpass==0
         numFails = numFails + 1; 
         continue;
     end
-
-    model0_perchain{iii} = model0;
 
 end % now we have a starting model!
 % diary off % Ending diary early for debugging. 

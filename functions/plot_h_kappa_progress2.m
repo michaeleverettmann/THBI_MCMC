@@ -4,6 +4,7 @@ function plot_h_kappa_progress2(trudata, allmodelsOrig, resdir, chainNo, ...
 % Make several plots of h-kappa inversion progress. 
 % This applies for just one chain. 
 
+
 %% Extract some info
 hStack              = trudata.HKstack_P.H; 
 kStack              = trudata.HKstack_P.K; 
@@ -42,6 +43,60 @@ sig                 = [accept_info.sig_hk]';
 allmodels           = [accept_info(:).model            ]; 
 hIter               = [allmodels.zmoh                  ]'; 
 kIter               = [allmodels.vpvs                  ]'; 
+
+
+%% Delayed rejection stuff
+nak = [accept_info.non_acceptk]'; 
+yShift = 0.05; % For accepted or rejected
+yPos = nak - yShift; 
+yPos(ifaccept) = yPos(ifaccept) + 2 * yShift; 
+
+figure(1425); clf; hold on; set(gcf, 'pos', [2156 1099 851 184]); 
+grid on; 
+box on; 
+title('Model acceptance and delayed rejection'); 
+xlabel('Iteration'); 
+ylabel('Number of perturbations'); 
+set(gca, 'YTick', [1, 2]); 
+set(gca, 'TickLength', [0,0]); 
+ylim([1-3*yShift, 2+3*yShift]); 
+
+
+% Two perturbations. Use only this for legend. 
+thisCond = and( ifaccept, nak == 2); 
+ac2_perc = sum(thisCond) / length(thisCond) * 100; 
+ac2 = scatter(iIter(thisCond), yPos(thisCond), '|b', 'DisplayName', ...
+    sprintf('Accepted 2P: %3.0f%%',ac2_perc))
+thisCond = and(~ifaccept, nak == 2); 
+rj2_perc = sum(thisCond) / length(thisCond)* 100; 
+rj2 = scatter(iIter(thisCond), yPos(thisCond), '|r', 'DisplayName', ...
+    sprintf('Rejected 2P: %3.0f%%',rj2_perc))
+
+
+% One perturbation
+thisCond = and( ifaccept, nak == 1); 
+ac1_perc = sum(thisCond) / length(thisCond)* 100; 
+ac1 = scatter(iIter(thisCond), yPos(thisCond), '|b', 'DisplayName', ...
+    sprintf('Accepted 1P: %3.0f%%',ac1_perc))
+thisCond = and(~ifaccept, nak == 1); 
+rj1_perc = sum(thisCond) / length(thisCond)* 100; 
+rj1 = scatter(iIter(thisCond), yPos(thisCond), '|r', 'DisplayName', ...
+    sprintf('Rejected 1P: %3.0f%%',rj1_perc))
+
+leg = legend([ac1, rj1, ac2, rj2], 'Location', 'east','NumColumns',2);
+legTitle = title(leg, 'Percent iterations per category'); 
+
+% % % scatter([accept_info.iter], [accept_info.non_acceptk], 40, [accept_info.ifaccept], 'filled'); 
+% % % scatter([accept_info.iter], [accept_info.non_acceptk], 40, [accept_info.ifaccept], 'filled'); 
+% % % cbar=colorbar(); 
+% % % colormap('cool'); 
+% % % cbar.Label.String = 'Accept?'; 
+% % % set(gcf, 'color', 'white'); 
+% % % grid on; 
+
+perc2pert = sum([accept_info.non_acceptk]==2) ./ length([accept_info.non_acceptk]) .* 100; 
+% title(sprintf('Perturbed twice %2.1f percent of time', perc2pert)); 
+exportgraphics(gcf, [resdir, '/delayed_perturbation_' num2str(chainNo) '.pdf']);  
 
 %% Plots with h-k as x and y in plots. 
 figure(1); clf; hold on; 

@@ -1,4 +1,4 @@
-function [model,laymodel] = z0_SYNTH_MODEL_splinemoduse(par,ifplot)
+function [model,laymodel,par] = z0_SYNTH_MODEL_splinemoduse(par,ifplot)
 
 
 if nargin < 2 || isempty(ifplot)
@@ -33,12 +33,23 @@ vpvs_crust = 1.8;
 
 
 xi_crust = 1.05;
+% xi_crust = 1; warning('no xi in crust')
 xi_mantle = 0.95;
 
 
 % xi_crust = 1.;
 % xi_mantle = 1.;
 % warning("removing anisotropy from the synthetic model")
+
+% % % brb2022.02.18 Save a few models in par...
+% % % Should set these elsewhere...
+% % par.synth.model.h_crust     = h_crust; 
+% % par.synth.model.selev       = selev; 
+% % par.synth.model.h_sed       = h_sed; 
+% % par.synth.model.vs_sed      = vs_sed; 
+% % par.synth.model.vpvs_Crust  = vpvs_crust; 
+% % par.synth.model.xi_crust    = xi_crust; 
+% % par.synth.model.xi_mantle   = xi_mantle; 
 
 %% DERIVATIVE PARMS
 % DEPTHS
@@ -112,6 +123,9 @@ xilay = [zeros(length(xs),1);...
          TRUEmodel.cxi*ones(length(xc),1);...
          TRUEmodel.mxi*ones(length(xm),1)]; % S radial anisotropy
 philay = ones(nlay,1); % P radial anisotropy
+% philay = (1 - xilay) + 1; warning("opposite p and s radial anisotropy")
+philay2 = xilay; warning('Changing synthetic philay')
+% philay = 1/2 * (philay + philay2); 
 etalay = ones(nlay,1); % eta anisotropy
 
 TLM = struct('zlayt',zlayt,'zlayb',zlayb,'Vs',Vslay,'Vp',Vplay,'rho',rholay,'nlay',nlay,'xi',xilay,'phi',philay,'eta',etalay);

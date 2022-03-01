@@ -23,7 +23,7 @@ elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
     fprintf(' > Creating custom model and synthetic data\n')
     
     % make synth model
-    [model,laymodel] = z0_SYNTH_MODEL_splinemoduse(par,0);  %close(95)
+    [model,laymodel,par] = z0_SYNTH_MODEL_splinemoduse(par,0);  %close(95)
     save([par.res.resdir,'/trumodel'],'TRUEmodel');
 
     % make synth data

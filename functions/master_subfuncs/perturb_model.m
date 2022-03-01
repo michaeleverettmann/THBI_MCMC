@@ -20,7 +20,7 @@ nchain = nchainOrig;
 
         ifpass = a1_TEST_CONDITIONS( model1, par, par.inv.verbose  );
         breakTrue=false; 
-		if p_bd==0, if par.inv.verbose, fprintf('  nope\n'); end; breakTrue=true; end
+		if p_bd==0, if par.inv.verbose, fprintf('  nope\n'); end; breakTrue=true; end % No need to return if breakTrue=true. We still want other variables to be defined. 
 		if ~ifpass, if par.inv.verbose, fprintf('  nope\n'); end; breakTrue=true; end
 
         Pm_prior1 = calc_Pm_prior(model1,par);  % Calculate prior probability of new model

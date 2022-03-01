@@ -19,7 +19,7 @@ end
 %% Setup misfit 
 % this is the SUM OF SQUARES MISFIT VECTOR
 misfit = struct('E2',cell2struct(cell(size(par.inv.datatypes)),par.inv.datatypes,2));
-    
+
 
 
 %% BW misfit
@@ -35,7 +35,7 @@ for id = 1:length(par.inv.datatypes)
         stfpow_tru = zeros(length(trudata.(dtype)),1);
         stfpow_pre = zeros(length(trudata.(dtype)),1);
         for itr = 1:length(trudata.(dtype))
-            misfit2(itr)    = xconv_misfit(trudata.(dtype)(itr).PSV(:,1),...
+            misfit2(itr)    =  (trudata.(dtype)(itr).PSV(:,1),...
                                                trudata.(dtype)(itr).PSV(:,2),...
                                                predata.(dtype)(itr).PSV(:,1),...
                                                predata.(dtype)(itr).PSV(:,2));
@@ -43,9 +43,57 @@ for id = 1:length(par.inv.datatypes)
                                  norm(trudata.(dtype)(itr).PSV(:,2));
             stfpow_pre(itr) = norm(predata.(dtype)(itr).PSV(:,1)) +...
                                  norm(predata.(dtype)(itr).PSV(:,2));
+                             
+                            
         end
+              
         misfit.E2.(dtype) = misfit2./stfpow_tru./stfpow_pre;      % SUM OF SQUARED MISFITS, NORMALISED
+        
+        %%% brb2022.02.18 Simple rms estimate for comparison. 
+        if strcmp(dtype, 'RF_Sp'); 
+            truSV = trudata.(dtype)(itr).PSV(:,1); 
+            preSV = predata.(dtype)(itr).PSV(:,1); 
+            
+%             truSV = truSV ./ norm(truSV); 
+%             preSV = preSV ./ norm(preSV); 
+            difSV = truSV - preSV; 
+                        
+            misfit.RMS_simple.(dtype) = sqrt(norm(truSV - preSV) ./ norm(truSV)); 
+            
+            if true; 
+                figure(1002); clf; hold on; set(gcf, 'color', 'white'); 
+                plot(truSV, 'k', 'DisplayName', 'truSV'); 
+                plot(preSV, 'b', 'DisplayName', 'preSV'); 
+                plot(difSV, 'r', 'DisplayName', ...
+                    sprintf('Diff: RMS = %0.4f', misfit.RMS_simple.(dtype) ) ); 
+                legend(); 
+            end 
+            
+            if true; % brb2022.02.18 Optional plotting to better understand RF error calculation. 
+                figure(1001); clf; hold on; set(gcf, 'color', 'white'); 
+                sgtitle(['Error (unsquared) = ' num2str(sqrt(misfit.E2.(dtype)))] ); 
+                subplot(4,1,1); hold on; box on; 
+                title(['True SV, norm = ' ...
+                    num2str(norm(trudata.(dtype)(itr).PSV(:,1)))]); 
+                plot(trudata.(dtype)(itr).PSV(:,1))
+                subplot(4,1,2); hold on; box on; 
+                title(['True P, norm = ' ...
+                    num2str(norm(trudata.(dtype)(itr).PSV(:,2)))]); 
+                plot(trudata.(dtype)(itr).PSV(:,2))
+                subplot(4,1,3); hold on; box on; 
+                title(['Pre SV, norm = ' ...
+                    num2str(norm(predata.(dtype)(itr).PSV(:,1)))]); 
+                plot(predata.(dtype)(itr).PSV(:,1))
+                subplot(4,1,4); hold on; box on; 
+                title(['Pre P, norm = ' ...
+                    num2str(norm(predata.(dtype)(itr).PSV(:,2)))]);  
+                plot(predata.(dtype)(itr).PSV(:,2))
+            end
+            
+        end    
+        
 
+        
     % SURFACE WAVE
     elseif strcmp(pdt{1},'SW')
         e = (trudata.(dtype).(pdt{3}) - predata.(dtype).(pdt{3}));

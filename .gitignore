@@ -4,8 +4,8 @@ ENAM/optimization_tests/**
 
 
 SYNTHETICS/inversion_results/**
-SYNTHETICS/**.mat 
-SYNTHETICS/**.mod 
+SYNTHETICS/**.mat
+SYNTHETICS/**.mod
 
 data/**
 
@@ -17,12 +17,12 @@ data/**
 **startAR**
 **startAL**
 **diary**
-**.eig 
-**.asc 
+**.eig
+**.asc
 **.mode
 **.run_mineos
-**vel_profile 
-**pathsAutoGen.m 
+**vel_profile
+**pathsAutoGen.m
 **nohup**.out
 
 
@@ -35,14 +35,14 @@ data/**
 **.pdf
 **.svg
 **.tif
-**.html 
-**.fig 
+**.html
+**.fig
 **.asv
-**.mat 
+**.mat
 
 
-papers_etc/** 
-SYNTHETICS/**.mat 
+papers_etc/**
+SYNTHETICS/**.mat
 SYNTHETICS/**/**.mat
 
 !**.m
@@ -51,8 +51,8 @@ SYNTHETICS/**/**.mat
 !**.c
 
 junk/**
-# This is just used to hold codes that I later developed and got running. They are elsewhere on my machine. 
-# There are some modifications, though. 
+# This is just used to hold codes that I later developed and got running. They are elsewhere on my machine.
+# There are some modifications, though.
 external_code_STORAGE/**
 code_storage_DELETE**/**
 ENAM/batch/process_ID.txt
@@ -70,3 +70,4 @@ matlab_to_hv_kernel/startB.model
 
 **pathsAutoGen.m
 *.jpeg
+investigations/h-kappa-tests/ears_waveforms/Ears/gauss_2.5/**
