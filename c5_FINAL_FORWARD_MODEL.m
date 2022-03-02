@@ -1,4 +1,4 @@
-function [ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,data )
+function [ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,data,posterior )
 %[ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,data )
 
 ID = [par.data.stadeets.nwk '.' par.data.stadeets.sta '_finalmod'];
@@ -299,12 +299,29 @@ end
 
 %% ===================  HK-stack: put in values  ====================
 if any(strcmp(pdtyps(:,1),'HKstack'))
-    HKdat = par.inv.datatypes{find(strcmp(pdtyps(:,1),'HKstack'),1,'first')};
-    ik = mindex(data.(HKdat).K,final_model.vpvsav);
-    ih = mindex(data.(HKdat).H,zmoh);
-    final_predata.(HKdat).H = zmoh;
-    final_predata.(HKdat).K = final_model.vpvsav;
-    final_predata.(HKdat).E_by_Emax = data.(HKdat).Esum(ik,ih)/maxgrid(data.(HKdat).Esum);
+    
+    fm = final_model; % Temporary final model. Put some posterior values in for calculating HK stack with hk_forward_model
+    fm.vpvs = median(posterior.vpvs); 
+    fm.rho = fm.rhoav; 
+    fm.zmoh = median(posterior.zmoh); 
+    fm.VS = final_model.VSav; 
+    fm.z = fm.Z; % this is why we should always use cammel case! 
+    fm.vpvs = fm.vpvsav; 
+   
+    ptemp = posterior; 
+    ptemp.phicrust = 1; warning('Assuming phi = 1 for making final HK stack')
+    
+    [final_predata, par] = hk_forward_model(...
+        par, fm, final_predata, pdtyps, 'posterior', ptemp, ...
+        'insistRerun', true, 'showPlot', true); 
+    
+%     HKdat = par.inv.datatypes{find(strcmp(pdtyps(:,1),'HKstack'),1,'first')};
+%     ik = mindex(data.(HKdat).K,final_model.vpvsav);
+%     ih = mindex(data.(HKdat).H,zmoh);
+%     final_predata.(HKdat).H = zmoh;
+%     final_predata.(HKdat).K = final_model.vpvsav;
+%     final_predata.(HKdat).E_by_Emax = data.(HKdat).Esum(ik,ih)/maxgrid(data.(HKdat).Esum);
+
 end
 
 

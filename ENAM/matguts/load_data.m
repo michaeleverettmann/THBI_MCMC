@@ -256,8 +256,13 @@ if any(strcmp(allpdytp(:,1),'HKstack'))
 	fprintf('\n pulling out EARS H-K stack\n')
     EARSdir = [seismoddir,'US_EARS'];
     try; 
+        % Get hkstack initially used for EARS. 
         hkstack = load(sprintf('%s/EARS_HKStack_%s_%s.mat',EARSdir,nwk,sta));
         hkstack = hkstack.hkstack; 
+        
+        % Get wavesforms used in EARS to make KK stack. 
+        rfWaves = load(sprintf('%s/IRIS_EARS//Ears/gauss_2.5/%s.%s/rfArr.mat',EARSdir,nwk,sta)); 
+        rfWaves.tt = rfWaves.tt'; 
     catch
         error('bb2021.10.01 Dont have h-k stack OR MAYBE WAVEFORMS for station %s.%s. Should make code to handle this situation', nwk, sta)
     end    
@@ -265,8 +270,12 @@ if any(strcmp(allpdytp(:,1),'HKstack'))
         fprintf('\t Not sure how many EQ in EARS obs - assigning 100\n');
         hkstack.Nobs = 100;
     end
-    HKstack_P = hkstack;
-    HKstack_P.Esum = HKstack_P.Esum-mingrid(HKstack_P.Esum);
+    HKstack_P           = hkstack;
+    HKstack_P.Esum      = HKstack_P.Esum-mingrid(HKstack_P.Esum);
+    HKstack_P.Esum_orig = HKstack_P.Esum-mingrid(HKstack_P.Esum); % Duplicate HK stack. Might end up replacing other info with my own HK stack. 
+    HKstack_P.H_orig    = HKstack_P.H; 
+    HKstack_P.K_orig    = HKstack_P.K; 
+    HKstack_P.waves     = rfWaves; 
 end
 
 

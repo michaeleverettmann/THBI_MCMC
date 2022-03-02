@@ -64,8 +64,9 @@ for istamp = [1:length(STAMP_all)];
     %%%%% Important! Must define network and station before runnig this! 
     % If we have not defined network and station, use default US.CEH
     if ~ (exist('network_manual', 'var') && exist('station_manual', 'var')) ; 
-        network_manual = 'US'; disp('resetting to US.CEH')
-        station_manual = 'CEH'; disp('resetting to US.CEH')
+        network_manual = 'US'; 
+        station_manual = 'CNNC'; 
+        fprintf('\nReseting to %s.%s\n',network_manual,station_manual)
     end
     disp('Network and station') 
     disp(network_manual) 

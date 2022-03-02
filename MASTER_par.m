@@ -208,8 +208,7 @@ for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, d
 % warning('BB2021.11.22 Not in parallel!!!')
 
 
-%%% Initialize several variables. Necessary for refactoring code. 
-predata = []; 
+%%% Initialize several variables. 
 newK = false; % Maybe make true. 
 SW_precise = []; 
 laymodel1 = []; 
@@ -228,6 +227,7 @@ delete(diaryFile);
 pause(0.01); % Because delete seems to fully execute after turning diary on...
 diary(diaryFile);
 par = PR.Value;
+par.res.chainstr = chainstr; 
 
 %% Fail-safe to restart chain if there's a succession of failures
 fail_chain=20;
@@ -262,6 +262,7 @@ fprintf('\n =========== STARTING ITERATIONS %s ===========\n',chainstr)
 ii = 0;
 time0 = now;
 
+par.hkResetInfo = struct('timesReset',0, 'timesSWKernelsReset',0); % Structure to keep track of when to reset HK stacks. 
 while ii < par.inv.niter
 ii = ii+1;
 par.ii = ii; % bb2022.10.18 Keep track of ii in par for easily plotting how inversion is changing with ii. 
@@ -339,6 +340,18 @@ try
     
     
     if breakTrue; break; end;
+    
+% % % %% =========== TEMPORARY update HK stacks. =============================
+% % %     % TODO brb2022.03.01 temporarily remake HK stack here. 
+% % %     % Eventually, start only remaking HK sometimes...
+% % %     % 
+% % %     for iWave = [1:size(predata.HKstack_P.waves.rf,2)]; 
+% % %         RF   = predata.HKstack_P.waves.rf(:,iWave); 
+% % %         tt   = predata.HKstack_P.waves.tt; 
+% % %         rayp = predata.HKstack_P.waves.rayParmSecDeg(iWave); 
+% % %         [HK_A, HK_H, HK_K] = HKstack_anis_wrapper(...
+% % %             par, model, RF, tt, rayp, 'ifplot', false);  
+% % %     end
 
 %% ===========================  FORWARD MODEL  ===========================
 	% don't re-calc if the only thing perturbed is the error, or if there
@@ -349,12 +362,14 @@ try
 
         try
             [predata,laymodel1] = b3__INIT_PREDATA(model1,par,TD.Value,0 );
-            predata = b3_FORWARD_MODEL_BW(       model1,laymodel1,par,predata,ID,0 );
+            [predata,par] = b3_FORWARD_MODEL_BW(       model1,laymodel1,par,predata,ID,0 );
+%             trudata = hk_pre_to_tru(predata,trudata); % Copy new HK stack to trudata
             predata = b3_FORWARD_MODEL_RF_ccp(   model1,laymodel1,par,predata,ID,0 );
             predata = b3_FORWARD_MODEL_SW_kernel(model1,Kbase,par,predata );
-        catch
+        catch e
             fail_chain=fail_chain+1;
             fprintf('Forward model error, failchain %.0f\n',fail_chain);  break;
+            fprintf(getReport(e)), fprintf('\n')
         end
 
         % continue if any Sp or PS inhomogeneous or nan or weird output
@@ -510,6 +525,10 @@ try
             fprintf('\n RECALCULATING %s KERNEL at iter %.0f - chain too long\n',chainstr,ii);
             resetK = true;
     end
+    
+    par.hkResetInfo.timesSWKernelsReset = par.hkResetInfo.timesSWKernelsReset ...
+    + int16(resetK); % If we are resetting surface wave kernels, also remake HK stacks with our current models parameters... but maybe only every N times kernel resets... 
+    
     if resetK
         try
             % reset the kernels using the current model
@@ -521,7 +540,9 @@ try
             model = Kbase.modelk;
             ii = Kbase.itersave;
 
-            [predata,laymodel] = b3_FORWARD_MODEL_BW( model,par,TD.Value,ID,0 );
+%             [predata,laymodel] = b3_FORWARD_MODEL_BW( model,par,TD.Value,ID,0 );
+            predata = b3_FORWARD_MODEL_BW( model,par,TD.Value,ID,0 );
+%             trudata = hk_pre_to_tru(predata,trudata); % Copy new HK stack to trudata
             predata = b3_FORWARD_MODEL_RF_ccp( model,laymodel,par,predata,ID,0 );
             predata = b3_FORWARD_MODEL_SW_kernel( model,Kbase,par,predata );
             fail_reset = fail_reset+1;
@@ -532,8 +553,12 @@ try
         nchain = 0;
     end
 
-catch
-    if par.inv.verbose, fprintf('  --SOME ERROR--\n'); end
+catch e %e is an MException struct
+%     fprintf(1,'\nMain master par loop error. Identifier:\n%s\n',e.identifier);
+    fprintf(1,'\n\nLine %1.0f\n%s\nMain master par loop error. Error message:\n%s\n\n',...
+        e.stack.line,e.identifier,e.message);
+%     disp(e.stack)
+%     if par.inv.verbose, fprintf('  --SOME ERROR--\n'); end
     fail_chain = fail_chain+1;
 end % on try-catch
 
@@ -551,7 +576,7 @@ try;
     plot_h_kappa_progress2(trudata, allmodels, resdir, iii, accept_info, ...
         par, trudata.HKstack_P.Esum)
 
-catch
+catch e 
     warning('bb2022.10.14 Could not plot h kappa inversion for some reason.')
 end
 
@@ -636,7 +661,7 @@ final_model = c4_FINAL_MODEL(posterior,allmodels_collated,par,1,[resdir,'/final_
 plot_FINAL_MODEL( final_model,posterior,1,[resdir,'/final_model.pdf'],true,[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
 
 %% predict data with the final model, and calculate the error!
-[ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,trudata );
+[ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,trudata,posterior );
 
 % distribute data for different processing (e.g. _lo, _cms)
 for idt = 1:length(par.inv.datatypes)
