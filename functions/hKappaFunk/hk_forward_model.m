@@ -1,4 +1,4 @@
-function [predata, parReturn] = hk_forward_model(...
+function [predata, par] = hk_forward_model(...
     par, model, predataOrig, pdtyps, predataPrev, options)
     arguments
         par
@@ -12,7 +12,7 @@ function [predata, parReturn] = hk_forward_model(...
     end
     
 predata = predataOrig; 
-parReturn = par; 
+% parReturn = par; 
 
 % Par needs some default values that are assigned in the parfor loop but
 % are removed after the par for loop. 
@@ -34,7 +34,7 @@ if (model.vpvs > max(predata.(HKdat).K)) || (model.vpvs < min(predata.(HKdat).K)
     predata.(HKdat).E_by_Emax = min(min(predata.(HKdat).Esum));
     warning('brb2022.03.02 HK outside bounds! THis should not happen. Thus, I am simply giving maximum HK stack error')
 else % When model is within HK bounds, run this. 
-    nSurfRes = 1; % Multiple of surface wave kernel resets that we will also reset HK stack
+    nSurfRes = 2; % Multiple of surface wave kernel resets that we will also reset HK stack
     
     % Kind of complicated to figure out if we do full HK or just one h and k
     runFullHK = ...
@@ -77,9 +77,9 @@ else % When model is within HK bounds, run this.
         E_by_Emax = interpn(k',h,Esum,kTrial,hTrial) ...
             / maxgrid(Esum);
         
-        plot_HK_stack(h, k, Esum, ...
-            'model_vpvs', model.vpvs, 'model_zmoh', model.zmoh, ...
-            'title', sprintf('Iteration = %1.0f',par.ii),'figNum', 198) 
+%         plot_HK_stack(h, k, Esum, ...
+%             'model_vpvs', model.vpvs, 'model_zmoh', model.zmoh, ...
+%             'title', sprintf('Iteration = %1.0f',par.ii),'figNum', 198) 
         
         if options.showPlot; 
             plot_HK_stack(HK_H, HK_K, HK_new, ...

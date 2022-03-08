@@ -14,6 +14,7 @@ addpath('~/MATLAB/m_map');
 % addpath('~/Documents/MATLAB/BayesianJointInv/functions');
 addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions'); 
 addpath('~/MATLAB/seizmo/cmap');
+addpath('/Users/brennanbrunsvik/MATLAB/borders'); 
 
 % specify details of this run
 generation = 1; % generation of solution and data processing
@@ -31,15 +32,16 @@ ccpcmp = cmap_makecustom([0 0 1],[1 0 0],0.1);
 ifsave = true;
 
 %% lon/lat limits on stations to include:
-lolim = [-98.5,-80];
-lalim = [32.5 49];
+lolim = [-98.5,-80] + [-2, 2] ;
+lalim = [32.5 49] + [-2, 2]; 
 %% section ends
 % WNW to ESE across whole region
 ofile1 = [figPath 'Xsect1_',STAMP];
 ofile2 = [figPath 'Xsect1_wCCP_',STAMP];
-Q1 = [45.5, -125.5];
-Q2 = [40, -89]; 
-offsecmax = 3; %5%  distance off section allowed, in degrees
+Q1 = [lalim(2), lolim(1)];
+Q2 = [lalim(1), lolim(2)]; 
+% lonBounds = sort([Q1(2) Q2(2)]); latBounds = sort([Q1(1) Q2(1)]); 
+offsecmax = 100; %5%  distance off section allowed, in degrees
 % NNW to SSE across Yellowstone
 % ofile1 = ['figs/Xsect2_',STAMP];
 % ofile2 = ['figs/Xsect2_wCCP_',STAMP];
@@ -71,23 +73,52 @@ semPath = '~/Documents/repositories/data/models_seismic/SEMum2_avg_VS'
 addpath(semPath); 
 a = SEMum2_avgprofiles(0,[semPath '/']);
 
+%%
+%%% Making my own map brb2022.03.08
+mapFigNum = 1001; 
+figure(mapFigNum); clf; hold on; set(gcf, 'color', 'white', 'pos', [-1152 439 378 369]); 
+m_proj('lambert','long',lolim + [-2 2],'lat',lalim + [-2 2]);
+m_coast('patch',[1 .85 .7]);
 
-%% plot map 
-% % % [mapfig] = map_stas(['stationsummary_',STAMP,'.mat']);
-% % % mapax = gca;
-% % % 
-% % % % plot section
-% % % plot_greatcircle(mapax,Q1,Q2)
-% % % 
-% % % % save map
-% % % if ifsave
-% % %     save2jpg(55,['figs/stationsummary_',STAMP,'_map'])
-% % % end
-% % % % m_plot([Q1(2),Q2(2)],[Q1(1),Q2(1)],'-or','linewidth',3)
-% % % 
-% % % %if ifsave
-% % % %    save2pdf(55,[ofile1,'_map']);
-% % % %end
+% m_coast('patch', [222, 164, 7]./255); 
+
+
+[latbord, lonbord] = borders('states'); % add states map
+for iplace = 1:length(lonbord); 
+    m_line(lonbord{iplace}, latbord{iplace}, 'LineWidth',1,'color',0*[1 1 1])
+end
+
+% m_elev('contourf',[-1000:10:1000]);
+% m_grid('box','fancy','tickdir','in');
+lineCol = [168, 58, 50]./255; 
+sectLine = m_line([Q1(2) Q2(2)], [Q1(1), Q2(1)]); 
+set(sectLine, 'LineWidth', 3, 'color', lineCol); 
+sectScat = m_scatter([Q1(2), Q2(2)], [Q1(1), Q2(1)], ...
+    'MarkerFaceColor', lineCol, 'MarkerEdgeColor', lineCol, 'LineWidth', 6); 
+m_grid('box','fancy','linestyle','-','gridcolor','w','backcolor',[.3 .75 1]);
+
+
+
+% colormap(flipud(copper));
+
+%%%
+
+% plot map 
+% % [mapfig] = map_stas(['stationsummary_',STAMP,'.mat']);
+% % mapax = gca;
+% % 
+% % % plot section
+% % plot_greatcircle(mapax,Q1,Q2)
+% % 
+% % % save map
+% % if ifsave
+% %     save2jpg(55,['figs/stationsummary_',STAMP,'_map'])
+% % end
+% % % m_plot([Q1(2),Q2(2)],[Q1(1),Q2(1)],'-or','linewidth',3)
+% % 
+% % %if ifsave
+% % %    save2pdf(55,[ofile1,'_map']);
+% % %end
 
 % get usable stations
 stinbounds = stainfo.slats<=max(lalim) & stainfo.slats>=min(lalim) &...
@@ -97,21 +128,21 @@ stinbounds = stainfo.slats<=max(lalim) & stainfo.slats>=min(lalim) &...
 gdstas = zeros(stainfo.nstas,1);
 for is = 1:stainfo.nstas 
     
-%     %%% Removing bounds check brb2022.03.07
-%     % check in bounds
-%     if stinbounds(is)==0, continue; end
-%     % check overall fit
-%     if isnan(stainfo.overallQ(is)), continue; end
-%     if stainfo.overallQ(is) < overallQ_thresh, continue; end
-%     % check Sp data quality
-%     clear sdtyp
-%     % find Sp data type...
-% %     for id = 1:length(stainfo.datatypes{is}')
-% %         sdtyp(id) = ~isempty(regexp(stainfo.datatypes{is}{id},'Sp'));
-% %     end
-% %     Sp_Q = sum(stainfo.datQ{is}(sdtyp));  if Sp_Q<Sp_Q_thresh, continue; end
-%     % to reach this point, has to pass all Q requirements and be in bounds
-%     %%%
+    %%% Removing bounds check brb2022.03.07
+    % check in bounds
+    if stinbounds(is)==0, continue; end
+    % check overall fit
+    if isnan(stainfo.overallQ(is)), continue; end
+    if stainfo.overallQ(is) < overallQ_thresh, continue; end
+    % check Sp data quality
+    clear sdtyp
+    % find Sp data type...
+%     for id = 1:length(stainfo.datatypes{is}')
+%         sdtyp(id) = ~isempty(regexp(stainfo.datatypes{is}{id},'Sp'));
+%     end
+%     Sp_Q = sum(stainfo.datQ{is}(sdtyp));  if Sp_Q<Sp_Q_thresh, continue; end
+    % to reach this point, has to pass all Q requirements and be in bounds
+    %%%
     sta = stainfo.stas{is}; 
     nwk = stainfo.nwk {is}; 
     
@@ -177,13 +208,9 @@ for ii = 1:Ngd
     fprintf('STATION: %s\n',sta)
     fprintf('NETWORK: %s\n\n',nwk)
     
-%     % find position on section
-%     [d_perp(ii),d_par(ii)] = dist2line_geog( Q1,Q2,...
-%         [stainfo.slats(is),stainfo.slons(is)],0.1 );
-    d_perp(ii) = 1; 
-    d_par(ii) = ii; 
-    warning('Ignoring distance to line thing')
-    
+    % find position on section
+    [d_perp(ii),d_par(ii)] = dist2line_geog( Q1,Q2,...
+        [stainfo.slats(is),stainfo.slons(is)],0.1 );    
 
     if d_perp(ii) > offsecmax, continue; end
     
@@ -252,7 +279,12 @@ insection = d_perp<=offsecmax;
 
 % plot goodstas in section on map
 % % % figure(mapfig);
-% % % m_plot(stainfo.slons(gdstas(insection)),stainfo.slats(gdstas(insection)),'^r','linewidth',3)
+% staScat = m_plot(stainfo.slons(gdstas(insection)),stainfo.slats(gdstas(insection)),'^','linewidth',3,...
+%     'MarkerFaceColor', [0,0,0], 'MarkerEdgeColor', [0,0,0]); 
+figure(mapFigNum); 
+staScat = m_plot(stainfo.slons(gdstas(insection)),stainfo.slats(gdstas(insection)),...
+    '^','linewidth',0.01, 'markerSize', 14, ...
+    'MarkerFaceColor', [0,0,0], 'MarkerEdgeColor', [0,0,0]); 
 figure(fig);
 
 %% plot VpVs
@@ -316,12 +348,15 @@ set(get(ax3,'ylabel'),'pos',get(get(ax3,'ylabel'),'pos').*[0 1 1] -[1.7 0 0],'ve
 %% save
 if ifsave
     exportgraphics(figure(56),[ofile1 '.pdf']);
+    exportgraphics(figure(mapFigNum), [ofile1 '_map.pdf'])
 else
     pause
 end
 
 % ==================  PLOT CCP  ================== 
 
+
+asdf
 delete([ax2,ax3])
 
 ax20 = axes; hold on

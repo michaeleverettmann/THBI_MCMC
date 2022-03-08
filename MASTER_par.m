@@ -403,9 +403,9 @@ try
     [ ifaccept ] = b6_IFACCEPT( log_likelihood1,log_likelihood,temp,p_bd*ifpass,Pm_prior1,Pm_prior);
     %!%!
     
-    if (ifaccept && non_acceptk == 2); 
-        disp('Accepted the second perturbation') 
-    end
+% % %     if (ifaccept && non_acceptk == 2); 
+% % %         disp('Accepted the second perturbation') 
+% % %     end
     
     if (~ifaccept); 
         if (non_acceptk == 1); % Didn't accept a model, but we only perturbed it once. Without increasing ii, perturb the again and try iterating again. 
