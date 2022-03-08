@@ -34,8 +34,23 @@ else;
     h                  = hkStack.HKstack_P.H; 
     k                  = hkStack.HKstack_P.K; 
     [rowMin, colMin]   = find(max(max(Esum))==Esum); % Kappa is first dimension
+        
     vpvs_crust         = k(rowMin);
     h_crust            = h(colMin);
+    
+    minStartingH = 35; 
+    % If we are at edge of vpvs or h, just scoot those parameters down a bit. 
+    vpvs_crust = min([vpvs_crust, par.mod.crust.vpvsmax-.1]); 
+    vpvs_crust = max([vpvs_crust, par.mod.crust.vpvsmin+.1]); 
+    h_crust    = min([h_crust   , par.mod.crust.hmax   - 5]); 
+    h_crust    = max([h_crust   , minStartingH            ]); 
+        
+    if h_crust == minStartingH; 
+        warning([newline '-------' newline 'IMPORTANT' newline,...
+            'Starting model H was to shallow and might have broke code (brb2022.03.07)\n',...
+            'I am artificically setting a deeper starting Moho',...
+            newline '-------------' newline])
+    end
 end
 
 %% resolve important values from prior distributions

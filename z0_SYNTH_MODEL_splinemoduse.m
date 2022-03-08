@@ -32,7 +32,7 @@ vpvs_crust = 1.8;
 % vpvs_crust = 1.6; warning('Changing synthetic vpvs_crust')
 
 
-xi_crust = 1.05;
+xi_crust = 1.15;
 % xi_crust = 1; warning('no xi in crust')
 xi_mantle = 0.95;
 
@@ -123,9 +123,11 @@ xilay = [zeros(length(xs),1);...
          TRUEmodel.cxi*ones(length(xc),1);...
          TRUEmodel.mxi*ones(length(xm),1)]; % S radial anisotropy
 philay = ones(nlay,1); % P radial anisotropy
-% philay = (1 - xilay) + 1; warning("opposite p and s radial anisotropy")
-philay2 = xilay; warning('Changing synthetic philay')
-% philay = 1/2 * (philay + philay2); 
+% warning('Changing philay')
+philay2 = 1./xilay; 
+% philay = (philay + philay2) ./2; 
+% disp(philay);
+philay = philay2; 
 etalay = ones(nlay,1); % eta anisotropy
 
 TLM = struct('zlayt',zlayt,'zlayb',zlayb,'Vs',Vslay,'Vp',Vplay,'rho',rholay,'nlay',nlay,'xi',xilay,'phi',philay,'eta',etalay);

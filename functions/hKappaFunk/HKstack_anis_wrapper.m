@@ -14,33 +14,14 @@ function [HK_A, HK_H, HK_K] = HKstack_anis_wrapper(par, model, ...
         options.hNum = 200; 
         options.posterior = []
     end
-% function [HK_A, HK_H, HK_K] = HKstack_anis_wrapper(par, model, data, options)  
-%     arguments
-%         par % Eventually contain phase weights
-%         model % Model structure
-%         data % Data structure
-%         options.ifplot = false; 
-%     end
-% brb2022.03.01
+
 % MCMC/THBI wrapper to get relevant model/data and use it for radially 
 % anisotropic HK stack. 
 
-% Replace data with: 
-% ray_parm
-% RF
-% tt
-
-
 % Choose weighting for different phases. There are a few valid choices.
-%     phase_wts = [.7, .2, .1]; % Zhu and Kanamori 2000 weights. Ordered as w1, w2, w3, but I'm not sure I Zach used the same ordering in HKstack.m bb2021.12.08
-%     phase_wts = [1/3, 1/3, 1/3]; % Choose equal weights for each phase. Supposedly this is done in the IRIS-EARS database (Crotwell 2007 dissertation). brb2022.02.08
-% phase_wts = [.5, .3, .2]; % brb2022.02.08 1/3 for each gave h-kappa stacks that don't look like others... They had way to tight of constraint on moho depth (for synthetics). I'm making a compromise. 
 phase_wts = options.phase_wts; 
 
 % Get average crust velocity. There are again a few choices. 
-% vsAv = model.vsAvCrust; % brb2022.02.08 Newly calculating this based on travel time of vertically travelling S wave from Moho to elv=0. See z0_SYNTH_MODEL_splinemoduse.m
-%     vsAv = trudata.RF_Ps.Vs_surf; % brb2022.02.08 Not sure how this value was calculated. 
-
 % Get vsv, vpv. If there is anisotropy, this influences HK calculation.
 isCrust = model.z < model.zmoh; 
 rho = mean(model.rho(isCrust)); % Medium density of crust. Not sure how best to average this yet.
@@ -57,9 +38,8 @@ else % If we have the posterior, get average values from there.
     phi = median(posterior.phicrust); 
 end
     
-    
 % Assume ray path change is insignificant when adding anisotropy
-incAngVs = rayp2inc(rayp/111.1949, vsAv); 
+incAngVs = rayp2inc(rayp/111.1949, vsAv             ); 
 incAngVp = rayp2inc(rayp/111.1949, vsAv * model.vpvs); % PN 20.6 was the incidence angle here. Seems reasonable. Same as for the real rays for US.CEH
 
 [velVs,~] = christof_radial_anis(vsAv, vsAv * model.vpvs,...
@@ -68,6 +48,8 @@ incAngVp = rayp2inc(rayp/111.1949, vsAv * model.vpvs); % PN 20.6 was the inciden
     xi, phi, eta, rho, incAngVp); % Velocities for ray with vp incidence angle
 vsvAn = velVs(2); % Vsv for s ray 
 vpAn  = velVp(1); % Vp for p ray
+
+% fprintf('\nvsvAn = %1.5f : vpAn = %1.5f\n', vsvAn, vpAn)
 
 vpvsEffective = vpAn/vsvAn; 
 

@@ -7,6 +7,7 @@ function []=plot_HK_stack(HK_H, HK_K, HK_A, options)
         options.model_zmoh = nan; 
         options.title = ''; 
         options.figNum = 198; 
+        options.saveString = ''; 
     end
 figure(options.figNum); clf; hold on; set(gcf,'color','white');
 subplot(1,1,1); hold on; 
@@ -45,6 +46,10 @@ text(kBest, hBest, sprintf('H = %2.2f, k = %1.3f',...
 if ~isnan(options.model_vpvs); 
     % Plot true position of max energy. TODO add to legend. 
     scatter(options.model_vpvs, options.model_zmoh, 50, 'k'); 
+end
+
+if ~isempty(options.saveString); 
+    exportgraphics(gcf, options.saveString ) 
 end
 
 end

@@ -1,14 +1,29 @@
-function [predata, par] = hk_forward_model(...
-    par, model, predata, pdtyps, options)
+function [predata, parReturn] = hk_forward_model(...
+    par, model, predataOrig, pdtyps, predataPrev, options)
     arguments
         par
         model
-        predata
+        predataOrig
         pdtyps
+        predataPrev = [] % Will need this any time you don't do full HK recalculation. 
         options.posterior = []
         options.showPlot = false; % Leave as true... this can only plot on iterations where doing HK stack anyway. 
         options.insistRerun = false; % Turn this to true only if you want full HK stack plot every iteration 
     end
+    
+predata = predataOrig; 
+parReturn = par; 
+
+% Par needs some default values that are assigned in the parfor loop but
+% are removed after the par for loop. 
+if ~isfield(par, 'hkResetInfo'); 
+    par.hkResetInfo = struct('timesReset', 0, 'timesSWKernelsReset',0); 
+    par.res.chainstr = ''; 
+end
+if ~isfield(par, 'ii'); 
+    par.ii = 0; 
+end
+% end default par values. 
 
 HKdat = par.inv.datatypes{find(strcmp(pdtyps(:,1),'HKstack'),1,'first')};
 
@@ -18,20 +33,24 @@ if (model.vpvs > max(predata.(HKdat).K)) || (model.vpvs < min(predata.(HKdat).K)
     predata.(HKdat).K = model.vpvs;
     predata.(HKdat).E_by_Emax = min(min(predata.(HKdat).Esum));
     warning('brb2022.03.02 HK outside bounds! THis should not happen. Thus, I am simply giving maximum HK stack error')
-else       
-    % TODO brb2022.03.01 temporarily remake HK stack here. 
-    % Eventually, start only remaking HK sometimes...
-
+else % When model is within HK bounds, run this. 
     nSurfRes = 1; % Multiple of surface wave kernel resets that we will also reset HK stack
-    if ((par.hkResetInfo.timesReset==0)                || ...
-            (par.hkResetInfo.timesSWKernelsReset == nSurfRes) || ...
-            (par.ii==par.inv.niter)) || ...
-            (options.insistRerun); 
+    
+    % Kind of complicated to figure out if we do full HK or just one h and k
+    runFullHK = ...
+        ((par.hkResetInfo.timesReset==0)                       || ...
+        (par.hkResetInfo.timesSWKernelsReset == nSurfRes) || ...
+        (par.ii==par.inv.niter))                          || ...
+        (options.insistRerun); % Could put this first to avoid the if isfield code, but this will almost certainly cause me to mess up the code in a few months. 
+
+    
+    if runFullHK; 
+        
         par.hkResetInfo.timesReset = par.hkResetInfo.timesReset + 1; 
         par.hkResetInfo.timesSWKernelsReset = 0; % Reset our surface wave kernel counter. This only is analyzed for the HK stacks. 
-
+        
         fprintf('\nResetting HK stack on iteration %1.0f (%1.0fx as often as surface wave kernels)\n', par.ii, nSurfRes);  
-        HK_new = zeros(201, 200); % temporary. TODO brb2022.03.01
+        HK_new = zeros(size(predata.HKstack_P.Esum_orig)); 
         for iWave = [1:size(predata.HKstack_P.waves.rf,2)]; 
             RF   = predata.HKstack_P.waves.rf(:,iWave); 
             tt   = predata.HKstack_P.waves.tt; 
@@ -40,40 +59,73 @@ else
                 par, model, RF, tt, rayp, 'ifplot', false, ...
                 'hBounds', [par.mod.crust.hmin, par.mod.crust.hmax], ...
                 'kBounds', [par.mod.crust.vpvsmin, par.mod.crust.vpvsmax], ...
+                'kNum', size(HK_new,1), 'hNum', size(HK_new,2),...
                 'posterior', options.posterior);   
             HK_new = HK_new + HK_A; 
         end
         predata.(HKdat).H    = HK_H; 
         predata.(HKdat).K    = HK_K; 
         predata.(HKdat).Esum = HK_new; 
-
-%             update_HK_plot = mod(par.ii, 50) == 0; 
+                
+        % Extract some values to make things easier to work with. 
+        h          = predata.(HKdat).H; 
+        k          = predata.(HKdat).K; 
+        Esum       = predata.(HKdat).Esum; 
+        kTrial     = model.vpvs; 
+        hTrial     = model.zmoh; 
+        
+        E_by_Emax = interpn(k',h,Esum,kTrial,hTrial) ...
+            / maxgrid(Esum);
+        
+        plot_HK_stack(h, k, Esum, ...
+            'model_vpvs', model.vpvs, 'model_zmoh', model.zmoh, ...
+            'title', sprintf('Iteration = %1.0f',par.ii),'figNum', 198) 
+        
         if options.showPlot; 
             plot_HK_stack(HK_H, HK_K, HK_new, ...
                 'model_vpvs', model.vpvs, 'model_zmoh', model.zmoh, ...
                 'title', sprintf('Iteration = %1.0f',par.ii),'figNum', 198) ; 
-%             paths = getPaths(); 
-%             exportgraphics(gcf, sprintf('%s/HK_%s_at_iter_%07d.pdf',...
-%                 par.res.resdir, par.res.chainstr, par.ii) ); 
+
             exportgraphics(gcf, sprintf('./HK_%s_at_iter_%07d.pdf',...
                 par.res.chainstr, par.ii) ) ; 
-             % If we want to use HD
         end
+    else % If not remaking whole HK stack, just sample waveforms directly. This is what usually runs. 
+        RF   = predata.HKstack_P.waves.rf(:,:); 
+        tt   = predata.HKstack_P.waves.tt; 
+        rayp = predata.HKstack_P.waves.rayParmSecDeg(:); 
+        [E_not_by_Emax] = HK_stack_anis_wrapper_no_grid(...
+                par, model, RF, tt, rayp); 
+            
+        % Extract some values to make things easier to work with. 
+        predata.(HKdat).Hgrid = predataPrev.(HKdat).Hgrid; % Store old HK values in new structure for propogating between iterations. The stack is only approximation now, but the specific h-k we sampled is correct.   
+        predata.(HKdat).Kgrid = predataPrev.(HKdat).Kgrid; 
+        predata.(HKdat).Esum  = predataPrev.(HKdat).Esum; 
+        h          = predataPrev.(HKdat).Hgrid; 
+        k          = predataPrev.(HKdat).Kgrid; 
+        Esum       = predataPrev.(HKdat).Esum; 
+        kTrial     = model.vpvs; 
+        hTrial     = model.zmoh; 
+        
+        E_by_Emax = E_not_by_Emax / maxgrid(Esum); % Dividing over maxgrid of the old HK stack. This induces a small amount of error, only in so much as the maximum value in the HK stack changes between iterations. I think this is small... We recalculate the full HK stack every so often. 
+        
+        E_by_Emax = min(E_by_Emax, 1); % brb2022.03.06 Just in case an un-updated Esum in maxgrid causes us to have higher than 1 normalized energy. That could cause problems when converting energy to mismatch (negative mismatch). 
+        
+%         plot_HK_stack(h, k, Esum, ...
+%             'model_vpvs', model.vpvs, 'model_zmoh', model.zmoh, ...
+%             'title', sprintf('Iteration = %1.0f',par.ii),'figNum', 198) 
+        
+        displayHKGridChange = false; 
+        if displayHKGridChange; % If we want to see how much the value of energy at h,k has changed from the old grid versus the value sampled at only h and k just now. 
+            E_by_Emax2 = interpn(k',h,Esum,kTrial,hTrial) ...
+                / maxgrid(Esum)
+            fprintf('\nHK change: %1.4f%%\n',(E_by_Emax-E_by_Emax2)./E_by_Emax * 100)
+        end
+
     end
 
-    % Extract some values to make things easier to work with. 
-    h          = predata.(HKdat).H; 
-    k          = predata.(HKdat).K; 
-    Esum       = predata.(HKdat).Esum; 
-    kTrial     = model.vpvs; 
-    hTrial     = model.zmoh; 
-    ii         = par.ii; 
-
-    % Energy at models part of h_kappa stack. Interpolate in case of small perterbations to model. 
-    E_by_Emax = interpn(k',h,Esum,kTrial,hTrial) ...
-                / maxgrid(Esum);
-
-
+    % brb2022.03.04 The distance approach below is mostly irrelevant. 
+    % Right now I always set all weight toward the actual HK stack values. 
+    
     % Find the portion of the h_kappa stack that gives maximum energy. 
     [rowMin, colMin] = find(max(max(Esum))==Esum); 
     kBest            = k(rowMin); % TODO verify that these are in correct order. Find might return collumn then row. 

@@ -153,6 +153,7 @@ stainfo.chanazs = chanazs;
 % % % End getting receiver function waveforms. 
 
 save([proj.infodir,'stations'],'stainfo','stations_IRIS','stations_request');
+save([proj.infodir 'proj.mat'], 'proj'); 
 
 if ~ifrunall
     return

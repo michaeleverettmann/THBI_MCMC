@@ -204,7 +204,7 @@ cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup.
 mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
 
 % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 % warning('BB2021.11.22 Not in parallel!!!')
 
 
@@ -213,6 +213,7 @@ newK = false; % Maybe make true.
 SW_precise = []; 
 laymodel1 = []; 
 non_acceptk = 0; % How often have we rejected the current baseline model. 
+predataPrev = []; 
 %%% End initializing several varibales. 
 
 accept_info = struct(); % bb2022.01.05 Temporary tests for h-kappa inversion. 
@@ -222,10 +223,10 @@ warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least s
     
 chainstr = [nwk '.' sta '_' mkchainstr(iii)];
 diaryFile = sprintf('diary_%s.txt', chainstr); % Use a diary file to keep track of parallel inversions seperately. %TODO_STATION_NETWORK bb2021.11.12
-diary off; 
-delete(diaryFile); 
+% diary off; 
+% delete(diaryFile); 
 pause(0.01); % Because delete seems to fully execute after turning diary on...
-diary(diaryFile);
+% diary(diaryFile);
 par = PR.Value;
 par.res.chainstr = chainstr; 
 
@@ -324,52 +325,31 @@ try
             Pm_prior1k = Pm_prior; end
     if non_acceptk == 0; p_bd = 1; end; %!%!
     
-%     [model1,ptbnorm,ifpass,p_bd,Pm_prior1,...
-%         ptb,modptb,nchain,breakTrue]...
-%         = perturb_model(model, Pm_prior, ptb, ii, par, temp, Kbase,nchain); 
-%     dis(non_acceptk)
     
     [model1,ptbnorm,ifpass,p_bd,Pm_prior1,...
     ptb,modptb,nchain,breakTrue,non_acceptk]...
     = delay_reject(model, Pm_prior, ptb, ii, par, temp, Kbase,nchain,...
         model1,ptbnorm,p_bd,Pm_prior1k,non_acceptk); 
-%     non_acceptk_array(ii) = non_acceptk; 
-    
-%     disp(non_acceptk)
-%     fprintf('non_acceptk = %1.0f, ifaccept = %1.0f', non_acceptk, 
-    
     
     if breakTrue; break; end;
-    
-% % % %% =========== TEMPORARY update HK stacks. =============================
-% % %     % TODO brb2022.03.01 temporarily remake HK stack here. 
-% % %     % Eventually, start only remaking HK sometimes...
-% % %     % 
-% % %     for iWave = [1:size(predata.HKstack_P.waves.rf,2)]; 
-% % %         RF   = predata.HKstack_P.waves.rf(:,iWave); 
-% % %         tt   = predata.HKstack_P.waves.tt; 
-% % %         rayp = predata.HKstack_P.waves.rayParmSecDeg(iWave); 
-% % %         [HK_A, HK_H, HK_K] = HKstack_anis_wrapper(...
-% % %             par, model, RF, tt, rayp, 'ifplot', false);  
-% % %     end
 
 %% ===========================  FORWARD MODEL  ===========================
 	% don't re-calc if the only thing perturbed is the error, or if there
 	% is zero probability of acceptance!
-    if ~strcmp('sig',ptb{ii}(1:3)) || isempty(predata)
+    if ~strcmp('sig',ptb{ii}(1:3)) || isempty(predata) % brb2022.03.06 If not recalculating, we get errors later. 
         % make random run ID (to avoid overwrites in parfor)
 		ID = [chainstr,num2str(ii,'%05.f'),num2str(randi(99),'_%02.f')];
 
         try
             [predata,laymodel1] = b3__INIT_PREDATA(model1,par,TD.Value,0 );
-            [predata,par] = b3_FORWARD_MODEL_BW(       model1,laymodel1,par,predata,ID,0 );
-%             trudata = hk_pre_to_tru(predata,trudata); % Copy new HK stack to trudata
+            [predata,par] = b3_FORWARD_MODEL_BW(model1,laymodel1,par,predata,ID,0,predataPrev);
             predata = b3_FORWARD_MODEL_RF_ccp(   model1,laymodel1,par,predata,ID,0 );
             predata = b3_FORWARD_MODEL_SW_kernel(model1,Kbase,par,predata );
+            predataPrev = predata; % Keep track of last predata. To keep the previous complete HK stack. 
         catch e
             fail_chain=fail_chain+1;
             fprintf('Forward model error, failchain %.0f\n',fail_chain);  break;
-            fprintf(getReport(e)), fprintf('\n')
+            fprintf('\n\n%s\n\n',getReport(e))
         end
 
         % continue if any Sp or PS inhomogeneous or nan or weird output
@@ -401,13 +381,7 @@ try
     else
         fail_chain = 0;
     end
-    
-    % Factored. Not working yet. 
-% % %     ID = [chainstr,num2str(ii,'%05.f'),num2str(randi(99),'_%02.f')];
-% % %     [predata,predata0,laymodel1,fail_chain,breakTrue,newK,SW_precise] = forward_model(...
-% % %     ID,ptb,ii,predata,model1,par,TD,laymodel1,fail_chain,ptbnorm,newK,SW_precise); 
-% % %     if breakTrue; break; end 
-   
+       
 
 %% =========================  CALCULATE MISFIT  ===========================
 
@@ -442,10 +416,6 @@ try
         end
     end
     
-%     fprintf('ifaccept = %1.0f, non_acceptk = %1.0f', ifaccept,
-%     non_acceptk) %!%!
-% % % %     sprintf('Accept: %1.0f --- %3.1f -> %3.1f Log likelihood  --- p_bd %3.1f',...
-% % % %         ifaccept, log_likelihood, log_likelihood1, p_bd)
     dLog = (log_likelihood1-log_likelihood); 
     if ((log_likelihood1 - log_likelihood) < -10) && ifaccept; 
         disp('Accepted a shitty model')
@@ -503,8 +473,6 @@ try
         end
 
     else
-%         non_acceptk = non_acceptk + 1;  %!%! We rejected the baseline model 1 more time. 
-%         sprintf('not accepted, non_acceptk = %1.0f', non_acceptk)
         if par.inv.verbose, fprintf('  --FAIL--\n'); end
         if newK, delete_mineos_files(ID,'R'); end
         if newK, delete_mineos_files(ID,'L'); end
@@ -540,9 +508,7 @@ try
             model = Kbase.modelk;
             ii = Kbase.itersave;
 
-%             [predata,laymodel] = b3_FORWARD_MODEL_BW( model,par,TD.Value,ID,0 );
             predata = b3_FORWARD_MODEL_BW( model,par,TD.Value,ID,0 );
-%             trudata = hk_pre_to_tru(predata,trudata); % Copy new HK stack to trudata
             predata = b3_FORWARD_MODEL_RF_ccp( model,laymodel,par,predata,ID,0 );
             predata = b3_FORWARD_MODEL_SW_kernel( model,Kbase,par,predata );
             fail_reset = fail_reset+1;
@@ -553,10 +519,13 @@ try
         nchain = 0;
     end
 
+    
 catch e %e is an MException struct
-%     fprintf(1,'\nMain master par loop error. Identifier:\n%s\n',e.identifier);
-    fprintf(1,'\n\nLine %1.0f\n%s\nMain master par loop error. Error message:\n%s\n\n',...
-        e.stack.line,e.identifier,e.message);
+%     fprintf(1,'\n\nLine %1.0f\nMain master par loop error. Error message:\n%s\n\n',...
+%         e.stack.line,e.message);
+    fprintf('\n---------------------------\nMASTER_par catch activated. \n\n%s\n\n-------------------\n',...
+        getReport(e))
+
 %     disp(e.stack)
 %     if par.inv.verbose, fprintf('  --SOME ERROR--\n'); end
     fail_chain = fail_chain+1;
@@ -588,11 +557,9 @@ if isfield(TD.Value,'SW_Ray')
     SWs_perchain{iii} = preSW;
 end
 
-
-
 % save('accept_info', 'accept_info.mat'); 
 
-diary off
+% diary off
 
 end % parfor loop
 [ram_copy_stats] = ram_to_HD(paths, mainDir, nwk, sta); % Copy final results from ram to hard disk. 

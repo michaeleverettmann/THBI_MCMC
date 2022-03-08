@@ -260,6 +260,10 @@ if any(strcmp(allpdytp(:,1),'HKstack'))
         hkstack = load(sprintf('%s/EARS_HKStack_%s_%s.mat',EARSdir,nwk,sta));
         hkstack = hkstack.hkstack; 
         
+        plot_HK_stack(hkstack.H, hkstack.K, hkstack.Esum,...
+            'title', 'HK stack from EARS',...
+            'saveString', sprintf('%s/HK_stack_EARS.pdf',par.res.resdir)); 
+        
         % Get wavesforms used in EARS to make KK stack. 
         rfWaves = load(sprintf('%s/IRIS_EARS//Ears/gauss_2.5/%s.%s/rfArr.mat',EARSdir,nwk,sta)); 
         rfWaves.tt = rfWaves.tt'; 

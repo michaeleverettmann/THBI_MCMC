@@ -124,7 +124,7 @@ switch pdtyp{1}
     case {'HKstack'}
 %         contourf(ax12,trudata.(dtype).K,trudata.(dtype).H,trudata.(dtype).Esum',30,'linestyle','none');
         contourf(ax12,predata.(dtype).Kgrid,predata.(dtype).Hgrid,...
-            trudata.(dtype).Esum',30,'linestyle','none'); % Use final_predata to get the HK stack estimated with our velocity model. 
+            predata.(dtype).Esum',30,'linestyle','none'); % Use final_predata to get the HK stack estimated with our velocity model. 
         colorbar(ax12,'southoutside')
         
         plot(predata.HKstack_P.K,predata.HKstack_P.H,'ok','linewidth',2,...

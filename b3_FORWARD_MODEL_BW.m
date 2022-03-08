@@ -1,4 +1,5 @@
-function [ predata, par ] = b3_FORWARD_MODEL_BW( model,laymodel,par,predata,ID,ifplot )
+function [ predata, par ] = b3_FORWARD_MODEL_BW( model,laymodel,par,...
+    predataOrig,ID,ifplot,predataPrev )
 % [ predata ] = b3_FORWARD_MODEL_BW( model,laymodel,par,predata,ID,ifplot )
 % 
 %   Do forward model to calculate predicted data.
@@ -21,6 +22,8 @@ function [ predata, par ] = b3_FORWARD_MODEL_BW( model,laymodel,par,predata,ID,i
 % layerised 1D model is also output from this function.
 
 %% ===================  PREPARE DATA STRUCTURE  ===================
+
+predata = predataOrig; 
 
 for id = 1:length(par.inv.datatypes)
     pdtyps(id,:) = parse_dtype(par.inv.datatypes{id}); 
@@ -189,7 +192,8 @@ end
 
 %% ===================  HK-stack: put in values  ====================
 if any(strcmp(pdtyps(:,1),'HKstack'))
-    [predata, par] = hk_forward_model(par, model, predata, pdtyps); % Put HK forward modelling code into it's own file, for repeatability with later code. 
+    [predata, par] = hk_forward_model(par, model, ...
+        predata, pdtyps, predataPrev); % Put HK forward modelling code into it's own file, for repeatability with later code. 
 end
 
 
