@@ -73,14 +73,22 @@ end
 fileattrib(execfile, '+x'); 
 
 %% do PropMatrix on it
-[status,cmdout] = system([paths.timeout ' 15 ./',execfile]); 
+[status,cmdout] = system([paths.timeout ' 0.3 ./',execfile]); 
+[status2,cmdout2] = system([paths.timeout ' 0.3 echo hi world']); % brb2022.03.22 just for testing things
+
+system(sprintf('cp %s slow.%s',execfile, execfile)); 
+fprintf('\nrun propmat: copying propmat exefile to slow*, and only tieout .3 s\n')
+
+
 
 %% read PropMatrix output
 [traces,tt] = readPROPMATtr(odatfile);
 
 %% delete files
 % delete(execfile,odatfile,ifile,ofile1,ofile2,'synth.out');
-delete(modfile,execfile,odatfile,ifile,ofile0,ofile1,ofile2);
+% delete(modfile,execfile,odatfile,ifile,ofile0,ofile1,ofile2);%brb2022.03.22 Add this back in. 
+fprintf('\nrun propmat: NOT deleting running files.\n')
+
 
 if demoPlot; 
     % plot

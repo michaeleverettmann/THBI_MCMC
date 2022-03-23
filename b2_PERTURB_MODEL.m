@@ -507,7 +507,6 @@ switch ptbopts{optflag} % decide what to modify
 
 %                         if any(model.mantmparm.VS_sp > par.mod.mantle.vsmax) || any(model.mantmparm.VS_sp < par.mod.mantle.vsmin), p_bd = 0; return, end % keep in bounds
 
-                        %report
                         if par.inv.verbose, fprintf('    Changed moho depth from %.2f to %.2f\n',model.sedmparm.h + h0,cmaxz); end
                 
                 end % switch on attribute of disc to modify
@@ -733,7 +732,7 @@ if P_bd == 0, return; end
 % if strcmp(ptb,'Moho_h') && a1_TEST_CONDITIONS( model, par ) == 0
 %     figure(2); clf,hold on
 %     plot(model0.z(1:40),model0.VS(1:40),'k',model.z(1:40),model.VS(1:40),'r')
-%     plot(model2.z(1:40),model2.VS(1:40),'g')
+% %     plot(model2.z(1:40),model2.VS(1:40),'g')
 %     plot(zci,vci,'b',zmi,vmi,'c','linewidth',2)
 %     xlim([0 70])
 % end

@@ -1,0 +1,15 @@
+TA J48A
+TA K49A
+TA L50A
+TA M51A
+TA N52A
+TA O53A
+TA P54A
+TA Q55A
+TA R56A
+TA S57A
+TA T59A
+TA U60A
+TA V61A
+TA V62A
+# For some reason have to have a final line that isn't used. Note: format is NET STA

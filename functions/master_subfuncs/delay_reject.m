@@ -85,7 +85,7 @@ elseif non_acceptk == 1; % We perturbed model and failed. Let's perturb one more
         ptb,modptb,nchain,breakTrue]...
         = perturb_model(model1, Pm_prior, ptb, ii, par, temp, Kbase,nchain); 
     % model1 is now perturbed twice. 
-    ptbnorm = ptbnormk + ptbnorm;  % Not sure what to do here yet. 
+    ptbnorm = ptbnormk * ptbnorm;  % Not sure what to do here yet. 
     % ifpass no changing tI think
     p_bd = p_bd * p_bdk;  % TODO get p_bd, probability for previous model bd. 
     % Pm_prior SHould be fine. 

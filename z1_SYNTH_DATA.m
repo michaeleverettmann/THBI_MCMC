@@ -108,6 +108,12 @@ if true
     subplot(413),plot(tt_sp,trudat_sp_PSV(:,1),'k','linewidth',2), xlim(par.datprocess.Sp.Twin.def), ylabel('Z tru','fontsize',18), title('Sp TRUE','fontsize',22)
     subplot(414),plot(tt_sp,trudat_sp_PSV(:,2),'r','linewidth',2), xlim(par.datprocess.Sp.Twin.def), ylabel('R tru','fontsize',18)
     
+    rfSave = struct('tt_ps', tt_ps, 'trudat_ps_PSV', trudat_ps_PSV, ...
+                    'ps_twin', par.datprocess.Ps.Twin, ...
+                    'tt_sp', tt_sp, 'trudat_sp_PSV', trudat_sp_PSV, ...
+                    'sp_twin', par.datprocess.Sp.Twin); % Just saving this for making some figures.... Not necessary. brb2022.03.21
+    save([par.res.resdir '/tru_receiver_functions.mat'],'rfSave'); 
+        
 end
 
 % save

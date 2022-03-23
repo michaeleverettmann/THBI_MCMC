@@ -206,7 +206,10 @@ mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep
 % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 % warning('BB2021.11.22 Not in parallel!!!')
+par = PR.Value; 
 
+% Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
+warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    
 
 %%% Initialize several variables. 
 newK = false; % Maybe make true. 
@@ -214,21 +217,22 @@ SW_precise = [];
 laymodel1 = []; 
 non_acceptk = 0; % How often have we rejected the current baseline model. 
 predataPrev = []; 
+accept_info = struct(); % bb2022.01.05 Temporary tests for h-kappa inversion. 
+timeStartIter = zeros(par.inv.niter,1); % Vector of starting times of each iteration. 
+timeVeryStart = now(); % Starting time of inversion
+tFact = (24 * 60 * 60); % Factor to convert from serial time to seconds. 
 %%% End initializing several varibales. 
 
-accept_info = struct(); % bb2022.01.05 Temporary tests for h-kappa inversion. 
-    
-% Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
-warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    
-    
 chainstr = [nwk '.' sta '_' mkchainstr(iii)];
-diaryFile = sprintf('diary_%s.txt', chainstr); % Use a diary file to keep track of parallel inversions seperately. %TODO_STATION_NETWORK bb2021.11.12
+par.res.chainstr = chainstr; 
+
+%% Diary file stuff
+% diaryFile = sprintf('diary_%s.txt', chainstr); % Use a diary file to keep track of parallel inversions seperately. %TODO_STATION_NETWORK bb2021.11.12
 % diary off; 
 % delete(diaryFile); 
-pause(0.01); % Because delete seems to fully execute after turning diary on...
+% pause(0.01); % Because delete seems to fully execute after turning diary on...
 % diary(diaryFile);
-par = PR.Value;
-par.res.chainstr = chainstr; 
+%% End diary file stuff. 
 
 %% Fail-safe to restart chain if there's a succession of failures
 fail_chain=20;
@@ -268,6 +272,12 @@ while ii < par.inv.niter
 ii = ii+1;
 par.ii = ii; % bb2022.10.18 Keep track of ii in par for easily plotting how inversion is changing with ii. 
 
+% Quickly check to make sure inversion isn't going way to slow. 
+timeStartIter(ii) = (now() - timeVeryStart) * tFact;  % Seconds since the inversion very first started. 
+littleIter=max(1,ii-100); smallTime = timeStartIter(littleIter); bigTime = timeStartIter(ii); 
+avgTime = (bigTime-smallTime) / (ii-littleIter); % Average computational time over past min([1,100]) iterations. 
+% Finish getting computational time. 
+
 %% SAVE model every saveperN
 if mod(ii,par.inv.saveperN)==0 && log_likelihood ~= -Inf
     [misfits,allmodels,savedat] = b9_SAVE_RESULT(ii,log_likelihood,misfit,model,Pm_prior,misfits,allmodels,predat_save,savedat,time0);
@@ -287,8 +297,11 @@ if rem(ii,par.inv.Nsavestate)==0
 end
 
 try
-    if rem(ii,4*par.inv.saveperN)==0 || ii==1, fprintf('Sta %4s nwk %2s  Iteration %s%.0f\n',...
-            par.data.stadeets.sta,par.data.stadeets.nwk,chainstr,ii); end
+    % TODO changed from 4 to 1 times par.inv.savepern. So fairly verbose. 
+    if rem(ii,1*par.inv.saveperN)==0 || ii==1, fprintf(...
+            'Sta %s nwk %s  Iteration %s %1.0f Average comp time (last 100 iter) %2.2f (all) %2.2f\n',...
+            par.data.stadeets.sta,par.data.stadeets.nwk,chainstr,ii,...
+            avgTime, timeStartIter(ii)/ii); end
     if par.inv.verbose, pause(0.05); end
     ifaccept=false;
     ifpass = false;
@@ -348,14 +361,16 @@ try
             predataPrev = predata; % Keep track of last predata. To keep the previous complete HK stack. 
         catch e
             fail_chain=fail_chain+1;
-            fprintf('Forward model error, failchain %.0f\n',fail_chain);  break;
+            fprintf('\nForward model error, failchain %.0f\n',fail_chain)  
             fprintf('\n\n%s\n\n',getReport(e))
+            break;
         end
 
         % continue if any Sp or PS inhomogeneous or nan or weird output
         if ifforwardfail(predata,par)
             fail_chain=fail_chain+1;
-            fprintf('Forward model error, failchain %.0f\n',fail_chain);  break;
+            fprintf('Forward model error, failchain %.0f\n',fail_chain)  
+            break;
         end
 
         % process predata - filter/taper etc.
@@ -366,7 +381,9 @@ try
 
 		% Explicitly use mineos + Tanimoto scripts if ptb is too large
         if ptbnorm/par.inv.kerneltolmax > random('unif',par.inv.kerneltolmed/par.inv.kerneltolmax,1,1) % control chance of going to MINEOS
-            newK = true;
+            newK = true; 
+            fprintf('\nsw presice: ptbnorm=%1.2f, ii=%1.0f, nonAcK=%1.0f\n',...
+                ptbnorm, ii, non_acceptk)
             [ predata,SW_precise ] = b3_FORWARD_MODEL_SW_precise( model1,par,predata,ID );
         end
 
@@ -377,7 +394,8 @@ try
     % continue if any Sp or PS inhomogeneous or nan or weird output
     if ifforwardfail(predata,par)
         fail_chain=fail_chain+1; ifpass=0;
-        fprintf('Forward model error, failchain %.0f\n',fail_chain);  break;
+        fprintf('Forward model error, failchain %.0f\n',fail_chain)
+        break;
     else
         fail_chain = 0;
     end
@@ -520,14 +538,11 @@ try
     end
 
     
-catch e %e is an MException struct
+catch e % e is an MException struct
 %     fprintf(1,'\n\nLine %1.0f\nMain master par loop error. Error message:\n%s\n\n',...
 %         e.stack.line,e.message);
-    fprintf('\n---------------------------\nMASTER_par catch activated. \n\n%s\n\n-------------------\n',...
-        getReport(e))
-
-%     disp(e.stack)
 %     if par.inv.verbose, fprintf('  --SOME ERROR--\n'); end
+    fprintf('\n%s\n',getReport(e)); 
     fail_chain = fail_chain+1;
 end % on try-catch
 
@@ -569,10 +584,14 @@ if profileRun; % Get results from profiling.
     mpiprofile off; 
     mpiStats = mpiprofile('info'); 
     save(['mpiProfileData_' nwk '_' sta], 'mpiStats');  % Save profile results. Can transfer from HPC and bring to local computer for viewing. 
-    % Use this to see the results: load('mpiProfileData'); mpiprofile('viewer', mpiStats);
+    fprintf('\n\nSaved mpiProfileData....mat to %s\n\n',mainDir); % Use this to see the results: load('mpiProfileData'); mpiprofile('viewer', mpiStats);
 end 
 
-delete(gcp('nocreate'));
+if par.inv.niter > 2000
+	delete(gcp('nocreate'));
+else
+    warning('brb2022.03.16 Not deleting parallel pool, niter<2000 so I assume we are debugging. ')
+end
 
 %% ========================================================================
 %% ========================================================================
@@ -649,7 +668,7 @@ end
 save([resdir,'/final_predata'],'final_predata');
 
 
-[ final_misfit ] = b4_CALC_MISFIT( trudata,final_predata,par,0 );
+[ final_misfit ] = b4_CALC_MISFIT( trudata,final_predata,par,0, 'plotRFError',true );
 [ final_log_likelihood,final_misfit ] = b5_CALC_LIKELIHOOD( final_misfit,trudata,final_model.hyperparms,par );
 plot_TRUvsPRE( trudata,final_predata,1,[resdir,'/final_true_vs_pred_data.pdf'], allmodels_collated);
 plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,1,[resdir,'/final_true_vs_pred_data_wavs.pdf']);

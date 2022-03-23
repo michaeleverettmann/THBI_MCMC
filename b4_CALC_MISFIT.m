@@ -1,6 +1,13 @@
-function [ misfit ] = b4_CALC_MISFIT( trudata,predata,par,ifplot,SWwt )
-% [ misfit ] = b4_CALC_MISFIT( trudata,predata,par,ifplot,SWwt)
-%  
+function [ misfit ] = b4_CALC_MISFIT( trudata,predata,par,ifplot,SWwt,options )
+    arguments
+        trudata
+        predata
+        par
+        ifplot = []
+        SWwt = []
+        options.plotRFError = false; 
+    end
+  
 % Calculate cross-convolution misfit between observed data and
 % (unit-normalised) predicted data
 
@@ -51,7 +58,7 @@ for id = 1:length(par.inv.datatypes)
         misfit.E2.(dtype) = misfit2./stfpow_tru./stfpow_pre;      % SUM OF SQUARED MISFITS, NORMALISED
         
         %%% brb2022.02.18 Simple rms estimate for comparison. 
-        if strcmp(dtype, 'RF_Sp'); 
+        if strcmp(dtype, 'RF_Sp') || strcmp(dtype, 'RF_Sp_ccp'); 
             truSV = trudata.(dtype)(itr).PSV(:,1); 
             preSV = predata.(dtype)(itr).PSV(:,1); 
             
@@ -61,16 +68,21 @@ for id = 1:length(par.inv.datatypes)
                         
             misfit.RMS_simple.(dtype) = sqrt(norm(truSV - preSV) ./ norm(truSV)); 
             
-            if true; 
+            if par.inv.verbose || options.plotRFError; % brb2022.02.18 Optional plotting to better understand RF error calculation. 
                 figure(1002); clf; hold on; set(gcf, 'color', 'white'); 
-                plot(truSV, 'k', 'DisplayName', 'truSV'); 
-                plot(preSV, 'b', 'DisplayName', 'preSV'); 
-                plot(difSV, 'r', 'DisplayName', ...
-                    sprintf('Diff: RMS = %0.4f', misfit.RMS_simple.(dtype) ) ); 
+                title(sprintf('RMS(diff)/norm(true) = %0.4f, X conv err = %0.4f', ...
+                        misfit.RMS_simple.(dtype), misfit.E2.(dtype) )); 
+                xlabel('Index'); 
+                ylabel('Sp receiver functions'); 
+                box on; 
+                LW = 3; 
+                shiftVal = 2*rms(truSV);
+                plot(difSV         , 'r', 'DisplayName', 'Difference', 'LineWidth', LW/2); 
+                plot(truSV-shiftVal, 'k', 'DisplayName', 'truSV',      'LineWidth', LW); 
+                plot(preSV+shiftVal, 'b', 'DisplayName', 'preSV',      'LineWidth', LW); 
                 legend(); 
-            end 
-            
-            if true; % brb2022.02.18 Optional plotting to better understand RF error calculation. 
+                exportgraphics(gcf, [par.res.resdir '/misfit_sp_rf.pdf']); 
+
                 figure(1001); clf; hold on; set(gcf, 'color', 'white'); 
                 sgtitle(['Error (unsquared) = ' num2str(sqrt(misfit.E2.(dtype)))] ); 
                 subplot(4,1,1); hold on; box on; 

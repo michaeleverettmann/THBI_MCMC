@@ -35,11 +35,14 @@ mminz = cmaxz;
 mmaxz = par.mod.maxz + model.selev; 
 zm = unique([mminz:par.mod.dz:mmaxz,mmaxz])';
 
+% try
 vs_mantle = sum(mpm.splines*diag(mpm.VS_sp),2);
 vp_mantle = mantle_vs2vp(vs_mantle,zm );
 rho_mantle = mantle_vs2rho(vs_mantle,zm );
 xi_mantle = mpm.xi*ones(size(zm));
-
+% catch e % Temporary...
+%     error(getReport(e)); 
+% end
 
 %% COLLATE
 zz = [zs;zc;zm];

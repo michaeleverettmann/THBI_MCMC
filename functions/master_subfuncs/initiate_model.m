@@ -25,9 +25,7 @@ while ifpass==0
             'maxrunN',5); % TODO this code caused a loop that would have failed infinitely. SHould not use a while loop like this. bb2021.09.14 
         %bb2021.09.23 Adding argument 5 where if run_mineos fails 5 (or some other small number of)times on the starting model, just toss it. No need to frett with getting a model to work with Mineos if no time is yet invested into inverting that model. 
     catch e 
-        disp('Error in while - try,catch loop in MASTER_par.m')
-        fprintf(1,'The identifier was:\n%s',e.identifier);
-        fprintf(1,'There was an error! The message was:\n%s',e.message);
+        fprintf('\n\n%s\n\n',getReport(e))
         ifpass = false; 
         numFails = numFails + 1; 
         continue;

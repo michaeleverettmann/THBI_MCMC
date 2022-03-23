@@ -9,9 +9,9 @@ function Vp  = mantle_vs2vp( Vs,Zkm )
 try
 %     Vp = Vs.*(akmod.vp./akmod.vs);
     Vp = Vs.*ak135vpvs(Zkm);
-catch
+catch e
     Vp=1.81*Vs;
-%     error
+    error(getReport(e))
 end
 
 end

@@ -50,7 +50,7 @@ else % When model is within HK bounds, run this.
         par.hkResetInfo.timesSWKernelsReset = 0; % Reset our surface wave kernel counter. This only is analyzed for the HK stacks. 
         
         fprintf('\nResetting HK stack on iteration %1.0f (%1.0fx as often as surface wave kernels)\n', par.ii, nSurfRes);  
-        HK_new = zeros(size(predata.HKstack_P.Esum_orig)); 
+        HK_new = zeros(size(predata.HKstack_P.Esum)); 
         for iWave = [1:size(predata.HKstack_P.waves.rf,2)]; 
             RF   = predata.HKstack_P.waves.rf(:,iWave); 
             tt   = predata.HKstack_P.waves.tt; 

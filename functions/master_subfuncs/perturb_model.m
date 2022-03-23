@@ -11,13 +11,13 @@ nchain = nchainOrig;
         modptb = nan; breakTrue = false; % In case not assigned in else. 
         ptb{ii,1} = 'start';
     else
-        %%%% brb2022.02.08 Start section where trying double perturbations.
         [model1, ptb{ii,1}, p_bd        ] = b2_PERTURB_MODEL(model,par,temp);
-% % % 		[model1, ptb{ii,1}, p_bd_first  ] = b2_PERTURB_MODEL(model,par,temp);
-% % %         [model1, ptb{ii,1}, p_bd_second ] = b2_PERTURB_MODEL(model1,par,temp); % bb2022.01.10 test to see what happens if we perterb model twice. 
-% % % 		p_bd = p_bd_first * p_bd_second; % Multiply these probabilities together... 
-        %%%% brb2022.02.08 End section where trying double perturbations.
 
+        % brb2022.03.14 Temporary code
+%         if strcmp(ptb{ii,1},'Moho_h'); 
+%             fprintf('\nPerturbed moho = %2.1f km\n',model1.zmoh)
+%         end
+        
         ifpass = a1_TEST_CONDITIONS( model1, par, par.inv.verbose  );
         breakTrue=false; 
 		if p_bd==0, if par.inv.verbose, fprintf('  nope\n'); end; breakTrue=true; end % No need to return if breakTrue=true. We still want other variables to be defined. 

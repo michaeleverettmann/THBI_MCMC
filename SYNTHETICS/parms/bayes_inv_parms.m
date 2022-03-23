@@ -130,12 +130,11 @@ inv = struct(    'synthTest',true                ,...
                  'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-                 'nchains',1                   ,... % number of chains to start in parallel
+                 'nchains',16                   ,... % number of chains to start in parallel
                  'Nsavestate',10               ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x  
-                  'datatypes',{{'HKstack_P'}})  
-%                   'datatypes',{{'HKstack_P','RF_Sp','SW_Ray_phV','SW_Lov_phV', 'SW_HV'}})  
+                  'datatypes',{{'HKstack_P','RF_Sp','SW_Ray_phV','SW_Lov_phV', 'SW_HV'}})  
 %                  'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}})  
                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
@@ -159,13 +158,13 @@ inv = struct(    'synthTest',true                ,...
 %                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
 %                  'BWclust',1                     ,... % option to use only one c x             
 %                   'datatypes',{{'HKstack_P','RF_Sp','SW_Ray_phV','SW_Lov_phV', 'SW_HV'}})  
-% %                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
-% %                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
-% %                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
-% %                                 %          'HKstack_x' with x='P'
+%                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
+%                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
+%                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
+%                                 %          'HKstack_x' with x='P'
 
 
-profileRun = false; 
+profileRun = true; if profileRun; fprintf('\n\nDoing an mpi profile run.\n\n'), end
                                 
 %% Model parms
 modl = struct([]);
@@ -348,9 +347,9 @@ synth = struct( 'gcarcs',[70]                 ,... % average gcarc
                 'noise_sigma_SW_Lov',0.015        ,... %0.03 std for random added noise for SWs
                 'noise_sigma_SW_HV',0.005        ,... %0.03 std for random added noise for SWs
                 'noise_sigma_BW_Sp',0.009        ,... %0.02 std for random added noise for SpRFs
-                'noise_sigma_BW_Ps',0.0        ,... %0.02 std for random added noise for PsRFs 0.012
+                'noise_sigma_BW_Ps',0.012        ,... %0.02 std for random added noise for PsRFs 0.012
                 'noise_sigma_RF_Sp',0.009        ,... %0.02 std for random added noise for SpRFs
-                'noise_sigma_RF_Ps',0.0        ,... %0.02 std for random added noise for PsRFs 0.012
+                'noise_sigma_RF_Ps',0.012        ,... %0.02 std for random added noise for PsRFs 0.012
                 'surf_Vp_Vs',[6.1 3.55]          ,... % [VP, VS] surface velocity values - if empty, uses True vals % bb2022.02.08 Not sure what these are. Different sets of values are used in z0_SYNTH_MODEL...
                 'SW_Ray_phV_periods',logspace(log10(6),log10(167),22)',...  % Rayleigh wave phV periods
                 'SW_Ray_grV_periods',logspace(log10(6),log10(40),10)',...  % Rayleigh wave phV periods
