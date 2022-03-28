@@ -17,9 +17,12 @@ temper              = [accept_info.temp                ]';
 Pm_prior            = [accept_info.Pm_prior1           ]'; 
 p_bd                = [accept_info.p_bd                ]'; % Prob associated with birth or death
 ptbnorm             = [accept_info.ptbnorm             ]'; 
+Emax_per_iter       = [accept_info.hk_Emax_per_iter    ]'; % Maximum energy in hk stack made at any iteration
+
 
 E2 = [misfit.E2]; 
 E2 = [E2.HKstack_P]'; 
+
 
 misfSurf = hKappaError(par.datprocess.HKappa.scale_error,...
                        trudata.HKstack_P.Esum,...
@@ -259,6 +262,12 @@ subplot(nRow, nCol, 10); cla; hold on; grid on; box on;
 plot(iIter, temper); 
 ylabel('Temperature'); 
 
+subplot(nRow, nCol, 11); cla; hold on; grid on; box on; 
+plot(iIter, Emax_per_iter)
+xlabel('Iter'); 
+title('Max hk energy at every iteration'); 
+
+set(gcf, 'color', 'white')
 exportgraphics(gcf, [resdir '/convergence_info_chain_' num2str(chainNo) '_v1.png'], 'Resolution', 400)
 
 

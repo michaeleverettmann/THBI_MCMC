@@ -460,6 +460,7 @@ try
     accept_info(ii).Pm_prior1 = Pm_prior1; 
     accept_info(ii).p_bd = p_bd; 
     accept_info(ii).non_acceptk = non_acceptk; 
+    accept_info(ii).hk_Emax_per_iter = max(max(predata.HKstack_P.Esum)); 
     if ii == 1; accept_info(1) .trudata = trudata; end; % Inefficient, but this is just for testing. 
     %%% TODO remove these lines eventually. 
 

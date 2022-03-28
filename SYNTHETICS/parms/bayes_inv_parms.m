@@ -120,7 +120,7 @@
 disp('NOT REAL SYNTHETIC\nUsing fast, debuging options (few iterations). See: bays_inv_parms.m')                                
 inv = struct(    'synthTest',true                ,...
                  'verbose',false                 ,... % option to spit out more information+plots
-                 'niter',500                    ,... % Number of iterations
+                 'niter',2000                    ,... % Number of iterations
                  'burnin',100                    ,... % don't record results before burnin iterations
                  'cooloff',100                    ,... % # of iterations over which temperature declines as erf
                  'tempmax',5                     ,... % maximum multiple of all standard deviations
@@ -130,7 +130,7 @@ inv = struct(    'synthTest',true                ,...
                  'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-                 'nchains',12                   ,... % number of chains to start in parallel
+                 'nchains',2                   ,... % number of chains to start in parallel
                  'Nsavestate',10               ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x  
