@@ -44,7 +44,7 @@ ocomps = 2; % 1 is [x,y,z], 2 is [r,t,z]
 %% filenames
 if ~ischar(ID), ID = num2str(ID);end
 modfile =    [ ID,'.mod'];
-execfile =   [ ID,'.cmd'];
+execfile =   [ ID,'.csh']; % brb2022.03.22 trying .csh seems to be a faster extension when runing from csh shell (csh shebang.). 
 odatfile =   [ ID,'.rtz'];
 ifile =      [ ID,'_synth.in'];
 ofile0 =     [ ID,'_synth.out0'];
@@ -73,13 +73,28 @@ end
 fileattrib(execfile, '+x'); 
 
 %% do PropMatrix on it
-[status,cmdout] = system([paths.timeout ' 0.3 ./',execfile]); 
-[status2,cmdout2] = system([paths.timeout ' 0.3 echo hi world']); % brb2022.03.22 just for testing things
+% warning('This is where things get slow')
+[status ,cmdout ] = system([paths.timeout ' 0.3 ./',execfile]); % now not deleting imag file. 
+% [status2,cmdout2] = system(sprintf('rm %s &',oimagout)); % Try deleting file in background? brb2022.03.25
 
-system(sprintf('cp %s slow.%s',execfile, execfile)); 
-fprintf('\nrun propmat: copying propmat exefile to slow*, and only tieout .3 s\n')
+% [status2,cmdout2] = system([paths.timeout ' 0.3 echo hi world']); % brb2022.03.22 just for testing things
+% % system(sprintf('cp %s slow.%s',execfile, execfile)); 
+% % fprintf('\nrun propmat: copying propmat exefile to slow*, and only tieout .3 s\n')
 
+% [res ,cmdout ,err ] = jsystem([paths.timeout ' 0.3 ./',execfile], '/bin/bash'); 
+% [res ,cmdout ,err ] = jsystem(['./',execfile], '/bin/bash -c'); 
+% [a,b]=system('thing that no work')
+% [res2,cmdout2,err2] = jsystem([paths.timeout ' 0.3 echo hi world']); % brb2022.03.22 just for testing slowness
+% [res2,cmdout2,err2] = jsystem(['echo $PATH']); % brb2022.03.22 just for testing slowness
 
+% p = java.lang.ProcessBuilder({paths.timeout,...
+%     '0.3',...
+%     ['./' execfile] }).start();
+% reader = java.io.BufferedReader(java.io.InputStreamReader(p.getInputStream()));
+% str = char(java.util.Scanner(reader).useDelimiter('\A').next());
+
+% system(sprintf('cp %s slow.%s',execfile, execfile)); 
+% fprintf('\nrun propmat: copying propmat exefile to slow*, and only tieout .3 s\n')
 
 %% read PropMatrix output
 [traces,tt] = readPROPMATtr(odatfile);

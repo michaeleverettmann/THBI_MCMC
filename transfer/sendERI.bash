@@ -7,7 +7,7 @@ computer=${1:-brunsvik@bellows.eri.ucsb.edu} # First argument is the computer yo
 
 rsync -ahv \
 --exclude-from='exclude_THBI.txt' \
---exclude={'**.mat','**.jpg','**.png','**.jpg','**invState'} \
+--exclude={'**.mat','**.jpg','**.png','**.jpg','**invState','*.git*','*vel_profile','*junk/*'} \
 ../ \
 $computer:~/Documents/UCSB/ENAM/THBI_ENAM
 
