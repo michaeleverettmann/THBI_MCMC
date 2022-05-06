@@ -33,8 +33,9 @@ logfile = [ID,'.log'];
 
 
 %% =======================================================================
-wd = pwd;
-cd([paths.THBIpath '/matlab_to_hv_kernel']); % bb2021.12.07 Why is this cd here? cd should be super slow, but I haven't seen this line come up in profilers...
+% % % brb2022.04.02 See if I can execute in ram folder. Sometimes a try catch doesn't permit us to change back to ram folder. 
+% % % wd = pwd;
+% % % cd([paths.THBIpath '/matlab_to_hv_kernel']); % bb2021.12.07 Why is this cd here? cd should be super slow, but I haven't seen this line come up in profilers...
 
 
 %% model is an input file or a matlab structure?
@@ -56,7 +57,9 @@ if ifverbose
     fprintf('    > Running HV kernel computation code. \n    > Will take some time...')
 end
 % [status,cmdout] = system(['/opt/local/bin/gtimeout 100 ./',execfile]);
-[status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % TODOPath
+[status,cmdout] = system([paths.timeout ' 15 ./',execfile]); % TODOPath
+if status ~= 0; warning('hv kernel exit status ~= 0.'); end
+    %brb2022.04.05 Changing from 100s timeout to 15s. 
 if ifverbose
      fprintf(' success!\n')
 end
@@ -65,7 +68,8 @@ if status~=124
     try
     [HVr,HVK,phV,grV] = readHVkernel_ofile(ofile,swperiods,ifplot);
     HVr = -1./HVr;
-    catch
+    catch e 
+        fprintf('\n%s\n',getReport(e)); 
         error('some error - check model file layers not too thin!\n')
     end
     phV = phV(:);
@@ -82,7 +86,7 @@ if ifdelete
     if java.io.File([pwd '/' logfile]).exists, delete(logfile); end %TODOEXIST bb2021.11.22 exist is SUPER slow
     if delcard, delete(modfile); end
 end
-cd(wd);
+% % % cd(wd); brb2022.04.02 Not changing directories cause I was getting stuck in HV folder. See earlier part of this file for another cd I commented out. 
 
 % %% plot
 % if ifplot

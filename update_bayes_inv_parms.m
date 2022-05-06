@@ -6,6 +6,18 @@ function [par, inv] = update_bayes_inv_parms(parOrig, stamp);
 par = parOrig; 
 str_temp = split(stamp, '/'); 
 
+
+% { Different data types alone
+% niter_only   = 12000; 
+% burnin_only  = 4000; 
+% cooloff_only = 3000; 
+% nchains_only = 16; 
+% niter_only   = 4000; 
+% burnin_only  = 1000; 
+% cooloff_only = 800 ; 
+% nchains_only = 16  ; 
+
+
 if     strcmp(stamp, 'ENAM_trial'); 
     disp('Using default parameters') 
     
@@ -158,10 +170,67 @@ elseif strcmp(stamp, 'all_001');
     par.mod.starting.HKappa.startAtHK = true;   
     par.inv.niter                     = 16000; 
     par.inv.burnin                    = 6000; 
-    par.cooloff                       = 4500; 
+    par.inv.cooloff                       = 4500; 
     par.inv.nchains = 16; 
     
-     
+    
+% { --- Different data types alone
+elseif strcmp(stamp, 'SW_Ray_phV_only'); 
+    par.inv.datatypes                 = {'SW_Ray_phV'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only; 
+elseif strcmp(stamp, 'SW_Lov_phV_only'); 
+    par.inv.datatypes                 = {'SW_Lov_phV'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only; 
+elseif strcmp(stamp, 'RF_Sp_ccp_only'); 
+    par.inv.datatypes                 = {'RF_Sp_ccp'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only; 
+elseif strcmp(stamp, 'HKstack_P_only'); 
+    par.inv.datatypes                 = {'HKstack_P'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only; 
+elseif strcmp(stamp, 'SW_HV_only'); 
+    par.inv.datatypes                 = {'SW_HV'}   ;
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
+% } --- End test different data types alone   
+
+
+elseif strcmp(stamp, 'all_demo'); 
+    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+    par.mod.starting.HKappa.startAtHK = true;   
+    par.inv.niter                     = 2000; 
+    par.inv.burnin                    = 700 ; 
+    par.inv.cooloff                   = 500 ; 
+    par.inv.nchains                   = 16  ; 
+elseif strcmp(stamp, 'all_002'); 
+    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+    par.mod.starting.HKappa.startAtHK = true;   
+    par.inv.niter                     = 16000; 
+    par.inv.burnin                    = 5000 ; 
+    par.inv.cooloff                   = 4000 ; 
+    par.inv.nchains                   = 16   ; 
+elseif strcmp(stamp, 'all_no_hv'); 
+    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'}; 
+    par.mod.starting.HKappa.startAtHK = true;   
+    par.inv.niter                     = 16000; 
+    par.inv.burnin                    = 5000 ; 
+    par.inv.cooloff                   = 4000 ; 
+    par.inv.nchains                   = 16   ; 
+    
+    
 end
 
 

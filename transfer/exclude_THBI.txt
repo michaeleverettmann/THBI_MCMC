@@ -1,6 +1,7 @@
-external_code_STORAGE/**
-code_storage_DELETE_when_know_its_not_needed/**
-papers_etc/**
+**external_code_STORAGE/**
+**code_storage_DELETE_when_know_its_not_needed/**
+**papers_etc/**
+**data/STASinv/** # Don't send results to computer: might overwrite important results!
 **.a 
 **.o
 **.DS_Store
@@ -19,3 +20,13 @@ papers_etc/**
 # Inversion .mat files that take a lot of space. 
 **cvfrechet 
 # **prior.mat # Actually might want to keep this. Usually no need to recalculate? 
+### Things that will change frequently
+**.mat
+**.jpg
+**.png
+**invState
+*.git*
+*vel_profile
+*junk/*
+**pathsAutoGen**
+**data/STASinv/**

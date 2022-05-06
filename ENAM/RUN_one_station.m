@@ -36,10 +36,17 @@ STAMP_all = {...
 %     'HKappa_005',...
 %     'HKappa_006',...
 %     'HKappa_007',...
-%     'all_001',...
+%     'all_002',...
+%     'all_no_hv',...
 %     'prior_sigma_10_min_sigma_3',...
-    'HKappa_008',...
-    }; % This determines which tests we want to run now. They will run sequentially, not in parallel (each station only has one ram folder. )
+%     'SSA_2022_v2',...
+%     'SW_Ray_phV_only',...  % { --- Start test to see influence of different data types independently
+%     'SW_Lov_phV_only',...  % ...
+%     'RF_Sp_ccp_only' ,...  % ...
+    'HKstack_P_only' ,...  % ...
+%     'SW_HV_only'     ,...  % } --- End   test to see influence of different data types independently
+%     'all_demo'       ,...
+}; % This determines which tests we want to run now. They will run sequentially, not in parallel (each station only has one ram folder. )
 
 % Need to do something like this. 
 
@@ -65,7 +72,7 @@ for istamp = [1:length(STAMP_all)];
     % If we have not defined network and station, use default US.CEH
     if ~ (exist('network_manual', 'var') && exist('station_manual', 'var')) ; 
         network_manual = 'TA'; 
-        station_manual = 'V52A'; 
+        station_manual = 'O53A'; 
 %         network_manual = 'US'; 
 %         station_manual = 'CEH'; 
         fprintf('\nReseting to %s.%s\n',network_manual,station_manual)
@@ -84,7 +91,8 @@ for istamp = [1:length(STAMP_all)];
     %% load project, station, and request details and request details
     try
         load([proj.dir,'/project_details.mat']);
-    catch
+    catch e 
+        fprintf('\n%s\n',getReport(e)); 
         run([proj.dir,'/project_details.m']);
     end
     load([proj.infodir,'stations.mat']); % bb2021.09.28 Get this using evdata1_database.m
@@ -131,6 +139,10 @@ for istamp = [1:length(STAMP_all)];
 end
 
 function execute_MASTER_par
-    MASTER_par;
+    try
+        MASTER_par;
+    catch e
+        fprintf('Cant execute master_par.m. %s\n%s','(todo put stamp here)',getReport(e)) 
+    end
 end
 % end

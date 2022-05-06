@@ -23,9 +23,15 @@ end
 if ~isfield(par, 'ii'); 
     par.ii = 0; 
 end
-% end default par values. 
 
+% end default par values. 
 HKdat = par.inv.datatypes{find(strcmp(pdtyps(:,1),'HKstack'),1,'first')};
+
+% if ~isfield(predataOrig.(HKdat), 'Emax_per_iter'); % First iteration, make new Emax_per_iter array
+%     predata.(HKdat).Emax_per_iter = zeros(par.inv.niter,1); 
+% else; % Other iterations, keep track of the Emax_per_iter saved in previous iteration
+%     predata.(HKdat).Emax_per_iter = predata.(HKdat).Emax_per_iterOrig;
+% end
 
 if (model.vpvs > max(predata.(HKdat).K)) || (model.vpvs < min(predata.(HKdat).K)) ... % Give maximum error if model is outside the bounds of the actual HK stack. 
         || (model.zmoh > max(predata.(HKdat).H)) || (model.zmoh < min(predata.(HKdat).H)); 
@@ -66,6 +72,34 @@ else % When model is within HK bounds, run this.
         predata.(HKdat).H    = HK_H; 
         predata.(HKdat).K    = HK_K; 
         predata.(HKdat).Esum = HK_new; 
+        
+% % %         %%% brb2022.03.28 Temporary. See what is the maximum ever
+% % %         %%% obtainable HK stack value. 
+% % %         figure(1); clf; hold on; 
+% % %         xlim([-2, 40]); 
+% % %         tmin = 2; % Minimum time to consider in RFs. Width of pulse? 
+% % %         tmax = 40; % Max time 
+% % %         for iWave = [1:size(predata.HKstack_P.waves.rf,2)]; 
+% % %             RF   = predata.HKstack_P.waves.rf(:,iWave); 
+% % %             tt   = predata.HKstack_P.waves.tt; 
+% % % 
+% % % %             rfmax = max(RF());
+% % %             inWind = and(tt>=tmin,tt<=tmax); 
+% % %             [pks,locs] = findpeaks( RF(inWind),tt(inWind) ); 
+% % %             [pksSort,indSort] = sort(pks); 
+% % %             pksSort = flip(pksSort); 
+% % %             indSort = flip(indSort); 
+% % %             
+% % %             % Maximum obtainable HK value. 
+% % %             % Assume Ps phase is the largest, PpPs is second largest, PpSs,
+% % %             % PsPs are the most negative value. 
+% % %             maxHKStack = 0.5 * pksSort(1) + 0.3 * pksSort(2) - 0.2 * pksSort(end); 
+% % % 
+% % %             plot(tt, RF)
+% % %             plot(tt, maxHKStack + 0 .* tt)
+% % %             
+% % %         end
+% % %         %%%
                 
         % Extract some values to make things easier to work with. 
         h          = predata.(HKdat).H; 
@@ -74,8 +108,10 @@ else % When model is within HK bounds, run this.
         kTrial     = model.vpvs; 
         hTrial     = model.zmoh; 
         
-        E_by_Emax = interpn(k',h,Esum,kTrial,hTrial) ...
-            / maxgrid(Esum);
+        E_no_norm = interpn(k',h,Esum,kTrial,hTrial); 
+        E_by_Emax = E_no_norm / maxgrid(Esum);
+        E_by_Esuper_max = E_no_norm / predata.(HKdat).E_by_Esuper_max; % brb2022.04.27 Not sure what this is doing. I think it's a mixed up naming scheme. 
+        
         
 %         plot_HK_stack(h, k, Esum, ...
 %             'model_vpvs', model.vpvs, 'model_zmoh', model.zmoh, ...
@@ -93,7 +129,7 @@ else % When model is within HK bounds, run this.
         RF   = predata.HKstack_P.waves.rf(:,:); 
         tt   = predata.HKstack_P.waves.tt; 
         rayp = predata.HKstack_P.waves.rayParmSecDeg(:); 
-        [E_not_by_Emax] = HK_stack_anis_wrapper_no_grid(...
+        [E_no_norm] = HK_stack_anis_wrapper_no_grid(...
                 par, model, RF, tt, rayp); 
             
         % Extract some values to make things easier to work with. 
@@ -106,10 +142,13 @@ else % When model is within HK bounds, run this.
         kTrial     = model.vpvs; 
         hTrial     = model.zmoh; 
         
-        E_by_Emax = E_not_by_Emax / maxgrid(Esum); % Dividing over maxgrid of the old HK stack. This induces a small amount of error, only in so much as the maximum value in the HK stack changes between iterations. I think this is small... We recalculate the full HK stack every so often. 
+        E_no_norm_old_hk = interpn(k',h,Esum,kTrial,hTrial); 
+%         E_no_norm = E_not_by_Emax; % 
+        E_by_Emax = E_no_norm / maxgrid(Esum); % Dividing over maxgrid of the old HK stack. This induces a small amount of error, only in so much as the maximum value in the HK stack changes between iterations. I think this is small... We recalculate the full HK stack every so often. 
+        E_by_Esuper_max = E_no_norm / predata.(HKdat).E_by_Esuper_max; % WRONG?!
         
         E_by_Emax = min(E_by_Emax, 1); % brb2022.03.06 Just in case an un-updated Esum in maxgrid causes us to have higher than 1 normalized energy. That could cause problems when converting energy to mismatch (negative mismatch). 
-        
+               
 %         plot_HK_stack(h, k, Esum, ...
 %             'model_vpvs', model.vpvs, 'model_zmoh', model.zmoh, ...
 %             'title', sprintf('Iteration = %1.0f',par.ii),'figNum', 198) 
@@ -187,6 +226,7 @@ else % When model is within HK bounds, run this.
 
     % Assign the penalty value. 
     predata.(HKdat).E_by_Emax = E_by_Emax * wEmax + EDist * wDist; 
+    predata.(HKdat).E_by_Esuper_max = E_by_Esuper_max; 
 
     % Assign other value for compatibility with remaining code. 
     predata.(HKdat).Hgrid = predata.(HKdat).H;
@@ -194,6 +234,8 @@ else % When model is within HK bounds, run this.
     predata.(HKdat).H = model.zmoh;
     predata.(HKdat).K = model.vpvs;        
 end
+
+% predata.(HKdat).Emax_per_iter(par.ii) = max(max(predata.(HKdat).Esum)); 
 
 
 end

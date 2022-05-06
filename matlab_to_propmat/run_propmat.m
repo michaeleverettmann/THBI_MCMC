@@ -74,7 +74,8 @@ fileattrib(execfile, '+x');
 
 %% do PropMatrix on it
 % warning('This is where things get slow')
-[status ,cmdout ] = system([paths.timeout ' 0.3 ./',execfile]); % now not deleting imag file. 
+[status ,cmdout ] = system([paths.timeout ' 5 ./',execfile]); % now not deleting imag file. 
+[errorInfo]=assess_timeout_results(status, cmdout); 
 % [status2,cmdout2] = system(sprintf('rm %s &',oimagout)); % Try deleting file in background? brb2022.03.25
 
 % [status2,cmdout2] = system([paths.timeout ' 0.3 echo hi world']); % brb2022.03.22 just for testing things
@@ -97,12 +98,16 @@ fileattrib(execfile, '+x');
 % fprintf('\nrun propmat: copying propmat exefile to slow*, and only tieout .3 s\n')
 
 %% read PropMatrix output
-[traces,tt] = readPROPMATtr(odatfile);
+try 
+    [traces,tt] = readPROPMATtr(odatfile);
+    delete(modfile,execfile,odatfile,ifile,ofile0,ofile1,ofile2);%% delete files
+catch e 
+    delete(modfile,execfile,odatfile,ifile,ofile0,ofile1,ofile2);%% delete files
+    warning('Cant read propmat files. Did timeout propmat not finish?')
+    error(getReport(e))
+end
 
-%% delete files
-% delete(execfile,odatfile,ifile,ofile1,ofile2,'synth.out');
-% delete(modfile,execfile,odatfile,ifile,ofile0,ofile1,ofile2);%brb2022.03.22 Add this back in. 
-fprintf('\nrun propmat: NOT deleting running files.\n')
+
 
 
 if demoPlot; 

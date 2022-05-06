@@ -85,14 +85,14 @@ elseif non_acceptk == 1; % We perturbed model and failed. Let's perturb one more
         ptb,modptb,nchain,breakTrue]...
         = perturb_model(model1, Pm_prior, ptb, ii, par, temp, Kbase,nchain); 
     % model1 is now perturbed twice. 
-    ptbnorm = ptbnormk * ptbnorm;  % Not sure what to do here yet. 
-    % ifpass no changing tI think
+    % However, we do NOT want to combine ptbnormk and ptbnorm. 
+    % ptbnorm is calculated by comparing current model with kbase model. 
+    % So it is already correct: ptbnormk is not necessary. 
+%     ptbnorm = ptbnormk * ptbnorm;  < this would be wrong. 
+
     p_bd = p_bd * p_bdk;  % TODO get p_bd, probability for previous model bd. 
     % Pm_prior SHould be fine. 
-    % ptb TODO decide what to do here. 
-    % modptb = modptb idk yet. 
-    % nchain, ? 
-    
+
     if plotTrue
         figure(500); clf; hold on; 
         LineWidth = 3; 

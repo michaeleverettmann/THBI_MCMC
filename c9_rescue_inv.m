@@ -18,10 +18,12 @@ end
 
 try
     load([resdir,'/prior.mat'],'prior');
-catch
+catch e 
+    fprintf('\n%s\n',getReport(e)); 
     try
         load([strtok(fliplr(strtok(fliplr(resdir),'/')),'_'),'/prior.mat']);
-    catch
+    catch e 
+        fprintf('\n%s\n',getReport(e)); 
         warning('could not find prior for rescuing')
         prior = [];
     end

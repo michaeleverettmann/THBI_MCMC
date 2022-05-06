@@ -21,7 +21,8 @@ fail_chain=fail_chainOrig;
             predata = b3_FORWARD_MODEL_BW(       model1,laymodel1,par,predata,ID,0 );
             predata = b3_FORWARD_MODEL_RF_ccp(   model1,laymodel1,par,predata,ID,0 );
             predata = b3_FORWARD_MODEL_SW_kernel(model1,Kbase,par,predata );
-        catch
+        catch e 
+            fprintf('\n%s\n',getReport(e)); 
             fail_chain=fail_chain+1;
             fprintf('Forward model error, failchain %.0f\n',fail_chain);  breakTrue=true; return
         end

@@ -25,7 +25,9 @@ if nargin <3 || isempty(ifplot)
 end
 
 mod = par.mod;
-if ~par.mod.starting.HKappa.startAtHK || nargin <4 || isempty(hkStack); 
+if ~par.mod.starting.HKappa.startAtHK || ...
+        ~ any('HKstack_P'==string(par.inv.datatypes)) || ...
+        nargin <4 || isempty(hkStack) ; 
     h_crust            = random('unif',mod.crust.hmin,mod.crust.hmax);
     vpvs_crust         = random('unif',mod.crust.vpvsmin,mod.crust.vpvsmax);
 else; 

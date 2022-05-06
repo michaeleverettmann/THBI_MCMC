@@ -122,6 +122,8 @@ writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
 fileattrib(execfile, '+x'); 
 [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % make sure your system can see your timeout function
+[errorInfo]=assess_timeout_results(status, cmdout); 
+%brb2022.04.05 Changing from 100s timeout to 15s. 
 
 delete(execfile,modefile); % kill files we don't need
 
@@ -161,6 +163,8 @@ writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
 fileattrib(execfile, '+x'); 
 [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % run execfile 
+[errorInfo]=assess_timeout_results(status, cmdout); 
+%brb2022.04.05 Changing from 100s timeout to 15s. 
 
 delete(execfile,modefile); % kill files we don't need
 
@@ -199,7 +203,9 @@ for ief = 1:length(eigfiles)-1
     
     fileattrib(execfile, '+x'); 
     [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % run execfile 
-    
+    [errorInfo]=assess_timeout_results(status, cmdout); 
+    %brb2022.04.05 Changing from 100s timeout to 15s. 
+
     eigfiles_fix{ief} = [eigfiles{ief},'_fix'];
     delete(execfile);
 end
@@ -210,6 +216,8 @@ writeMINEOS_Qexecfile( qexecfile,eigfiles_fix,qmod,[ID,'.q'],[ID,'.log'] )
 
 fileattrib(qexecfile, '+x'); 
 [status,cmdout] = system([paths.timeout ' 100 ./',qexecfile]); % run qexecfile 
+[errorInfo]=assess_timeout_results(status, cmdout); 
+%brb2022.04.05 Changing from 100s timeout to 15s. 
 
 
 delete(qexecfile);
@@ -219,7 +227,9 @@ try
 %     disp([ID,'.q'])
 %     disp(swperiods)
     [phV,grV] = readMINEOS_qfile([ID,'.q'],swperiods);
-catch
+catch e 
+    warning('Cant read Mineos files. Did timeout not finish?')
+    fprintf('\n%s\n',getReport(e)); 
     error('some error with extracting phV and grV from q-file')        
 end
   

@@ -267,7 +267,23 @@ if any(strcmp(allpdytp(:,1),'HKstack'))
         % Get wavesforms used in EARS to make KK stack. 
         rfWaves = load(sprintf('%s/IRIS_EARS//Ears/gauss_2.5/%s.%s/rfArr.mat',EARSdir,nwk,sta)); 
         rfWaves.tt = rfWaves.tt'; 
-    catch
+        
+        %%% Make my own HK stacks. Seems like phase weighting in IRIS EARS make inversion unstable... brb2022.04.04
+        Esum2 = zeros(size(hkstack.Esum)); 
+        warning('brb2022.02.04: TODO synthetic starting HK stack: making first hk stack using 0.5, 0.3, 0.2 weights. Also using 3.5 as average s crustal velocity, similar to Zhu and Kanamori 2000. These should be parameters. ')
+        for irf = [1:size(rfWaves.rf,2)]; 
+            [Esum2Irf, h2, k2] = HKstack(rfWaves.rf(:,irf), rfWaves.tt', ...
+                rfWaves.rayParmSecDeg(irf)/111.1949, [0.5, 0.3, 0.2], ...
+                3.5,hkstack.H,hkstack.K'); 
+            Esum2 = Esum2 + Esum2Irf'; 
+        end
+        
+        plot_HK_stack(hkstack.H, hkstack.K,Esum2,'title',...
+            'HK stack with vs=3.5, xi=0. Using to determine starting H and K'); 
+        %%% End making my own HK stacks for starting model. 
+        
+    catch e 
+        fprintf('\n%s\n',getReport(e)); 
         error('bb2021.10.01 Dont have h-k stack OR MAYBE WAVEFORMS for station %s.%s. Should make code to handle this situation', nwk, sta)
     end    
     if isempty(hkstack.Nobs)
@@ -275,11 +291,15 @@ if any(strcmp(allpdytp(:,1),'HKstack'))
         hkstack.Nobs = 100;
     end
     HKstack_P           = hkstack;
-    HKstack_P.Esum      = HKstack_P.Esum-mingrid(HKstack_P.Esum);
+    HKstack_P.Esum      = Esum2         -mingrid(Esum2         );
     HKstack_P.Esum_orig = HKstack_P.Esum-mingrid(HKstack_P.Esum); % Duplicate HK stack. Might end up replacing other info with my own HK stack. 
     HKstack_P.H_orig    = HKstack_P.H; 
     HKstack_P.K_orig    = HKstack_P.K; 
     HKstack_P.waves     = rfWaves; 
+    
+    HKstack_P.E_by_Esuper_max = ...
+        hk_maximum_possible_value(rfWaves.rf, rfWaves.tt); % Not finished. Try to estimate the highest possible value that could ever be achieved in HK stack. 
+    
 end
 
 

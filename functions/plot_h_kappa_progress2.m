@@ -9,6 +9,7 @@ function plot_h_kappa_progress2(trudata, allmodelsOrig, resdir, chainNo, ...
 hStack              = trudata.HKstack_P.H; 
 kStack              = trudata.HKstack_P.K; 
 eStack              = trudata.HKstack_P.Esum; 
+E_by_Esuper_max     = trudata.HKstack_P.E_by_Esuper_max; 
 
 ifaccept            = [accept_info.ifaccept            ]'; 
 ifaccept = logical(ifaccept); 
@@ -69,22 +70,22 @@ ylim([1-3*yShift, 2+3*yShift]);
 thisCond = and( ifaccept, nak == 2); 
 ac2_perc = sum(thisCond) / length(thisCond) * 100; 
 ac2 = scatter(iIter(thisCond), yPos(thisCond), '|b', 'DisplayName', ...
-    sprintf('Accepted 2P: %3.0f%%',ac2_perc))
+    sprintf('Accepted 2P: %3.0f%%',ac2_perc)); 
 thisCond = and(~ifaccept, nak == 2); 
 rj2_perc = sum(thisCond) / length(thisCond)* 100; 
 rj2 = scatter(iIter(thisCond), yPos(thisCond), '|r', 'DisplayName', ...
-    sprintf('Rejected 2P: %3.0f%%',rj2_perc))
+    sprintf('Rejected 2P: %3.0f%%',rj2_perc)); 
 
 
 % One perturbation
 thisCond = and( ifaccept, nak == 1); 
 ac1_perc = sum(thisCond) / length(thisCond)* 100; 
 ac1 = scatter(iIter(thisCond), yPos(thisCond), '|b', 'DisplayName', ...
-    sprintf('Accepted 1P: %3.0f%%',ac1_perc))
+    sprintf('Accepted 1P: %3.0f%%',ac1_perc)); 
 thisCond = and(~ifaccept, nak == 1); 
 rj1_perc = sum(thisCond) / length(thisCond)* 100; 
 rj1 = scatter(iIter(thisCond), yPos(thisCond), '|r', 'DisplayName', ...
-    sprintf('Rejected 1P: %3.0f%%',rj1_perc))
+    sprintf('Rejected 1P: %3.0f%%',rj1_perc)); 
 
 leg = legend([ac1, rj1, ac2, rj2], 'Location', 'east','NumColumns',2);
 legTitle = title(leg, 'Percent iterations per category'); 
@@ -147,7 +148,7 @@ ax4   = start_hk_ax(ax4hk, kStack, hStack, misfSurf); hold on;
 colorbar(ax4hk, 'location', 'north'); 
 linkaxes([ax4, ax4hk]); 
 
-exportgraphics(gcf, [resdir '/convergence_info_chain_' num2str(chainNo) '_v0.png'], 'Resolution', 400)
+exportgraphics(gcf, [resdir '/convergence_info_chain_' num2str(chainNo) '_v0.png'], 'Resolution', 400);
 
 %% Plots of liklihood and other useful things, across iterations. 
 figure(2); clf; hold on; set(gcf, 'pos', [1345 1046 1985 785]);
@@ -158,42 +159,42 @@ plot(iIter, E2, 'k');
 scatter(iIter(~ifaccept), E2(~ifaccept), 15, 'r', 'filled');
 scatter(iIter( ifaccept), E2( ifaccept), 15, 'g');
 ylabel('E');
-set(gca, 'yscale', 'log')
+set(gca, 'yscale', 'log');
 
 subplot(nRow, nCol,2); hold on; grid on; box on;
 plot(iIter, chi2, 'k');
 scatter(iIter(~ifaccept), chi2(~ifaccept), 15, 'r', 'filled');
 scatter(iIter( ifaccept), chi2( ifaccept), 15, 'g');
 ylabel('chi2');
-set(gca, 'yscale', 'log')
+set(gca, 'yscale', 'log');
 
 subplot(nRow, nCol,3); hold on; grid on; box on;
 plot(iIter, rms, 'k');
 scatter(iIter(~ifaccept), rms(~ifaccept), 15, 'r', 'filled');
 scatter(iIter( ifaccept), rms( ifaccept), 15, 'g');
 ylabel('rms');
-set(gca, 'yscale', 'log')
+set(gca, 'yscale', 'log');
 
 subplot(nRow, nCol,4); hold on; grid on; box on;
 plot(iIter, chi2sum, 'k');
 scatter(iIter(~ifaccept), chi2sum(~ifaccept), 15, 'r', 'filled');
 scatter(iIter( ifaccept), chi2sum( ifaccept), 15, 'g');
 ylabel('chi2su');
-set(gca, 'yscale', 'log')
+set(gca, 'yscale', 'log');
 
 subplot(nRow, nCol,5); hold on; grid on; box on;
 plot(iIter, sig, 'k');
 scatter(iIter(~ifaccept), sig(~ifaccept), 15, 'r', 'filled');
 scatter(iIter( ifaccept), sig( ifaccept), 15, 'g');
 ylabel('sigma');
-set(gca, 'yscale', 'log')
+set(gca, 'yscale', 'log');
 
 subplot(nRow, nCol,7); hold on; grid on; box on;
 plot(iIter, log_lik, 'k');
 scatter(iIter(~ifaccept), log_lik(~ifaccept), 15, 'r', 'filled');
 scatter(iIter( ifaccept), log_lik( ifaccept), 15, 'g');
 ylabel('log\_lik');
-set(gca, 'yscale', 'log')
+set(gca, 'yscale', 'log');
 
 subplot(nRow, nCol,6); cla; hold on; grid on; box on;
 plot(iIter, sig, 'k');
@@ -203,7 +204,7 @@ ylabel('sigma');
 currentXlim = xlim(); 
 currentXlim(1) = floor(1/30 * currentXlim(2)); 
 xlim(currentXlim); 
-set(gca, 'yscale', 'log')
+set(gca, 'yscale', 'log');
 
 subplot(nRow, nCol,8); hold on; grid on; box on;
 plot(iIter, log_lik, 'k');
@@ -211,7 +212,7 @@ scatter(iIter(~ifaccept), log_lik(~ifaccept), 15, 'r', 'filled');
 scatter(iIter( ifaccept), log_lik( ifaccept), 15, 'g');
 ylabel('log\_lik');
 xlim(currentXlim); 
-set(gca, 'yscale', 'log')
+set(gca, 'yscale', 'log');
 
 % brb2022.02.09 Don't remember wha tthe commented code is below. 
 % % % subplot(nRow, nCol, 9); cla; hold on; grid on; box on; 
@@ -263,12 +264,14 @@ plot(iIter, temper);
 ylabel('Temperature'); 
 
 subplot(nRow, nCol, 11); cla; hold on; grid on; box on; 
-plot(iIter, Emax_per_iter)
+plot(iIter, Emax_per_iter);
 xlabel('Iter'); 
-title('Max hk energy at every iteration'); 
+title(sprintf(...
+    'Max hk energy at every iteration. Highest ever obtainable: %s',...
+    E_by_Esuper_max)); 
 
-set(gcf, 'color', 'white')
-exportgraphics(gcf, [resdir '/convergence_info_chain_' num2str(chainNo) '_v1.png'], 'Resolution', 400)
+set(gcf, 'color', 'white');
+exportgraphics(gcf, [resdir '/convergence_info_chain_' num2str(chainNo) '_v1.png'], 'Resolution', 400);
 
 
 
@@ -281,7 +284,7 @@ scatter(iIter(~ifaccept), log_lik(~ifaccept), 15, 'r', 'filled');
 scatter(iIter( ifaccept), log_lik( ifaccept), 15, 'g');
 ylabel('log\_lik');
 xlim(currentXlim); 
-set(gca, 'yscale', 'log')
+set(gca, 'yscale', 'log');
 
 currentXlim = xlim();
 
@@ -364,6 +367,6 @@ ylabel('Percent accepted');
 
 xlim(currentXlim); 
 
-exportgraphics(gcf, [resdir '/convergence_info_chain_' num2str(chainNo) '_v2.png'], 'Resolution', 400)
+exportgraphics(gcf, [resdir '/convergence_info_chain_' num2str(chainNo) '_v2.png'], 'Resolution', 400);
 
 end

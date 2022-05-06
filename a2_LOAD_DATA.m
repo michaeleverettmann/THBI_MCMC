@@ -71,16 +71,29 @@ elseif strcmp(par.proj.name,'LAB_tests')
 %% REAL DATA
 else
 	try 
-        stadeets = irisFetch.Stations('station',par.data.stadeets.nwk,par.data.stadeets.sta,'*','*'); 
+        try % Janky try catch in try catch... I cant use internet with slurm on CNSI computers? so have to have a simple solution for loading saved .mat file instead of using irisetch. 
+            stadeets = irisFetch.Stations('station',par.data.stadeets.nwk,par.data.stadeets.sta,'*','*'); 
+            save([par.proj.rawdatadir,'/stadeets.mat'], 'stadeets'); 
+        catch e
+            warning(['brb2022.04.11 Could not irisFetch stadeets. Loading saved file instead. ',...
+              'For this to work, you have to send the stadeets.mat file ',...
+              'to this cluster!!! I did this MANUALLY before.'])
+            stadeets = load([par.proj.rawdatadir,'/stadeets.mat']); 
+            stadeets = stadeets.stadeets; 
+        end    
+            
         fns = fieldnames(stadeets);
         for ii = 1:length(fns)
             par.data.stadeets.(fns{ii}) = stadeets.(fns{ii});
         end
-    catch 
+        
+	catch e 
+        warning('Could not get stadeets.mat. Might need to send that directly to the cluster computer. Looking for stainfo_master.mat instead - might not work...')
+        fprintf('\nError report was: %s\n',getReport(e)); 
         load([par.proj.rawdatadir,'/stainfo_master.mat']); 
         par.data.stadeets.Latitude = stainfo(strcmp({stainfo.StationCode},par.data.stadeets.sta)).Latitude;
         par.data.stadeets.Longitude = stainfo(strcmp({stainfo.StationCode},par.data.stadeets.sta)).Longitude;
-    end
+	end
     
     %% LOAD THE DATA!!
     [trudata,zeroDstr] = load_data(par);

@@ -30,7 +30,9 @@ addpath(bayesdir)
 % path of all inversion sub functions
 addpath([bayesdir,'functions']) % inside this folder
 addpath([bayesdir,'functions/hKappaFunk']) % For doing some things with h-kappa stacks. 
+addpath([bayesdir,'functions/plotting/progress']) % For doing some things with h-kappa stacks. 
 addpath([bayesdir,'functions/master_subfuncs']); % Trying to break up master par into many subfunctions
+addpath([bayesdir,'functions/handle_errors']); 
 % path of sub functions that I got online but don't know if I can legally
 % distribute. bb2021.09.14
 addpath(genpath([bayesdir, 'functions/functionsExternal'])); 
@@ -87,7 +89,7 @@ prem_isotropic = prem;
 
 
 % Initiate ram drive and keep track of where this folder is. 
-ramDrive = make_ram_drive() 
+ramDrive = make_ram_drive(); 
 
 setPaths(hd,proj,ramDrive); 
 
@@ -120,8 +122,9 @@ paths.STAinversions = [paths.THBIpath '/data/STASinv/'   ]; % bb2021.09.28 if th
 % 'STAinversions', ['/Volumes/data/',proj.name,'/THBI/STASinv/'] ); 
 % save([paths.THBIpath '/misc/paths.mat']); 
 % [status, cmdout] = system('rm ./*pathsAutoGen.m')
-delete('pathsAutoGen.m') % Delete and recreate pathsAutoGen.m for each computer. 
-matlab.io.saveVariablesToScript([paths.THBIpath '/pathsAutoGen.m'], 'paths')
+% % % delete('pathsAutoGen.m') % Delete and recreate pathsAutoGen.m for each computer. 
+warning('brb2022.04.05 : Not deleting pathsAutoGen.m. Cant do this if running many stations at once. Do things still work? If you see something about a file not existing, maybe this is the cause. ')
+matlab.io.saveVariablesToScript([paths.THBIpath '/pathsAutoGen.m'], 'paths');
 
 addpath(paths.models_seismic); % bb2021.11.02 Needed for some functions which access data. I thought this was already added somewhere but I don't see where. 
 end

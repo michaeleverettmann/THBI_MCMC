@@ -1,24 +1,27 @@
 %% Pseudo cross section for all sites with inversions along section
 clear;close all
 
+run("../../a0_STARTUP_BAYES.m"); 
+
 %% Setup
 paths = getPaths(); 
 % proj = struct('name','ENAM');
 % proj.dir = [paths.THBIpath '/' proj.name];
-proj = load('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/INFO/proj.mat'); 
+proj = load('~/Documents/UCSB/ENAM/THBI_ENAM/ENAM/INFO/proj.mat'); 
 proj = proj.proj; 
 
-figPath = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/xsect/'; 
+% figPath = '~/Documents/UCSB/ENAM/THBI_ENAM/figures/xsect/'; 
+figPath = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/xsect/'; warning('Export path not relative path')
     
 addpath('~/MATLAB/m_map');
 % addpath('~/Documents/MATLAB/BayesianJointInv/functions');
-addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions'); 
+addpath('~/Documents/UCSB/ENAM/THBI_ENAM/functions'); 
 addpath('~/MATLAB/seizmo/cmap');
-addpath('/Users/brennanbrunsvik/MATLAB/borders'); 
+addpath('~/MATLAB/borders'); 
 
 % specify details of this run
 generation = 1; % generation of solution and data processing
-STAMP = 'HKappa_008';
+STAMP = 'all_no_hv';
 
 % Quality thresholds for including stations - important!
 overallQ_thresh = 1; % 2 is good, 1 is ok, 0 is bad
@@ -32,7 +35,9 @@ ccpcmp = cmap_makecustom([0 0 1],[1 0 0],0.1);
 ifsave = true;
 
 %% lon/lat limits on stations to include:
-lolim = [-98.5,-80] + [-2, 2] ;
+% % lolim = [-84,-76] + [0, 0] ;
+% % lalim = [35, 43] + [0, 0]; 
+lolim = [-98.5,-80] + [-2, 2] +5;
 lalim = [32.5 49] + [-2, 2]; 
 %% section ends
 % WNW to ESE across whole region
@@ -41,7 +46,7 @@ ofile2 = [figPath 'Xsect1_wCCP_',STAMP];
 Q1 = [lalim(2), lolim(1)];
 Q2 = [lalim(1), lolim(2)]; 
 % lonBounds = sort([Q1(2) Q2(2)]); latBounds = sort([Q1(1) Q2(1)]); 
-offsecmax = 100; %5%  distance off section allowed, in degrees
+offsecmax = 2; %5%  distance off section allowed, in degrees
 % NNW to SSE across Yellowstone
 % ofile1 = ['figs/Xsect2_',STAMP];
 % ofile2 = ['figs/Xsect2_wCCP_',STAMP];
@@ -128,7 +133,6 @@ stinbounds = stainfo.slats<=max(lalim) & stainfo.slats>=min(lalim) &...
 gdstas = zeros(stainfo.nstas,1);
 for is = 1:stainfo.nstas 
     
-    %%% Removing bounds check brb2022.03.07
     % check in bounds
     if stinbounds(is)==0, continue; end
     % check overall fit
@@ -148,7 +152,12 @@ for is = 1:stainfo.nstas
     
     resdir = sprintf('%s%s_%s_dat%.0f/%s',proj.STAinversions,sta,nwk,generation,STAMP);
     fdir = [resdir, '/final_model.mat']; 
-    gdstas(is) =  exist(fdir, 'file'); 
+    gdstas(is) =  exist(fdir, 'file');
+    
+    if ~gdstas(is); continue; end; % can't load par if it doesn't exist. Just do continue. 
+    par=load([resdir,'/par.mat']); par=par.par; 
+    disp(par.inv)
+    gdstas(is) = (par.inv.niter>=8000) && (par.inv.nchains>=5); % Don't plot results if we didn't run the inversion with enough chains or iterations. Might have been test runs...
 %     fprintf('\n%s\n',fdir)
 end
 gdstas = find(gdstas);
@@ -176,11 +185,11 @@ ax2 = axes; hold on
 ax3 = axes; hold on
 
 
-if profd < 15
-	x0 = 0.12; xw = 0.76;
-else
+% if profd < 15
+% 	x0 = 0.12; xw = 0.76;
+% else
     x0 = 0.08; xw = 0.82;
-end
+% end
 
 set(ax1,'pos',[x0 0.36 xw 0.62]);
 set(ax2,'pos',[x0 0.22 xw 0.11]);
@@ -219,10 +228,11 @@ for ii = 1:Ngd
     load([resdir,'/posterior.mat'])
 %     load([resdir,'/prior.mat'])
     load([resdir,'/final_model.mat'])
+          
     
     %% plot vertical profiles by colour
  
-    dh = 0.3; % half width 
+    dh = 0.2; % half width 
     % round off VSav
     dVs = 0.03;
     VSuse = round_level(final_model.VSav,dVs);
@@ -274,6 +284,8 @@ for ii = 1:Ngd
 
 end
 fclose(fid); % close file with station locations/names
+
+% % % gdtas = gdstas(~isnan(gdstas)); % Remove stations we decided were not good. 
 
 insection = d_perp<=offsecmax;
 
@@ -327,7 +339,7 @@ set(ax2,'fontsize',16,'ylim',[1.62 1.9],'xlim',[0 ceil(max(d_par))+0.5],...
     'xticklabel',[],'ytick',[1.65:.1:1.85]);
 caxis(ax2,[1.55,1.95]);colormap(ax2,spring)
 
-set(ax3,'fontsize',16,'ylim',[0.90 1.10],'xlim',[0 ceil(max(d_par))+0.5],...
+set(ax3,'fontsize',16,'ylim',[0.750 1.15],'xlim',[0 ceil(max(d_par))+0.5],...
     'color','none','box','on','layer','top','linewidth',1.8,...
     'xticklabels',round_level(loprof,0.1));
 caxis(ax3,[0.88,1.12]);colormap(ax3,flipud(spring))
@@ -348,47 +360,47 @@ set(get(ax3,'ylabel'),'pos',get(get(ax3,'ylabel'),'pos').*[0 1 1] -[1.7 0 0],'ve
 %% save
 if ifsave
     exportgraphics(figure(56),[ofile1 '.pdf']);
-    exportgraphics(figure(mapFigNum), [ofile1 '_map.pdf'])
+    exportgraphics(figure(mapFigNum), [ofile1 '_map.pdf']) ;  %exportgraphics(figure(mapFigNum), '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/xsect/Xsect_thingy.pdf')
 else
     pause
 end
 
 % ==================  PLOT CCP  ================== 
-
-
-asdf
-delete([ax2,ax3])
-
-ax20 = axes; hold on
-set(ax20,'pos',[x0 0.08 xw 0.24]);
-
-%% Plot CCP 
-contourf(ax20,ccplo,zz,-100*RFz,ccplim*[-1:0.025:1],'linestyle','none'); 
-set(ax20,'ydir','reverse'); 
-colormap(ax20,ccpcmp)
-
-%% cbar - ccp
-ax40 = axes(fig,'pos',get(ax20,'pos'),'visible','off');
-hcb2  = colorbar(ax40); caxis(ax40,ccplim*[-1 1]); colormap(ax40,ccpcmp)
-set(hcb2,'pos',[0.91 .08 0.017 .20],'linewidth',2,...
-    'ytick',10*[-1 0 1])
-title(hcb2,'\textbf{CCP (\%)}','fontsize',16,'interpreter','latex','horizontalalignment','left')
-% p/n vg
-text(ax40,1.05,0.65,'PVG','color','red','fontsize',18,'fontweight','bold','verticalalignment','middle')
-text(ax40,1.05,0.22,'NVG','color','blue','fontsize',18,'fontweight','bold','verticalalignment','middle')
-
-% limits/pretty
-[~,maxlo] = reckon(Q1(1),Q1(2),max(get(ax1,'xlim')),profaz);
-set(ax20,'xlim',[Q1(2), maxlo],'fontsize',16,'ylim',[20 260],...
-    'color','none','box','on','layer','top','linewidth',1.8,...
-    'xtick',0.9995*loprof,'xticklabels',round_level(loprof,0.1));
-
-xlabel(ax20,'\textbf{Longitude}','fontsize',20,'fontweight','bold','interp','latex')
-
-
-if ifsave
-    save2pdf(56,ofile2);
-end
+% % % 
+% % % 
+% % % asdf
+% % % delete([ax2,ax3])
+% % % 
+% % % ax20 = axes; hold on
+% % % set(ax20,'pos',[x0 0.08 xw 0.24]);
+% % % 
+% % % %% Plot CCP 
+% % % contourf(ax20,ccplo,zz,-100*RFz,ccplim*[-1:0.025:1],'linestyle','none'); 
+% % % set(ax20,'ydir','reverse'); 
+% % % colormap(ax20,ccpcmp)
+% % % 
+% % % %% cbar - ccp
+% % % ax40 = axes(fig,'pos',get(ax20,'pos'),'visible','off');
+% % % hcb2  = colorbar(ax40); caxis(ax40,ccplim*[-1 1]); colormap(ax40,ccpcmp)
+% % % set(hcb2,'pos',[0.91 .08 0.017 .20],'linewidth',2,...
+% % %     'ytick',10*[-1 0 1])
+% % % title(hcb2,'\textbf{CCP (\%)}','fontsize',16,'interpreter','latex','horizontalalignment','left')
+% % % % p/n vg
+% % % text(ax40,1.05,0.65,'PVG','color','red','fontsize',18,'fontweight','bold','verticalalignment','middle')
+% % % text(ax40,1.05,0.22,'NVG','color','blue','fontsize',18,'fontweight','bold','verticalalignment','middle')
+% % % 
+% % % % limits/pretty
+% % % [~,maxlo] = reckon(Q1(1),Q1(2),max(get(ax1,'xlim')),profaz);
+% % % set(ax20,'xlim',[Q1(2), maxlo],'fontsize',16,'ylim',[20 260],...
+% % %     'color','none','box','on','layer','top','linewidth',1.8,...
+% % %     'xtick',0.9995*loprof,'xticklabels',round_level(loprof,0.1));
+% % % 
+% % % xlabel(ax20,'\textbf{Longitude}','fontsize',20,'fontweight','bold','interp','latex')
+% % % 
+% % % 
+% % % if ifsave
+% % %     save2pdf(56,ofile2);
+% % % end
 
 %% Plot of Vp/Vs against Xi
 

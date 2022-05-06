@@ -268,7 +268,8 @@ for iv = 1:length(varargin)
     zzz = [min(Z):dzmin/100:max(Z)]; zzz=zzz(:);
     try
         val = linterp(Z,ival,zzz);
-    catch
+    catch e 
+        fprintf('\n%s\n',getReport(e)); 
         t
     end
     for ilay = 1:length(vlay)

@@ -50,7 +50,8 @@ for iii = 1:nchains
     try % brb2022.02.09 I put this try-catch here because somehow some glitch would cause the whole inversion to shut down. TODO solve the glitch. 
         set(ax1,'xlim',[0 max(iters)],'fontsize',16)
         set(ax2,'xlim',[0 max(iters)],'fontsize',16)
-    catch
+    catch e 
+        fprintf('\n%s\n',getReport(e)); 
         warning('Somehow cant set xlim in plot_invtime.m'); 
     end
 end

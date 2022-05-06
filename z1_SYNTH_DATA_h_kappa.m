@@ -20,6 +20,8 @@ if any(string(pdtyps(:,1))=='HKstack'); % Use the Ps receiver function to get h-
                    'tt',   trudata.RF_Ps.tt, ...
                    'rayParmSecDeg', trudata.RF_Ps.rayp); % Parameters used in forward modelling HK stack on waveforms. 
     
+               
+               
     trumodelIso = trumodel; warning('!!!')
     trumodelIso.Panis = trumodel.Panis .* 0; 
     trumodelIso.Sanis = trumodel.Sanis .* 0; 
@@ -46,6 +48,10 @@ if any(string(pdtyps(:,1))=='HKstack'); % Use the Ps receiver function to get h-
         'Nobs', par.mod.data.deg_of_freedom.h_kappa, ...
         'dof' , par.mod.data.deg_of_freedom.h_kappa, ...
         'waves', waves, 'RF_Ps', data.RF_Ps); 
+    
+    HKstack_P.E_by_Esuper_max = ...
+        hk_maximum_possible_value(waves.rf, waves.tt); 
+    
     data.HKstack_P = HKstack_P; 
         
     % We needed to calculate synthetic receiver function just to get h-kappa stack. Now, remove the receiver function time series from data. 

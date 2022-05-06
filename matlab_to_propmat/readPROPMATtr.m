@@ -20,7 +20,8 @@ for ic = 1:3
     % convert cell to [nsamp/8 * 8] matrix, transpose and cat along columns
     try
         traces(:,ic) = reshape(cell2mat(C)',nsamp,1);
-    catch
+    catch e 
+        fprintf('\n%s\n',getReport(e)); 
         traces(:,ic) = nan;
         fprintf('WARNING BAD PROPMAT OUTPUT\n')
     end

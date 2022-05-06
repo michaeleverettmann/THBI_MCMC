@@ -40,8 +40,9 @@ if isempty(maxVz)
 end
 
 try
-minVz = z(find(gVs>-0.00002 & z>(maxVz+10),1,'first')); % no lith smaller than 10 km...
-catch
+    minVz = z(find(gVs>-0.00002 & z>(maxVz+10),1,'first')); % no lith smaller than 10 km...
+catch e 
+    fprintf('\n%s\n',getReport(e)); 
     me
 end
 % =======
