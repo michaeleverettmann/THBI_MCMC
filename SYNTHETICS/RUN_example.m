@@ -4,9 +4,13 @@ clear all
 run('../a0_STARTUP_BAYES.m')
 
 proj = struct('name', 'SYNTHETICS'); % bb2021.08.04 changed from EXAMPLE because I don't have the example data files. %,'EXAMPLE');
+paths = getPaths(); 
+proj.STAinversions = paths.STAinversions; 
 proj.dir = [fileparts(mfilename('fullpath')),'/'];
-proj.STAinversions = [proj.dir,'inversion_results/'];
+% proj.dir = paths.STAinversions; 
+proj.STAinversions = paths.STAinversions; ; % [proj.dir,'inversion_results/'];
 save([proj.dir,'project_details.mat'],'proj')
+
 
 wd = pwd; addpath(wd);
 cd(proj.dir);

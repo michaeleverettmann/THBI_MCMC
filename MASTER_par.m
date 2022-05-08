@@ -197,9 +197,9 @@ if profileRun;  % Start profiling parfor iterations, where most calculations hap
     mpiprofile on; 
 end
 
-mainDir = [paths.execPath '/' nwk '_' sta]; % Keep track of where the main folder is, where we want to return after changing directory back from ram drive. 
+% mainDir = [paths.execPath '/' nwk '_' sta]; % Keep track of where the main folder is, where we want to return after changing directory back from ram drive. 
 % TODO might cause problems to change to new directory because of prior.mat (which loads from absolute directory though, maybe ok) and project_details.mat) which might be different for different stations? 
-if ~ exist(mainDir); mkdir(mainDir); end % This is where we will cd to for final processing, and save final results. using exist here is ok, because we only do it once per stations.  NOTE don't need if exists, but it's REALLY important to not accidentally overwrite the whole folder. 
+% if ~ exist(mainDir); mkdir(mainDir); end % This is where we will cd to for final processing, and save final results. using exist here is ok, because we only do it once per stations.  NOTE don't need if exists, but it's REALLY important to not accidentally overwrite the whole folder. 
 cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
 mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
 
@@ -731,14 +731,14 @@ fprintf('\nMoving files from chain folder (%s)\n  to network folder (..).  \n  R
 if ~mvStatus==0; warning('Possible problem moving files from chain folder to station folder. brb2022.03.30'); end
 
 end % parfor loop
-[ram_copy_stats] = ram_to_HD(paths, mainDir, nwk, sta); % Copy final results from ram to hard disk. 
-cd(mainDir); % Get back out of ram and go to stations hard drive folder 
+[ram_copy_stats] = ram_to_HD(paths, resdir, nwk, sta); % Copy final results from ram to hard disk. 
+cd(resdir); % Get back out of ram and go to stations hard drive folder 
 
 if profileRun; % Get results from profiling. 
     mpiprofile off; 
     mpiStats = mpiprofile('info'); 
     save(['mpiProfileData_' nwk '_' sta], 'mpiStats');  % Save profile results. Can transfer from HPC and bring to local computer for viewing. 
-    fprintf('\n\nSaved mpiProfileData....mat to %s\n\n',mainDir); % Use this to see the results: load('mpiProfileData'); mpiprofile('viewer', mpiStats);
+    fprintf('\n\nSaved mpiProfileData....mat to %s\n\n',resdir); % Use this to see the results: load('mpiProfileData'); mpiprofile('viewer', mpiStats);
 end 
 
 if par.inv.niter > 2000
