@@ -12,11 +12,14 @@ str_temp = split(stamp, '/');
 % burnin_only  = 4000; 
 % cooloff_only = 3000; 
 % nchains_only = 16; 
-niter_only   = 6000; 
-burnin_only  = 1000; 
-cooloff_only = 800 ; 
-nchains_only = 16  ; 
-
+niter_only   = 300; 
+burnin_only  = 100; 
+cooloff_only = 80 ; 
+nchains_only = 1  ; 
+% niter_only   = 600; 
+% burnin_only  = 100; 
+% cooloff_only = 80 ; 
+% nchains_only = 2  ; 
 
 if     strcmp(stamp, 'ENAM_trial'); 
     disp('Using default parameters') 

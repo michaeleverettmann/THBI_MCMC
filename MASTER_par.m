@@ -204,7 +204,7 @@ cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup.
 mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
 
 % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 % warning('BB2021.11.22 Not in parallel!!!')
 par = PR.Value; 
 % % % par.fail_info = cell(par.inv.niter,1)
@@ -250,8 +250,9 @@ end
 chainstr = [nwk '.' sta '_' mkchainstr(iii)];
 par.res.chainstr = chainstr; 
 par.res.chainID = mkchainstr(iii); % ID to keep track of things like where the velocity profiles are. brb2022.03.30
-mkdir(par.res.chainID); 
+% mkdir(par.res.chainID); 
 par.res.chainExecFold = [paths.ramDrive '/' nwk '_' sta '/' par.res.chainID]; % Explicitly determine executable folder, since we will use rm ./* and don't want to risk executing this from somewhere on the hard drive!!! brb2022.03.30
+mkdir(par.res.chainExecFold); 
 cd(par.res.chainExecFold);  % Speed up execution of code by reducing number of files in a chains folder (this should help in Matlab system() calls). brb2022.03.30
 %% Diary file stuff
 diaryFile = sprintf('diary_%s.txt', chainstr); % Use a diary file to keep track of parallel inversions seperately. %TODO_STATION_NETWORK bb2021.11.12
@@ -415,7 +416,7 @@ try
             Pm_prior1k = Pm_prior; end
     if non_acceptk == 0; p_bd = 1; end; %!%!
     
-    delay_reject_bool = true; if (mod(ii, 100)==0); warning('brb2022.04.12 non_acceptk=0. No delayed rejection.'); end; % brb2022.04.12. 
+    delay_reject_bool = false; if (mod(ii, 100)==0) && ~delay_reject_bool; warning('brb2022.04.12 non_acceptk=0. NO DELAYED REJECTION.'); end; % brb2022.04.12. 
     if ~ delay_reject_bool; 
         non_acceptk = 0; 
     end
@@ -597,7 +598,7 @@ try
     
 %% Plot some inversion progress stuff. 
     try
-        plot_progress_chain(absTimeIter, par, accept_info); 
+        plot_progress_chain(absTimeIter, par, accept_info, ptb); 
     catch e 
         fprintf('\nProblem with plot_progress_chain. \n%s\n',getReport(e))
     end
