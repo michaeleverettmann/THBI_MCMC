@@ -35,12 +35,14 @@ HKdat = par.inv.datatypes{find(strcmp(pdtyps(:,1),'HKstack'),1,'first')};
 
 if (model.vpvs > max(predata.(HKdat).K)) || (model.vpvs < min(predata.(HKdat).K)) ... % Give maximum error if model is outside the bounds of the actual HK stack. 
         || (model.zmoh > max(predata.(HKdat).H)) || (model.zmoh < min(predata.(HKdat).H)); 
-    predata.(HKdat).H = model.zmoh;
-    predata.(HKdat).K = model.vpvs;
+    predata.(HKdat).Hgrid     = predata.(HKdat).H             ; % Had to use H/Kgrid elsewhere because for somereason zmoh replaces H, similar with kappa. Leaving us with 1x1 arrays, not vectors. H/Kgrid are thus present as backups. And we always have to define them when we define H or k. brb2022.05.08. 
+    predata.(HKdat).Kgrid     = predata.(HKdat).K             ;
+    predata.(HKdat).H         = model.zmoh                    ;
+    predata.(HKdat).K         = model.vpvs                    ;
     predata.(HKdat).E_by_Emax = min(min(predata.(HKdat).Esum));
-    warning('brb2022.03.02 HK outside bounds! THis should not happen. Thus, I am simply giving maximum HK stack error')
+    warning('brb2022.03.02 HK outside bounds! THis should not happen. Thus, I am simply giving maximum HK stack error. Hypothetically this model will be rejected as having prior = 0')
 else % When model is within HK bounds, run this. 
-    nSurfRes = 2; % Multiple of surface wave kernel resets that we will also reset HK stack
+    nSurfRes = 1; % Multiple of surface wave kernel resets that we will also reset HK stack
     
     % Kind of complicated to figure out if we do full HK or just one h and k
     runFullHK = ...
@@ -55,23 +57,28 @@ else % When model is within HK bounds, run this.
         par.hkResetInfo.timesReset = par.hkResetInfo.timesReset + 1; 
         par.hkResetInfo.timesSWKernelsReset = 0; % Reset our surface wave kernel counter. This only is analyzed for the HK stacks. 
         
-        fprintf('\nResetting HK stack on iteration %1.0f (%1.0fx as often as surface wave kernels)\n', par.ii, nSurfRes);  
+        fprintf('\nResetting HK stack on iteration %1.0f (1/%1.0fx as often as surface wave kernels)\n', par.ii, nSurfRes);  
         HK_new = zeros(size(predata.HKstack_P.Esum)); 
         for iWave = [1:size(predata.HKstack_P.waves.rf,2)]; 
             RF   = predata.HKstack_P.waves.rf(:,iWave); 
             tt   = predata.HKstack_P.waves.tt; 
             rayp = predata.HKstack_P.waves.rayParmSecDeg(iWave); 
+
             [HK_A, HK_H, HK_K] = HKstack_anis_wrapper(...
                 par, model, RF, tt, rayp, 'ifplot', false, ...
                 'hBounds', [par.mod.crust.hmin, par.mod.crust.hmax], ...
                 'kBounds', [par.mod.crust.vpvsmin, par.mod.crust.vpvsmax], ...
                 'kNum', size(HK_new,1), 'hNum', size(HK_new,2),...
                 'posterior', options.posterior);   
+
             HK_new = HK_new + HK_A; 
         end
-        predata.(HKdat).H    = HK_H; 
-        predata.(HKdat).K    = HK_K; 
-        predata.(HKdat).Esum = HK_new; 
+        
+        predata.(HKdat).H        = HK_H  ; 
+        predata.(HKdat).K        = HK_K  ; 
+        predata.(HKdat).Hgrid    = HK_H  ; % H/Kgrid is here because sometimes, the old code replaces H and K with a single value and not vector. brb2022.05.08. 
+        predata.(HKdat).Kgrid    = HK_K  ; 
+        predata.(HKdat).Esum     = HK_new; 
         
 % % %         %%% brb2022.03.28 Temporary. See what is the maximum ever
 % % %         %%% obtainable HK stack value. 
@@ -102,14 +109,14 @@ else % When model is within HK bounds, run this.
 % % %         %%%
                 
         % Extract some values to make things easier to work with. 
-        h          = predata.(HKdat).H; 
-        k          = predata.(HKdat).K; 
+        h          = predata.(HKdat).H   ; 
+        k          = predata.(HKdat).K   ; 
         Esum       = predata.(HKdat).Esum; 
-        kTrial     = model.vpvs; 
-        hTrial     = model.zmoh; 
+        kTrial     = model.vpvs          ; 
+        hTrial     = model.zmoh          ; 
         
-        E_no_norm = interpn(k',h,Esum,kTrial,hTrial); 
-        E_by_Emax = E_no_norm / maxgrid(Esum);
+        E_no_norm       = interpn(k',h,Esum,kTrial,hTrial)           ; 
+        E_by_Emax       = E_no_norm / maxgrid(Esum)                  ;
         E_by_Esuper_max = E_no_norm / predata.(HKdat).E_by_Esuper_max; % brb2022.04.27 Not sure what this is doing. I think it's a mixed up naming scheme. 
         
         
@@ -126,28 +133,27 @@ else % When model is within HK bounds, run this.
                 par.res.chainstr, par.ii) ) ; 
         end
     else % If not remaking whole HK stack, just sample waveforms directly. This is what usually runs. 
-        RF   = predata.HKstack_P.waves.rf(:,:); 
-        tt   = predata.HKstack_P.waves.tt; 
-        rayp = predata.HKstack_P.waves.rayParmSecDeg(:); 
+        RF          = predata.HKstack_P.waves.rf(:,:)         ; 
+        tt          = predata.HKstack_P.waves.tt              ; 
+        rayp        = predata.HKstack_P.waves.rayParmSecDeg(:); 
         [E_no_norm] = HK_stack_anis_wrapper_no_grid(...
                 par, model, RF, tt, rayp); 
             
         % Extract some values to make things easier to work with. 
         predata.(HKdat).Hgrid = predataPrev.(HKdat).Hgrid; % Store old HK values in new structure for propogating between iterations. The stack is only approximation now, but the specific h-k we sampled is correct.   
         predata.(HKdat).Kgrid = predataPrev.(HKdat).Kgrid; 
-        predata.(HKdat).Esum  = predataPrev.(HKdat).Esum; 
-        h          = predataPrev.(HKdat).Hgrid; 
-        k          = predataPrev.(HKdat).Kgrid; 
-        Esum       = predataPrev.(HKdat).Esum; 
-        kTrial     = model.vpvs; 
-        hTrial     = model.zmoh; 
+        predata.(HKdat).Esum  = predataPrev.(HKdat).Esum ; 
+        h                     = predataPrev.(HKdat).Hgrid; 
+        k                     = predataPrev.(HKdat).Kgrid; 
+        Esum                  = predataPrev.(HKdat).Esum ; 
+        kTrial                = model.vpvs               ; 
+        hTrial                = model.zmoh               ; 
         
-        E_no_norm_old_hk = interpn(k',h,Esum,kTrial,hTrial); 
+        E_no_norm_old_hk    = interpn(k',h,Esum,kTrial,hTrial); 
 %         E_no_norm = E_not_by_Emax; % 
-        E_by_Emax = E_no_norm / maxgrid(Esum); % Dividing over maxgrid of the old HK stack. This induces a small amount of error, only in so much as the maximum value in the HK stack changes between iterations. I think this is small... We recalculate the full HK stack every so often. 
-        E_by_Esuper_max = E_no_norm / predata.(HKdat).E_by_Esuper_max; % WRONG?!
-        
-        E_by_Emax = min(E_by_Emax, 1); % brb2022.03.06 Just in case an un-updated Esum in maxgrid causes us to have higher than 1 normalized energy. That could cause problems when converting energy to mismatch (negative mismatch). 
+        E_by_Emax           = E_no_norm / maxgrid(Esum); % Dividing over maxgrid of the old HK stack. This induces a small amount of error, only in so much as the maximum value in the HK stack changes between iterations. I think this is small... We recalculate the full HK stack every so often. 
+        E_by_Esuper_max     = E_no_norm / predata.(HKdat).E_by_Esuper_max; % WRONG?!
+        E_by_Emax           = min(E_by_Emax, 1); % brb2022.03.06 Just in case an un-updated Esum in maxgrid causes us to have higher than 1 normalized energy. That could cause problems when converting energy to mismatch (negative mismatch). 
                
 %         plot_HK_stack(h, k, Esum, ...
 %             'model_vpvs', model.vpvs, 'model_zmoh', model.zmoh, ...
@@ -217,10 +223,10 @@ else % When model is within HK bounds, run this.
     % Start with max val. 
     % Scale toward min val by end of burnin. 
     % NOTE I'm not using this anymore, so use 0 for dist and 1 for stack. brb2022.02.08
-    wDistMax = par.datprocess.HKappa.weightDistanceMax; 
-    wDistMin = par.datprocess.HKappa.weightDistanceMin; 
+    wDistMax       = par.datprocess.HKappa.weightDistanceMax; 
+    wDistMin       = par.datprocess.HKappa.weightDistanceMin; 
     wDistWithSlope = wDistMax - par.ii * (wDistMax-wDistMin)/par.inv.burnin; % Intercept slope formula with par.ii is independent variable
-    wDist = max(wDistMin, wDistWithSlope); 
+    wDist          = max(wDistMin, wDistWithSlope); 
 %         sprintf('wDist = %1.2f', wDist)
     wEmax = 1 - wDist; 
 
@@ -231,8 +237,8 @@ else % When model is within HK bounds, run this.
     % Assign other value for compatibility with remaining code. 
     predata.(HKdat).Hgrid = predata.(HKdat).H;
     predata.(HKdat).Kgrid = predata.(HKdat).K; % For some reason these are getting replaced with single values, making it hard to plot later. So keep track of the grid values here. 
-    predata.(HKdat).H = model.zmoh;
-    predata.(HKdat).K = model.vpvs;        
+    predata.(HKdat).H     = model.zmoh;
+    predata.(HKdat).K     = model.vpvs;         
 end
 
 % predata.(HKdat).Emax_per_iter(par.ii) = max(max(predata.(HKdat).Esum)); 
