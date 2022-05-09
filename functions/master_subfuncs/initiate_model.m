@@ -1,6 +1,6 @@
 function [ifpass, numFails, model0, model,...
     Pm_prior, par, Kbase] = initiate_model(...
-        parOrig, TD, chainstr, fail_chain, iii); 
+        parOrig, tdvalue, chainstr, fail_chain, iii); 
     
 par = parOrig; 
 
@@ -10,9 +10,9 @@ numFails = 0;
 % only let starting model out of the loop if it passes conditions
 while ifpass==0
     while ifpass==0 % first make sure the starting model satisfies conditions
-        model0 = b1_INITIATE_MODEL(par,[],[],TD.Value);
+        model0 = b1_INITIATE_MODEL(par,[],[],tdvalue);
         model = model0;
-        model = expand_dathparms_to_data( model,TD.Value,par );
+        model = expand_dathparms_to_data( model,tdvalue,par );
         ifpass = a1_TEST_CONDITIONS( model, par );
         Pm_prior = calc_Pm_prior(model,par);
     end
@@ -21,7 +21,7 @@ while ifpass==0
     fprintf('\nCreating starting kernels %s, have tried %1.0f times, fail_chain=%1.0f\n',...
         chainstr, numFails, fail_chain)
     try 
-        [Kbase] = make_allkernels(model,[],TD.Value,['start',chainstr],par,...
+        [Kbase] = make_allkernels(model,[],tdvalue,['start',chainstr],par,...
             'maxrunN',5); % TODO this code caused a loop that would have failed infinitely. SHould not use a while loop like this. bb2021.09.14 
         %bb2021.09.23 Adding argument 5 where if run_mineos fails 5 (or some other small number of)times on the starting model, just toss it. No need to frett with getting a model to work with Mineos if no time is yet invested into inverting that model. 
     catch e 
