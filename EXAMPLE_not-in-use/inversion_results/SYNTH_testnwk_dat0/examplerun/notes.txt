@@ -1,0 +1,1 @@
+Not using Ps data, not permitting mantle anisotropy. Moho constrained between 30 and 40 km depth - cf SR16. Relaxed condition of no negative crustal velocity gradients. 

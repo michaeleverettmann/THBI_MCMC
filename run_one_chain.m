@@ -1,69 +1,29 @@
 % par = PR.Value; 
 % trudata = TD.Value
 
-% run_one_chain(par, nwk, sta, iii)
-
-
-
 function [model0, misfits, allmodels, preSW ...
     ]=run_one_chain(par, trudata, nwk, sta, iii ); 
 
-% run_one_chain(par, trudata, nwk, sta, iii,model0_perchain, misfits_perchain, allmodels_perchain, SWs_perchain )
-% % % 
-% % % % For some reason matlab doesn't like returning a variable that was an input. 
-% % % model0_perchain    = model0_perchainO    ;
-% % % misfits_perchain   = misfits_perchainO   ;
-% % % allmodels_perchain = allmodels_perchainO ;
-% % % SWs_perchain       = SWs_perchainO       ;
-
+%% Some setup
 paths = getPaths(); 
 
 % Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
 warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    
 
+% Time the inversion
 absTimeIter = timeseries(zeros(par.inv.niter,1)); 
 absTimeIter(1) = datetime(); 
 
-accept_info = struct('ifaccept'          , zeros(par.inv.niter,1)*nan,...; ; % Initialize structure with acceptance info for each iteration. 
-                     'misfit'            , zeros(par.inv.niter,1)*nan,...
-                     'log_likelihood'    , zeros(par.inv.niter,1)*nan,...
-                     'sig_hk'            , zeros(par.inv.niter,1)*nan,...
-                     'model'             , zeros(par.inv.niter,1)*nan,...
-                     'predat_save'       , zeros(par.inv.niter,1)*nan,...
-                     'iter'              , zeros(par.inv.niter,1)*nan,...
-                     'temp'              , zeros(par.inv.niter,1)*nan,...
-                     'ptbnorm'           , zeros(par.inv.niter,1)*nan,...
-                     'Pm_prior1'         , zeros(par.inv.niter,1)*nan,...
-                     'p_bd'              , zeros(par.inv.niter,1)*nan,...
-                     'non_acceptk'       , zeros(par.inv.niter,1)*nan,...
-                     'hk_Emax_per_iter'  , zeros(par.inv.niter,1)*nan,...
-                     'trudata'           , zeros(par.inv.niter,1)*nan); 
-
-for iInit=1:par.inv.niter;
-    accept_info(iInit).ifaccept          = []; ; % Initialize structure with acceptance info for each iteration. 
-    accept_info(iInit).misfit            = []; % misfit1; 
-    accept_info(iInit).log_likelihood    = []; % log_likelihood1; 
-    accept_info(iInit).sig_hk            = []; % model1.datahparm.sig_HKstack_P; 
-    accept_info(iInit).model             = []; % model1; 
-    accept_info(iInit).predat_save       = []; % predat_save1; 
-    accept_info(iInit).iter              = []; % ii; 
-    accept_info(iInit).temp              = []; % temp; 
-    accept_info(iInit).ptbnorm           = []; % ptbnorm; 
-    accept_info(iInit).Pm_prior1         = []; % Pm_prior1; 
-    accept_info(iInit).p_bd              = []; % p_bd; 
-    accept_info(iInit).non_acceptk       = []; % non_acceptk; 
-    accept_info(iInit).hk_Emax_per_iter  = []; % max(max(predata.HKstack_P.Esum)); 
-    accept_info(iInit).trudata           = []; % trudata; end; % Inefficient, but this is just for testing. 
-end
-
-
+% Folder/name for this chain. 
 chainstr = [nwk '.' sta '_' mkchainstr(iii)];
 par.res.chainstr = chainstr; 
 par.res.chainID = mkchainstr(iii); % ID to keep track of things like where the velocity profiles are. brb2022.03.30
-% mkdir(par.res.chainID); 
 par.res.chainExecFold = [paths.ramDrive '/' nwk '_' sta '/' par.res.chainID]; % Explicitly determine executable folder, since we will use rm ./* and don't want to risk executing this from somewhere on the hard drive!!! brb2022.03.30
 mkdir(par.res.chainExecFold); 
 cd(par.res.chainExecFold);  % Speed up execution of code by reducing number of files in a chains folder (this should help in Matlab system() calls). brb2022.03.30
+
+% Structure to keep track of accepting/rejecting models and the related conditions
+accept_info = make_accept_info(par); 
 
 %%% Diary file stuff
 diaryFile = sprintf('diary_%s.txt', chainstr); % Use a diary file to keep track of parallel inversions seperately. %TODO_STATION_NETWORK bb2021.11.12
@@ -83,7 +43,6 @@ SW_precise = [];
 laymodel1 = []; 
 non_acceptk = 0; % How often have we rejected the current baseline model. 
 predataPrev = []; 
-% accept_info = struct(); % bb2022.01.05 Temporary tests for h-kappa inversion. 
 timeStartIter = zeros(par.inv.niter,1); % Vector of starting times of each iteration. 
 timeVeryStart = now(); % Starting time of inversion
 tFact = (24 * 60 * 60); % Factor to convert from serial time to seconds. 
@@ -95,50 +54,50 @@ tFact = (24 * 60 * 60); % Factor to convert from serial time to seconds.
 
 %% initiate model
 [ifpass, numFails, model0, model,...
-    Pm_prior, par, Kbase] = initiate_model(...
+    Pm_prior, par, Kbase] = ...
+    initiate_model(...
         par, trudata, chainstr, fail_chain, iii); 
-model0_perchain{iii} = model0;
-
-
+    
+    
 %% ========================================================================
 %% ------------------------- Start iterations -----------------------------
 %% ========================================================================
+fprintf('\n =========== STARTING ITERATIONS %s ===========\n',chainstr)
+ii = 0;
+time0 = now;
+
 ptb = cell({});
 nchain = 0;
-fail_chain = 0; fail_reset = 0;
+fail_chain = 0; 
+fail_reset = 0;
 ifaccept=true;
 if isfield(trudata,'SW_Ray')
     preSW = zeros(length(trudata.SW_Ray.periods),ceil(par.inv.niter./par.inv.saveperN));
 end
 % reset_likelihood;
 log_likelihood = -Inf;
-predata=[]; predat_save = []; misfit = [];
-% not parfor
-
-fprintf('\n =========== STARTING ITERATIONS %s ===========\n',chainstr)
-ii = 0;
-time0 = now;
-
+predata=[]; 
+predat_save = []; 
+misfit = [];
 par.hkResetInfo = struct('timesReset',0, 'timesSWKernelsReset',0); % Structure to keep track of when to reset HK stacks. 
+
 while ii < par.inv.niter
 ii = ii+1; par.ii = ii; % bb2022.10.18 Keep track of ii in par for easily plotting how inversion is changing with ii. 
 
-% Maintenance in case folder was abused during last iterations. 
+% Maintenance in case folder is getting filled up during last iterations. 
 [~,~]=clean_ram(ii,par,'clearRamInterval',200) % Prevent large amount of files from building up in ram, which can dramatically slow down matlab. If the ram is getting very full, then there is probably a problem!
 if ~strcmp(pwd,par.res.chainExecFold); 
     warning('Somehow you left the ram folder! This can tremendously slow down code execute. Changing back (note that cd is slow)... Fix it. brb2022.04.02'); 
     cd(par.res.chainExecFold); 
 end
-
+% END folder maintenance
 
 % Quickly check to make sure inversion isn't going way to slow. 
-% absTimeIter(ii) = now() * tFact; 
-
 timeStartIter(ii) = (now() - timeVeryStart) * tFact;  % Seconds since the inversion very first started. 
 littleIter=max(1,ii-100); smallTime = timeStartIter(littleIter); bigTime = timeStartIter(ii); 
 avgTime = (bigTime-smallTime) / (ii-littleIter); % Average computational time over past min([1,100]) iterations. 
 if ii ~= 1; absTimeIter(ii) = datetime(); end; % Dont replace first time. Want that in case fail_chain is a PITA
-% Finish getting computational time. 
+% END getting computational time. 
 
 
 %% SAVE model every saveperN
@@ -159,8 +118,9 @@ if rem(ii,par.inv.Nsavestate)==0
 %     [ram_copy_stats] = ram_to_HD(paths, chainstr, mainDir, nwk, sta); % bb2021.12.07 this is time consuming if done often. Just do at end of inversion. Copy current results from ram to hard disk. 
 end
 
-
 try
+    
+    %% Figure out if chain is too slow or unstable. 
     % TODO changed from 4 to 1 times par.inv.savepern. So fairly verbose. 
     if rem(ii,1*par.inv.saveperN)==0 || ii==1, fprintf(...
             'Sta %s nwk %s  Iteration %s %1.0f Average comp time (last 100 iter) %2.2f (all) %2.2f\n',...
@@ -193,7 +153,7 @@ try
         end
     end
     
-%     %%% Kill chain if too slow. 
+    %%% Kill chain if too slow. 
     if avgTime > 1; % Things are running really slow... why? Might want to restart, unless we are at the beginning of iterations. 
 %         if ~feature('IsDebugMode'); % Don't break slow chains if we are debugging. 
         tScaleKill = 1; 
@@ -214,7 +174,8 @@ try
         end  
 %         end
     end
-%     %%% End kill chain if too slow. 
+    %%% End Figure out if chain is too slow or unstable. 
+    %%
    
     % temperature - for perturbation scaling and likelihood increase
     temp = (par.inv.tempmax-1)*erfc(2*(ii-1)./par.inv.cooloff) + 1;
@@ -229,22 +190,23 @@ try
             Pm_prior1k = Pm_prior; end
     if non_acceptk == 0; p_bd = 1; end; %!%!
     
-    delay_reject_bool = false; if (mod(ii, 100)==0) && ~delay_reject_bool; warning('brb2022.04.12 non_acceptk=0. NO DELAYED REJECTION.'); end; % brb2022.04.12. 
+    delay_reject_bool = true; if (mod(ii, 100)==0) && ~delay_reject_bool; warning('brb2022.04.12 non_acceptk=0. NO DELAYED REJECTION.'); end; % brb2022.04.12. 
     if ~ delay_reject_bool; 
         non_acceptk = 0; 
     end
     
+    % Perturb the model. Perturb up to twice if delay_reject is true. 
     [model1,ptbnorm,ifpass,p_bd,Pm_prior1,...
     ptb,modptb,nchain,breakTrue,non_acceptk]...
-    = delay_reject(model, Pm_prior, ptb, ii, par, temp, Kbase,nchain,...
+    = delay_reject(...
+        model, Pm_prior, ptb, ii, par, temp, Kbase,nchain,...
         model1,ptbnorm,p_bd,Pm_prior1k,non_acceptk); 
 %     fprintf('\nptbnorm=%1.3f, non_acceptk=%1.0f\n',ptbnorm, non_acceptk) % Temporary
     
     if breakTrue; break; end;
 
 %% ===========================  FORWARD MODEL  ===========================
-	% don't re-calc if the only thing perturbed is the error, or if there
-	% is zero probability of acceptance!
+	% don't re-calc if the only thing perturbed is the error, or if there is zero probability of acceptance!
     if ~strcmp('sig',ptb{ii}(1:3)) || isempty(predata) % brb2022.03.06 If not recalculating, we get errors later. 
         % make random run ID (to avoid overwrites in parfor)
 		ID = [chainstr,num2str(ii,'%05.f'),num2str(randi(99),'_%02.f')];
@@ -265,7 +227,7 @@ try
         % continue if any Sp or PS inhomogeneous or nan or weird output
         if ifforwardfail(predata,par)
             fail_chain=fail_chain+1;
-            fprintf('Forward model error, fail_chain %.0f\n',fail_chain)  
+            fprintf('Forward model error, run_one_chain line 230 or so. Fail_chain %.0f\n',fail_chain)  
             break;
         end
 
@@ -441,10 +403,9 @@ try
             fprintf('\nModel changed ptbnorm=%1.3f since last kernel set. Running !=sw_precise and ==kernel_reset at ii=%1.0f.\n',ptbnorm,ii) 
 %             [ predata,SW_precise ] = b3_FORWARD_MODEL_SW_precise( model1,par,predata,ID ); % brb2022.04.06 Now need to do this here since I'm no longer doing it earlier? Check github to verify. 
             [Kbase,predata] = b7_KERNEL_RESET(model,Kbase,predata,ID,ii,par,0,SW_precise);
-            nchain = 0;
             % need to also reset likelihood and misfit to the new, precise data (likelihood may have been artificially high due to kernel forward  calc. approximation - if so, need to undo this, or chain will get stuck once we reset kernels).
-            [log_likelihood,misfit] = b8_LIKELIHOOD_RESET(par,predata,trudata,Kbase,model.datahparm);
-            Pm_prior = calc_Pm_prior(model,par);
+% % %             [log_likelihood,misfit] = b8_LIKELIHOOD_RESET(par,predata,trudata,Kbase,model.datahparm);
+% % %             Pm_prior = calc_Pm_prior(model,par); % This block executes only if accepted model. So no need to recalculate prior or likelihood. 
             nchain = 0;
         end
 
@@ -458,10 +419,12 @@ try
     if isinf(log_likelihood), fail_chain=100; break; end
 
 %% =========  reset kernel at end of burn in or after too many iter =======
+% Very important: kernel reset might be already done. This addresses the following conditions: 
+% - We did not accept a model, but burning or maxnkchain requires us to reset kernel. We will reset USING THE LAST ACCEPTED MODEL. 
+% - We did accept a model, but newk = false, and maxnkchains or burnin requires us to reset things. 
     resetK = false;
-    mightReset = (newK == false) && (ifaccept == true); 
+    mightReset = (newK && ifaccept) == false; % In all cases EXCEPT when we just made K for an accepted model, then there is a chance we need to reset kernels. 
     if mightReset && ii == par.inv.burnin % reset kernel at end of burn in (and we didn't just reset it tacitly)
-            % bb2022.10.12 TODO Need to find way to run kernel on first accepted model after burnin
             fprintf('\n RECALCULATING %s KERNEL - end of burn in\n',chainstr);
             resetK = true;
     end
@@ -502,9 +465,6 @@ try
 
     
 catch e % e is an MException struct
-%     fprintf(1,'\n\nLine %1.0f\nMain master par loop error. Error message:\n%s\n\n',...
-%         e.stack.line,e.message);
-%     if par.inv.verbose, fprintf('  --SOME ERROR--\n'); end
     fprintf('\nbrb Main master par catch: %s\n',getReport(e)); 
     fail_chain = fail_chain+1;
 end % on try-catch

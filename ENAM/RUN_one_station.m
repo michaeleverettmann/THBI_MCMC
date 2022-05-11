@@ -2,6 +2,7 @@
 %
 
 
+
 %% specify details of this run
 generation = 1; % generation of solution and data processing
 gc = 1;
@@ -43,9 +44,10 @@ STAMP_all = {...
 %     'SW_Ray_phV_only',...  % { --- Start test to see influence of different data types independently
 %     'SW_Lov_phV_only',...  % ...
 %     'RF_Sp_ccp_only' ,...  % ...
-    'HKstack_P_only' ,...  % ...
+%     'HKstack_P_only' ,...  :q!
 %     'SW_HV_only'     ,...  % } --- End   test to see influence of different data types independently
 %     'all_demo'       ,...
+    'HK_fast'   ,...
 }; % This determines which tests we want to run now. They will run sequentially, not in parallel (each station only has one ram folder. )
 
 % Need to do something like this. 

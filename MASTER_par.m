@@ -205,7 +205,7 @@ mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep
 
 
 
-% % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+%% % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 % warning('BB2021.11.22 Not in parallel!!!')
 par = PR.Value; 
@@ -216,6 +216,7 @@ trudata = TD.Value;
     run_one_chain(par, trudata, nwk, sta, iii)
 
 end % parfor loop
+%%
 [ram_copy_stats] = ram_to_HD(paths, resdir, nwk, sta); % Copy final results from ram to hard disk. 
 cd(resdir); % Get back out of ram and go to stations hard drive folder 
 

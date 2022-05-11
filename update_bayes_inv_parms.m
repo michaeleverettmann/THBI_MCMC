@@ -12,10 +12,10 @@ str_temp = split(stamp, '/');
 % burnin_only  = 4000; 
 % cooloff_only = 3000; 
 % nchains_only = 16; 
-niter_only   = 300; 
-burnin_only  = 100; 
-cooloff_only = 80 ; 
-nchains_only = 1  ; 
+niter_only   = 3000; 
+burnin_only  = 1000; 
+cooloff_only = 800 ; 
+nchains_only = 16  ; 
 % niter_only   = 600; 
 % burnin_only  = 100; 
 % cooloff_only = 80 ; 
@@ -233,6 +233,19 @@ elseif strcmp(stamp, 'all_no_hv');
     par.inv.cooloff                   = 4000 ; 
     par.inv.nchains                   = 16   ; 
     
+    
+elseif strcmp(stamp, 'HK_fast'); 
+    par.inv.datatypes                 = {'HKstack_P'};
+    par.inv.niter                     = 3000  ; 
+    par.inv.burnin                    = 1000  ; 
+    par.inv.cooloff                   = 800   ; 
+    par.inv.nchains                   = 16    ;     
+elseif strcmp(stamp, 'HK_faster'); 
+    par.inv.datatypes                 = {'HKstack_P'};
+    par.inv.niter                     = 300  ; 
+    par.inv.burnin                    = 100  ; 
+    par.inv.cooloff                   = 80   ; 
+    par.inv.nchains                   = 1    ;    
     
 end
 
