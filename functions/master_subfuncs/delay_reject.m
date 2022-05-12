@@ -62,7 +62,6 @@ if non_acceptk == 0; % We just accepted the last model. Definitely perturb from 
     [model1,ptbnorm,ifpass,p_bd,Pm_prior1,...
         ptb,modptb,nchain,breakTrue]...
         = perturb_model(model, Pm_prior, ptb, ii, par, temp, Kbase,nchain); 
-    non_acceptk = 1; 
     
     if plotTrue
         figure(500); clf; hold on; 
@@ -80,10 +79,25 @@ if non_acceptk == 0; % We just accepted the last model. Definitely perturb from 
         xlim([2.8, 4.8]); 
     end
     
+    if ~ breakTrue; % ~breaktrue means the model passed ifpass, and p_bd~=0
+        non_acceptk = 1; 
+    else % Failed model. Revert to model.         
+        non_acceptk = 0; % Start from model, not failed model1. 
+        model1 = model; % Just in case code tries using broken model1 again. 
+    end
+    
 elseif non_acceptk == 1; % We perturbed model and failed. Let's perturb one more time. 
     [model2,ptbnormk,ifpass,p_bdk,Pm_prior1,...
         ptb,modptb,nchain,breakTrue]...
         = perturb_model(model1, Pm_prior, ptb, ii, par, temp, Kbase,nchain); 
+    
+%     for ii = [1:1000]; 
+%                 [model2,ptbnormk,ifpass,p_bdk,Pm_prior1,...
+%         ptb,modptb,nchain,breakTrue]...
+%         = perturb_model(model1, Pm_prior, ptb, ii, par, temp, Kbase,nchain); 
+%         model1 = model2; 
+%     end
+    
     % model1 is now perturbed twice. 
     % However, we do NOT want to combine ptbnormk and ptbnorm. 
     % ptbnorm is calculated by comparing current model with kbase model. 
@@ -91,7 +105,7 @@ elseif non_acceptk == 1; % We perturbed model and failed. Let's perturb one more
 %     ptbnorm = ptbnormk * ptbnorm;  < this would be wrong. 
 
     p_bd = p_bd * p_bdk;  % TODO get p_bd, probability for previous model bd. 
-    % Pm_prior SHould be fine. 
+    % Pm_prior Should be fine. 
 
     if plotTrue
         figure(500); clf; hold on; 
@@ -110,7 +124,7 @@ elseif non_acceptk == 1; % We perturbed model and failed. Let's perturb one more
         sprintf('Did a second perturbation at ii = %1.0f', ii)
         xlim([2.8, 4.8]); 
     end
-    
+
     non_acceptk = 2; 
     model1 = model2; 
         

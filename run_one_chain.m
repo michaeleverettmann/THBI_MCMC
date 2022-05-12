@@ -479,11 +479,14 @@ end % on the fail_chain while...
 fprintf('\n ================= ENDING ITERATIONS %s =================\n',chainstr)
 % save([resdir,'/chainout/',chainstr],'model0','misfits','allmodels')
 
-try; 
-    plot_h_kappa_progress2(trudata, allmodels, par.res.resdir, iii, accept_info, ...
-        par, trudata.HKstack_P.Esum)
-catch e 
-    fprintf('\nError in plot_h_kappa_progress2. \n  %s  \n',getReport(e)); 
+plot_hk_progress_bool = false; if ~plot_hk_progress_bool; warning('Purposfully not plotting HK stack inversion progress'); end 
+if plot_hk_progress_bool 
+    try; 
+        plot_h_kappa_progress2(trudata, allmodels, par.res.resdir, iii, accept_info, ...
+            par, trudata.HKstack_P.Esum)
+    catch e 
+        fprintf('\nError in plot_h_kappa_progress2. This is normal if you dont have HK data. \n  %s  \n',getReport(e)); 
+    end
 end
 
 

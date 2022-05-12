@@ -12,9 +12,9 @@ str_temp = split(stamp, '/');
 % burnin_only  = 4000; 
 % cooloff_only = 3000; 
 % nchains_only = 16; 
-niter_only   = 3000; 
-burnin_only  = 1000; 
-cooloff_only = 800 ; 
+niter_only   = 300; 
+burnin_only  = 100; 
+cooloff_only = 80 ; 
 nchains_only = 16  ; 
 % niter_only   = 600; 
 % burnin_only  = 100; 
@@ -177,7 +177,7 @@ elseif strcmp(stamp, 'all_001');
     par.inv.nchains = 16; 
     
     
-% { --- Different data types alone
+% { --- Different data types alone 
 elseif strcmp(stamp, 'SW_Ray_phV_only'); 
     par.inv.datatypes                 = {'SW_Ray_phV'};
     par.inv.niter                     = niter_only  ; 
@@ -208,6 +208,37 @@ elseif strcmp(stamp, 'SW_HV_only');
     par.inv.burnin                    = burnin_only ; 
     par.inv.cooloff                   = cooloff_only; 
     par.inv.nchains                   = nchains_only;     
+% { --- ONE CHAIN Different data types alone
+elseif strcmp(stamp, 'SW_Ray_phV_only_one_chain'); 
+    par.inv.datatypes                 = {'SW_Ray_phV'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = 1; 
+elseif strcmp(stamp, 'SW_Lov_phV_only_one_chain'); 
+    par.inv.datatypes                 = {'SW_Lov_phV'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = 1; 
+elseif strcmp(stamp, 'RF_Sp_ccp_only_one_chain'); 
+    par.inv.datatypes                 = {'RF_Sp_ccp'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = 1; 
+elseif strcmp(stamp, 'HKstack_P_only_one_chain'); 
+    par.inv.datatypes                 = {'HKstack_P'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = 1; 
+elseif strcmp(stamp, 'SW_HV_only_one_chain'); 
+    par.inv.datatypes                 = {'SW_HV'}   ;
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = 1;     
 % } --- End test different data types alone   
 
 

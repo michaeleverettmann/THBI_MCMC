@@ -130,11 +130,11 @@ inv = struct(    'synthTest',true                ,...
                  'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-                 'nchains',4                   ,... % number of chains to start in parallel
+                 'nchains',1                   ,... % number of chains to start in parallel
                  'Nsavestate',100                ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x  
-                  'datatypes',{{'HKstack_P','RF_Sp','SW_Ray_phV','SW_Lov_phV', 'SW_HV'}})  
+                  'datatypes',{{'HKstack_P'}})  
 %                  'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}})  
                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
