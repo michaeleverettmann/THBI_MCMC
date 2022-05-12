@@ -132,7 +132,6 @@ elseif non_acceptk == 2;
     [model1,ptbnorm,ifpass,p_bd,Pm_prior1,...
         ptb,modptb,nchain,breakTrue]...
         = perturb_model(model, Pm_prior, ptb, ii, par, temp, Kbase,nchain); 
-    non_acceptk = 1; 
     
     if plotTrue
         figure(500); clf; hold on; 
@@ -148,6 +147,13 @@ elseif non_acceptk == 2;
         box on; 
         set(gcf, 'color', 'white')
         xlim([2.8, 4.8]); 
+    end
+    
+    if ~ breakTrue; % ~breaktrue means the model passed ifpass, and p_bd~=0
+        non_acceptk = 1; 
+    else % Failed model. Revert to model.         
+        non_acceptk = 0; % Start from model, not failed model1. 
+        model1 = model; % Just in case code tries using broken model1 again. 
     end
     
 end

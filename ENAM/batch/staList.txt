@@ -1,4 +1,2 @@
-TA T59A
-TA U60A
 TA O53A
 # For some reason have to have a final line that isn't used. Note: format is NET STA TA U60ATA V61ATA V62ATA M51ATA N52A

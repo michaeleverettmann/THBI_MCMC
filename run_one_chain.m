@@ -196,12 +196,25 @@ try
     end
     
     % Perturb the model. Perturb up to twice if delay_reject is true. 
+    accept_info(ii).non_acceptk = non_acceptk; % What perturbation number were we at when we perturbed the model? 0 will mean perturbed once, 1 will mean perturbed twice, 2 will mean perturbed once
     [model1,ptbnorm,ifpass,p_bd,Pm_prior1,...
     ptb,modptb,nchain,breakTrue,non_acceptk]...
     = delay_reject(...
         model, Pm_prior, ptb, ii, par, temp, Kbase,nchain,...
         model1,ptbnorm,p_bd,Pm_prior1k,non_acceptk); 
 %     fprintf('\nptbnorm=%1.3f, non_acceptk=%1.0f\n',ptbnorm, non_acceptk) % Temporary
+
+% % %     %%% Test stuff
+% % %     for itest = [1:10000]; 
+% % %         fprintf('\n     nac %1.0f', non_acceptk)
+% % %         [model1,ptbnorm,ifpass,p_bd,Pm_prior1,...
+% % %             ptb,modptb,nchain,breakTrue,non_acceptk]...
+% % %             = delay_reject(...
+% % %                 model, Pm_prior, ptb, ii, par, temp, Kbase,nchain,...
+% % %                 model1,ptbnorm,p_bd,Pm_prior1k,non_acceptk); 
+% % %         fprintf('\n%4.0f nac=%1.0f breaktrue=%1.0f',itest,non_acceptk,breakTrue)
+% % %     end
+% % %     %%%
     
     if breakTrue; break; end;
 
@@ -358,7 +371,6 @@ try
     accept_info(ii).ptbnorm = ptbnorm; 
     accept_info(ii).Pm_prior1 = Pm_prior1; 
     accept_info(ii).p_bd = p_bd; 
-    accept_info(ii).non_acceptk = non_acceptk; 
     if any('HKstack_P'==string(par.inv.datatypes)); 
         accept_info(ii).hk_Emax_per_iter = max(max(predata.HKstack_P.Esum)); 
         accept_info(ii).sig_hk = model1.datahparm.sig_HKstack_P; 
