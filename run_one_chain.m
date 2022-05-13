@@ -216,7 +216,7 @@ try
 % % %     end
 % % %     %%%
     
-    if breakTrue; break; end;
+    if breakTrue; continue; end;
 
 %% ===========================  FORWARD MODEL  ===========================
 	% don't re-calc if the only thing perturbed is the error, or if there is zero probability of acceptance!
@@ -234,14 +234,14 @@ try
             fail_chain=fail_chain+1;
             fprintf('\nbrb Forward model error, fail_chain %.0f Report below:\n',fail_chain)  
             fprintf('\n\n%s\n\n',getReport(e))
-            break;
+            continue;
         end
 
         % continue if any Sp or PS inhomogeneous or nan or weird output
         if ifforwardfail(predata,par)
             fail_chain=fail_chain+1;
             fprintf('Forward model error, run_one_chain line 230 or so. Fail_chain %.0f\n',fail_chain)  
-            break;
+            continue;
         end
 
         % process predata - filter/taper etc.
@@ -281,7 +281,7 @@ try
         fail_chain=fail_chain+1; ifpass=0;
         fprintf('Forward model error, fail_chain %.0f, ii=%1.0f\n',fail_chain,ii)
         warning('This forward fail forces ifpass = 0. Im not sure, maybe this can make your chain get stuck. brb2022.04.12.')
-        break;
+        continue;
     else
         fail_chain = 0;
     end

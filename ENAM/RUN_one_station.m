@@ -58,7 +58,7 @@ BWclust = 1;
 
 % Copy what you want to run here. 
 STAMP_all = {...
-    'HKstack_P_only'     ,...  % } --- End   test to see influence of different data types independently
+    'HKstack_P___SW_HV_only__only'     ,...  % } --- End   test to see influence of different data types independently
 }; % This determines which tests we want to run now. They will run sequentially, not in parallel (each station only has one ram folder. )
 
 

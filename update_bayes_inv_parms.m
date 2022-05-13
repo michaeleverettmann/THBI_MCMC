@@ -241,6 +241,15 @@ elseif strcmp(stamp, 'SW_HV_only_one_chain');
     par.inv.nchains                   = 1;     
 % } --- End test different data types alone   
 
+% { --- A couple data types. 
+elseif strcmp(stamp, 'HKstack_P___SW_HV_only__only'); 
+    par.inv.datatypes                 = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;  
+% } ---
+
 
 elseif strcmp(stamp, 'all_demo'); 
     par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
