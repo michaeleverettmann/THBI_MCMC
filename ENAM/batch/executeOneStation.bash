@@ -20,14 +20,13 @@
 # First argument is station.network. 
 # Script executes RUN_one_station.m on that station. 
 
-# line=$1
-# line=$2
-# network=$(echo $line | head -n1 | awk '{print $1;}')
-# station=$(echo $line | head -n1 | awk '{print $2;}')
 network=$1
 station=$2
-echo Running: $network $station
+STAMP=$3
+echo Running: $network $station $STAMP
 pwd
-# #nohup 
-matlab -nodisplay -nosplash -nodesktop -r "network_manual='$network'; station_manual='$station'; RUN_one_station" # &> batch/run_info/nohup$network.$station.out 
-# }
+
+now="$(date)"
+echo $date 
+
+matlab -nodisplay -nosplash -nodesktop -r "network_manual='$network'; station_manual='$station'; STAMP='$STAMP'; RUN_one_station" # &> batch/run_info/nohup$network.$station.out 

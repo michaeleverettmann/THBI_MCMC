@@ -283,6 +283,8 @@ save([resdir,'/SWs_pred'],'SWs_perchain');
 end
 
 %% Final interpolated model with errors
+% If you have to few iterations/chains, there aren't enough models, and you
+% will get an error in c4_FINAL_MODEL. 
 final_model = c4_FINAL_MODEL(posterior,allmodels_collated,par,1,[resdir,'/final_model']);
 plot_FINAL_MODEL( final_model,posterior,1,[resdir,'/final_model.pdf'],true,[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
 

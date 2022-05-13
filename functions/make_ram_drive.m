@@ -3,6 +3,7 @@ function [ramDir]=make_ram_drive(options);
         options.linuxRamBase = '/dev/shm'; 
         options.linuxRam = '/dev/shm/ramDriveTHBI';  
         options.macRam = '/Volumes/ramDriveTHBI';
+        options.stamp = ''; % stamp. Dont put a slash here.  
         options.ramMb = 1000; 
     end
 %% Function to check whether a ram drive is present, make one if it is not, and return that ram drives position. 
@@ -47,6 +48,15 @@ elseif ~exist(options.linuxRamBase);
         end
     end
     
+end
+
+if ~isempty(options.stamp); % Folder corresponding to our stamp. For easier parallel runs of one station with different settings. 
+    curDir = pwd(); 
+    cd(ramDir); 
+    mkdir(options.stamp); 
+    cd(options.stamp); 
+    ramDir = pwd(); 
+    cd(curDir);    
 end
    
 end

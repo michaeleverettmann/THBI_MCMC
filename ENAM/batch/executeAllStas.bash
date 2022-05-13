@@ -1,5 +1,6 @@
 #/bin/bash 
 staList='batch/staList.txt'
+stampList='batch/stampList.txt'
 pid='batch/run_info/process_ID.txt'
 
 cd .. 
@@ -22,13 +23,17 @@ echo "NOT RUNNING RUN_prep_data.m"
 
 echo '************** New Run **************' !>> $pid
 echo $(date) !>> $pid # Put the date in process_ID file so we know what's what. Also, don't want to remove old PIDs, in case one keeps running and we have to shut it down. 
-while read -r line; # Loop over each station. 
-do
-    # Run "task" on network, station, and echo the process_ID to $pid file. 
-#     ./batch/executeOneStation.bash $line & echo $! >> $pid
-    sbatch batch/executeOneStation.bash $line
-    # $(echo $line | head -n1 | awk '{print $1;}').$(echo $line | head -n1 | awk '{print $2;}')
-done < $staList
+while read -r lineStamp; # Loop over each stamp. 
+do 
+    while read -r lineSta; # Loop over each station. 
+    do
+        # Run "task" on network, station, and echo the process_ID to $pid file. 
+    #     ./batch/executeOneStation.bash $line & echo $! >> $pid
+        echo $lineSta $lineStamp
+        sbatch batch/executeOneStation.bash $lineSta $lineStamp
+        # $(echo $line | head -n1 | awk '{print $1;}').$(echo $line | head -n1 | awk '{print $2;}')
+    done < $staList
+done < $stampList 
 
 wait 
 echo "Done starting jobs."

@@ -89,7 +89,7 @@ prem_isotropic = prem;
 
 
 % Initiate ram drive and keep track of where this folder is. 
-ramDrive = make_ram_drive(); 
+ramDrive = make_ram_drive('stamp', STAMP);  
 
 setPaths(hd,proj,ramDrive); 
 

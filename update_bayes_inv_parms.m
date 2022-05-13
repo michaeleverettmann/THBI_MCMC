@@ -276,16 +276,16 @@ elseif strcmp(stamp, 'all_no_hv');
     
 elseif strcmp(stamp, 'HK_fast'); 
     par.inv.datatypes                 = {'HKstack_P'};
-    par.inv.niter                     = 3000  ; 
-    par.inv.burnin                    = 1000  ; 
-    par.inv.cooloff                   = 800   ; 
+    par.inv.niter                     = 500  ; 
+    par.inv.burnin                    = 100  ; 
+    par.inv.cooloff                   = 80   ; 
     par.inv.nchains                   = 16    ;     
 elseif strcmp(stamp, 'HK_faster'); 
     par.inv.datatypes                 = {'HKstack_P'};
-    par.inv.niter                     = 300  ; 
+    par.inv.niter                     = 500  ; 
     par.inv.burnin                    = 100  ; 
     par.inv.cooloff                   = 80   ; 
-    par.inv.nchains                   = 1    ;    
+    par.inv.nchains                   = 2    ;    
     
 end
 
