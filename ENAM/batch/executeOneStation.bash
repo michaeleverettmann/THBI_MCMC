@@ -22,11 +22,12 @@
 
 network=$1
 station=$2
-STAMP=$3
-echo Running: $network $station $STAMP
-pwd
+echo Running: $network $station 
 
 now="$(date)"
-echo $date 
+echo $now 
+pwd
+echo "network_manual='$network'; station_manual='$station'; RUN_one_station"
+echo ''
 
-matlab -nodisplay -nosplash -nodesktop -r "network_manual='$network'; station_manual='$station'; STAMP='$STAMP'; RUN_one_station" # &> batch/run_info/nohup$network.$station.out 
+matlab -nodisplay -nosplash -nodesktop -r "network_manual='$network'; station_manual='$station'; RUN_one_station" # &> batch/run_info/nohup$network.$station.out 

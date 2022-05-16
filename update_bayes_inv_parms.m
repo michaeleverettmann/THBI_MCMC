@@ -8,14 +8,14 @@ str_temp = split(stamp, '/');
 
 
 % { Different data types alone
-% niter_only   = 12000; 
-% burnin_only  = 4000; 
-% cooloff_only = 3000; 
-% nchains_only = 16; 
-niter_only   = 4000; 
-burnin_only  = 1000; 
-cooloff_only = 800 ; 
-nchains_only = 16  ; 
+niter_only   = 16000; 
+burnin_only  = 5000; 
+cooloff_only = 4000; 
+nchains_only = 16; 
+% niter_only   = 4000; 
+% burnin_only  = 1000; 
+% cooloff_only = 800 ; 
+% nchains_only = 16  ; 
 % niter_only   = 600; 
 % burnin_only  = 100; 
 % cooloff_only = 80 ; 
@@ -254,10 +254,10 @@ elseif strcmp(stamp, 'HKstack_P___SW_HV_only__only');
 elseif strcmp(stamp, 'all_demo'); 
     par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
     par.mod.starting.HKappa.startAtHK = true;   
-    par.inv.niter                     = 2000; 
-    par.inv.burnin                    = 700 ; 
-    par.inv.cooloff                   = 500 ; 
-    par.inv.nchains                   = 16  ; 
+    par.inv.niter                     = 500; 
+    par.inv.burnin                    = 100 ; 
+    par.inv.cooloff                   = 800 ; 
+    par.inv.nchains                   = 1  ; 
 elseif strcmp(stamp, 'all_002'); 
     par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
     par.mod.starting.HKappa.startAtHK = true;   
@@ -279,19 +279,22 @@ elseif strcmp(stamp, 'HK_fast');
     par.inv.niter                     = 500  ; 
     par.inv.burnin                    = 100  ; 
     par.inv.cooloff                   = 80   ; 
-    par.inv.nchains                   = 16    ;     
+    par.inv.nchains                   = 16    ; 
+elseif strcmp(stamp, 'SW_HV_faster'); 
+    par.inv.datatypes                 = {'SW_HV'}   ;
+    par.inv.niter                     = 500  ; 
+    par.inv.burnin                    = 100  ; 
+    par.inv.cooloff                   = 80   ; 
+    par.inv.nchains                   = 16    ;  
 elseif strcmp(stamp, 'HK_faster'); 
     par.inv.datatypes                 = {'HKstack_P'};
     par.inv.niter                     = 500  ; 
     par.inv.burnin                    = 100  ; 
     par.inv.cooloff                   = 80   ; 
-    par.inv.nchains                   = 2    ;    
+    par.inv.nchains                   = 2    ;  
+
     
 end
-
-
-
-  
 
 
 inv = par.inv; 

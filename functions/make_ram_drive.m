@@ -51,12 +51,15 @@ elseif ~exist(options.linuxRamBase);
 end
 
 if ~isempty(options.stamp); % Folder corresponding to our stamp. For easier parallel runs of one station with different settings. 
-    curDir = pwd(); 
-    cd(ramDir); 
-    mkdir(options.stamp); 
-    cd(options.stamp); 
-    ramDir = pwd(); 
-    cd(curDir);    
+    warning(['options.stamp was provided. This doesnt work. '...
+        'So I am NOT including stamp in the ram folder. '...
+        'Otherwise, pathsAutoGen.m has to be different for each station.']); 
+% % %     curDir = pwd(); 
+% % %     cd(ramDir); 
+% % %     mkdir(options.stamp); 
+% % %     cd(options.stamp); 
+% % %     ramDir = pwd(); 
+% % %     cd(curDir);    
 end
    
 end
