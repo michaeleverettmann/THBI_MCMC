@@ -298,6 +298,12 @@ elseif strcmp(stamp, 'all_fast');
     par.inv.burnin                    = 100  ; 
     par.inv.cooloff                   = 80   ; 
     par.inv.nchains                   = 16    ; 
+elseif strcmp(stamp, 'all_faster'); 
+    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+    par.inv.niter                     = 500  ; 
+    par.inv.burnin                    = 100  ; 
+    par.inv.cooloff                   = 80   ; 
+    par.inv.nchains                   = 16    ; 
 
     
 end

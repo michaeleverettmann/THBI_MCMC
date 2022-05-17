@@ -83,6 +83,7 @@ par.hkResetInfo = struct('timesReset',0, 'timesSWKernelsReset',0); % Structure t
 
 while ii < par.inv.niter
 ii = ii+1; par.ii = ii; % bb2022.10.18 Keep track of ii in par for easily plotting how inversion is changing with ii. 
+accept_info(ii).fail_chain = fail_chain; 
 
 % Maintenance in case folder is getting filled up during last iterations. 
 [~,~]=clean_ram(ii,par,'clearRamInterval',200) % Prevent large amount of files from building up in ram, which can dramatically slow down matlab. If the ram is getting very full, then there is probably a problem!
@@ -369,6 +370,7 @@ try
     
 %% ========== TEMPORARY ====== make some plots and get insight into why acceptance does/doesn't happen
     accept_info(ii).ifaccept = ifaccept; 
+    accept_info(ii).ifpass = ifpass; 
     accept_info(ii).misfit = misfit1; 
     accept_info(ii).log_likelihood = log_likelihood1; 
     accept_info(ii).model = model1; 
@@ -503,7 +505,7 @@ end % on the fail_chain while...
 fprintf('\n ================= ENDING ITERATIONS %s =================\n',chainstr)
 % save([resdir,'/chainout/',chainstr],'model0','misfits','allmodels')
 
-plot_hk_progress_bool = false; if ~plot_hk_progress_bool; warning('Purposfully not plotting HK stack inversion progress'); end 
+plot_hk_progress_bool = true; if ~plot_hk_progress_bool; warning('Purposfully not plotting HK stack inversion progress'); end 
 if plot_hk_progress_bool 
     try; 
         plot_h_kappa_progress2(trudata, allmodels, par.res.resdir, iii, accept_info, ...

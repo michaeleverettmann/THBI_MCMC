@@ -2,6 +2,8 @@ function [accept_info] = make_accept_info(par);
 
 accept_info = struct('ifaccept'          , zeros(par.inv.niter,1)*nan,...; ; % Initialize structure with acceptance info for each iteration. 
                      'misfit'            , zeros(par.inv.niter,1)*nan,...
+                     'ifpass'            , zeros(par.inv.niter,1)*nan,...
+                     'fail_chain'        , zeros(par.inv.niter,1)*nan,...
                      'log_likelihood'    , zeros(par.inv.niter,1)*nan,...
                      'sig_hk'            , zeros(par.inv.niter,1)*nan,...
                      'model'             , zeros(par.inv.niter,1)*nan,...
@@ -18,12 +20,14 @@ accept_info = struct('ifaccept'          , zeros(par.inv.niter,1)*nan,...; ; % I
 for iInit=1:par.inv.niter;
     accept_info(iInit).ifaccept          = false; ; % Initialize structure with acceptance info for each iteration. 
     accept_info(iInit).misfit            = nan; % misfit1; 
+    accept_info(iInit).ifpass            = nan; % misfit1; 
+    accept_info(iInit).fail_chain        = nan; % misfit1; 
     accept_info(iInit).log_likelihood    = nan; % log_likelihood1; 
     accept_info(iInit).sig_hk            = nan; % model1.datahparm.sig_HKstack_P; 
     accept_info(iInit).model             = []; % model1; 
     accept_info(iInit).predat_save       = []; % predat_save1; 
     accept_info(iInit).iter              = nan; % ii; 
-    accept_info(iInit).temp              = []; % temp; 
+    accept_info(iInit).temp              = nan; % temp; 
     accept_info(iInit).ptbnorm           = nan; % ptbnorm; 
     accept_info(iInit).Pm_prior1         = nan; % Pm_prior1; 
     accept_info(iInit).p_bd              = nan; % p_bd; 
