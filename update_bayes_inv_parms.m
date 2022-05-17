@@ -256,7 +256,7 @@ elseif strcmp(stamp, 'all_demo');
     par.mod.starting.HKappa.startAtHK = true;   
     par.inv.niter                     = 500; 
     par.inv.burnin                    = 100 ; 
-    par.inv.cooloff                   = 800 ; 
+    par.inv.cooloff                   = 80 ; 
     par.inv.nchains                   = 1  ; 
 elseif strcmp(stamp, 'all_002'); 
     par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
@@ -280,7 +280,7 @@ elseif strcmp(stamp, 'HK_fast');
     par.inv.burnin                    = 100  ; 
     par.inv.cooloff                   = 80   ; 
     par.inv.nchains                   = 16    ; 
-elseif strcmp(stamp, 'SW_HV_faster'); 
+elseif strcmp(stamp, 'SW_HV_fast'); 
     par.inv.datatypes                 = {'SW_HV'}   ;
     par.inv.niter                     = 500  ; 
     par.inv.burnin                    = 100  ; 
@@ -292,6 +292,12 @@ elseif strcmp(stamp, 'HK_faster');
     par.inv.burnin                    = 100  ; 
     par.inv.cooloff                   = 80   ; 
     par.inv.nchains                   = 2    ;  
+elseif strcmp(stamp, 'all_fast'); 
+    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+    par.inv.niter                     = 1000  ; 
+    par.inv.burnin                    = 100  ; 
+    par.inv.cooloff                   = 80   ; 
+    par.inv.nchains                   = 16    ; 
 
     
 end

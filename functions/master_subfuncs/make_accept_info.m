@@ -16,19 +16,19 @@ accept_info = struct('ifaccept'          , zeros(par.inv.niter,1)*nan,...; ; % I
                      'trudata'           , zeros(par.inv.niter,1)*nan); 
 
 for iInit=1:par.inv.niter;
-    accept_info(iInit).ifaccept          = []; ; % Initialize structure with acceptance info for each iteration. 
-    accept_info(iInit).misfit            = []; % misfit1; 
-    accept_info(iInit).log_likelihood    = []; % log_likelihood1; 
-    accept_info(iInit).sig_hk            = []; % model1.datahparm.sig_HKstack_P; 
+    accept_info(iInit).ifaccept          = false; ; % Initialize structure with acceptance info for each iteration. 
+    accept_info(iInit).misfit            = nan; % misfit1; 
+    accept_info(iInit).log_likelihood    = nan; % log_likelihood1; 
+    accept_info(iInit).sig_hk            = nan; % model1.datahparm.sig_HKstack_P; 
     accept_info(iInit).model             = []; % model1; 
     accept_info(iInit).predat_save       = []; % predat_save1; 
-    accept_info(iInit).iter              = []; % ii; 
+    accept_info(iInit).iter              = nan; % ii; 
     accept_info(iInit).temp              = []; % temp; 
-    accept_info(iInit).ptbnorm           = []; % ptbnorm; 
-    accept_info(iInit).Pm_prior1         = []; % Pm_prior1; 
-    accept_info(iInit).p_bd              = []; % p_bd; 
-    accept_info(iInit).non_acceptk       = []; % non_acceptk; 
-    accept_info(iInit).hk_Emax_per_iter  = []; % max(max(predata.HKstack_P.Esum)); 
+    accept_info(iInit).ptbnorm           = nan; % ptbnorm; 
+    accept_info(iInit).Pm_prior1         = nan; % Pm_prior1; 
+    accept_info(iInit).p_bd              = nan; % p_bd; 
+    accept_info(iInit).non_acceptk       = nan; % non_acceptk; 
+    accept_info(iInit).hk_Emax_per_iter  = nan; % max(max(predata.HKstack_P.Esum)); 
     accept_info(iInit).trudata           = []; % trudata; end; % Inefficient, but this is just for testing. 
 end
 

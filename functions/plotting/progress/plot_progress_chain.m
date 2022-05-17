@@ -1,7 +1,6 @@
 function plot_progress_chain(absTimeIter, par, accept_info, ptb); 
 
-
-
+warning('plot_progress_chain not in use: use plot_progress_chain2.m'); 
 
 if any(par.ii==[10 100 500 1000]) || (mod(par.ii, 1000) == 0) % Every thousand iterations or a few select iterations before that
     ifaccept           = [accept_info.ifaccept      ]; 

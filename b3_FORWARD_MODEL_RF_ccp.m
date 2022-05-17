@@ -122,8 +122,17 @@ if isreal(asind(laymodel.Vs*sind(S_inc)./laymodel.Vs(end))) %
     predat_sp_PSV(kill,:) = [];
     
     % convert RF_t to RF_z 
-	RF_P  = interp1(zz_mig,predat_sp_PSV(:,1),predata.RF_Sp_ccp.zz,'linear',0);
-	RF_SV  = interp1(zz_mig,predat_sp_PSV(:,2),predata.RF_Sp_ccp.zz,'linear',0);
+    try 
+        RF_P  = interp1(zz_mig,predat_sp_PSV(:,1),predata.RF_Sp_ccp.zz,'linear',0);
+        RF_SV  = interp1(zz_mig,predat_sp_PSV(:,2),predata.RF_Sp_ccp.zz,'linear',0);
+    catch e 
+        fprintf('\nProblem with receiver function calculation. psv waveforms disp below:\n')
+        disp(predat_sp_PSV)
+        error(['\nReceiver function error. Maybe nan receiver functions? ',...
+            'If so, the model probably should count as junk. ',...
+            'Error message was this: \n',...
+            '%s\n'],getReport(e)); 
+    end
 
     % taper off daughter = P component
 	Zwin = par.datprocess.CCP.Zwin.def;

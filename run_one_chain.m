@@ -216,7 +216,7 @@ try
 % % %     end
 % % %     %%%
     
-    if breakTrue; continue; end;
+    if breakTrue; break; end; % Using break here instead of break is equivalent to saying that if (1) this model has zero prior, then we want to bake that into our inverted PDFs in some way. Using a continue means we would just try ignoring the zero prior model and who knows what consequences that would have. Then (2), if ifaccept==false, then we simply already know that it has zero prior(?) and there is no point in conducting the forward modelling. brb2022.05.16.  
 
 %% ===========================  FORWARD MODEL  ===========================
 	% don't re-calc if the only thing perturbed is the error, or if there is zero probability of acceptance!
@@ -232,16 +232,16 @@ try
             predataPrev = predata; % Keep track of last predata. To keep the previous complete HK stack. 
         catch e
             fail_chain=fail_chain+1;
-            fprintf('\nbrb Forward model error, fail_chain %.0f Report below:\n',fail_chain)  
+            fprintf('\nbrb Forward model error on ii=%1.0f, fail_chain %.0f Report below:\n',ii,fail_chain)  
             fprintf('\n\n%s\n\n',getReport(e))
-            continue;
+            break; % Break instead of continue -- equivalent to saying that if forward modelling doesn't work, then that model is crap and deserved a zero prior. We arent sure the best approach here yet. However, the forward modelling should usually work, so this shouldn't matter much. brb2022.05.16. 
         end
 
         % continue if any Sp or PS inhomogeneous or nan or weird output
         if ifforwardfail(predata,par)
             fail_chain=fail_chain+1;
             fprintf('Forward model error, run_one_chain line 230 or so. Fail_chain %.0f\n',fail_chain)  
-            continue;
+            break; % Break instead of continue -- equivalent to saying that if forward modelling doesn't work, then that model is crap and deserved a zero prior. We arent sure the best approach here yet. However, the forward modelling should usually work, so this shouldn't matter much. brb2022.05.16. 
         end
 
         % process predata - filter/taper etc.
@@ -281,7 +281,7 @@ try
         fail_chain=fail_chain+1; ifpass=0;
         fprintf('Forward model error, fail_chain %.0f, ii=%1.0f\n',fail_chain,ii)
         warning('This forward fail forces ifpass = 0. Im not sure, maybe this can make your chain get stuck. brb2022.04.12.')
-        continue;
+        break;
     else
         fail_chain = 0;
     end
@@ -308,20 +308,27 @@ try
     
     
 %%% Figure out if chain is stuck
-    stuckIfNoChange = 30; % p of not changing 13 times in row is about 0.0001. if there is 50% chance of acceptance each time and nothing has gone wrong.  
+    stuckIfNoChange = 20; % p of not changing 13 times in row is about 0.0001. if there is 50% chance of acceptance each time and nothing has gone wrong.  
     if (ii>stuckIfNoChange+1); 
         % Temporary coding. accept_info.ifaccept doesn't exist until after
         % first iteration. In either case, don't check if stuck until we
         % try at least a few iterations. 
-        accptArr = [accept_info.ifaccept]; 
+        accptArr = [accept_info.ifaccept]; % In case this wasn't already an array - it shouldn't be necessary after initializing ifaccept as an array brb2022.05.17
         if all( ~accptArr(ii-stuckIfNoChange:ii-1) ); % last stuckIfNoChange have been rejected. Somethings wrong! 
 % % %             ifaccept = true; % Just accept this model. Hopefully will get us away from the model region that breaks the code.  Temporary solution. 
 % % %             newK=true; % We might have got stuck because kernels needed to be reset. Let's reset them. 
 % % %             fprintf('\nbrb2022.04.06 Stuck! Didnt accept model for %1.0f iterations. Simply accepted a new model to get unstuck. ii=%1.0f\n',stuckIfNoChange,ii)
             fprintf(['\nbrb2022.04.06 Stuck! Didnt accept model for %1.0f iterations.\n  ',...
                      'What errors came before this?. ii=%1.0f\n  ',...
-                     'log like prev and current: %f3.2f, -> %f3.2f'],...
-                     stuckIfNoChange,ii,log_likelihood,log_likelihood1)
+                     'log like prev and current: %f3.2f, -> %f3.2f\n',...
+                     'fail_chain=%1.0f'],...
+                     stuckIfNoChange,ii,log_likelihood,log_likelihood1,fail_chain)
+            fprintf('Increasing nchain artificially IF fail_chain == 0\nnchain: %1.0f',nchain); 
+            if fail_chain == 0; 
+                nchain = nchain + 50; 
+            end
+            fprintf(' -> nchain now: %1.0f\n', nchain); 
+
 % % %             logLikArr = [accept_info(:).log_likelihood]; 
 % % %             iterLik = [ii-stuckIfNoChange:ii-2];
 % % %             logLikArr=logLikArr(iterLik);
@@ -434,7 +441,11 @@ try
 % Very important: kernel reset might be already done. This addresses the following conditions: 
 % - We did not accept a model, but burning or maxnkchain requires us to reset kernel. We will reset USING THE LAST ACCEPTED MODEL. 
 % - We did accept a model, but newk = false, and maxnkchains or burnin requires us to reset things. 
-    resetK = false;
+% % %     resetK = false;   
+% % %     if (chainIsStuck && (fail_chain == 0)); % Chain gets stuck sometimes and it could be due to surface wave kernels having wrong likelihood: then we want to reset kernels very soon. But if we are stuck just because of forward models failing, there isnt a point in resetting the kernels. 
+% % %         fprintf(' \n Increasing nchain for %s: chain was stuck.\n',chainstr); 
+% % %         nchain = nchain + 50; 
+% % %     end
     mightReset = (newK && ifaccept) == false; % In all cases EXCEPT when we just made K for an accepted model, then there is a chance we need to reset kernels. 
     if mightReset && ii == par.inv.burnin % reset kernel at end of burn in (and we didn't just reset it tacitly)
             fprintf('\n RECALCULATING %s KERNEL - end of burn in\n',chainstr);
@@ -477,8 +488,9 @@ try
 
     
 catch e % e is an MException struct
-    fprintf('\nbrb Main master par catch: %s\n',getReport(e)); 
     fail_chain = fail_chain+1;
+    fprintf('\nbrb Main master par catch: %s\n',getReport(e)); 
+    fprintf('\nfail_chain = %1.0f',fail_chain); 
 end % on try-catch
 
 if newK||resetK, delete_mineos_files(ID,'R'); end
