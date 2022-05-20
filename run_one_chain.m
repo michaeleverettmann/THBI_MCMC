@@ -82,6 +82,16 @@ misfit = [];
 par.hkResetInfo = struct('timesReset',0, 'timesSWKernelsReset',0); % Structure to keep track of when to reset HK stacks. 
 
 while ii < par.inv.niter
+    
+save_exit_if_broken = true; 
+if (save_exit_if_broken) && (fail_chain > 0); 
+    save(sprintf('%s/chain_with_broken_something_%s.mat',...
+        par.res.resdir,chainstr))
+    fail_chain = -100; 
+    warning('fail_chain > 0. EXITING INVERSION FOR CHAIN %s',chainstr); 
+    break
+end
+    
 ii = ii+1; par.ii = ii; % bb2022.10.18 Keep track of ii in par for easily plotting how inversion is changing with ii. 
 accept_info(ii).fail_chain = fail_chain; 
 
@@ -207,7 +217,7 @@ try
 
 % % %     %%% Test stuff
 % % %     for itest = [1:10000]; 
-% % %         fprintf('\n     nac %1.0f', non_acceptk)
+% % %         fprintf('\n         nac %1.0f', non_acceptk)
 % % %         [model1,ptbnorm,ifpass,p_bd,Pm_prior1,...
 % % %             ptb,modptb,nchain,breakTrue,non_acceptk]...
 % % %             = delay_reject(...
@@ -227,6 +237,9 @@ try
 
         try
             [predata,laymodel1] = b3__INIT_PREDATA(model1,par,trudata,0 );
+% % %             if ii > 5; 
+% % %                 error('Fake error, testing saving fail_chain > 0 model')
+% % %             end
             [predata,par] = b3_FORWARD_MODEL_BW(model1,laymodel1,par,predata,ID,0,predataPrev);
             predata = b3_FORWARD_MODEL_RF_ccp(   model1,laymodel1,par,predata,ID,0 );
             predata = b3_FORWARD_MODEL_SW_kernel(model1,Kbase,par,predata );
@@ -281,7 +294,6 @@ try
     if ifforwardfail(predata,par)
         fail_chain=fail_chain+1; ifpass=0;
         fprintf('Forward model error, fail_chain %.0f, ii=%1.0f\n',fail_chain,ii)
-        warning('This forward fail forces ifpass = 0. Im not sure, maybe this can make your chain get stuck. brb2022.04.12.')
         break;
     else
         fail_chain = 0;
@@ -310,7 +322,7 @@ try
     
 %%% Figure out if chain is stuck
     stuckIfNoChange = 20; % p of not changing 13 times in row is about 0.0001. if there is 50% chance of acceptance each time and nothing has gone wrong.  
-    if (ii>stuckIfNoChange+1); 
+    if (ii>stuckIfNoChange+1) 
         % Temporary coding. accept_info.ifaccept doesn't exist until after
         % first iteration. In either case, don't check if stuck until we
         % try at least a few iterations. 

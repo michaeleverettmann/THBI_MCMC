@@ -12,10 +12,16 @@ if any(par.ii==[10 100 500 1000]) || (mod(par.ii, 1000) == 0) % Every thousand i
     nRow = 5; nCol = 1; 
     figure(3001); clf; hold on; set(gcf, 'color', 'white', 'pos', [1000 673 800 664]);
     
-    subplot(nRow, nCol, 1); hold on; box on; 
-    scatter([absTimeIter.data], iter); 
-    xlabel('Time'); 
-    title('Iteration'); 
+    try 
+        subplot(nRow, nCol, 1); hold on; box on; 
+        scatter([absTimeIter.data], iter); 
+        xlabel('Time'); 
+        title('Iteration'); 
+    catch
+        subplot(nRow, nCol, 1); hold on; box on; 
+        title('Problem making this iteration versus time plot...')
+        warning('Couldnt plot time. Probably [absTimeIter.data] has wrong size. TODO! brb2022.05.17');
+    end
     
     subplot(nRow, nCol, 2); hold on; box on; 
     scatter(iter, ifaccept); 

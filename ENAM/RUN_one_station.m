@@ -58,15 +58,15 @@ overwrite = true;
 
 % Copy what you want to run here. 
 STAMP_all = {...
-    'all_fast',... % } --- End   test to see influence of different data types independently
+    'all_002',... % } --- End   test to see influence of different data types independently
 }; % This determines which tests we want to run now. They will run sequentially, not in parallel (each station only has one ram folder. )
 
 
 
 
-if exist('STAMP', 'var'); % If we defined this already in a bash script, then only run that stamp. Otherwise, go through the list of stamps above. 
-    STAMP_all = {STAMP}; 
-end
+% if exist('STAMP', 'var'); % If we defined this already in a bash script, then only run that stamp. Otherwise, go through the list of stamps above. 
+%     STAMP_all = {STAMP}; 
+% end
 
 for istamp = [1:length(STAMP_all)]; 
     STAMP = STAMP_all{istamp}; 
@@ -81,7 +81,7 @@ for istamp = [1:length(STAMP_all)];
     % If we have not defined network and station, use default US.CEH
     if ~ (exist('network_manual', 'var') && exist('station_manual', 'var')) ; 
         network_manual = 'TA'; 
-        station_manual = 'O53A'; 
+        station_manual = 'S57A'; 
         fprintf('\nReseting to %s.%s\n',network_manual,station_manual)
     end
     disp('Network and station') 
