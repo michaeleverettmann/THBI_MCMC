@@ -32,6 +32,34 @@ ofile = [ID,'.out'];
 logfile = [ID,'.log'];
 
 
+% % % %%% TEMPORARY model adjustment again. 
+% % % absRoughness = inf;
+% % % zMaxSmooth = 100; % Smooth over top this many km of model if needed. Will add 5 to this in while loop. 
+% % % maxAbsRoughness = 0.35; % average absolute roughness of model that is tolerable. 
+% % % while absRoughness > maxAbsRoughness; 
+% % %     zMaxSmooth = zMaxSmooth + 5; 
+% % %     fixGrad = find(model.z<=zMaxSmooth); 
+% % %     vsGrad = (model.VS(fixGrad+1) - model.VS(fixGrad)) ./ (model.z(fixGrad+1) - model.z(fixGrad)); 
+% % %     absRoughness = sum(abs(vsGrad)); % If this number were 1, that would mean we change 1 km/s per km on average. That would be rediculous over 15 km in terms of what we can resolve. 
+% % %     
+% % %     if absRoughness < maxAbsRoughness; 
+% % %         break; 
+% % %     end
+% % %     
+% % %     fprintf('\nSmoothing Mineos velocities above %1.1f km. absRoughness was %1.2f\n',zMaxSmooth,absRoughness)
+% % %     smMeth = 'gaussian'; 
+% % %     nSmooth = ceil(1/2 * length(fixGrad)); % Smooth with Gaussian filter over half the distance we are trying to smooth
+% % %     model.VS (fixGrad) = smoothdata(model.VS (fixGrad) , smMeth, nSmooth);
+% % %     model.VP (fixGrad) = smoothdata(model.VP (fixGrad) , smMeth, nSmooth);
+% % %     model.rho(fixGrad) = smoothdata(model.rho(fixGrad) , smMeth, nSmooth);
+% % % end
+% % % figure(1); clf; hold on; set(gca, 'ydir', 'reverse'); xlabel('VS'); ylabel('Depth'); box on; grid on; 
+% % % plot(model.VS, model.z); 
+% % % ifplot = true; 
+% % % ifverbose = true; 
+% % % %%%
+
+
 %% =======================================================================
 % % % brb2022.04.02 See if I can execute in ram folder. Sometimes a try catch doesn't permit us to change back to ram folder. 
 % % % wd = pwd;
@@ -70,7 +98,10 @@ if status~=124
     HVr = -1./HVr;
     catch e 
         fprintf('\n%s\n',getReport(e)); 
-        error('some error - check model file layers not too thin!\n')
+        error(['some error - check model file layers not too thin!\n',...
+            'brb2022.05.31 - This can also happen to HV code if ',...
+            'velocities toward base of model become super low. See tests from today.',...
+            'We would want to reject those models anyway...'])
     end
     phV = phV(:);
     grV = grV(:);

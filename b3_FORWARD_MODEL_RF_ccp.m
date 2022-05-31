@@ -31,6 +31,7 @@ if isempty(iccp), return; end
 if isempty(laymodel)
     [zlayt,zlayb,Vslay] = ...
     layerise(model.z,model.VS,par.forc.mindV,0); 
+
     nlay = length(Vslay);
 
     % S to P and rho structure
@@ -81,6 +82,7 @@ if isreal(asind(laymodel.Vs*sind(S_inc)./laymodel.Vs(end))) %
     else
         laymodel_Suse = laymodel;
     end
+
     [predat_sp,tt_sp] = run_propmat(laymodel_Suse,ID,'Sp',samprate, S_inc,...
         par.forc.synthperiod,par.forc.nsamps);
     % pad with zeros

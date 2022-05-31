@@ -5,7 +5,13 @@
 % fig_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/testing/forward_model_breaking/'; 
 % model = model1; 
 
-for imod = [1:100]; 
+%% Use this code to save only what's necessary for testing out the broken model. Saves file space. 
+% saveToPath = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/workspaces/broken_chains_for_zach/'; 
+% save([saveToPath 'breaksPropmat_1.mat'], 'model1', 'par', 'trudata', 'laymodel1', 'predata', 'ID', 'predataPrev', 'Kbase', 'model'); 
+%% 
+
+nFails = 0; 
+for imod = [1:10]; 
     
     if imod ~= 1; 
         [model1,ptbnorm,ifpass,p_bd,Pm_prior1,...
@@ -16,13 +22,32 @@ for imod = [1:100];
     end
     
     try
-        [predata,laymodel1] = b3__INIT_PREDATA(model1,par,trudata,0 );
+%         par.forc.synthperiod = 2; 
+%         par.forc.nsamps = 2048 * 1
+        [predata,laymodel1] = b3__INIT_PREDATA(model1,par,trudata,1 );
     %     [predata,par] = b3_FORWARD_MODEL_BW(model1,laymodel1,par,predata,ID,0,predataPrev);
-        predata = b3_FORWARD_MODEL_RF_ccp(   model1,laymodel1,par,predata,ID,0 );
+        predata = b3_FORWARD_MODEL_RF_ccp(   model1,laymodel1,par,predata,ID,1 );
     %     predata = b3_FORWARD_MODEL_SW_kernel(model1,Kbase,par,predata );
+    
+% Increase velocity of deep stuff. 
+%         model1.VS = model1.VS + linspace(0,1,length(model1.VS))'; 
+%         model1.VP = model1.VP + linspace(0,1,length(model1.VS))'; 
+%         model1.rho= model1.rho+ linspace(0,1,length(model1.VS))'; 
+
+% Try reducing velocity of shallowest sediment. 
+%         nc = 10; % Number of changed indicies. 
+%         model1.VS (1:nc) = model1.VS (1:nc) - linspace(.5,0,nc)'; 
+%         model1.VP (1:nc) = model1.VP (1:nc) - linspace(.5,0,nc)';
+%         model1.rho(1:nc) = model1.rho(1:nc) - linspace(.5,0,nc)';
+
+    
+        [ predata,SW_precise ] = b3_FORWARD_MODEL_SW_precise( model1,par,predata,ID )
+        [Kbase,predata] = b7_KERNEL_RESET(model,Kbase,predata,ID,ii,par,0,SW_precise)
         success_model = true; 
     catch 
         success_model = false; 
+        nFails = nFails + 1; 
+        fprintf('\nFail!\n'); 
     end
         
     figure(1); clf; hold on; set(gcf, 'color', 'white'); 
@@ -54,8 +79,9 @@ for imod = [1:100];
 
     sgtitle(sprintf('elastic (z): success = %1.0f',int16(success_model))); 
     
-    exportgraphics(gcf, ...
-        sprintf('%s%s/model_broke_forward_code_idmod%1.0f.pdf',...
-        fig_path,sub_fold,imod)); 
+%     exportgraphics(gcf, ...
+%         sprintf('%s%s/model_broke_forward_code_idmod%1.0f.pdf',...
+%         fig_path,sub_fold,imod)); 
 
 end
+fprintf('\nNumber of fails: %1.0f\n',nFails)

@@ -72,7 +72,12 @@ end
 
 
 if ifplot
-    figure(1); clf, hold on
+    figure(1); clf, hold on; set(gcf, 'color', 'white'); 
+    box on; 
+    grid on; 
+    xlabel('V'); 
+    ylabel('Z (km)'); 
+    title('Layering of model'); 
     plot(model.VS,model.z,'-ko')
     plot(model.VP,model.z,'-ko')
     zlayp = reshape([laymodel.zlayt';laymodel.zlayb'],2*laymodel.nlay,1);
@@ -81,7 +86,9 @@ if ifplot
     plot(vslayp,zlayp,'-ro')
     plot(vplayp,zlayp,'-ro')
     set(gca,'ydir','reverse','ylim',[0, max(model.z)],'xlim',[0.9*min(model.VS) 1.1*max(model.VP)])
-    set(gcf,'pos',[41   282   729   823]);
+    set(gcf,'pos',[77 1 685 586]);
+    text(6, 150, sprintf('N lay = %1.0f',laymodel.nlay), 'FontSize', 16); 
+%     exportgraphics(gcf, sprintf('%s/layerize.pdf',par.res.resdir))
 end
 
 

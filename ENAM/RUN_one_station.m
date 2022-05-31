@@ -58,7 +58,7 @@ overwrite = true;
 
 % Copy what you want to run here. 
 STAMP_all = {...
-    'all_002',... % } --- End   test to see influence of different data types independently
+    'all_fast',... % } --- End   test to see influence of different data types independently
 }; % This determines which tests we want to run now. They will run sequentially, not in parallel (each station only has one ram folder. )
 
 
@@ -80,8 +80,8 @@ for istamp = [1:length(STAMP_all)];
     %%%%% Important! Must define network and station before runnig this! 
     % If we have not defined network and station, use default US.CEH
     if ~ (exist('network_manual', 'var') && exist('station_manual', 'var')) ; 
-        network_manual = 'TA'; 
-        station_manual = 'S57A'; 
+        network_manual = 'US'; 
+        station_manual = 'CEH'; 
         fprintf('\nReseting to %s.%s\n',network_manual,station_manual)
     end
     disp('Network and station') 

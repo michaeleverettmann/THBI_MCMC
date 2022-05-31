@@ -35,11 +35,14 @@ diary(diaryFile);
 
 %% Fail-safe to restart chain if there's a succession of failures
 fail_chain=20;
+fail_total = 0; 
+iter_fail = []; % Keep track of all iterations where there was an error. Needs to be resisable array, and keep track of previous failures even after resetting a chain. 
 while fail_chain>=20
 
 %%% Initialize several variables. 
 newK = false; % Maybe make true. 
 SW_precise = []; 
+KbasePrev = []; % When this is empty, we've only made kernels once. Can reset to this model if needed. 
 laymodel1 = []; 
 non_acceptk = 0; % How often have we rejected the current baseline model. 
 predataPrev = []; 
@@ -82,23 +85,76 @@ misfit = [];
 par.hkResetInfo = struct('timesReset',0, 'timesSWKernelsReset',0); % Structure to keep track of when to reset HK stacks. 
 
 while ii < par.inv.niter
-    
-save_exit_if_broken = true; 
+       
+save_exit_if_broken = false; % if save_exit_if_broken; warning('Will save and exit chain if there is an error'); end 
 if (save_exit_if_broken) && (fail_chain > 0); 
     save(sprintf('%s/chain_with_broken_something_%s.mat',...
         par.res.resdir,chainstr))
     fail_chain = -100; 
     warning('fail_chain > 0. EXITING INVERSION FOR CHAIN %s',chainstr); 
+    warning('Turn off save_exit_if_broken if you dont want an error to stop the inversion. %s',chainstr); 
     break
 end
     
 ii = ii+1; par.ii = ii; % bb2022.10.18 Keep track of ii in par for easily plotting how inversion is changing with ii. 
 accept_info(ii).fail_chain = fail_chain; 
 
+% % % %%%
+if fail_chain > 0; % Problem -- There are various ways of dealing with this.
+%     fprintf('\nFail chain: %2.0f. ii = %6.0f',fail_chain, ii)
+%%% TODO add in Kbase.numRewinds. If it gets to > 3 or something, go to
+%%% prev Kbase.
+    resetData = false; 
+    failInfoStr = sprintf('\n%s ii=%1.0f Failure. fail_chain = %1.0f, fail_total = %1.0f. ',...
+            chainstr, ii, fail_chain, fail_total); 
+        
+    %%% If early fail
+    earlyFailNum = 75; 
+    if ii < earlyFailNum; % If chain is giving problems this early, just reset it.
+        warning('%sError within first %1.0f iterations. Reseting chain.\n', failInfoStr, earlyFailNum);  
+%         warning([failInfoStr 'Error within first 10 iterations. Reseting chain.']); 
+        fail_chain = 100; fail_total = fail_total + 1; break; 
+    end 
+    
+    %%% If later fail
+    if fail_chain > 15; 
+        if ii - Kbase.itersave > 50; % Last Kbase is probably a decent model
+            warning([failInfoStr 'High fail chain. Reset to last Kbase.']); 
+            model = Kbase.modelk; ii = Kbase.itersave; % Rewind to last model    
+            resetData = true; 
+        else % Last Kbase might also be bad. Go back two models. 
+            if ~isempty(KbasePrev); 
+                warning([failInfoStr 'High fail chain. Reset to last KbasePrev (NOT Kbase).']); 
+                model = KbasePrev.modelk; ii = KbasePrev.itersave; 
+                resetData = true; 
+            else; % We don't know if last Kbase is good, and we only have one Kbase. Just reset the chain: we must not be very far anyway.  
+                warning([failInfoStr 'High fail chain after reset Kbase, but KbasePrev doesnt exist. Resetting chain.']); 
+                fail_chain = 100; fail_total = fail_total + 1; break; 
+            end
+        end
+    end
+    
+    fprintf('\nNow on iteration %1.0f',ii); 
+    iter_fail(end+1) = ii; 
+    
+    if resetData; 
+        predata = b3_FORWARD_MODEL_BW( model,laymodel,par,predata,ID,0,predataPrev); % brb2022.04.12 The arguments to forward_model_bw were in the wrong order. Probaly an old version of the code. 
+        predata = b3_FORWARD_MODEL_RF_ccp( model,laymodel,par,predata,ID,0 );
+        predata = b3_FORWARD_MODEL_SW_kernel( model,Kbase,par,predata );
+        predataPrev = predata; % Keep track of last predata. To keep the previous complete HK stack. 
+        % need to also reset likelihood and misfit to the new, precise data (likelihood may have been artificially high due to kernel forward  calc. approximation - if so, need to undo this, or chain will get stuck once we reset kernels).
+        [log_likelihood,misfit] = b8_LIKELIHOOD_RESET(par,predata,trudata,Kbase,model.datahparm);
+        Pm_prior = calc_Pm_prior(model,par);
+        nchain = 0;
+    end
+    %!%! Code to break chain entirely if reset to many times.     
+end
+% % % %%%
+
 % Maintenance in case folder is getting filled up during last iterations. 
 [~,~]=clean_ram(ii,par,'clearRamInterval',200) % Prevent large amount of files from building up in ram, which can dramatically slow down matlab. If the ram is getting very full, then there is probably a problem!
 if ~strcmp(pwd,par.res.chainExecFold); 
-    warning('Somehow you left the ram folder! This can tremendously slow down code execute. Changing back (note that cd is slow)... Fix it. brb2022.04.02'); 
+    warning('\nSomehow you left the ram folder! This can tremendously slow down code execute. Changing back (note that cd is slow)... Fix it. brb2022.04.02'); 
     cd(par.res.chainExecFold); 
 end
 % END folder maintenance
@@ -130,6 +186,9 @@ if rem(ii,par.inv.Nsavestate)==0
 end
 
 try
+%     if ii == 3; error('Fake'); end % One error at ii = 5
+%     if (ii > 10) && (ii < 20); error('Fake'); end % 10 errors 20 to 30
+%     if (ii > 80) && (ii < 90); error('Fake');  end % 10 errors 20 to 30
     
     %% Figure out if chain is too slow or unstable. 
     % TODO changed from 4 to 1 times par.inv.savepern. So fairly verbose. 
@@ -234,7 +293,7 @@ try
     if ~strcmp('sig',ptb{ii}(1:3)) || isempty(predata) % brb2022.03.06 If not recalculating, we get errors later. 
         % make random run ID (to avoid overwrites in parfor)
 		ID = [chainstr,num2str(ii,'%05.f'),num2str(randi(99),'_%02.f')];
-
+        
         try
             [predata,laymodel1] = b3__INIT_PREDATA(model1,par,trudata,0 );
 % % %             if ii > 5; 
@@ -435,6 +494,7 @@ try
         if newK==true
             fprintf('\nModel changed ptbnorm=%1.3f since last kernel set. Running !=sw_precise and ==kernel_reset at ii=%1.0f.\n',ptbnorm,ii) 
 %             [ predata,SW_precise ] = b3_FORWARD_MODEL_SW_precise( model1,par,predata,ID ); % brb2022.04.06 Now need to do this here since I'm no longer doing it earlier? Check github to verify. 
+            KbasePrev = Kbase; 
             [Kbase,predata] = b7_KERNEL_RESET(model,Kbase,predata,ID,ii,par,0,SW_precise);
             % need to also reset likelihood and misfit to the new, precise data (likelihood may have been artificially high due to kernel forward  calc. approximation - if so, need to undo this, or chain will get stuck once we reset kernels).
 % % %             [log_likelihood,misfit] = b8_LIKELIHOOD_RESET(par,predata,trudata,Kbase,model.datahparm);
@@ -476,6 +536,7 @@ try
     if resetK
         try
             % reset the kernels using the current model
+            KbasePrev = Kbase; 
             [Kbase,predata] = b7_KERNEL_RESET(model,Kbase,predata,ID,ii,par,1);
             fail_reset = 0;
         catch e 

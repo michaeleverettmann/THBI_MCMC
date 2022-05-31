@@ -88,6 +88,7 @@ if isequal(doperiods,rswperiods)
 else
     
     %% interpolate to get kernels and velocities
+    imeth = 'spline'; 
     HVr = interp1(doperiods,HVr_fs,swperiods,imeth);
     phV = interp1(doperiods,phV_fs,swperiods,imeth);
     grV = interp1(doperiods,grV_fs,swperiods,imeth);
