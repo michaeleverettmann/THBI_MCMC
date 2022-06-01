@@ -138,14 +138,20 @@ if fail_chain > 0; % Problem -- There are various ways of dealing with this.
     iter_fail(end+1) = ii; 
     
     if resetData; 
-        predata = b3_FORWARD_MODEL_BW( model,laymodel,par,predata,ID,0,predataPrev); % brb2022.04.12 The arguments to forward_model_bw were in the wrong order. Probaly an old version of the code. 
-        predata = b3_FORWARD_MODEL_RF_ccp( model,laymodel,par,predata,ID,0 );
-        predata = b3_FORWARD_MODEL_SW_kernel( model,Kbase,par,predata );
-        predataPrev = predata; % Keep track of last predata. To keep the previous complete HK stack. 
-        % need to also reset likelihood and misfit to the new, precise data (likelihood may have been artificially high due to kernel forward  calc. approximation - if so, need to undo this, or chain will get stuck once we reset kernels).
-        [log_likelihood,misfit] = b8_LIKELIHOOD_RESET(par,predata,trudata,Kbase,model.datahparm);
-        Pm_prior = calc_Pm_prior(model,par);
-        nchain = 0;
+        try; 
+            predata = b3_FORWARD_MODEL_BW( model,laymodel,par,predata,ID,0,predataPrev); % brb2022.04.12 The arguments to forward_model_bw were in the wrong order. Probaly an old version of the code. 
+            predata = b3_FORWARD_MODEL_RF_ccp( model,laymodel,par,predata,ID,0 );
+            predata = b3_FORWARD_MODEL_SW_kernel( model,Kbase,par,predata );
+            predataPrev = predata; % Keep track of last predata. To keep the previous complete HK stack. 
+            % need to also reset likelihood and misfit to the new, precise data (likelihood may have been artificially high due to kernel forward  calc. approximation - if so, need to undo this, or chain will get stuck once we reset kernels).
+            [log_likelihood,misfit] = b8_LIKELIHOOD_RESET(par,predata,trudata,Kbase,model.datahparm);
+            Pm_prior = calc_Pm_prior(model,par);
+            nchain = 0;
+            fail_chain = 0; 
+        catch 
+            warning('You should always be able to rewind to a model and run all forward modelling on it. A model wasnt accepted if we couldnt run the forward modelling. What is happening?. We simply have to exit the inversion.'); 
+            fail_chain = - 100; break;
+        end
     end
     %!%! Code to break chain entirely if reset to many times.     
 end
@@ -223,28 +229,28 @@ try
         end
     end
     
-    %%% Kill chain if too slow. 
-    if avgTime > 1; % Things are running really slow... why? Might want to restart, unless we are at the beginning of iterations. 
-%         if ~feature('IsDebugMode'); % Don't break slow chains if we are debugging. 
-        tScaleKill = 1; 
-        tryKeeping = ((ii - par.inv.burnin)/par.inv.saveperN) >= 200; 
-        toBreak = ( (avgTime > 20  * tScaleKill ) && (ii > 3   ) ) || ...
-                  ( (avgTime > 7   * tScaleKill ) && (ii > 20  ) ) || ...
-                  ( (avgTime > 3.5 * tScaleKill ) && (ii > 200 ) ) || ...
-                  ( (avgTime > 2   * tScaleKill ) && (ii > 500 ) ) || ...
-                  ( (avgTime > 1.2 * tScaleKill ) && (ii > 1000) ); % Things should be going smoothly by now and always take ~ .6 s. However, there might be a time where mineos runs a few times and makes a good chain seem slow: maybe averaging over just 100 iterations could make us reject an otherwise ok chain. 
-        if toBreak && tryKeeping; 
-            fprintf('\nExecution too slow. Aborting (and keeping chain) %s ii=%1.0f, avg time last 100 iter = %1.2f\n',...
-                chainstr,ii,avgTime); 
-            fail_chain = -100; break; 
-        elseif toBreak; 
-            fprintf('\nExecution to slow. Resetting %s ii=%1.0f, avg time last 100 iter = %1.2f\n',...
-                chainstr,ii,avgTime);
-            fail_chain =  100;  break; 
-        end  
-%         end
-    end
-    %%% End Figure out if chain is too slow or unstable. 
+% % %     %%% Kill chain if too slow. 
+% % %     if avgTime > 1; % Things are running really slow... why? Might want to restart, unless we are at the beginning of iterations. 
+% % % %         if ~feature('IsDebugMode'); % Don't break slow chains if we are debugging. 
+% % %         tScaleKill = 1; 
+% % %         tryKeeping = ((ii - par.inv.burnin)/par.inv.saveperN) >= 200; 
+% % %         toBreak = ( (avgTime > 20  * tScaleKill ) && (ii > 3   ) ) || ...
+% % %                   ( (avgTime > 7   * tScaleKill ) && (ii > 20  ) ) || ...
+% % %                   ( (avgTime > 3.5 * tScaleKill ) && (ii > 200 ) ) || ...
+% % %                   ( (avgTime > 2   * tScaleKill ) && (ii > 500 ) ) || ...
+% % %                   ( (avgTime > 1.2 * tScaleKill ) && (ii > 1000) ); % Things should be going smoothly by now and always take ~ .6 s. However, there might be a time where mineos runs a few times and makes a good chain seem slow: maybe averaging over just 100 iterations could make us reject an otherwise ok chain. 
+% % %         if toBreak && tryKeeping; 
+% % %             fprintf('\nExecution too slow. Aborting (and keeping chain) %s ii=%1.0f, avg time last 100 iter = %1.2f\n',...
+% % %                 chainstr,ii,avgTime); 
+% % %             fail_chain = -100; break; 
+% % %         elseif toBreak; 
+% % %             fprintf('\nExecution to slow. Resetting %s ii=%1.0f, avg time last 100 iter = %1.2f\n',...
+% % %                 chainstr,ii,avgTime);
+% % %             fail_chain =  100;  break; 
+% % %         end  
+% % % %         end
+% % %     end
+% % %     %%% End Figure out if chain is too slow or unstable. 
     %%
    
     % temperature - for perturbation scaling and likelihood increase
