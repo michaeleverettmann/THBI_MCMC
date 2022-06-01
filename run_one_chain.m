@@ -98,6 +98,7 @@ end
     
 ii = ii+1; par.ii = ii; % bb2022.10.18 Keep track of ii in par for easily plotting how inversion is changing with ii. 
 accept_info(ii).fail_chain = fail_chain; 
+accept_info(ii).fail_total = fail_total; 
 
 % % % %%%
 if fail_chain > 0; % Problem -- There are various ways of dealing with this.
@@ -105,7 +106,8 @@ if fail_chain > 0; % Problem -- There are various ways of dealing with this.
 %%% TODO add in Kbase.numRewinds. If it gets to > 3 or something, go to
 %%% prev Kbase.
     resetData = false; 
-    failInfoStr = sprintf('\n%s ii=%1.0f Failure. fail_chain = %1.0f, fail_total = %1.0f. ',...
+    failInfoStr = sprintf(['',...
+        '%s ii=%1.0f Failure. fail_chain = %1.0f, fail_total previously = %1.0f. '],...
             chainstr, ii, fail_chain, fail_total); 
         
     %%% If early fail
@@ -113,23 +115,28 @@ if fail_chain > 0; % Problem -- There are various ways of dealing with this.
     if ii < earlyFailNum; % If chain is giving problems this early, just reset it.
         warning('%sError within first %1.0f iterations. Reseting chain.\n', failInfoStr, earlyFailNum);  
 %         warning([failInfoStr 'Error within first 10 iterations. Reseting chain.']); 
-        fail_chain = 100; fail_total = fail_total + 1; break; 
+        fail_chain = 100; 
+        fail_total = fail_total + 1; break; 
     end 
     
     %%% If later fail
     if fail_chain > 15; 
+        fprintf('\n :(   :(   :(   :(   :(   :(   :(   :(   :(   :(   \n'); 
         if ii - Kbase.itersave > 50; % Last Kbase is probably a decent model
             warning([failInfoStr 'High fail chain. Reset to last Kbase.']); 
             model = Kbase.modelk; ii = Kbase.itersave; % Rewind to last model    
             resetData = true; 
+            fail_total = fail_total + 1; 
         else % Last Kbase might also be bad. Go back two models. 
             if ~isempty(KbasePrev); 
                 warning([failInfoStr 'High fail chain. Reset to last KbasePrev (NOT Kbase).']); 
                 model = KbasePrev.modelk; ii = KbasePrev.itersave; 
                 resetData = true; 
+                fail_total = fail_total + 1; 
             else; % We don't know if last Kbase is good, and we only have one Kbase. Just reset the chain: we must not be very far anyway.  
                 warning([failInfoStr 'High fail chain after reset Kbase, but KbasePrev doesnt exist. Resetting chain.']); 
-                fail_chain = 100; fail_total = fail_total + 1; break; 
+                fail_chain = 100; 
+                fail_total = fail_total + 1; break; 
             end
         end
     end
@@ -139,6 +146,8 @@ if fail_chain > 0; % Problem -- There are various ways of dealing with this.
     
     if resetData; 
         try; 
+            fprintf(['\n *********************************************** \n',...
+                'Trying to reset data according to previous Kbase.\n'])
             predata = b3_FORWARD_MODEL_BW( model,laymodel,par,predata,ID,0,predataPrev); % brb2022.04.12 The arguments to forward_model_bw were in the wrong order. Probaly an old version of the code. 
             predata = b3_FORWARD_MODEL_RF_ccp( model,laymodel,par,predata,ID,0 );
             predata = b3_FORWARD_MODEL_SW_kernel( model,Kbase,par,predata );
@@ -207,9 +216,10 @@ try
     ifpass = false;
     newK = false; resetK = false;
     if fail_chain>19
+        fail_total = fail_total + 1;
         % if not enough saved in this chain, abort and restart
         if (ii - par.inv.burnin)/par.inv.saveperN < 200
-            fprintf('\nBreak chain -- spot a1\n')
+            fprintf('\nBreak chain -- spot a1\n') 
             break
         % if enough saved in chain, abort and keep the incomplete chain
         else
@@ -218,6 +228,7 @@ try
         end
     end
     if fail_reset>5
+        fail_total = fail_total + 1; 
         % if cannot reset kernels because current saved model is not viable
         if (ii - par.inv.burnin)/par.inv.saveperN < 200
             fprintf('\nBreak chain -- spot a3\n')
@@ -241,11 +252,13 @@ try
 % % %                   ( (avgTime > 1.2 * tScaleKill ) && (ii > 1000) ); % Things should be going smoothly by now and always take ~ .6 s. However, there might be a time where mineos runs a few times and makes a good chain seem slow: maybe averaging over just 100 iterations could make us reject an otherwise ok chain. 
 % % %         if toBreak && tryKeeping; 
 % % %             fprintf('\nExecution too slow. Aborting (and keeping chain) %s ii=%1.0f, avg time last 100 iter = %1.2f\n',...
-% % %                 chainstr,ii,avgTime); 
+% % %                 chainstr,ii,avgTime);
+% % %             fail_total = fail_total + 1;
 % % %             fail_chain = -100; break; 
 % % %         elseif toBreak; 
 % % %             fprintf('\nExecution to slow. Resetting %s ii=%1.0f, avg time last 100 iter = %1.2f\n',...
 % % %                 chainstr,ii,avgTime);
+% % %             fail_total = fail_total + 1;
 % % %             fail_chain =  100;  break; 
 % % %         end  
 % % % %         end
@@ -572,6 +585,7 @@ catch e % e is an MException struct
     fail_chain = fail_chain+1;
     fprintf('\nbrb Main master par catch: %s\n',getReport(e)); 
     fprintf('\nfail_chain = %1.0f',fail_chain); 
+    fprintf('\n--------------------------------------------------\n\n\n'); 
 end % on try-catch
 
 if newK||resetK, delete_mineos_files(ID,'R'); end
