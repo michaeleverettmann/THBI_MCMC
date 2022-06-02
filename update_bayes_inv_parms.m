@@ -294,16 +294,16 @@ elseif strcmp(stamp, 'HK_faster');
     par.inv.nchains                   = 2    ;  
 elseif strcmp(stamp, 'all_fast'); 
     par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
-    par.inv.niter                     = 600  ; 
-    par.inv.burnin                    = 200  ; 
-    par.inv.cooloff                   = 150  ; 
+    par.inv.niter                     = 1000  ; 
+    par.inv.burnin                    = 400  ; 
+    par.inv.cooloff                   = 300  ; 
     par.inv.nchains                   = 16    ; 
 elseif strcmp(stamp, 'all_faster'); 
     par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
     par.inv.niter                     = 500  ; 
     par.inv.burnin                    = 100  ; 
     par.inv.cooloff                   = 80   ; 
-    par.inv.nchains                   = 1    ; 
+    par.inv.nchains                   = 4    ; 
 
     
 end
