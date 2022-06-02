@@ -15,7 +15,8 @@ Pm_prior = 1;
 %% Crustal thickness
 try
     Pm_prior = Pm_prior*par.mod.crust.h_pprior(model.zmoh-model.zsed);
-catch
+catch e 
+    fprintf('\n%s\n',getReport(e)); 
     if par.inv.verbose
         fprintf(' >> Model prior prob not being calculated for crust h <<\n');
     end
@@ -24,7 +25,8 @@ end
 %% Crustal Vp/Vs
 try
     Pm_prior = Pm_prior*par.mod.crust.vpvs_pprior(model.vpvs);
-catch
+catch e 
+    fprintf('\n%s\n',getReport(e)); 
     if par.inv.verbose
         fprintf(' >> Model prior prob not being calculated for crust vpvs <<\n');
     end

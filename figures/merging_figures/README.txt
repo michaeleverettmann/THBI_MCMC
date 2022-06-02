@@ -1,0 +1,1 @@
+compre-*.svg is an example of relative linking to several files (their locations are shown in prep-raw-figs.bash) and merging the files in inkscape. They have to be raster files though. prep-raw-figs.bash is an example of how to convert .pdf files that we want, and put them in a nice organized folder. . )

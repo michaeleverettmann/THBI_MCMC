@@ -16,6 +16,8 @@ if nargin < 5 || isempty(ifnorm)
     ifnorm=true;
 end
 
+boxLineWidth = 1.75; 
+titleSize = 20; 
 xlims = [-3 31;-31 3]; %[P;S]
 
 dtypes = fieldnames(predata);
@@ -23,26 +25,40 @@ dtypes(strcmp(dtypes,'SW')) = [];
 
 
 figure(58),clf,set(gcf,'pos',[44 150 1500 1100])
-ax1 = axes('position',[0.03 0.69 0.21 0.27]); hold on
-ax2 = axes('position',[0.03 0.39 0.21 0.27]); hold on
-ax3 = axes('position',[0.27 0.69 0.21 0.27]); hold on
-ax4 = axes('position',[0.27 0.39 0.21 0.27]); hold on
-ax5 = axes('position',[0.52 0.69 0.21 0.27]); hold on
-ax6 = axes('position',[0.52 0.39 0.21 0.27]); hold on
-ax7 = axes('position',[0.76 0.69 0.21 0.27]); hold on
-ax8 = axes('position',[0.76 0.39 0.21 0.27]); hold on
-ax9 = axes('position',[0.03 0.05 0.28 0.26]); hold on
-ax10 = axes('position',[0.36 0.05 0.28 0.26]); hold on
-ax11 = axes('position',[0.69 0.05 0.28 0.26]); hold on
+ax1  = axes('position',[0.05 0.69 0.20 0.26]); hold on % Ps? 
+ax2  = axes('position',[0.05 0.39 0.20 0.26]); hold on % Sp? 
+ax3  = axes('position',[0.28 0.69 0.20 0.15 ]); hold on % Sp, HK present I guess. 
+ax4  = axes('position',[0.28 0.39 0.20 0.15 ]); hold on % Sp, parent pulse. 
+ax5  = axes('position',[0.51 0.69 0.20 0.26]); hold on
+ax6  = axes('position',[0.51 0.39 0.20 0.26]); hold on
+ax7  = axes('position',[0.72 0.69 0.20 0.26]); hold on
+ax8  = axes('position',[0.72 0.39 0.20 0.26]); hold on
 
-if any(strcmp(fieldnames(trudata),'HKstack_P'))
-    ax12 = axes('pos',[axpos(ax2,[1,2,3]) sum(axpos(ax1,[2,4]))-axpos(ax2,2)]); hold on
-    delete([ax1,ax2]);
+ax9  = axes('position',[0.05 0.05 0.24 0.21]); hold on % Rayleigh 
+ax10 = axes('position',[0.36 0.05 0.24 0.21]); hold on % Love
+ax11 = axes('position',[0.67 0.05 0.24 0.21]); hold on % HV
+
+axs=[ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9,ax10,ax11];
+for iaxs = [1:length(axs)]; 
+    set(axs(iaxs), 'Box', 'on'); 
+    set(axs(iaxs), 'linewidth', boxLineWidth); 
 end
 
 
-axs=[ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9,ax10,ax11];
+if any(strcmp(fieldnames(trudata),'HKstack_P'))
+%     ax12 = axes('pos',[axpos(ax2,[1,2,3]) sum(axpos(ax1,[2,4]))-axpos(ax2,2)]); hold on % HK
+    ax12  = axes('position',[0.05 0.39 0.20 0.4]); hold on % Ps? 
+    delete([ax1,ax2]);
+    set(ax12, 'Box', 'on'); 
+    set(ax12, 'linewidth', boxLineWidth); 
+    axs=[ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9,ax10,ax11];
+end
 
+% % % 
+% % % for iaxs = [1:length(axs)]; 
+% % %     set(axs(iaxs), 'Box', 'on'); 
+% % %     set(axs(iaxs), 'linewidth', 2); 
+% % % end
 
 for id = 1:length(dtypes)
 dtype = dtypes{id};
@@ -63,7 +79,7 @@ switch pdtyp{1}
     set(ax,'fontsize',15)
     xlabel(ax,'Period (s)','fontsize',18)
     ylabel(ax,ylabstr,'fontsize',18)
-    title(ax,['SW-',pdtyp{2}],'fontsize',22)
+    title(ax,['SW-',pdtyp{2}],'fontsize',titleSize)
 
 %% BWs
     case {'BW','RF'}
@@ -110,28 +126,34 @@ switch pdtyp{1}
         set(xa2,'xlim',xlims(ps,:),...
                 'ylim',0.7*xsv*[-1 1],...
                 'fontsize',13)
-        title(xa1, regexprep(dtype,'_','-'),'fontsize',22)
+        title(xa1, regexprep(dtype,'_','-'),'fontsize',titleSize)
         xlabel(xa2, sprintf('Time from %s arrival',pdtyp{2}(1)),'fontsize',18)
         
         if strcmp(pdtyp{3},'ccp')
             set([xa1,xa2],'xlim',minmax(trudata.(dtype)(itr).zz')); 
-            xlabel(xa2,'Depth of conversion (km)','fontsize',18)
+            xlabel([xa1,xa2],'Depth of conversion (km)','fontsize',18)
         end
     
     end
     
 %% HKstack        
     case {'HKstack'}
-        contourf(ax12,trudata.(dtype).K,trudata.(dtype).H,trudata.(dtype).Esum',30,'linestyle','none');
+%         contourf(ax12,trudata.(dtype).K,trudata.(dtype).H,trudata.(dtype).Esum',30,'linestyle','none');
+%         axis(ax12); 
+%         box on;         
+        [~,contH] = contourf(ax12,predata.(dtype).Kgrid,predata.(dtype).Hgrid,...
+            predata.(dtype).Esum',30,'linestyle','none'); % Use final_predata to get the HK stack estimated with our velocity model. 
+%         uistack(cntr,'top')
         colorbar(ax12,'southoutside')
+%         colorbar(ax12,'south')
         
         plot(predata.HKstack_P.K,predata.HKstack_P.H,'ok','linewidth',2,...
             'markerfacecolor','r','markersize',7)
         
-        title(ax12, regexprep(dtype,'_','-'),'fontsize',22)
+        title(ax12, regexprep(dtype,'_','-'),'fontsize',titleSize)
         xlabel(ax12, 'Vp/Vs ratio','fontsize',16)
         ylabel(ax12, 'Moho depth','fontsize',16)
-        set(ax12,'fontsize',13,'ydir','reverse')
+        set(ax12,'ydir','reverse')
     
     
 end

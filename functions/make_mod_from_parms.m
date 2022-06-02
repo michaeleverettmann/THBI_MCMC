@@ -35,11 +35,14 @@ mminz = cmaxz;
 mmaxz = par.mod.maxz + model.selev; 
 zm = unique([mminz:par.mod.dz:mmaxz,mmaxz])';
 
+% try
 vs_mantle = sum(mpm.splines*diag(mpm.VS_sp),2);
 vp_mantle = mantle_vs2vp(vs_mantle,zm );
 rho_mantle = mantle_vs2rho(vs_mantle,zm );
 xi_mantle = mpm.xi*ones(size(zm));
-
+% catch e % Temporary...
+%     error(getReport(e)); 
+% end
 
 %% COLLATE
 zz = [zs;zc;zm];
@@ -68,6 +71,7 @@ model.fdVSsed = 100*diff(vs(zz==zsed))./mean(vs(zz==zsed)); if zsed==0, model.fd
 model.fdVSmoh = 100*diff(vs(zz==zmoh))./mean(vs(zz==zmoh));
 model.Sanis = 100*(xi-1); % in percentage 
 model.Panis = zeros(Nz,1);
+% model.Panis = 100*(phi-1); warning('Trying P anis')
 
 % re-order fields of model structure 
 forder ={'z','z0','VS','VP','rho','Nz','zsed','zmoh','vpvs','cxi','mxi','selev',...

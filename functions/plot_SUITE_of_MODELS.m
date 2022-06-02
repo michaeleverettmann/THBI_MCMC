@@ -7,7 +7,7 @@ if nargin<3 || isempty(ifsave)
     ifsave = false; % default is not to save
 end
 if nargin<4 || isempty(ofile)
-    ofile = 'figs/suite_of_models_fig.pdf';
+    ofile = 'figs/suite_of_models_fig.png';
 end
 
 sm = suite_of_models;
@@ -94,7 +94,8 @@ plot(ax2,vp,Z,'-r','Linewidth',1.5);
 %% SAVE
 if ifsave
     fprintf('   saving fig\n')
-    save2pdf(85,ofile,'/');
+%     save2pdf(85,ofile,'/');
+    exportgraphics(figure(85), ofile); 
 end
 
 end

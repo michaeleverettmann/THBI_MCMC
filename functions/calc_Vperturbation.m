@@ -11,6 +11,22 @@ if nargin <3 || isempty(ifplot)
     ifplot=false;
 end
 
+%% (brb2022.05.18 - updated to fix glitch with array sizes) Still testing. 
+% modptb has to have the same z as model1. But model0 sometimes has
+% different z. Resample model0 z onto model1, so we can an approximation of
+% perterbation values at each depth.
+% fprintf('\nOld nz: %1.0f',model0.Nz); %!%! Remove. For testing. 
+[unique_z, iz, ~] = unique(model0.z,'first'); % Aim to find duplicate z values. Next we change them, for interp1. 
+index_to_dupes = find(not(ismember(1:numel(model0.z),iz))); % Should give second occurance of each(?) duplicated value. 
+model0.z(index_to_dupes) = model0.z(index_to_dupes) + 0.0001; % Shift duplicated Z values down slightly so that we can use interp1. This code should do nothing if there are no duplicates.  
+each_param = {'Panis', 'Sanis', 'rho', 'VP', 'VS', 'z0', 'z'}; % List all parameters in model that have nz values. 
+for i_param = [1:length(each_param)]; 
+    param = each_param{i_param}; 
+    model0.(param) = interp1(model0.z, model0.(param), model1.z); % Resample model0. parameters to the model1.z depths. 
+end
+model0.Nz = length(model0.z); 
+% fprintf('New nz: %1.0f\n',model1.Nz); %!%! Remove. For testing. 
+
 %% Radial anisotropy
 xi0  = 1 + model0.Sanis/100;  % assumes Sanis is a percentage of anis about zero
 phi0 = 1 + model0.Panis/100;  % assumes Panis is a percentage of anis about zero
@@ -50,7 +66,7 @@ if length(zbothi0)~=length(zbothi1)
         end
     end
 end
-if ~isequal(zz0(zbothi0),zz1(zbothi1))
+if ~isequal(zz0(zbothi0),zz1(zbothi1)) % Because estimated dV for multiplying with surface waves kernels will not make sense if there are different depth vector lengths? I dont know... brb2022.05.19
     error('something wrong with indices'); 
 end
 

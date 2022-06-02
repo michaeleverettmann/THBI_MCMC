@@ -33,7 +33,7 @@ if nargin < 6 || isempty(ifverbose)
     ifverbose = true;
 end
 if nargin < 7 || isempty(maxrunN) 
-    maxrunN = 5e2; 
+    maxrunN = 100; 
 end
 
 %% parameters
@@ -73,6 +73,45 @@ qmod= parm.qmodpath;
 
 %% =======================================================================
 wd = pwd;
+
+%%% TEMPORARY model adjustment
+%% Could try upsampling and using more layers. Would mineos work better
+%% that way when there is really complicated structure? Not working yet. 
+% newZ = linspace(min(model.z), max(model.z), 2*length(model.z))'; 
+% model.VS = interp1(model.z, model.VS, newZ); 
+% model.VP = interp1(model.z, model.VP, newZ); 
+% model.z = newZ; 
+% % % %%% TEMPORARY model adjustment again. 
+% % % absRoughness = inf;
+% % % zMaxSmooth = 10; % Smooth over top this many km of model if needed. Will add 5 to this in while loop. 
+% % % maxAbsRoughness = .2; % average absolute roughness of model that is tolerable. 
+% % % while absRoughness > maxAbsRoughness; 
+% % %     zMaxSmooth = zMaxSmooth + 5; 
+% % %     
+% % %     fixGrad = find(model.z<=zMaxSmooth); 
+% % %     vsGrad = (model.VS(fixGrad+1) - model.VS(fixGrad)) ./ (model.z(fixGrad+1) - model.z(fixGrad)); 
+% % %     absRoughness = sum(abs(vsGrad)); % If this number were 1, that would mean we change 1 km/s per km on average. That would be rediculous over 15 km in terms of what we can resolve. 
+% % %     
+% % %     if absRoughness < maxAbsRoughness; 
+% % %         break; 
+% % %     end
+% % %     if zMaxSmooth > 25 ; % Otherwise this goes on forever. 
+% % %         break 
+% % %     end
+% % %     
+% % %     
+% % %     fprintf('\nSmoothing Mineos velocities above %1.1f km. absRoughness was %1.2f\n',zMaxSmooth,absRoughness)
+% % %     smMeth = 'gaussian'; 
+% % %     nSmooth = ceil(1/2 * length(fixGrad)); % Smooth with Gaussian filter over half the distance we are trying to smooth
+% % %     model.VS (fixGrad) = smoothdata(model.VS (fixGrad) , smMeth, nSmooth);
+% % %     model.VP (fixGrad) = smoothdata(model.VP (fixGrad) , smMeth, nSmooth);
+% % %     model.rho(fixGrad) = smoothdata(model.rho(fixGrad) , smMeth, nSmooth);
+% % % end
+% % % figure(1); clf; hold on; set(gca, 'ydir', 'reverse'); xlabel('VS'); ylabel('Depth'); box on; grid on; 
+% % % plot(model.VS, model.z); 
+% % % ifplot = true; 
+% % % ifverbose = true; 
+% % % %%%
 
 
 %% write MINEOS executable and input files format
@@ -122,6 +161,8 @@ writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
 fileattrib(execfile, '+x'); 
 [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % make sure your system can see your timeout function
+[errorInfo]=assess_timeout_results(status, cmdout); 
+%brb2022.04.05 Changing from 100s timeout to 15s. 
 
 delete(execfile,modefile); % kill files we don't need
 
@@ -140,7 +181,7 @@ while Tmin > min(swperiods)
 lrun = lrun + 1; lrunstr = num2str(lrun);
 lmin = llast + parm.l_increment_standard;
 
-if ifverbose
+if (ifverbose) || (lrun > 10); 
     fprintf('\n        %4u modes done, failed after mode %u... restarting at %u. Run=%1.0f',max(round(llast-lfirst+1)),llast,lmin,lrun)
 end
 
@@ -161,6 +202,8 @@ writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
 fileattrib(execfile, '+x'); 
 [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % run execfile 
+[errorInfo]=assess_timeout_results(status, cmdout); 
+%brb2022.04.05 Changing from 100s timeout to 15s. 
 
 delete(execfile,modefile); % kill files we don't need
 
@@ -187,7 +230,7 @@ if ifplot
     readMINEOS_ascfile(ascfiles,ifplot,skiplines);
 end
 
-if ifverbose
+if (ifverbose) || (lrun > 10)
      fprintf(' success!\n')
 end
 
@@ -199,7 +242,9 @@ for ief = 1:length(eigfiles)-1
     
     fileattrib(execfile, '+x'); 
     [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % run execfile 
-    
+    [errorInfo]=assess_timeout_results(status, cmdout); 
+    %brb2022.04.05 Changing from 100s timeout to 15s. 
+
     eigfiles_fix{ief} = [eigfiles{ief},'_fix'];
     delete(execfile);
 end
@@ -210,6 +255,8 @@ writeMINEOS_Qexecfile( qexecfile,eigfiles_fix,qmod,[ID,'.q'],[ID,'.log'] )
 
 fileattrib(qexecfile, '+x'); 
 [status,cmdout] = system([paths.timeout ' 100 ./',qexecfile]); % run qexecfile 
+[errorInfo]=assess_timeout_results(status, cmdout); 
+%brb2022.04.05 Changing from 100s timeout to 15s. 
 
 
 delete(qexecfile);
@@ -219,7 +266,9 @@ try
 %     disp([ID,'.q'])
 %     disp(swperiods)
     [phV,grV] = readMINEOS_qfile([ID,'.q'],swperiods);
-catch
+catch e 
+    warning('Cant read Mineos files. Did timeout not finish?')
+    fprintf('\n%s\n',getReport(e)); 
     error('some error with extracting phV and grV from q-file')        
 end
   
@@ -243,6 +292,7 @@ cd(wd);
 %% plot
 if ifplot
     figure(88), clf; set(gcf,'pos',[331 385 848 613]);
+    set(gcf, 'color', 'white'); 
     ax1 = axes; hold on;
     % dispersion curves
     hd(1)=plot(ax1,swperiods,phV,'o-','linewidth',2);
@@ -252,6 +302,7 @@ if ifplot
     set(ax1,'fontsize',16)
     xlabel(ax1,'Period (s)','interpreter','latex','fontsize',22)
     ylabel(ax1,'Velocity (km/s)','interpreter','latex','fontsize',22)
+    box on; 
 end
 
 if ifverbose

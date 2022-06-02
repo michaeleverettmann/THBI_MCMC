@@ -1,13 +1,12 @@
-% function RUN_one_station(net, sta) % Can comment out the function part of this and run as normal script, if you define net and sta. But have to move run_param
-%
-
-
 %% specify details of this run
 generation = 1; % generation of solution and data processing
 gc = 1;
 BWclust = 1;
+onesta = '';
+overwrite = true;
+
 % STAMP = 'ENAM_trial';
-STAMP_all = {...
+% STAMP_all = {...
 %       'adding_sediment_pt1',...
 %     'h_kappa_tests/degree_of_freedom/4',...
 %     'h_kappa_tests/degree_of_freedom/9',...
@@ -36,20 +35,38 @@ STAMP_all = {...
 %     'HKappa_005',...
 %     'HKappa_006',...
 %     'HKappa_007',...
-    'all_001',...
+%     'all_002',...
+%     'all_no_hv',...
 %     'prior_sigma_10_min_sigma_3',...
-    }; % This determines which tests we want to run now. They will run sequentially, not in parallel (each station only has one ram folder. )
+%     'SSA_2022_v2',...
+%     'SW_Ray_phV_only',...  % { --- Start test to see influence of different data types independently
+%     'SW_Lov_phV_only',...  % ...
+%     'RF_Sp_ccp_only' ,...  % ...
+%     'HKstack_P_only' ,...  :q!
+%     'SW_HV_only'     ,...  % } --- End   test to see influence of different data types independently
+%     'SW_Ray_phV_only_one_chain',...  % { --- Start test to see influence of different data types independently
+%     'SW_Lov_phV_only_one_chain',...  % ...
+%     'RF_Sp_ccp_only_one_chain' ,...  % ...
+%     'HKstack_P_only_one_chain' ,...  :q!
+%     'SW_HV_only_one_chain'     ,...  % } --- End   test to see influence of different data types independently
+%     'all_demo'       ,...
+%     'HK_fast'   ,...
+%     'SW_HV_fast' ,...
+%     'HK_faster',...
+%     'all_fast',...
+% }; % This determines which tests we want to run now. They will run sequentially, not in parallel (each station only has one ram folder. )
 
-% Need to do something like this. 
+% Copy what you want to run here. 
+STAMP_all = {...
+    'all_faster',... % } --- End   test to see influence of different data types independently
+}; % This determines which tests we want to run now. They will run sequentially, not in parallel (each station only has one ram folder. )
 
-% % stamp_vals = {...
-% %     {'prior-sigma_min-sigma_', [0.3, 0.1]}, }
-% Then run bayes. 
-% Then immediately after, run update...
 
-onesta = '';
 
-overwrite = true;
+
+% if exist('STAMP', 'var'); % If we defined this already in a bash script, then only run that stamp. Otherwise, go through the list of stamps above. 
+%     STAMP_all = {STAMP}; 
+% end
 
 for istamp = [1:length(STAMP_all)]; 
     STAMP = STAMP_all{istamp}; 
@@ -63,8 +80,9 @@ for istamp = [1:length(STAMP_all)];
     %%%%% Important! Must define network and station before runnig this! 
     % If we have not defined network and station, use default US.CEH
     if ~ (exist('network_manual', 'var') && exist('station_manual', 'var')) ; 
-        network_manual = 'US'; disp('resetting to US.CEH')
-        station_manual = 'CEH'; disp('resetting to US.CEH')
+        network_manual = 'US'; 
+        station_manual = 'CEH'; 
+        fprintf('\nReseting to %s.%s\n',network_manual,station_manual)
     end
     disp('Network and station') 
     disp(network_manual) 
@@ -80,7 +98,8 @@ for istamp = [1:length(STAMP_all)];
     %% load project, station, and request details and request details
     try
         load([proj.dir,'/project_details.mat']);
-    catch
+    catch e 
+        fprintf('\n%s\n',getReport(e)); 
         run([proj.dir,'/project_details.m']);
     end
     load([proj.infodir,'stations.mat']); % bb2021.09.28 Get this using evdata1_database.m
@@ -101,7 +120,7 @@ for istamp = [1:length(STAMP_all)];
 
     %% ==================  LOOP OVER STATIONS IN DB  ================== 
     % No, actually just find the right station and run it. 
-    for is = tempStaInd; disp('Only doing 1 station right now!!!!')
+    for is = tempStaInd; 
 
         if exist('onesta') && ~isempty(onesta)
             if ~strcmp(stainfo.stas{is},onesta), continue; end
@@ -116,7 +135,6 @@ for istamp = [1:length(STAMP_all)];
 
         % do the work (and make all the Mineos files) in a workdir
         if exist('workdir','dir')~=7, mkdir('workdir'); end
-    %     cd('workdir')
         cd(proj.dir)
 
         execute_MASTER_par
@@ -127,6 +145,10 @@ for istamp = [1:length(STAMP_all)];
 end
 
 function execute_MASTER_par
+%     try
     MASTER_par;
+%     catch e
+%         fprintf('Cant execute master_par.m. %s\n%s','(todo put stamp here)',getReport(e)) 
+%     end
 end
 % end

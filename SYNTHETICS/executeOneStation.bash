@@ -5,7 +5,7 @@
 #SBATCH --time=30:00:00   # bb2021.11.17 Might have to refine this, just to make sure a failed run will be terminated at a decent time.             # Time limit hrs:min:sec
 ##SBATCH --nice=10 # bb2021.11.17 Be nice to the other researchers and let their scripts take some precedence. Not in use right now, will be once I really start things. 
 ## SBATCH --output=batch/run_info/slurm.%j.out
-#SBATCH --oversubscribe
+##SBATCH --oversubscribe
 
 # Below things might not be needed. 
 ##SBATCH --mem=2G #bb2021.11.17 default option on Bellows is unlimited (try scontrol show config). So for Bellows, we do not need to specify this (I think)                     # Total memory limit

@@ -88,7 +88,10 @@ if ifverbose
     fprintf('    > Calculting kernels from MINEOS output \n    > Will take some time...')
 end
 %tic
-[status,cmdout] = system([paths.timeout ' 100 ./',execfile_k]); % TODOPATH bb2021.09.13, didn't double check replacement worked here. 
+[status,cmdout] = system([paths.timeout ' 150 ./',execfile_k]); 
+[errorInfo]=assess_timeout_results(status, cmdout);
+%brb2022.04.05 Changing from 100s timeout to 15s. 
+
 
 %fprintf('Kernel computation itself %s%s took %.5f s\n',ID,parm.R_or_L(1),toc)
 if ifverbose

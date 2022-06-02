@@ -197,410 +197,41 @@ if profileRun;  % Start profiling parfor iterations, where most calculations hap
     mpiprofile on; 
 end
 
-mainDir = [paths.execPath '/' nwk '_' sta]; % Keep track of where the main folder is, where we want to return after changing directory back from ram drive. 
+% mainDir = [paths.execPath '/' nwk '_' sta]; % Keep track of where the main folder is, where we want to return after changing directory back from ram drive. 
 % TODO might cause problems to change to new directory because of prior.mat (which loads from absolute directory though, maybe ok) and project_details.mat) which might be different for different stations? 
-if ~ exist(mainDir); mkdir(mainDir); end % This is where we will cd to for final processing, and save final results. using exist here is ok, because we only do it once per stations.  NOTE don't need if exists, but it's REALLY important to not accidentally overwrite the whole folder. 
+% if ~ exist(mainDir); mkdir(mainDir); end % This is where we will cd to for final processing, and save final results. using exist here is ok, because we only do it once per stations.  NOTE don't need if exists, but it's REALLY important to not accidentally overwrite the whole folder. 
 cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
 mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
 
+
+
+%% % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-% % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 % warning('BB2021.11.22 Not in parallel!!!')
-accept_info = struct(); % bb2022.01.05 Temporary tests for h-kappa inversion. 
-    
-% Disable a bspline warning that doesn't seem to matter. Needs to be placed in parfor or else individual workers don't keep this warning off. ; 
-warning('off', 'MATLAB:rankDeficientMatrix'); % This comes up when doing least squares inversion for spline weights. Be careful, the rankDeficientMatrix could be needed at another point in the inversion...    
-    
-chainstr = [nwk '.' sta '_' mkchainstr(iii)];
-diaryFile = sprintf('diary_%s.txt', chainstr); % Use a diary file to keep track of parallel inversions seperately. %TODO_STATION_NETWORK bb2021.11.12
-diary off; 
-delete(diaryFile); 
-pause(0.01); % Because delete seems to fully execute after turning diary on...
-diary(diaryFile);
-par = PR.Value;
+par = PR.Value; 
+trudata = TD.Value; 
 
-%% Fail-safe to restart chain if there's a succession of failures
-fail_chain=20;
-while fail_chain>=20
-
-%% Prep posterior structure
-[ misfits,allmodels,savedat ] = b0_RESULTS_SETUP(par);
-
-%% Initiate model
-ifpass = 0;
-numFails = 0; 
-% only let starting model out of the loop if it passes conditions
-while ifpass==0
-    while ifpass==0 % first make sure the starting model satisfies conditions
-        model0 = b1_INITIATE_MODEL(par,[],[],TD.Value);
-        model = model0;
-        model = expand_dathparms_to_data( model,TD.Value,par );
-        ifpass = a1_TEST_CONDITIONS( model, par );
-        Pm_prior = calc_Pm_prior(model,par);
-    end
-
-    %% starting model kernel
-    fprintf('\nCreating starting kernels %s, have tried %1.0f times, fail_chain=%1.0f\n',chainstr, numFails, fail_chain)
-    try 
-        [Kbase] = make_allkernels(model,[],TD.Value,['start',chainstr],par,...
-            'maxrunN',5); % TODO this code caused a loop that would have failed infinitely. SHould not use a while loop like this. bb2021.09.14 
-        %bb2021.09.23 Adding argument 5 where if run_mineos fails 5 (or some other small number of)times on the starting model, just toss it. No need to frett with getting a model to work with Mineos if no time is yet invested into inverting that model. 
-    catch e 
-        disp('Error in while - try,catch loop in MASTER_par.m')
-        fprintf(1,'The identifier was:\n%s',e.identifier);
-        fprintf(1,'There was an error! The message was:\n%s',e.message);
-        ifpass = false; 
-        numFails = numFails + 1; 
-        continue;
-    end
-
-    model0_perchain{iii} = model0;
-
-end % now we have a starting model!
-% diary off % Ending diary early for debugging. 
-% figure(22); clf; hold on
-% contourf(trudata.HKstack_P.K,trudata.HKstack_P.H,trudata.HKstack_P.Esum',20,'linestyle','none')
-% set(gca,'ydir','reverse')
-% figure(23); clf; hold on
-% set(gca,'ydir','reverse')
-
-
-%% ========================================================================
-%% ------------------------- Start iterations -----------------------------
-%% ========================================================================
-ptb = cell({});
-nchain = 0;
-fail_chain = 0; fail_reset = 0;
-ifaccept=true;
-if isfield(TD.Value,'SW_Ray')
-    preSW = zeros(length(TD.Value.SW_Ray.periods),ceil(par.inv.niter./par.inv.saveperN));
-end
-% reset_likelihood;
-log_likelihood = -Inf;
-predata=[]; predat_save = []; misfit = [];
-% not parfor
-
-fprintf('\n =========== STARTING ITERATIONS %s ===========\n',chainstr)
-ii = 0;
-time0 = now;
-
-while ii < par.inv.niter
-ii = ii+1;
-par.ii = ii; % bb2022.10.18 Keep track of ii in par for easily plotting how inversion is changing with ii. 
-
-%% SAVE model every saveperN
-if mod(ii,par.inv.saveperN)==0 && log_likelihood ~= -Inf
-    [misfits,allmodels,savedat] = b9_SAVE_RESULT(ii,log_likelihood,misfit,model,Pm_prior,misfits,allmodels,predat_save,savedat,time0);
-%     if isfield(TD.Value,'SW_Ray_phV')
-%         preSW(:,misfits.Nstored) = predata.SW_Ray_phV.phV;
-%     end
-%     figure(22); hold on
-%     plot([model.vpvs],[model.zmoh],'-ow')
-%     figure(23);
-%     plot(model.VS,model.z,'k')
-end
-
-%% SAVE inv state every Nsavestate iterations
-if rem(ii,par.inv.Nsavestate)==0
-    save_inv_state(resdir,chainstr,allmodels,misfits)
-%     [ram_copy_stats] = ram_to_HD(paths, chainstr, mainDir, nwk, sta); % bb2021.12.07 this is time consuming if done often. Just do at end of inversion. Copy current results from ram to hard disk. 
-end
-
-try
-    if rem(ii,4*par.inv.saveperN)==0 || ii==1, fprintf('Sta %4s nwk %2s  Iteration %s%.0f\n',...
-            par.data.stadeets.sta,par.data.stadeets.nwk,chainstr,ii); end
-    if par.inv.verbose, pause(0.05); end
-    ifaccept=false;
-    ifpass = false;
-    newK = false; resetK = false;
-    if fail_chain>19
-        % if not enough saved in this chain, abort and restart
-        if (ii - par.inv.burnin)/par.inv.saveperN < 200
-            break
-        % if enough saved in chain, abort and keep the incomplete chain
-        else
-            fail_chain = -fail_chain; break
-        end
-    end
-    if fail_reset>5
-        % if cannot reset kernels because current saved model is not viable
-        if (ii - par.inv.burnin)/par.inv.saveperN < 200
-            fail_chain = 100;  break % high fail_chain will mean we restart chain
-        % if enough saved in chain, abort and keep the incomplete chain
-        else
-            fail_chain = -100; break
-        end
-    end
-
-    % temperature - for perturbation scaling and likelihood increase
-    temp = (par.inv.tempmax-1)*erfc(2*(ii-1)./par.inv.cooloff) + 1;
-%     if round_level(temp,0.01)>1
-%         if par.inv.verbose, fprintf('TEMPERATURE = %.2f\n',temp); end
-%     end
-
-    while ifpass == false % only keep calculating if model passes (otherwise save and move on)
-
-%% ===========================  PERTURB  ===========================
-    if ii==1 % no perturb on first run
-        model1 = model; ptbnorm = 0; ifpass = 1; p_bd = 1; Pm_prior1 = Pm_prior; log_likelihood1 = -Inf;
-        ptb{ii,1} = 'start';
-    else
-        %%%% brb2022.02.08 Start section where trying double perturbations.
-        [model1, ptb{ii,1}, p_bd        ] = b2_PERTURB_MODEL(model,par,temp);
-% % % 		[model1, ptb{ii,1}, p_bd_first  ] = b2_PERTURB_MODEL(model,par,temp);
-% % %         [model1, ptb{ii,1}, p_bd_second ] = b2_PERTURB_MODEL(model1,par,temp); % bb2022.01.10 test to see what happens if we perterb model twice. 
-% % % 		p_bd = p_bd_first * p_bd_second; % Multiply these probabilities together... 
-        %%%% brb2022.02.08 End section where trying double perturbations.
-
-        ifpass = a1_TEST_CONDITIONS( model1, par, par.inv.verbose  );
-		if p_bd==0, if par.inv.verbose, fprintf('  nope\n'); end; break; end
-		if ~ifpass, if par.inv.verbose, fprintf('  nope\n'); end; break; end
-
-        Pm_prior1 = calc_Pm_prior(model1,par);  % Calculate prior probability of new model
-		[ modptb ] = calc_Vperturbation( Kbase.modelk,model1);
-
-        ptbnorm = 0.5*(norm(modptb.dvsv) + norm(modptb.dvsh)) + norm(modptb.dvpv);
-		if par.inv.verbose, fprintf('    Perturbation %.2f\n',ptbnorm); end
-    end
-
-    % quickly plot model (if not in parallel and if verbose)
-    plot_quickmodel(par,model,model1)
-
-    nchain  = kchain_addcount( nchain,ptbnorm,par );
-
-%% ===========================  FORWARD MODEL  ===========================
-	% don't re-calc if the only thing perturbed is the error, or if there
-	% is zero probability of acceptance!
-    if ~strcmp('sig',ptb{ii}(1:3)) || isempty(predata)
-        % make random run ID (to avoid overwrites in parfor)
-		ID = [chainstr,num2str(ii,'%05.f'),num2str(randi(99),'_%02.f')];
-
-        try
-            [predata,laymodel1] = b3__INIT_PREDATA(model1,par,TD.Value,0 );
-            predata = b3_FORWARD_MODEL_BW(       model1,laymodel1,par,predata,ID,0 );
-            predata = b3_FORWARD_MODEL_RF_ccp(   model1,laymodel1,par,predata,ID,0 );
-            predata = b3_FORWARD_MODEL_SW_kernel(model1,Kbase,par,predata );
-        catch
-            fail_chain=fail_chain+1;
-            fprintf('Forward model error, failchain %.0f\n',fail_chain);  break;
-        end
-
-        % continue if any Sp or PS inhomogeneous or nan or weird output
-        if ifforwardfail(predata,par)
-            fail_chain=fail_chain+1;
-            fprintf('Forward model error, failchain %.0f\n',fail_chain);  break;
-        end
-
-        % process predata - filter/taper etc.
-        predata0=predata; % save orig.
-        for idt = 1:length(par.inv.datatypes)
-            predata = predat_process( predata,par.inv.datatypes{idt},par);
-        end
-
-		% Explicitly use mineos + Tanimoto scripts if ptb is too large
-        if ptbnorm/par.inv.kerneltolmax > random('unif',par.inv.kerneltolmed/par.inv.kerneltolmax,1,1) % control chance of going to MINEOS
-            newK = true;
-            [ predata,SW_precise ] = b3_FORWARD_MODEL_SW_precise( model1,par,predata,ID );
-        end
-
-    end % only redo data if model has changed
-
-%      plot_TRUvsPRE(TD.Value,predata);
-
-    % continue if any Sp or PS inhomogeneous or nan or weird output
-    if ifforwardfail(predata,par)
-        fail_chain=fail_chain+1; ifpass=0;
-        fprintf('Forward model error, failchain %.0f\n',fail_chain);  break;
-    else
-        fail_chain = 0;
-    end
-
-%% =========================  CALCULATE MISFIT  ===========================
-
-    % SW weights, if applicable
-    [ SWwt ] = make_SW_weight( par,Kbase,TD.Value );
-
-    [ misfit1 ] = b4_CALC_MISFIT( TD.Value,predata,par,0,SWwt ); % misfit has structures of summed errors
-
-%% =======================  CALCULATE LIKELIHOOD  =========================
-    [ log_likelihood1,misfit1 ] = b5_CALC_LIKELIHOOD( misfit1,TD.Value,model1.datahparm,par);
-
-%     fprintf('MISFITS: Sp %5.2e  Ps %5.2e  SW %5.2e\n',misfit.SpRF,misfit.PsRF,misfit.SW)
-%     fprintf('CHI2S:   Sp %5.2e  Ps %5.2e  SW %5.2e\n',misfit.chi2_sp,misfit.chi2_ps,misfit.chi2_SW)
-
-    fail_chain = 0;
-    predat_save1 = predata0;
-
-    end % while ifpass
-       
-%% ========================  ACCEPTANCE CRITERION  ========================
-    [ ifaccept ] = b6_IFACCEPT( log_likelihood1,log_likelihood,temp,p_bd*ifpass,Pm_prior1,Pm_prior);
-    
-% % % %     sprintf('Accept: %1.0f --- %3.1f -> %3.1f Log likelihood  --- p_bd %3.1f',...
-% % % %         ifaccept, log_likelihood, log_likelihood1, p_bd)
-    dLog = (log_likelihood1-log_likelihood); 
-    if ((log_likelihood1 - log_likelihood) < -10) && ifaccept; 
-        disp('Accepted a shitty model')
-    end
-    
-    % ======== PLOT ========  if accept
-    if ifaccept && par.inv.verbose && fail_chain==0
-        plot_TRUvsPRE( TD.Value,predata);  pause(0.001);
-        if strcmp(projname,'SYNTHETICS')
-            plot_MOD_TRUEvsTRIAL( TRUEmodel, model1 ); pause(0.001);
-        end
-    end
-    
-%% ========== TEMPORARY ====== make some plots and get insight into why acceptance does/doesn't happen
-    accept_info(ii).ifaccept = ifaccept; 
-    accept_info(ii).misfit = misfit1; 
-    accept_info(ii).log_likelihood = log_likelihood1; 
-    accept_info(ii).sig_hk = model1.datahparm.sig_HKstack_P; 
-    accept_info(ii).model = model1; 
-    accept_info(ii).predat_save = predat_save1; 
-    accept_info(ii).iter = ii; 
-    accept_info(ii).temp = temp; 
-    accept_info(ii).ptbnorm = ptbnorm; 
-    accept_info(ii).Pm_prior1 = Pm_prior1; 
-    accept_info(ii).p_bd = p_bd; 
-    if ii == 1; accept_info(1) .trudata = trudata; end; % Inefficient, but this is just for testing. 
-    %%% TODO remove these lines eventually. 
-
-
-%% ========================  IF ACCEPT ==> CHANGE TO NEW MODEL  =========================
-    if ifaccept
-        if par.inv.verbose
-            fprintf('  *********************\n  Accepting model! logL:  %.4e ==>  %.4e\n  *********************\n',...
-                log_likelihood,log_likelihood1)
-            fprintf('                   Pm_+prior:  %.4e ==>  %.4e\n  *********************\n',...
-                Pm_prior,Pm_prior1)
-        end
-
-        % save new model!
-        model = model1;
-        log_likelihood = log_likelihood1;
-        Pm_prior = Pm_prior1;
-        misfit = misfit1;
-        predat_save = predat_save1;
-
-
-
-    %% UPDATE KERNEL if needed
-        if newK==true
-            [Kbase,predata] = b7_KERNEL_RESET(model,Kbase,predata,ID,ii,par,0,SW_precise);
-            nchain = 0;
-        end
-
-    else
-        if par.inv.verbose, fprintf('  --FAIL--\n'); end
-        if newK, delete_mineos_files(ID,'R'); end
-        if newK, delete_mineos_files(ID,'L'); end
-    end
-
-    % restart-chain if immediate failure
-    if isinf(log_likelihood), fail_chain=100; break; end
-
-%% =========  reset kernel at end of burn in or after too many iter =======
-    resetK = false;
-% %     if (newK && ifaccept) == false && ii == par.inv.burnin % reset kernel at end of burn in (and we didn't just reset it tacitly)
-% %             fprintf('\n RECALCULATING %s KERNEL - end of burn in\n',chainstr);
-% %             resetK = true;
-% %     end
-% %     if (newK && ifaccept) == false && nchain > par.inv.maxnkchain % reset kernel if chain too long (and we didn't just reset it tacitly)
-% %             fprintf('\n RECALCULATING %s KERNEL at iter %.0f - chain too long\n',chainstr,ii);
-% %             resetK = true;
-% %     end
-% bb2022.01.12 I think the ifaccept part of the if... is making us reset
-% our likelihood below even if we are currently stuck with a model that
-% failed ifaccept. 
-%(newK == false) % Don't reset if we already reset just above... 
-%(ifaccept == true) % Don't reset on this model since we didn't even accept it. Otherwise our likelihood is reset.
-% mightReset = ( (newK && ifaccept) == false ); % Zach's old version
-    mightReset = (newK == false) && (ifaccept == true); 
-    if mightReset && ii == par.inv.burnin % reset kernel at end of burn in (and we didn't just reset it tacitly)
-            % bb2022.10.12 TODO Need to find way to run kernel on first accepted model after burnin
-            fprintf('\n RECALCULATING %s KERNEL - end of burn in\n',chainstr);
-            resetK = true;
-    end
-    if mightReset && nchain > par.inv.maxnkchain % reset kernel if chain too long (and we didn't just reset it tacitly)
-            fprintf('\n RECALCULATING %s KERNEL at iter %.0f - chain too long\n',chainstr,ii);
-            resetK = true;
-    end
-    if resetK
-        try
-            % reset the kernels using the current model
-            [Kbase,predata] = b7_KERNEL_RESET(model,Kbase,predata,ID,ii,par,1);
-            fail_reset = 0;
-        catch
-            % rewind back to last Kbase model that worked!
-            fprintf('Kernel reset BROKE at %s-%.0f... REWIND to %s-%.0f <<<<<<<<<<<<<<< \n',chainstr,ii,chainstr,Kbase.itersave)
-            model = Kbase.modelk;
-            ii = Kbase.itersave;
-
-            [predata,laymodel] = b3_FORWARD_MODEL_BW( model,par,TD.Value,ID,0 );
-            predata = b3_FORWARD_MODEL_RF_ccp( model,laymodel,par,predata,ID,0 );
-            predata = b3_FORWARD_MODEL_SW_kernel( model,Kbase,par,predata );
-            fail_reset = fail_reset+1;
-        end
-        % need to also reset likelihood and misfit to the new, precise data
-        % (likelihood may have been artificially high due to kernel forward
-        % calc. approximation - if so, need to undo this, or chain will get
-        % stuck once we reset kernels).
-        [log_likelihood,misfit] = b8_LIKELIHOOD_RESET(par,predata,TD.Value,Kbase,model.datahparm);
-        Pm_prior = calc_Pm_prior(model,par);
-        nchain = 0;
-    end
-
-catch
-    if par.inv.verbose, fprintf('  --SOME ERROR--\n'); end
-    fail_chain = fail_chain+1;
-end % on try-catch
-
-if newK||resetK, delete_mineos_files(ID,'R'); end
-if newK||resetK, delete_mineos_files(ID,'L'); end
-
-end % on iterations
-%% -------------------------- End iteration  ------------------------------
-end % on the fail_chain while...
-% ----------
-fprintf('\n ================= ENDING ITERATIONS %s =================\n',chainstr)
-% save([resdir,'/chainout/',chainstr],'model0','misfits','allmodels')
-
-try; 
-    % % % plot_h_kappa_progress(trudata, allmodels, resdir, iii)
-    plot_h_kappa_progress2(trudata, allmodels, resdir, iii, accept_info, ...
-        par, trudata.HKstack_P.Esum)
-catch
-    warning('bb2022.10.14 Could not plot h kappa inversion for some reason.')
-end
-
-
-save_inv_state(resdir,chainstr,allmodels,misfits)
-misfits_perchain{iii} = misfits;
-allmodels_perchain{iii} = allmodels;
-if isfield(TD.Value,'SW_Ray')
-    SWs_perchain{iii} = preSW;
-end
-
-
-
-% save('accept_info', 'accept_info.mat'); 
-
-diary off
+[ model0_perchain{iii}, misfits_perchain{iii},...
+    allmodels_perchain{iii}, SWs_perchain{iii} ]=...
+    run_one_chain(par, trudata, nwk, sta, iii)
 
 end % parfor loop
-[ram_copy_stats] = ram_to_HD(paths, mainDir, nwk, sta); % Copy final results from ram to hard disk. 
-
-cd(mainDir); % Get back out of ram and go to stations hard drive folder 
+%%
+[ram_copy_stats] = ram_to_HD(paths, resdir, nwk, sta); % Copy final results from ram to hard disk. 
+cd(resdir); % Get back out of ram and go to stations hard drive folder 
 
 if profileRun; % Get results from profiling. 
     mpiprofile off; 
     mpiStats = mpiprofile('info'); 
     save(['mpiProfileData_' nwk '_' sta], 'mpiStats');  % Save profile results. Can transfer from HPC and bring to local computer for viewing. 
-    % Use this to see the results: load('mpiProfileData'); mpiprofile('viewer', mpiStats);
+    fprintf('\n\nSaved mpiProfileData....mat to %s\n\n',resdir); % Use this to see the results: load('mpiProfileData'); mpiprofile('viewer', mpiStats);
 end 
 
-delete(gcp('nocreate'));
+if par.inv.niter > 2000
+	delete(gcp('nocreate'));
+else
+    warning('brb2022.03.16 Not deleting parallel pool, niter<2000 so I assume we are debugging. ')
+end
 
 %% ========================================================================
 %% ========================================================================
@@ -636,7 +267,7 @@ plot_PRIORvsPOSTERIOR(prior,posterior,par,1,[resdir,'/prior2posterior.pdf'])
 
 fprintf('  > Plotting model suite\n')
 [ suite_of_models ] = c3_BUILD_MODEL_SUITE(allmodels_collated,par );
-plot_SUITE_of_MODELS( suite_of_models,posterior,1,[resdir,'/suite_of_models.pdf'],[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
+plot_SUITE_of_MODELS( suite_of_models,posterior,1,[resdir,'/suite_of_models.png'],[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
 plot_HEATMAP_ALLMODELS(suite_of_models,par,1,[resdir,'/heatmap_of_models.pdf']);
 
 %% Save some things
@@ -652,11 +283,13 @@ save([resdir,'/SWs_pred'],'SWs_perchain');
 end
 
 %% Final interpolated model with errors
+% If you have to few iterations/chains, there aren't enough models, and you
+% will get an error in c4_FINAL_MODEL. 
 final_model = c4_FINAL_MODEL(posterior,allmodels_collated,par,1,[resdir,'/final_model']);
 plot_FINAL_MODEL( final_model,posterior,1,[resdir,'/final_model.pdf'],true,[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
 
 %% predict data with the final model, and calculate the error!
-[ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,trudata );
+[ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,trudata,posterior );
 
 % distribute data for different processing (e.g. _lo, _cms)
 for idt = 1:length(par.inv.datatypes)
@@ -677,10 +310,12 @@ end
 save([resdir,'/final_predata'],'final_predata');
 
 
-[ final_misfit ] = b4_CALC_MISFIT( trudata,final_predata,par,0 );
+[ final_misfit ] = b4_CALC_MISFIT( trudata,final_predata,par,0, 'plotRFError',true );
 [ final_log_likelihood,final_misfit ] = b5_CALC_LIKELIHOOD( final_misfit,trudata,final_model.hyperparms,par );
 plot_TRUvsPRE( trudata,final_predata,1,[resdir,'/final_true_vs_pred_data.pdf'], allmodels_collated);
 plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,1,[resdir,'/final_true_vs_pred_data_wavs.pdf']);
+% plot_TRUvsPRE_WAVEFORMS_indiv_figs(trudata,final_predata,1,[resdir,'/final_true_vs_pred_data_wavs.pdf']);
+save([resdir,'/final_misfit'],'final_misfit');
 
 
 plot_FIG2_FIT_MODEL( final_model,posterior,prior,par,1,[resdir,'/fig2_FIT_MODEL.pdf']);

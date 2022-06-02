@@ -13,7 +13,8 @@ cd(proj.dir);
 %% load project, station, and request details and request details
 try
     load([proj.dir,'/project_details.mat']);
-catch
+catch e 
+    fprintf('\n%s\n',getReport(e)); 
     run([proj.dir,'/project_details.m']);
 end
 load([proj.infodir,'stations.mat']); % bb2021.09.28 Get this using evdata1_database.m

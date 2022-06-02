@@ -25,17 +25,34 @@ if nargin <3 || isempty(ifplot)
 end
 
 mod = par.mod;
-if ~par.mod.starting.HKappa.startAtHK || nargin <4 || isempty(hkStack); 
+if ~par.mod.starting.HKappa.startAtHK || ...
+        ~ any('HKstack_P'==string(par.inv.datatypes)) || ...
+        nargin <4 || isempty(hkStack) ; 
     h_crust            = random('unif',mod.crust.hmin,mod.crust.hmax);
     vpvs_crust         = random('unif',mod.crust.vpvsmin,mod.crust.vpvsmax);
 else; 
-    disp('Getting starting model h and k from HK stack')
+% % %     disp('Getting starting model h and k from HK stack')
     Esum               = hkStack.HKstack_P.Esum;
     h                  = hkStack.HKstack_P.H; 
     k                  = hkStack.HKstack_P.K; 
     [rowMin, colMin]   = find(max(max(Esum))==Esum); % Kappa is first dimension
+        
     vpvs_crust         = k(rowMin);
     h_crust            = h(colMin);
+    
+    minStartingH = 35; 
+    % If we are at edge of vpvs or h, just scoot those parameters down a bit. 
+    vpvs_crust = min([vpvs_crust, par.mod.crust.vpvsmax-.1]); 
+    vpvs_crust = max([vpvs_crust, par.mod.crust.vpvsmin+.1]); 
+    h_crust    = min([h_crust   , par.mod.crust.hmax   - 5]); 
+    h_crust    = max([h_crust   , minStartingH            ]); 
+        
+% % %     if h_crust == minStartingH; 
+% % %         warning([newline '-------' newline 'IMPORTANT' newline,...
+% % %             'Starting model H was to shallow and might have broke code (brb2022.03.07)\n',...
+% % %             'I am artificically setting a deeper starting Moho',...
+% % %             newline '-------------' newline])
+% % %     end
 end
 
 %% resolve important values from prior distributions

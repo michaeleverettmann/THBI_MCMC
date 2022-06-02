@@ -114,7 +114,10 @@ switch pdtyp{1}
 %         ax7 = axes(); 
 %         ax7a = copyobj(ax7, gcf); % ax7a.Visible = 'off';
 %         axes(ax7); 
-        contourf(ax7,trudata.(dtype).K,trudata.(dtype).H,trudata.(dtype).Esum',30,'linestyle','none');
+%         contourf(ax7,trudata.(dtype).K,trudata.(dtype).H,trudata.(dtype).Esum',30,'linestyle','none');
+        contourf(ax7,predata.(dtype).Kgrid,predata.(dtype).Hgrid,...
+            predata.(dtype).Esum',30,'linestyle','none'); % Use final_predata to get the HK stack estimated with our velocity model. 
+
         colorbar(ax7,'southoutside')
 %         colormap('cool'); 
         

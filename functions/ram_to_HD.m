@@ -15,4 +15,8 @@ results = struct('resultvel', resultVel, 'resultDiary', resultDiary);
 [~, res_du] = system(['du -h -d 0']); 
 sprintf('Ram currently in use in %s: %s', paths.ramDrive, res_du)
 
+% Remove those files from ram. 
+% Not doing this yet... Really should...
+
+
 end

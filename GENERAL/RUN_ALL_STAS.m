@@ -11,7 +11,8 @@ cd(proj.dir);
 %% load project, station, and request details and request details
 try
     load([proj.dir,'/project_details.mat']);
-catch
+catch e 
+    fprintf('\n%s\n',getReport(e)); 
     run([proj.dir,'/project_details.m']);
 end
 load([proj.infodir,'stations.mat']);
@@ -64,7 +65,7 @@ function execute_MASTER_par
     global run_params
     try
         MASTER_par;
-    catch
-         1;
+    catch e 
+        fprintf('\n%s\n',getReport(e)); 
     end
 end
