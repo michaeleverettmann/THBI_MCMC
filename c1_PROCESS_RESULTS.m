@@ -1,5 +1,5 @@
 function [misfits,allmodels,goodchains,misfits_orig,allmodels_orig,allmodels_collated]...
-               = c1_PROCESS_RESULTS( misfits,allmodels,par,ifsave,ofile )
+               = c1_PROCESS_RESULTS( misfits,allmodels,par,ifsave,ofile, goodChainsManual )
 % [misfits,allmodels,goodchains] = c1_PROCESS_RESULTS( misfits,allmodels,par,ifsave,ofile )
 % 
 % Script to process the results and make some plots of the misfit + the
@@ -233,6 +233,11 @@ else
         goodchains = goodchains & (chi2_alldata(:,id) < mean_chi2_dtp + 5*std_chi2_gdtp); % bb2021.09.17 chains might fail here if you are using small iteration chains for debugging. 
     end
     goodchains=find(goodchains);
+end
+
+%% Option to specify good chains 
+if ~isempty(goodChainsManual)
+    goodchains = goodChainsManual; 
 end
 
 %% GET TARGET MODEL for comparison

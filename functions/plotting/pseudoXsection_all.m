@@ -37,8 +37,10 @@ ifsave = true;
 %% lon/lat limits on stations to include:
 % % lolim = [-84,-76] + [0, 0] ;
 % % lalim = [35, 43] + [0, 0]; 
-lolim = [-98.5,-80] + [-2, 2] +5;
-lalim = [32.5 49] + [-2, 2]; 
+% lolim = [-98.5,-80] + [-2, 2] +5;
+lolim = [-87, -76]; 
+% lalim = [32.5 49] + [-2, 2]; 
+lalim = [35, 43]; 
 %% section ends
 % WNW to ESE across whole region
 ofile1 = [figPath 'Xsect1_',STAMP];
@@ -46,7 +48,7 @@ ofile2 = [figPath 'Xsect1_wCCP_',STAMP];
 Q1 = [lalim(2), lolim(1)];
 Q2 = [lalim(1), lolim(2)]; 
 % lonBounds = sort([Q1(2) Q2(2)]); latBounds = sort([Q1(1) Q2(1)]); 
-offsecmax = 2; %5%  distance off section allowed, in degrees
+offsecmax = .65; %5%  distance off section allowed, in degrees
 % NNW to SSE across Yellowstone
 % ofile1 = ['figs/Xsect2_',STAMP];
 % ofile2 = ['figs/Xsect2_wCCP_',STAMP];
@@ -161,7 +163,10 @@ for is = 1:stainfo.nstas
 %     fprintf('\n%s\n',fdir)
 end
 gdstas = find(gdstas);
+gdstas = [1:stainfo.nstas]'; warning('Setting all stas as good stas'); 
+
 Ngd = length(gdstas);
+
 
 lolim = [min(stainfo.slons(gdstas)),max(stainfo.slons(gdstas))] + [-1 1];
 % make colourmap
@@ -204,6 +209,7 @@ set(ax3,'pos',[x0 0.08 xw 0.11]);
 
 
 % ==================  LOOP OVER STATIONS IN DB  ================== 
+iKeepSta = 0; 
 for ii = 1:Ngd
      
     is = gdstas(ii);
@@ -213,15 +219,24 @@ for ii = 1:Ngd
     % get results directory
     resdir = sprintf('%s/%s_%s_dat%.0f/%s',proj.STAinversions,sta,nwk,generation,STAMP);
     % spit out station info
-    fprintf('\n'); for j=1:40, fprintf('**'); end; fprintf('*\n');
-    fprintf('STATION: %s\n',sta)
-    fprintf('NETWORK: %s\n\n',nwk)
+% % %     fprintf('\n'); for j=1:40, fprintf('**'); end; fprintf('*\n');
+% % %     fprintf('STATION: %s\n',sta)
+% % %     fprintf('NETWORK: %s\n\n',nwk)
     
     % find position on section
     [d_perp(ii),d_par(ii)] = dist2line_geog( Q1,Q2,...
         [stainfo.slats(is),stainfo.slons(is)],0.1 );    
 
     if d_perp(ii) > offsecmax, continue; end
+    
+    %%% Delete this
+    if ~ strcmp(nwk , 'TA'); continue ; end; 
+    iKeepSta = iKeepSta + 1; 
+    fprintf('\n%s %s', nwk, sta)
+%     fprintf('%s\n\n',nwk)    
+%     fprintf('%s\n',sta)
+    continue
+    %%% Delete this
     
     % load final model and data
     load([resdir,'/par.mat'])

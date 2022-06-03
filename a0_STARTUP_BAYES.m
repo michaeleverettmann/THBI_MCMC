@@ -9,7 +9,7 @@
 proj = struct('name', 'ENAM'); % Subfolder where this inversions stuff is stored. 
 
 % turn off warning about name conflict with matlab builtin isstring
-warning('off','MATLAB:dispatcher:nameConflict');
+% warning('off','MATLAB:dispatcher:nameConflict');
 % set time zone:
 setenv('TZ','America/Los_Angeles')
 
