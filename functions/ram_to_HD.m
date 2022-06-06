@@ -15,8 +15,10 @@ results = struct('resultvel', resultVel, 'resultDiary', resultDiary);
 [~, res_du] = system(['du -h -d 0']); 
 sprintf('Ram currently in use in %s: %s', paths.ramDrive, res_du)
 
-% Remove those files from ram. 
-% Not doing this yet... Really should...
+% brb2022.06.03 Don't remove filres from ram. diary and inv files need to
+% be copied to resdir. Then the files are later deletd off ram. 
+% % % [status, resultVel] = system(  ['rm ' paths.ramDrive '/' nwk '_' sta '/' '*vel_profile* ' ]); % Includes finalmodRvel_profile.mat
+% % % [status, resultDiary] = system(['rm ' paths.ramDrive '/' nwk '_' sta '/diary_* '          ]); 
 
 
 end

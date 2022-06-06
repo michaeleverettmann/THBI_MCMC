@@ -11,6 +11,9 @@ end
 if nargin < 5 || isempty(ofile)
     ofile = 'figs/misfits_vs_iter';
 end
+if nargin < 6 || isempty(goodChainsManual)
+    goodChainsManual = []; 
+end
 
 
 figure(88);clf, set(gcf,'pos',[850 198 900 888])

@@ -463,7 +463,7 @@ try
     accept_info(ii).ifpass = ifpass; 
     accept_info(ii).misfit = misfit1; 
     accept_info(ii).log_likelihood = log_likelihood1; 
-    accept_info(ii).model = model1; 
+%     accept_info(ii).model = model1; 
     accept_info(ii).predat_save = predat_save1; 
     accept_info(ii).iter = ii; 
     accept_info(ii).temp = temp; 

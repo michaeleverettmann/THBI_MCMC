@@ -25,7 +25,7 @@ cmaxz = mps.h+mpc.h;
 zc = unique([cminz:par.mod.dz:cmaxz,cmaxz])';
 
 vs_crust = sum(mpc.splines*diag(mpc.VS_sp),2);
-vp_crust = vs_crust*mpc.vpvs;
+vp_crust = vs_crust*mpc.vpvs; %!%!%! brb2022.06.03 TODO here can make the od vpvs jump at moho work better by tapering the transition of  vpvs crust to vpvs mantle
 rho_crust = sed_vs2rho(vs_crust); % use same expression as for sed (assume not ultramafic or other poorly-fit rocks)
 xi_crust = mpc.xi*ones(size(zc));
 

@@ -218,6 +218,8 @@ trudata = TD.Value;
 end % parfor loop
 %%
 [ram_copy_stats] = ram_to_HD(paths, resdir, nwk, sta); % Copy final results from ram to hard disk. 
+[~,duRam] = system(sprintf('du -h %s',paths.ramDrive)); 
+fprintf('\nDisk usage of ram drive after moving files off of it: \n%s\n', duRam )
 cd(resdir); % Get back out of ram and go to stations hard drive folder 
 
 if profileRun; % Get results from profiling. 
@@ -313,7 +315,7 @@ save([resdir,'/final_predata'],'final_predata');
 [ final_misfit ] = b4_CALC_MISFIT( trudata,final_predata,par,0, 'plotRFError',true );
 [ final_log_likelihood,final_misfit ] = b5_CALC_LIKELIHOOD( final_misfit,trudata,final_model.hyperparms,par );
 plot_TRUvsPRE( trudata,final_predata,1,[resdir,'/final_true_vs_pred_data.pdf'], allmodels_collated);
-plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,1,[resdir,'/final_true_vs_pred_data_wavs.pdf']);
+plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,1,[resdir,'/final_true_vs_pred_data_wavs.png']);
 % plot_TRUvsPRE_WAVEFORMS_indiv_figs(trudata,final_predata,1,[resdir,'/final_true_vs_pred_data_wavs.pdf']);
 save([resdir,'/final_misfit'],'final_misfit');
 

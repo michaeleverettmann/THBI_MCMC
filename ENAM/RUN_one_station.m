@@ -58,7 +58,7 @@ overwrite = true;
 
 % Copy what you want to run here. 
 STAMP_all = {...
-    'all_faster',... % } --- End   test to see influence of different data types independently
+    'sage_gage',... % } --- End   test to see influence of different data types independently
 }; % This determines which tests we want to run now. They will run sequentially, not in parallel (each station only has one ram folder. )
 
 

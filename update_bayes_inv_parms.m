@@ -297,7 +297,7 @@ elseif strcmp(stamp, 'all_fast');
     par.inv.niter                     = 1000  ; 
     par.inv.burnin                    = 400  ; 
     par.inv.cooloff                   = 300  ; 
-    par.inv.nchains                   = 16    ; 
+    par.inv.nchains                   = 12    ; 
 elseif strcmp(stamp, 'all_faster'); 
     par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
     par.inv.niter                     = 500  ; 
@@ -305,6 +305,21 @@ elseif strcmp(stamp, 'all_faster');
     par.inv.cooloff                   = 80   ; 
     par.inv.nchains                   = 4    ; 
 
+    
+elseif strcmp(stamp, 'sage_gage'); 
+    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'}; % No HV 
+    par.mod.starting.HKappa.startAtHK = true;   
+    par.inv.niter                     = 16000; 
+    par.inv.burnin                    = 5000 ; 
+    par.inv.cooloff                   = 4000 ; 
+    par.inv.nchains                   = 12   ; % Less chains. So we can run more stations. 
+elseif strcmp(stamp, 'sage_gage_faster'); 
+    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'}; % No HV 
+    par.mod.starting.HKappa.startAtHK = true;   
+    par.inv.niter                     = 700; 
+    par.inv.burnin                    = 200 ; 
+    par.inv.cooloff                   = 100 ; 
+    par.inv.nchains                   = 12   ; % Less chains. So we can run more stations. 
     
 end
 

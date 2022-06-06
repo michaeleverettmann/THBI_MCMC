@@ -66,6 +66,7 @@ javaaddpath([hd '/MATLAB/iris/IRIS-WS-2.0.18.jar']); % bb2021.09.27 moving this 
 addpath([hd '/MATLAB/seizmo/mattaup']); % This might break things. It's Seizmo. 
 addpath([hd '/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for_seizmo']); % bb2021.08.04 Just taking the absolutely necessary Seizmo tools. 
 
+addpath('/Users/brennanbrunsvik/Documents/repositories/Base_code/colormaps/colormaps_ander_biguri'); % Perceptually uniform color maps. 
 
 % addpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup'); % bb2021.08.04 Need taup. 
 % addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for_seizmo'); % bb2021.08.04 Just taking the absolutely necessary Seizmo tools. 

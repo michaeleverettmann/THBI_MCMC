@@ -9,6 +9,8 @@ paths = getPaths();
 % proj.dir = [paths.THBIpath '/' proj.name];
 proj = load('~/Documents/UCSB/ENAM/THBI_ENAM/ENAM/INFO/proj.mat'); 
 proj = proj.proj; 
+paths.STAinversions = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/'; % Place where your results are. 
+proj.STAinversions = paths.STAinversions; 
 
 % figPath = '~/Documents/UCSB/ENAM/THBI_ENAM/figures/xsect/'; 
 figPath = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/xsect/'; warning('Export path not relative path')
@@ -21,7 +23,7 @@ addpath('~/MATLAB/borders');
 
 % specify details of this run
 generation = 1; % generation of solution and data processing
-STAMP = 'all_no_hv';
+STAMP = 'sage_gage';
 
 % Quality thresholds for including stations - important!
 overallQ_thresh = 1; % 2 is good, 1 is ok, 0 is bad
@@ -138,8 +140,8 @@ for is = 1:stainfo.nstas
     % check in bounds
     if stinbounds(is)==0, continue; end
     % check overall fit
-    if isnan(stainfo.overallQ(is)), continue; end
-    if stainfo.overallQ(is) < overallQ_thresh, continue; end
+% % %     if isnan(stainfo.overallQ(is)), continue; end
+% % %     if stainfo.overallQ(is) < overallQ_thresh, continue; end
     % check Sp data quality
     clear sdtyp
     % find Sp data type...
@@ -163,7 +165,7 @@ for is = 1:stainfo.nstas
 %     fprintf('\n%s\n',fdir)
 end
 gdstas = find(gdstas);
-gdstas = [1:stainfo.nstas]'; warning('Setting all stas as good stas'); 
+% % % gdstas = [1:stainfo.nstas]'; warning('Setting all stas as good stas'); 
 
 Ngd = length(gdstas);
 
@@ -184,7 +186,7 @@ ccplo = linspace(Q1(2),Q2(2),nccp);
 fid = fopen(ostafile,'w');
 
 %% prep figure
-fig = figure(56); clf; set(fig,'pos',[19 157 43*profd 648]);
+fig = figure(56); clf; set(fig,'pos',[468 333 93.4198*profd 620]); set(gcf, 'color', 'white'); 
 ax1 = axes; hold on
 ax2 = axes; hold on
 ax3 = axes; hold on
@@ -229,14 +231,14 @@ for ii = 1:Ngd
 
     if d_perp(ii) > offsecmax, continue; end
     
-    %%% Delete this
-    if ~ strcmp(nwk , 'TA'); continue ; end; 
-    iKeepSta = iKeepSta + 1; 
-    fprintf('\n%s %s', nwk, sta)
-%     fprintf('%s\n\n',nwk)    
-%     fprintf('%s\n',sta)
-    continue
-    %%% Delete this
+% % %     %%% Delete this
+% % %     if ~ strcmp(nwk , 'TA'); continue ; end; 
+% % %     iKeepSta = iKeepSta + 1; 
+% % %     fprintf('\n%s %s', nwk, sta)
+% % % %     fprintf('%s\n\n',nwk)    
+% % % %     fprintf('%s\n',sta)
+% % %     continue
+% % %     %%% Delete this
     
     % load final model and data
     load([resdir,'/par.mat'])
@@ -247,7 +249,7 @@ for ii = 1:Ngd
     
     %% plot vertical profiles by colour
  
-    dh = 0.2; % half width 
+    dh = 0.1; % half width 
     % round off VSav
     dVs = 0.03;
     VSuse = round_level(final_model.VSav,dVs);
@@ -354,7 +356,7 @@ set(ax2,'fontsize',16,'ylim',[1.62 1.9],'xlim',[0 ceil(max(d_par))+0.5],...
     'xticklabel',[],'ytick',[1.65:.1:1.85]);
 caxis(ax2,[1.55,1.95]);colormap(ax2,spring)
 
-set(ax3,'fontsize',16,'ylim',[0.750 1.15],'xlim',[0 ceil(max(d_par))+0.5],...
+set(ax3,'fontsize',16,'ylim',[0.95 1.12],'xlim',[0 ceil(max(d_par))+0.5],...
     'color','none','box','on','layer','top','linewidth',1.8,...
     'xticklabels',round_level(loprof,0.1));
 caxis(ax3,[0.88,1.12]);colormap(ax3,flipud(spring))

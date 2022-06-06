@@ -47,7 +47,7 @@ end
 
 if any(strcmp(fieldnames(trudata),'HKstack_P'))
 %     ax12 = axes('pos',[axpos(ax2,[1,2,3]) sum(axpos(ax1,[2,4]))-axpos(ax2,2)]); hold on % HK
-    ax12  = axes('position',[0.05 0.39 0.20 0.4]); hold on % Ps? 
+    ax12  = axes('position',[0.05 0.39 0.20 0.3]); hold on % Ps? 
     delete([ax1,ax2]);
     set(ax12, 'Box', 'on'); 
     set(ax12, 'linewidth', boxLineWidth); 
@@ -68,10 +68,16 @@ switch pdtyp{1}
 %% SW
     case 'SW'
         switch pdtyp{2}
-            case 'Ray', ax = ax9;  ylabstr = 'Phase Velocity (km/s)';
-            case 'Lov', ax = ax10; ylabstr = 'Phase Velocity (km/s)';
-            case 'HV',  ax = ax11; ylabstr = 'H/V ratio'; errorbar(ax,trudata.(dtype).periods,trudata.(dtype).HVr,2*trudata.(dtype).sigma.*ones(size(trudata.(dtype).periods)),'k')
-
+            case 'Ray', 
+                ax = ax9; 
+                ylabstr = 'Phase Velocity (km/s)';
+            case 'Lov', 
+                ax = ax9; 
+                ylabstr = 'Phase Velocity (km/s)';
+            case 'HV',  
+                ax = ax11;
+                ylabstr = 'H/V ratio'; 
+                errorbar(ax,trudata.(dtype).periods,trudata.(dtype).HVr,2*trudata.(dtype).sigma.*ones(size(trudata.(dtype).periods)),'k')
         end
     hp(1) = plot(ax,trudata.(dtype).periods,trudata.(dtype).(pdtyp{3}),'k.-','linewidth',3,'markersize',40);
     hp(2) = plot(ax,predata.(dtype).periods,predata.(dtype).(pdtyp{3}),'r.-','linewidth',1.5,'markersize',30);
@@ -79,7 +85,9 @@ switch pdtyp{1}
     set(ax,'fontsize',15)
     xlabel(ax,'Period (s)','fontsize',18)
     ylabel(ax,ylabstr,'fontsize',18)
-    title(ax,['SW-',pdtyp{2}],'fontsize',titleSize)
+    title(ax, 'Surface waves','fontsize',titleSize, 'fontweight', 'normal') ; 
+
+%     title(ax,['SW-',pdtyp{2}],'fontsize',titleSize)
 
 %% BWs
     case {'BW','RF'}
@@ -121,12 +129,12 @@ switch pdtyp{1}
             plot(xa2,predata.(dtype)(itr).tt,predata.(dtype)(itr).PSV(:,2)./prenrm(itr),'r','linewidth',1.5)
         end
         set(xa1,'xlim',xlims(ps,:),...
-                'ylim',0.7*xp*[-1 1],...
-                'fontsize',13,'xticklabel',[])
-        set(xa2,'xlim',xlims(ps,:),...
-                'ylim',0.7*xsv*[-1 1],...
+                'ylim',0.3*xp*[-1 1],...
                 'fontsize',13)
-        title(xa1, regexprep(dtype,'_','-'),'fontsize',titleSize)
+        set(xa2,'xlim',xlims(ps,:),...
+                'ylim',0.5*xsv*[-1 1],...
+                'fontsize',13)
+        title(xa1, regexprep(dtype,'_','-'),'fontsize',titleSize, 'fontweight', 'normal')
         xlabel(xa2, sprintf('Time from %s arrival',pdtyp{2}(1)),'fontsize',18)
         
         if strcmp(pdtyp{3},'ccp')
@@ -144,16 +152,32 @@ switch pdtyp{1}
         [~,contH] = contourf(ax12,predata.(dtype).Kgrid,predata.(dtype).Hgrid,...
             predata.(dtype).Esum',30,'linestyle','none'); % Use final_predata to get the HK stack estimated with our velocity model. 
 %         uistack(cntr,'top')
-        colorbar(ax12,'southoutside')
+
+        cbar = colorbar(ax12,'eastoutside'); 
+        set(cbar, 'fontsize', 12); 
+%         cbar = colorbar(ax12,'south'); 
+%         a =  cbar.Position;  %gets the positon and size of the color bar
+%         set(cbar,'Position',[a(1)+.5 * a(3), a(2) .5 * a(3), a(4)],...
+%             'fontsize', 12, ...
+%             'linewidth', .01, ...
+%             'color', [1 1 1]); % To change size
+
+%         cmapSCM = 'imola'; 
+%         load(sprintf('/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/ScientificColourMaps7/%s/%s.mat',cmapSCM,cmapSCM)); % Temporary. Try out a new colormap. 
+        try 
+            colormap(viridis); 
+        catch 
+            warning('Missing colormap viridis. Should be in repositories somewhere. '); 
+        end
 %         colorbar(ax12,'south')
         
         plot(predata.HKstack_P.K,predata.HKstack_P.H,'ok','linewidth',2,...
             'markerfacecolor','r','markersize',7)
         
-        title(ax12, regexprep(dtype,'_','-'),'fontsize',titleSize)
+        title(ax12, regexprep(dtype,'_','-'),'fontsize',titleSize, 'fontweight', 'normal')
         xlabel(ax12, 'Vp/Vs ratio','fontsize',16)
         ylabel(ax12, 'Moho depth','fontsize',16)
-        set(ax12,'ydir','reverse')
+        set(ax12,'ydir','reverse', 'linewidth', 4)
     
     
 end
@@ -163,7 +187,8 @@ pause(0.001)
 
 
 if ifsave
-    save2pdf(58,ofile,'/');
+%     save2pdf(58,ofile,'/');
+    exportgraphics(gcf, ofile, 'resolution', 300); 
 end
 
 % %% Ps

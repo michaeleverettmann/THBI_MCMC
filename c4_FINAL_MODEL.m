@@ -68,7 +68,7 @@ final_model.ximasig2 = vord(isig2);
 Z = sort(unique([[0:par.mod.dz:par.mod.maxz],...
                  Zd(1).mu+[0,-3*Zd(1).std:0.1:3*Zd(1).std],...
                  Zd(2).mu+[0,-3*Zd(2).std:0.2:3*Zd(2).std]]')); 
-             Z(Z<0)=[];
+Z(Z<0)=[];
 Nz = length(Z);
 
 fprintf('  > Gathering models (layer-wise)\n    & fitting gaussians to each parm/depth\n      ')
