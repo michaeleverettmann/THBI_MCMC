@@ -9,9 +9,15 @@ str_temp = split(stamp, '/');
 
 % { Different data types alone
 niter_only   = 16000; 
-burnin_only  = 5000; 
-cooloff_only = 4000; 
-nchains_only = 16; 
+burnin_only  = 4000; 
+cooloff_only = 3000; 
+nchains_only = 12; 
+
+% niter_only   = 500; 
+% burnin_only  = 100; 
+% cooloff_only = 80; 
+% nchains_only = 12; warning('Short "only" stamp');  
+
 % niter_only   = 4000; 
 % burnin_only  = 1000; 
 % cooloff_only = 800 ; 
@@ -321,8 +327,40 @@ elseif strcmp(stamp, 'sage_gage_faster');
     par.inv.cooloff                   = 100 ; 
     par.inv.nchains                   = 12   ; % Less chains. So we can run more stations. 
     
-end
+    
+    
+elseif strcmp(stamp, 'most_fast'); 
+    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'}; % No HV 
+    par.mod.starting.HKappa.startAtHK = true;   
+    par.inv.niter                     = 500 ; 
+    par.inv.burnin                    = 100 ; 
+    par.inv.cooloff                   = 80  ; 
+    par.inv.nchains                   = 12  ; % Less chains. So we can run more stations. 
+elseif strcmp(stamp, 'most_003'); 
+    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'}; % No HV 
+    par.mod.starting.HKappa.startAtHK = true ;   
+    par.inv.niter                     = 16000; 
+    par.inv.burnin                    = 5000 ; 
+    par.inv.cooloff                   = 4000 ; 
+    par.inv.nchains                   = 12   ; % Less chains. So we can run more stations. 
 
+
+% Sp receiver function, upweight at depth. 
+elseif strcmp(stamp, 'ccp_weights_1'); 
+    par.inv.datatypes                 = {'RF_Sp_ccp'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only; 
+    par.datprocess.CCP.weight_depth_val = [-10,1 ; 6371,1]; % Constant weight. 1. 
+elseif strcmp(stamp, 'ccp_weights_2'); 
+    par.inv.datatypes                 = {'RF_Sp_ccp'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only; 
+    par.datprocess.CCP.weight_depth_val = [-10,0.3 ; 50,0.3 ; 100,1 ; 6371,1]; % Upweight at depth. This gets normalized.  
+end
 
 inv = par.inv; 
 

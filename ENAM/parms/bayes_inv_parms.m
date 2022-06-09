@@ -202,7 +202,7 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
                  
 %% Forward calc. parms
 forc = struct(      'mindV',0.05                 ,... % min delta Vs for layerising
-                    'nsamps',2^11                ,... % number of samples (more means longer run time)
+                    'nsamps',2^11                ,... % number of samples (more means longer run time) - brb2022.06.08 I don't think this actually gets passed to propmat. 
                     'PSVorZR','PSV'             ,... % whether to rotate data into PSV or keep in ZR
                     'synthperiod',2              );  % period for propmat response
                 
@@ -231,7 +231,8 @@ datprocess=struct( 'normdata',true               ,... % normalise data in proces
                       'surv_Vp_vs',[6.1 3.55]    ,... %   [VP, VS] surface velocity values for P-SV rotation
                       'taperz',10               ,... %   taper width at the edges of the Zwin
                       'Zwin'                     ,... %   depth window    
-                      struct('def',[20 250]))    ,...
+                      struct('def',[20 250])     ,...
+                      'weight_depth_val',[-10,1 ; 6371,1])    ,... ; % First collumn: Specify depths of interest. Second collumn: Ideal weight at those depths. The weights are a linear interpolation of these points which then go through a Gaussian smoothing filter. 
                    'HKappa',struct(              ...
                        'min_error', 0.002,           ... % Add this much "error" to h-kappa stacks (error of 0 can result in sigma inverting improperly)
                        'scale_error', 1,           ... % Multiply h-kappa error by this constant. Sigma needs to be scaled accordingly. If using 100, we can think of it like percent. 

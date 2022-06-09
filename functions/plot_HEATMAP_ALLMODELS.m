@@ -41,10 +41,10 @@ hmpp = log(hmpp); hmpp(isinf(hmpp)) = -20;
 
 
 %% Plot
-figure(25); clf; set(gcf,'pos',[120 151 920 947])
-ax1 = axes(gcf,'pos',[0.13 0.11 0.35 0.815]); hold on
-ax2 = axes(gcf,'pos',[0.52 0.11 0.35 0.815]); hold on
-ax3 = axes(gcf,'pos',[0.91 0.11 0.02 0.815]); hold on
+figure(25); clf; set(gcf,'pos',[-1011 247 841 721])
+ax1 = axes(gcf,'pos',[0.13 0.11 0.35 0.815], 'linewidth', 1.5); hold on; box on; 
+ax2 = axes(gcf,'pos',[0.52 0.11 0.35 0.815], 'linewidth', 1.5); hold on; box on; 
+ax3 = axes(gcf,'pos',[0.91 0.11 0.02 0.815], 'linewidth', 1.5); hold on; box on; 
 
 
 %% data
@@ -72,7 +72,8 @@ caxis(ax1,[-5 0])
 caxis(ax2,[-5 0])
 caxis(ax3,[-5 0])
 hcb = colorbar(ax3);
-set(hcb,'pos',[0.89 0.71 0.02 0.215],'fontsize',14,'yaxislocation','right')
+% set(hcb,'pos',[0.89 0.71 0.02 0.215],'fontsize',14,'yaxislocation','right')
+set(hcb,'pos',[0.155 0.13 0.02 0.215],'fontsize',14,'yaxislocation','right')
 hcby = ylabel(hcb,'log_{10}(Probability)','fontweight','bold','verticalalignment','middle','HorizontalAlignment','center');
 set(hcby,'rotation',270,'pos',[3.2 -2.5 0]);
 

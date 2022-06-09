@@ -58,7 +58,8 @@ overwrite = true;
 
 % Copy what you want to run here. 
 STAMP_all = {...
-    'sage_gage',... % } --- End   test to see influence of different data types independently
+    'RF_Sp_ccp_only',...
+%     'ccp_weights_2',...% } --- End   test to see influence of different data types independently
 }; % This determines which tests we want to run now. They will run sequentially, not in parallel (each station only has one ram folder. )
 
 

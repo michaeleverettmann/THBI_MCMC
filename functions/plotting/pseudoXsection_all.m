@@ -20,6 +20,7 @@ addpath('~/MATLAB/m_map');
 addpath('~/Documents/UCSB/ENAM/THBI_ENAM/functions'); 
 addpath('~/MATLAB/seizmo/cmap');
 addpath('~/MATLAB/borders'); 
+addpath('/Users/brennanbrunsvik/Documents/repositories/general_data'); % For topography loading. get_z_etopo1.m
 
 % specify details of this run
 generation = 1; % generation of solution and data processing
@@ -163,6 +164,11 @@ for is = 1:stainfo.nstas
     disp(par.inv)
     gdstas(is) = (par.inv.niter>=8000) && (par.inv.nchains>=5); % Don't plot results if we didn't run the inversion with enough chains or iterations. Might have been test runs...
 %     fprintf('\n%s\n',fdir)
+%     if gdstas(is); 
+%         warning('Breaking at first good station. .'); 
+%         break; 
+%     end; % can't load par if it doesn't exist. Just do continue. 
+
 end
 gdstas = find(gdstas);
 % % % gdstas = [1:stainfo.nstas]'; warning('Setting all stas as good stas'); 
@@ -186,24 +192,27 @@ ccplo = linspace(Q1(2),Q2(2),nccp);
 fid = fopen(ostafile,'w');
 
 %% prep figure
-fig = figure(56); clf; set(fig,'pos',[468 333 93.4198*profd 620]); set(gcf, 'color', 'white'); 
+fig = figure(56); clf; 
+% set(fig,'pos',[468 333 93.4198*profd 620]); 
+set(fig,'pos',[-1204 344 1092 620]); 
+set(gcf, 'color', 'white');
 ax1 = axes; hold on
 ax2 = axes; hold on
 ax3 = axes; hold on
 
+  
 
-% if profd < 15
-% 	x0 = 0.12; xw = 0.76;
-% else
-    x0 = 0.08; xw = 0.82;
-% end
-
-set(ax1,'pos',[x0 0.36 xw 0.62]);
+x0 = 0.08; xw = 0.82;
+ax1Height = 0.45 ; 
+set(ax1,'pos',[x0 0.36 xw ax1Height]);
+% set(ax1,'pos',[x0 0.36 xw 0.62]);
 set(ax2,'pos',[x0 0.22 xw 0.11]);
 set(ax3,'pos',[x0 0.08 xw 0.11]);
 
-
-
+% Topography
+[topox, topoy, topoz] = get_z_etopo1(...
+    lolim(1)-.5, lolim(2)+.5, ...
+    lalim(1)-.5, lalim(2)+.5  );
 
 % figmap = figure(46); clf; set(figmap,'pos',[30 1016 943 278]);
 % axin = axes; hold on
@@ -333,10 +342,12 @@ for ii = 1:Ngd
 end
 
 %% cbar
-ax4 = axes(fig,'pos',get(ax1,'pos'),'visible','off');
+ax1Pos = get(ax1,'pos'); 
+ax4 = axes(fig,'pos',ax1Pos,'visible','off');
 hcb  = colorbar(ax4); caxis(ax4,vlims); colormap(ax4,vcmp);
-set(hcb,'pos',[0.91 .38 0.017 .54],'linewidth',2)
-title(hcb,'\textbf{V$_S$ (km/s)}','fontsize',16,'interpreter','latex','horizontalalignment','left')
+set(hcb,'pos',[ax1Pos(1)+0.01 + ax1Pos(3), ax1Pos(2) 0.017 ax1Pos(4)],'linewidth',2)
+% title(hcb,'\textbf{V$_S$ (km/s)}','fontsize',16,'interpreter','latex','horizontalalignment','left')
+ylabel(hcb, '\textbf{V$_S$ (km/s)}','fontsize',16,'interpreter','latex'); 
 %% pretty axes
 % % moho
 % set(ax2,'fontsize',15,'xlim',[27,61],'ylim',[0 max(max(No_moho_bin))],'ytick',[],...
@@ -344,10 +355,17 @@ title(hcb,'\textbf{V$_S$ (km/s)}','fontsize',16,'interpreter','latex','horizonta
 % xlabel(ax2,'Moho depth (km)','fontsize',15,'interp','tex','fontweight','bold')
 % anis
 
+
+%% Topo
+
+
+
+%% Axes 
+
 % compute degrees lon along profile
 loprof = Q1(2) + (Q2(2)-Q1(2))*get(ax2,'xtick')/distance(Q1(1),Q1(2),Q2(1),Q2(2));
 
-set(ax1,'fontsize',16,'ylim',[20 260],'xlim',[0 ceil(max(d_par))+0.5],...
+set(ax1,'fontsize',16,'ylim',[-20 260],'xlim',[0 ceil(max(d_par))+0.5],...
     'ydir','reverse','xticklabel','',...
     'color','none','box','on','layer','top','linewidth',1.8);
 
@@ -368,16 +386,70 @@ ylabel(ax1,'\textbf{Depth (km)}','fontsize',20,'interp','latex','fontweight','bo
 %
 xlabel(ax3,'\textbf{Longitude}','fontsize',20,'interp','latex','fontweight','bold')
 % 
-set(get(ax1,'ylabel'),'pos',get(get(ax1,'ylabel'),'pos').*[0 1 1] -[1.7 0 0],'verticalalignment','top')
-set(get(ax2,'ylabel'),'pos',get(get(ax2,'ylabel'),'pos').*[0 1 1] -[1.7 0 0],'verticalalignment','middle')
-set(get(ax3,'ylabel'),'pos',get(get(ax3,'ylabel'),'pos').*[0 1 1] -[1.7 0 0],'verticalalignment','top')
 
+%%% brb2022.06.06 Not sure what is happening here. These seem to remove the
+%%% labels. 
+% % % set(get(ax1,'ylabel'),'pos',get(get(ax1,'ylabel'),'pos').*[0 1 1] -[1.7 0 0],'verticalalignment','top')
+% % % set(get(ax2,'ylabel'),'pos',get(get(ax2,'ylabel'),'pos').*[0 1 1] -[1.7 0 0],'verticalalignment','middle')
+% % % set(get(ax3,'ylabel'),'pos',get(get(ax3,'ylabel'),'pos').*[0 1 1] -[1.7 0 0],'verticalalignment','top')
 
+% brb2022.06.06. Get lat (slt) and lon (sln) of points along our
+% cross-sections line. These are used for interpolating topography. Note:
+% this requires the mapping matlab package. If you dont have it, need to
+% find another way to get topography along cross-sections line. 
+% Make Topo axis to join with the model axis. 
+ax1Topo = copyobj(ax1, gcf);
+axes(ax1Topo); cla; 
+
+% ax1Box  = copyobj(ax1, gcf); 
+% ax1Box. Visible = 'on' ; % This one is specifically for labels and such, and goes on top. 
+ax1Topo.Visible = 'off'; % Only show what I plot here. Not labels, etc. 
+ax1.    Visible = 'on' ; 
+
+gcarc = distance(Q1, Q2); 
+azline= azimuth (Q1, Q2); 
+[latout_is_Q2, lonout_is_Q2] = reckon(Q1(1), Q1(2), gcarc, azline); % As a test, these outputs should be Q2. 
+[slt, sln] = reckon(Q1(1), Q1(2), linspace(0,gcarc,300), azline); % As a test, these outputs should be Q2. 
+slt = slt'; % Lats along our line for topo
+sln = sln'; % lons along our line for topo. 
+topo = griddata(topox, topoy, topoz', sln, slt); % Topo as a function of longitude and latitude. 
+[topo_perp, topo_par] = dist2line_geog( Q1,Q2,...
+        [slt, sln],0.1 ); % Get topo distance, in degrees. Seems like that's what unit Zach is using as horizontal unit? 
+topo = -topo./1000
+topo_exaggerate = 13; 
+topo(topo<0) = topo(topo<0)*topo_exaggerate;
+% plot(ss(topo<=0),topo(topo<=0),'LineWidth',1.5, 'color', [41, 94, 0]./256);
+% plot(ss(topo>0),topo(topo>0),'blue','LineWidth',1.6);
+plot(ax1Topo, topo_par, topo, ...
+    'linewidth', 2, 'color', [54, 163, 0]./256); 
+linkaxes([ax1, ax1Topo]); 
+axes(ax1); 
+
+% In case we have any negative depth yticks, corresponding to topography, just
+% get rid of those yticks. Most people don't explicitly put topography
+% ontheir plots anyway. 
+ytickarray = yticks(); 
+if any(ytickarray<0); 
+    set(gca, 'ytick', ytickarray(ytickarray>=0) ); 
+end
+
+% How much exageration is there? 
+figure(56); 
+axes(ax1); 
+figPos = get(gcf, 'pos') ; 
+axPos  = get(gca, 'pos'); 
+aspectFig = figPos(4) / figPos(3); % Aspect in this case is vertical over horizontal. 
+aspectAx  = axPos (4) / axPos (3);
+aspectDisplay = aspectFig * aspectAx * 0.44/0.465; % Multiply the two aspects together to get total aspect. The scaler at the end is the ratio of physical measurements on my screen with a ruler versus the aspectDisplay variable with no correction. THey are close. This is an emperical correction to handle things like labels.  
+aspectData = diff(ylim) / (diff(xlim) * 111); 
+verticalExag = aspectDisplay / aspectData; 
+fprintf('\nVertical exaggeration = %1.2f\n', verticalExag);
 
 %% save
 if ifsave
     exportgraphics(figure(56),[ofile1 '.pdf']);
-    exportgraphics(figure(mapFigNum), [ofile1 '_map.pdf']) ;  %exportgraphics(figure(mapFigNum), '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/xsect/Xsect_thingy.pdf')
+    exportgraphics(figure(mapFigNum), [ofile1 '_map.pdf'], ...
+        'BackgroundColor','none') ;  %exportgraphics(figure(mapFigNum), '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/xsect/Xsect_thingy.pdf')
 else
     pause
 end
