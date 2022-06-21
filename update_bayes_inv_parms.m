@@ -8,15 +8,15 @@ str_temp = split(stamp, '/');
 
 
 % { Different data types alone
-niter_only   = 16000; 
-burnin_only  = 4000; 
-cooloff_only = 3000; 
-nchains_only = 12; 
-
-% niter_only   = 500; 
-% burnin_only  = 100; 
-% cooloff_only = 80; 
-% nchains_only = 12; warning('Short "only" stamp');  
+% niter_only   = 16000; 
+% burnin_only  = 4000; 
+% cooloff_only = 3000; 
+% nchains_only = 12; 
+% 
+niter_only   = 300; 
+burnin_only  = 100; 
+cooloff_only =  70; 
+nchains_only = 2; warning('Short "only" stamp');  
 
 % niter_only   = 4000; 
 % burnin_only  = 1000; 

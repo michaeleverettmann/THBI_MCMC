@@ -32,7 +32,9 @@ addpath([bayesdir,'functions']) % inside this folder
 addpath([bayesdir,'functions/hKappaFunk']) % For doing some things with h-kappa stacks. 
 addpath([bayesdir,'functions/plotting/progress']) % For doing some things with h-kappa stacks. 
 addpath([bayesdir,'functions/master_subfuncs']); % Trying to break up master par into many subfunctions
-addpath([bayesdir,'functions/handle_errors']); 
+addpath([bayesdir,'functions/handle_errors']);
+addpath([bayesdir,'functions/plotting/plot_data_heatmap']); 
+
 % path of sub functions that I got online but don't know if I can legally
 % distribute. bb2021.09.14
 addpath(genpath([bayesdir, 'functions/functionsExternal'])); 
@@ -66,7 +68,9 @@ javaaddpath([hd '/MATLAB/iris/IRIS-WS-2.0.18.jar']); % bb2021.09.27 moving this 
 addpath([hd '/MATLAB/seizmo/mattaup']); % This might break things. It's Seizmo. 
 addpath([hd '/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for_seizmo']); % bb2021.08.04 Just taking the absolutely necessary Seizmo tools. 
 
-addpath('/Users/brennanbrunsvik/Documents/repositories/Base_code/colormaps/colormaps_ander_biguri'); % Perceptually uniform color maps. 
+% Any specific colormaps we want. Careful not to add them all or you might overwrite a variable, because the matlab namespace system is ... insane. 
+addpath([hd '/Documents/repositories/Base_code/colormaps/colormaps_ander_biguri']);
+addpath([hd '/Documents/repositories/Base_code/colormaps/ScientificColourMaps7/vik']); 
 
 % addpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup'); % bb2021.08.04 Need taup. 
 % addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for_seizmo'); % bb2021.08.04 Just taking the absolutely necessary Seizmo tools. 

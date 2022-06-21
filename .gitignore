@@ -71,3 +71,4 @@ matlab_to_hv_kernel/startB.model
 **pathsAutoGen.m
 *.jpeg
 investigations/h-kappa-tests/ears_waveforms/Ears/gauss_2.5/**
+figures/xsect/stafile*.txt

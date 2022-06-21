@@ -14,6 +14,7 @@ transferFolds=\
 /Users/brennanbrunsvik/Documents/repositories/Peoples_codes/HV_ellipticity/transfer
 /Users/brennanbrunsvik/MATLAB/transfer
 /Users/brennanbrunsvik/Documents/repositories/data/models_seismic/transfer
+/Users/brennanbrunsvik/Documents/repositories/Base_code/transfer
 '
 
 for fold in $transferFolds

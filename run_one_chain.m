@@ -291,6 +291,7 @@ try
     = delay_reject(...
         model, Pm_prior, ptb, ii, par, temp, Kbase,nchain,...
         model1,ptbnorm,p_bd,Pm_prior1k,non_acceptk); 
+% % %     p_bd = 1; if (mod(ii, 1000)==0) ; warning('brb2022.04.12 setting p_bd to 1.'); end; % brb2022.06.08
 %     fprintf('\nptbnorm=%1.3f, non_acceptk=%1.0f\n',ptbnorm, non_acceptk) % Temporary
 
 % % %     %%% Test stuff
@@ -396,6 +397,14 @@ try
        
 %% ========================  ACCEPTANCE CRITERION  ========================
     [ ifaccept ] = b6_IFACCEPT( log_likelihood1,log_likelihood,temp,p_bd*ifpass,Pm_prior1,Pm_prior);
+    
+% % %     %%% Temporary %!%!%!%!
+% % %     if ifaccept; 
+% % %         datamap.RF_Sp_ccp(ii).rf = predata.RF_Sp_ccp.PSV(:,1);
+% % %     else
+% % %         datamap.RF_Sp_ccp(ii).rf = predataPrev.RF_Sp_ccp.PSV(:,1); 
+% % %     end
+% % %     %%% Temporary %!%!%!%!
     
     
 %%% Figure out if chain is stuck
@@ -608,6 +617,7 @@ if plot_hk_progress_bool
     end
 end
 
+% % % plot_data_heatmap(datamap, trudata, predata, par); %!%!%!%!
 
 save_inv_state(par.res.resdir,chainstr,allmodels,misfits)
 misfits_perchain{iii} = misfits;

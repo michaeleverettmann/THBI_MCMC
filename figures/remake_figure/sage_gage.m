@@ -8,8 +8,8 @@
 clc; clear; 
 run('../../a0_STARTUP_BAYES.m');
 
-resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/S57A_TA_dat1/sage_gage'; 
-resdir_fig = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/remake_figure/figs/S57A_TA_dat1'; 
+resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/R55A_TA_dat1/sage_gage'; 
+resdir_fig = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/remake_figure/figs/R55A_TA_dat1'; 
 prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat'; 
 
 %% Load files from the inversion. 
