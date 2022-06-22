@@ -140,18 +140,18 @@ for istamp = [1:length(STAMP_all)];
         if exist('workdir','dir')~=7, mkdir('workdir'); end
         cd(proj.dir)
 
-        execute_MASTER_par
+        execute_run_all_chains
 
         cd(proj.dir)
     end
 
 end
 
-function execute_MASTER_par
+function execute_run_all_chains
 %     try
-    MASTER_par;
+    run_all_chains;
 %     catch e
-%         fprintf('Cant execute master_par.m. %s\n%s','(todo put stamp here)',getReport(e)) 
+%         fprintf('Cant execute run_all_chains.m. %s\n%s','(todo put stamp here)',getReport(e)) 
 %     end
 end
 % end

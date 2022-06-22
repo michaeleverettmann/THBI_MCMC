@@ -28,7 +28,7 @@ misfits_perchain_orig = misfits_perchain;
 allmodels_perchain_orig = allmodels_perchain; 
 [par, ~] = update_bayes_inv_parms(par, 'sage_gage'); 
 
-%% Do some tests. This is modified from MASTER_par.m
+%% Do some tests. This is modified from run_all_chains.m
 
 par.res.resdir = resdir_fig; % For saving files to new location
 par.inv.synthTest = false; % Get an error without this. 

@@ -40,4 +40,4 @@ run_params.STAMP = STAMP; % NEED - some identifier for this inversion run
 run_params.overwrite = 1; % do you want to overwrite previous results?
 
 %% Run it
-MASTER_par;
+run_all_chains;

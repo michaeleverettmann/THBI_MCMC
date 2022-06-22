@@ -27,7 +27,7 @@ load(prior_path);
 misfits_perchain_orig = misfits_perchain; 
 allmodels_perchain_orig = allmodels_perchain; 
 
-%% Do some tests. This is modified from MASTER_par.m
+%% Do some tests. This is modified from run_all_chains.m
 for iNumChains = [1, 2, 3, 4, 6, 9, 12, 16]; 
     fprintf('\n----------------------------------\nStarting iNumChains = %1.0f\n',iNumChains); 
     resdir = sprintf('%s/nchain_%1.0f', resdir_main, iNumChains); 

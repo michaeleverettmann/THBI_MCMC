@@ -136,7 +136,7 @@ if any(strcmp(allpdytp(:,1),'RF'))
         if strcmpi(allpdytp(idt,3),'ccp')
             fprintf('\n Extracting %s "RF" from CCP stack\n',allpdytp{idt,2})
             % addpath to CCP data
-            addpath(seismoddir);
+            addpath(seismoddir); % brb2022.06.21 Should not have addpath anywhere except in a0_STARTUP_BAYES.m
             slat = par.data.stadeets.Latitude;
             slon = par.data.stadeets.Longitude;
 

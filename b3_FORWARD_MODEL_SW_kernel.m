@@ -63,25 +63,25 @@ for id = 1:length(par.inv.datatypes)
    
         case {'HV'}
 
-        % these should be the same each time...
-        dvs_vs = linterp(modptb.Z,modptb.dvsav,0.5*(Kbase.(pdtyp{2}).KHV{1}.Z1 + Kbase.(pdtyp{2}).KHV{1}.Z2));
-        dvp_vp = linterp(modptb.Z,modptb.dvpav,0.5*(Kbase.(pdtyp{2}).KHV{1}.Z1 + Kbase.(pdtyp{2}).KHV{1}.Z2));
-        drh_rh = linterp(modptb.Z,modptb.drho, 0.5*(Kbase.(pdtyp{2}).KHV{1}.Z1 + Kbase.(pdtyp{2}).KHV{1}.Z2));
-        zzz = 0.5*(Kbase.(pdtyp{2}).KHV{1}.Z1 + Kbase.(pdtyp{2}).KHV{1}.Z2);
+            % these should be the same each time...
+            dvs_vs = linterp(modptb.Z,modptb.dvsav,0.5*(Kbase.(pdtyp{2}).KHV{1}.Z1 + Kbase.(pdtyp{2}).KHV{1}.Z2));
+            dvp_vp = linterp(modptb.Z,modptb.dvpav,0.5*(Kbase.(pdtyp{2}).KHV{1}.Z1 + Kbase.(pdtyp{2}).KHV{1}.Z2));
+            drh_rh = linterp(modptb.Z,modptb.drho, 0.5*(Kbase.(pdtyp{2}).KHV{1}.Z1 + Kbase.(pdtyp{2}).KHV{1}.Z2));
+            zzz = 0.5*(Kbase.(pdtyp{2}).KHV{1}.Z1 + Kbase.(pdtyp{2}).KHV{1}.Z2);
 
-        Np = length(Kbase.(pdtyp{2}).(pdtyp{3}));        
-        for ip = 1:Np
-            if ~isequal(zzz,0.5*(Kbase.(pdtyp{2}).KHV{ip}.Z1 + Kbase.(pdtyp{2}).KHV{ip}.Z2))
-            dvs_vs = linterp(modptb.Z,modptb.dvsav,0.5*(Kbase.(pdtyp{2}).KHV{ip}.Z1 + Kbase.(pdtyp{2}).KHV{ip}.Z2));
-            dvp_vp = linterp(modptb.Z,modptb.dvpav,0.5*(Kbase.(pdtyp{2}).KHV{ip}.Z1 + Kbase.(pdtyp{2}).KHV{ip}.Z2));
-            drh_rh = linterp(modptb.Z,modptb.drho, 0.5*(Kbase.(pdtyp{2}).KHV{ip}.Z1 + Kbase.(pdtyp{2}).KHV{ip}.Z2));
+            Np = length(Kbase.(pdtyp{2}).(pdtyp{3}));        
+            for ip = 1:Np
+                if ~isequal(zzz,0.5*(Kbase.(pdtyp{2}).KHV{ip}.Z1 + Kbase.(pdtyp{2}).KHV{ip}.Z2))
+                dvs_vs = linterp(modptb.Z,modptb.dvsav,0.5*(Kbase.(pdtyp{2}).KHV{ip}.Z1 + Kbase.(pdtyp{2}).KHV{ip}.Z2));
+                dvp_vp = linterp(modptb.Z,modptb.dvpav,0.5*(Kbase.(pdtyp{2}).KHV{ip}.Z1 + Kbase.(pdtyp{2}).KHV{ip}.Z2));
+                drh_rh = linterp(modptb.Z,modptb.drho, 0.5*(Kbase.(pdtyp{2}).KHV{ip}.Z1 + Kbase.(pdtyp{2}).KHV{ip}.Z2));
+                end
+                dHV = sum(dvs_vs.*Kbase.(pdtyp{2}).KHV{ip}.Kzh_Vs + ...
+                          dvp_vp.*Kbase.(pdtyp{2}).KHV{ip}.Kzh_Vp + ...
+                          drh_rh.*Kbase.(pdtyp{2}).KHV{ip}.Kzh_rho);
+                predata.(dtype).HVr(ip) = Kbase.(pdtyp{2}).(pdtyp{3})(ip) - dHV; % I think the signs are correct here!
             end
-            dHV = sum(dvs_vs.*Kbase.(pdtyp{2}).KHV{ip}.Kzh_Vs + ...
-                      dvp_vp.*Kbase.(pdtyp{2}).KHV{ip}.Kzh_Vp + ...
-                      drh_rh.*Kbase.(pdtyp{2}).KHV{ip}.Kzh_rho);
-            predata.(dtype).HVr(ip) = Kbase.(pdtyp{2}).(pdtyp{3})(ip) - dHV; % I think the signs are correct here!
-        end
- 
+
 
             
             

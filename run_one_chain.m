@@ -316,9 +316,6 @@ try
         
         try
             [predata,laymodel1] = b3__INIT_PREDATA(model1,par,trudata,0 );
-% % %             if ii > 5; 
-% % %                 error('Fake error, testing saving fail_chain > 0 model')
-% % %             end
             [predata,par] = b3_FORWARD_MODEL_BW(model1,laymodel1,par,predata,ID,0,predataPrev);
             predata = b3_FORWARD_MODEL_RF_ccp(   model1,laymodel1,par,predata,ID,0 );
             predata = b3_FORWARD_MODEL_SW_kernel(model1,Kbase,par,predata );

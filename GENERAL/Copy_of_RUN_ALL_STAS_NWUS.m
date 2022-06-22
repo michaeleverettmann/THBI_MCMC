@@ -55,15 +55,15 @@ for is = 100:stainfo.nstas % got to BMO, UO = is 89
 %     cd('workdir')
     cd(proj.dir)
     
-    execute_MASTER_par
+    execute_run_all_chains
 
     cd(proj.dir)
 end
 
-function execute_MASTER_par
+function execute_run_all_chains
     global run_params
     try
-    MASTER_par;
+    run_all_chains;
     catch
 %         1;
     end

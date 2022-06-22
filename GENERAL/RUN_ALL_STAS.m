@@ -56,15 +56,15 @@ for is = 1:stainfo.nstas % done 30-end, need to do before and after...
 %     cd('workdir')
     cd(proj.dir)
     
-    execute_MASTER_par
+    execute_run_all_chains
     
     cd(proj.dir)
 end
 
-function execute_MASTER_par
+function execute_run_all_chains
     global run_params
     try
-        MASTER_par;
+        run_all_chains;
     catch e 
         fprintf('\n%s\n',getReport(e)); 
     end
