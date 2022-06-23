@@ -203,16 +203,43 @@ if any(strcmp(allpdytp(:,1),'SW'))
 
     %% -------- Rayleigh waves
     if any(strcmp(allpdytp(strcmp(allpdytp(:,1),'SW'),2),'Ray'))
-        [Rperiods,RphV]  = Rph_dispcurve_latlon( slat,slon); % grab composite of AN and EQ
+        
+        % Determine which Rayleigh wave datasets to use. 
+        phv_modifiers = {}; 
+        for idata = 1:size(allpdytp,1); 
+            isRayPhv = strcmp(allpdytp{idata,1},'SW') && ...
+                strcmp(allpdytp{idata,2},'Ray') && ...
+                strcmp(allpdytp{idata,3},'phV'); % Indecies of data where we care about authors.  
+            if isRayPhv; 
+                phv_modifiers{end+1} = allpdytp{idata,4}; 
+            end
+        end 
+        % phv_modifiers should either be empty of have cells with modifiers.
+            
+        
+%         [Rperiods,RphV]  = Rph_dispcurve_latlon( slat,slon); % grab composite of AN and EQ
         % err = error_curve_EQ_latlon( 1./periods,avar.slat,avar.slon,phVerrordir);
+        
+        [Rperiods1,RphV,SW_Ray_phV_dal]=...
+            Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','DALTON');
+        [Rperiods2,RphV,SW_Ray_phV_eks]=...
+            Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','EKSTROM');
+        
+        allPeriods = unique(sort([Rperiods1; Rperiods2])); 
+        minPeriod = min([allPeriods]); 
+        maxPeriod = max([allPeriods]); 
+        
+        SW_Ray_phV_eks.periods_calc = allPeriods; % Keep track of all periods we care about. This is for forward modelling. We want to run full mineos kernel calculation once over all periods, not once for each author. 
+        SW_Ray_phV_dal.periods_calc = allPeriods; 
 
-        if ~isempty(RphV)
-            [Rperiods,iT] = sort(Rperiods);
-            RphV = RphV(iT);
-            SW_Ray_phV = struct('periods',Rperiods,'phV',RphV,'sigma',[]);
-        else
-            SW_Ray_phV=[];
-        end
+% % %         if ~isempty(RphV)
+% % %             [Rperiods,iT] = sort(Rperiods);
+% % %             RphV = RphV(iT);
+% % %             SW_Ray_phV = struct('periods',Rperiods,'phV',RphV,'sigma',[]);
+% % %         else
+% % %             SW_Ray_phV=[];
+% % %         end
+        
     end
 
     %% -------- Love waves
@@ -321,7 +348,9 @@ trudata = struct('BW_Ps',BW_Ps,'BW_Sp',BW_Sp,...
                  'RF_Ps',RF_Ps,'RF_Sp',RF_Sp,...
                  'RF_Ps_ccp',RF_Ps_ccp,'RF_Sp_ccp',RF_Sp_ccp,...
                  'HKstack_P',HKstack_P,...
-                 'SW_Ray_phV',SW_Ray_phV,'SW_Lov_phV',SW_Lov_phV,'SW_HV',SW_HV);
+                 'SW_Ray_phV',SW_Ray_phV,'SW_Lov_phV',SW_Lov_phV,'SW_HV',SW_HV,...
+                 'SW_Ray_phV_dal',SW_Ray_phV_dal,'SW_Ray_phV_eks',SW_Ray_phV_eks);
+%         warning('brb2022.06.23 did I replace sw_ray_phv in trudata struct?'); 
 
 
 cd(wd);

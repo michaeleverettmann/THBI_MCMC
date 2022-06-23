@@ -125,6 +125,12 @@ elseif strcmp(pdt{1},'SW')
     elseif any(strcmp(pdt,'gr'))
         parsed_dtype{3} = 'grV'; 
     end
+    % Modifications
+%     if any(strcmpi(pdt,'Eks')); % brb2022.06.21. Add in author or other modifications... not a great system, since strings in different positions could match strings in this position. 
+%         parsed_dtype{4} = 'Eks'; 
+%     elseif any(strcmpi(pdt,'Lyn')); 
+%         parsed_dtype{4} = 'Lyn'; 
+%     end
 end
 
 

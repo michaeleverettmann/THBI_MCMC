@@ -14,6 +14,8 @@ if isempty(Kbase)
     Kbase = initiate_Kbase;
 end
 
+ran_sw_vel_true = false; % Have we ran surface
+
 Kbase.modelk = model;
 Kbase.itersave=0;
 for id = 1:length(par.inv.datatypes)
@@ -27,7 +29,9 @@ for id = 1:length(par.inv.datatypes)
         Kbase = populate_Kbase( Kbase,dtype,HVr_new,[],{HVK_new} );    
     else
         par_mineos = struct('R_or_L',pdtyp{2},'phV_or_grV',pdtyp{3},'ID',ID);
-        [phV,grV,eigfiles] = run_mineos(model,data.(dtype).periods,par_mineos,0,0,par.inv.verbose,options.maxrunN);
+        periods_mineos = data.(dtype).periods; 
+%         periods_mineos = [5:.1:40]'; 
+        [phV,grV,eigfiles] = run_mineos(model,periods_mineos,par_mineos,0,0,par.inv.verbose,options.maxrunN);
         K = run_kernels(data.(dtype).periods,par_mineos,eigfiles,1,0,par.inv.verbose);
         Kbase = populate_Kbase( Kbase,dtype,phV,grV,{K} );
     end

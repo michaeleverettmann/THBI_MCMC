@@ -14,8 +14,8 @@ function [ periods, phVs ] = Rph_dispcurve_latlon(ilat,ilon,transT,options)
 %  the frequencies of interest. If the requested lat/lon point is outside
 %  the grid of data, this function will return phV_freq = nan.
 
-EQauth = options.EQauth; 
-ANauth = options.ANauth; 
+EQauth = options.EQauth; % 'DALTON'
+ANauth = options.ANauth;  % 'EKSTROM'
 
 if nargin<3 || isempty(transT)
     transT = 33;

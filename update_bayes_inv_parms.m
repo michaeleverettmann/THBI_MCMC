@@ -360,6 +360,30 @@ elseif strcmp(stamp, 'ccp_weights_2');
     par.inv.cooloff                   = cooloff_only; 
     par.inv.nchains                   = nchains_only; 
     par.datprocess.CCP.weight_depth_val = [-10,0.3 ; 50,0.3 ; 100,1 ; 6371,1]; % Upweight at depth. This gets normalized.  
+
+elseif strcmp(stamp, 'many_sw_authors'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+    
+% %     par.inv.datasets = struct('SW_Ray_phV', ["Eks", "Lyn"], ...
+% %         'SW_Lov_phV', [], 'RF_Sp_ccp', [], 'HKstack_P',[],'SW_HV',[]); 
+% %     
+% %     datatypes = {}; 
+% %     for idtype = 1:length(par.inv.datatypes); 
+% %         par.inv.datatypes par.inv.datasets(idtype)
+        
+    
+    par.inv.niter                     = 300  ; 
+    par.inv.burnin                    = 100  ; 
+    par.inv.cooloff                   = 80   ; 
+    par.inv.nchains                   = 1    ; 
+
+
+
+
+
+
+
 end
 
 inv = par.inv; 
