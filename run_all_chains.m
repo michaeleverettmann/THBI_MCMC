@@ -206,8 +206,8 @@ mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep
 
 
 %% % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-for asdfasdf = [1:10]; warning('BB2021.11.22 Not in parallel!!!'); end; 
+parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+% for asdfasdf = [1:10]; warning('BB2021.11.22 Not in parallel!!!'); end; 
 par = PR.Value; 
 trudata = TD.Value; 
 

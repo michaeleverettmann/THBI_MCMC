@@ -13,10 +13,10 @@ str_temp = split(stamp, '/');
 % cooloff_only = 3000; 
 % nchains_only = 12; 
 % 
-niter_only   = 300; 
+niter_only   = 400; 
 burnin_only  = 100; 
 cooloff_only =  70; 
-nchains_only = 2; warning('Short "only" stamp');  
+nchains_only = 4; warning('Short "only" stamp');  
 
 % niter_only   = 4000; 
 % burnin_only  = 1000; 
@@ -362,7 +362,7 @@ elseif strcmp(stamp, 'ccp_weights_2');
     par.datprocess.CCP.weight_depth_val = [-10,0.3 ; 50,0.3 ; 100,1 ; 6371,1]; % Upweight at depth. This gets normalized.  
 
 elseif strcmp(stamp, 'many_sw_authors'); 
-    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal',...
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', 'SW_Ray_phV_lyneqeik',...
         'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
     
 % %     par.inv.datasets = struct('SW_Ray_phV', ["Eks", "Lyn"], ...
@@ -373,10 +373,10 @@ elseif strcmp(stamp, 'many_sw_authors');
 % %         par.inv.datatypes par.inv.datasets(idtype)
         
     
-    par.inv.niter                     = 300  ; 
-    par.inv.burnin                    = 100  ; 
-    par.inv.cooloff                   = 80   ; 
-    par.inv.nchains                   = 1    ; 
+    par.inv.niter                     = 16000; 
+    par.inv.burnin                    = 5000 ; 
+    par.inv.cooloff                   = 4000 ; 
+    par.inv.nchains                   = 12   ; % Less chains. So we can run more stations. 
 
 
 

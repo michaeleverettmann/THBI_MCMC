@@ -25,6 +25,10 @@ if isempty(Kbase)
     Kbase = initiate_Kbase;
 end
 
+ran_ray_vel = false; % Have we ran this data type? Only do calculation for it once. 
+ran_lov_vel = false; 
+ran_hv = false; 
+
 if nargin < 6 || isempty(redo_phV) || redo_phV==true
     % recalculate the data (phase/group velocities and HVratios)
     % using the precise model, if this has not been done already this
@@ -43,18 +47,32 @@ for id = 1:length(par.inv.datatypes)
     if ~strcmp(pdtyp{1},'SW'), continue; end
     
     if strcmp(pdtyp{2},'HV')
+        if ran_hv; continue; end; 
         HVr_new = predata.SW_HV.HVr;
-%         [HVr_new,HVK_new] = run_HVkernel(model,predata.(dtype).periods,ID,1,0,par.inv.verbose);
-        Kbase = populate_Kbase( Kbase, dtype, HVr_new, [], {SW_precise.HV.HVK_new} );    
+        Kbase = populate_Kbase( Kbase, dtype, HVr_new, [], {SW_precise.HV.HVK_new},...
+            predata.(dtype).for_mod_info.periods_calc ); 
+        
+        if ~ran_hv; ran_hv = true; end; 
     else
+        if ran_ray_vel && strcmp(pdtyp{2},'Ray'); continue; end; 
+        if ran_lov_vel && strcmp(pdtyp{2},'Lov'); continue; end; 
+        
         MINEOS_file_delete = 1;
         ifplot = 0;
-        grV = [];
-        phV = predata.(dtype).phV;
+        
+        grV = SW_precise.(pdtyp{2}).grV
+        phV = SW_precise.(pdtyp{2}).phV; 
+        
         par_mineos = struct('R_or_L',pdtyp{2},'phV_or_grV',pdtyp{3},'ID',ID);
-%         [phV,grV] = run_mineos(model,predata.(dtype).periods,pdtyp{2},ID,0,0,par.inv.verbose);
-        K = run_kernels(predata.(dtype).periods, par_mineos,SW_precise.(pdtyp{2}).eigfiles, MINEOS_file_delete, ifplot, par.inv.verbose);
-        Kbase = populate_Kbase( Kbase, dtype, phV, grV, {K} );
+        
+        K = run_kernels(predata.(dtype).for_mod_info.periods_calc, ...
+            par_mineos,SW_precise.(pdtyp{2}).eigfiles, MINEOS_file_delete, ifplot, par.inv.verbose);
+        Kbase = populate_Kbase( Kbase, dtype, phV, grV, {K}, ...
+            predata.(dtype).for_mod_info.periods_calc );
+        
+        if ~ran_ray_vel && strcmp(pdtyp{2},'Ray'); ran_ray_vel = true; end; 
+        if ~ran_lov_vel && strcmp(pdtyp{2},'Lov'); ran_lov_vel = true; end; 
+        
     end
     
 end

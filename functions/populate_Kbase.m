@@ -1,4 +1,4 @@
-function [ Kbase ] = populate_Kbase( Kbase,dtype,phV,grV,K )
+function [ Kbase ] = populate_Kbase(Kbase,dtype,phV,grV,K,periods)
 %[ Kbase ] = populate_Kbase( Kbase,dtype,phV,grV,K )
 
 pdtyp = parse_dtype(dtype);
@@ -19,7 +19,11 @@ elseif strcmp(pdtyp{2},'HV') % HV ratio
     else
         Kbase.(pdtyp{2}).HVr = phV;
         Kbase.(pdtyp{2}).(['K',pdtyp{3}(1:2)]) = K{1};
-    end
+    end    
+end
+
+Kbase.(pdtyp{2}).periods = periods;     
+
 
 end
 

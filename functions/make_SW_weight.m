@@ -13,8 +13,11 @@ for id = 1:length(par.inv.datatypes)
         case {'Ray','Lov'}
             % what should the weight be?
             if all(par.inv.Kweight == true) % if using default weight by fraction of kernel in model
-                    SWwt.(dtype) = calc_K_in_model( Kbase.(pdtyp{2}).(['K',pdtyp{3}(1:2)]),par );
+                    SWwt_all_k = calc_K_in_model( Kbase.(pdtyp{2}).(['K',pdtyp{3}(1:2)]),par );
+                    SWwt.(dtype) = interp1(...
+                        Kbase.(pdtyp{2}).periods, SWwt_all_k, trudata.(dtype).periods); % We had weight for all periods. We just want weight corresponding to periods in this specific dataset. Interpolate betwen weights for them. 
                     SWwt.(dtype) = SWwt.(dtype)/geomean(SWwt.(dtype));    
+                    
             elseif all(par.inv.Kweight == false) % if no weight
                 SWwt.(dtype) = 1;    
             else
@@ -24,8 +27,11 @@ for id = 1:length(par.inv.datatypes)
         case {'HV'}
             % what should the weight be?
             if all(par.inv.Kweight == true) % if using default weight by fraction of kernel in model
-                    SWwt.(dtype) = calc_K_in_model( Kbase.(pdtyp{2}).(['K',pdtyp{3}(1:2)]),par );
-                    SWwt.(dtype) = SWwt.(dtype)/geomean(SWwt.(dtype));    
+                    SWwt_all_k = calc_K_in_model( Kbase.(pdtyp{2}).(['K',pdtyp{3}(1:2)]),par );
+                    SWwt.(dtype) = interp1(...
+                        Kbase.(pdtyp{2}).periods, SWwt_all_k, trudata.(dtype).periods); % We had weight for all periods. We just want weight corresponding to periods in this specific dataset. Interpolate betwen weights for them. 
+                    SWwt.(dtype) = SWwt.(dtype)/geomean(SWwt.(dtype)); 
+                    
             elseif all(par.inv.Kweight == false) % if no weight
                 SWwt.(dtype) = 1;    
             else

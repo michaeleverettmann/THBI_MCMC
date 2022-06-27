@@ -224,13 +224,22 @@ if any(strcmp(allpdytp(:,1),'SW'))
             Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','DALTON');
         [Rperiods2,RphV,SW_Ray_phV_eks]=...
             Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','EKSTROM');
+        [Rperiods3,RphV,SW_Ray_phV_lyneqeik]=...
+            Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','LYNNER_EQ_EIK');
         
-        allPeriods = unique(sort([Rperiods1; Rperiods2])); 
-        minPeriod = min([allPeriods]); 
-        maxPeriod = max([allPeriods]); 
+        all_periods = unique(sort([Rperiods1; Rperiods2; Rperiods3])); 
+        min_period = min([all_periods]); 
+        max_period = max([all_periods]); 
+        periods_calc = all_periods; % Just run calculations at the periods where authors made their measurements. 
+        n_periods_calc = length(periods_calc); 
+        for_mod_info = struct('n_periods_calc', n_periods_calc,...
+            'all_periods', all_periods,...
+            'min_period',min_period,'max_period',max_period,...
+            'periods_calc',periods_calc); % Information on what forward modelling needs to be done. We don't want to do forward modelling once for each seperate author. Instead, forward model once, accounting for every author simultaneously. 
         
-        SW_Ray_phV_eks.periods_calc = allPeriods; % Keep track of all periods we care about. This is for forward modelling. We want to run full mineos kernel calculation once over all periods, not once for each author. 
-        SW_Ray_phV_dal.periods_calc = allPeriods; 
+        SW_Ray_phV_eks                .for_mod_info = for_mod_info; % Forward modelling shouldn't change for any author. We forward model once, and interpolate from those results. 
+        SW_Ray_phV_dal                .for_mod_info = for_mod_info; 
+        SW_Ray_phV_lyneqeik           .for_mod_info = for_mod_info; 
 
 % % %         if ~isempty(RphV)
 % % %             [Rperiods,iT] = sort(Rperiods);
@@ -246,6 +255,7 @@ if any(strcmp(allpdytp(:,1),'SW'))
 	if any(strcmp(allpdytp(strcmp(allpdytp(:,1),'SW'),2),'Lov'))
         [Lperiods,LphV]  = Lph_dispcurve_latlon( slat,slon); % 
 
+        % %!%! brb2022.06.24 Put this in Lph_dispcurve_latlon_oneauthr
         if ~isempty(LphV)
             [Lperiods,iT] = sort(Lperiods);
             LphV = LphV(iT);
@@ -253,6 +263,19 @@ if any(strcmp(allpdytp(:,1),'SW'))
         else
             SW_Lov_phV=[];
         end
+        
+        all_periods = unique(sort(Lperiods)); 
+        min_period = min([all_periods]); 
+        max_period = max([all_periods]); 
+        periods_calc = all_periods; 
+        n_periods_calc = length(periods_calc); 
+        for_mod_info = struct('n_periods_calc', n_periods_calc,...
+            'all_periods', all_periods,...
+            'min_period',min_period,'max_period',max_period,...
+            'periods_calc',periods_calc); % Information on what forward modelling needs to be done. We don't want to do forward modelling once for each seperate author. Instead, forward model once, accounting for every author simultaneously. 
+        
+        SW_Lov_phV.for_mod_info = for_mod_info; % Forward modelling shouldn't change for any author...
+
     end
 
     %% -------- Rayleigh HV ratios
@@ -273,6 +296,18 @@ if any(strcmp(allpdytp(:,1),'SW'))
         else
             SW_HV=[];
         end
+        
+        
+        all_periods = unique(sort(HVperiods)); 
+        min_period = min([all_periods]); 
+        max_period = max([all_periods]); 
+        periods_calc = all_periods; % No need for extra periods here unless we are bringing in more HV datasets. 
+        n_periods_calc = length(all_periods); 
+        for_mod_info = struct('n_periods_calc', n_periods_calc,...
+            'all_periods', all_periods,...
+            'min_period',min_period,'max_period',max_period,...
+            'periods_calc',periods_calc); % Information on what forward modelling needs to be done. We don't want to do forward modelling once for each seperate author. Instead, forward model once, accounting for every author simultaneously. 
+        SW_HV.for_mod_info = for_mod_info; 
     end
 
 end
@@ -318,8 +353,8 @@ if any(strcmp(allpdytp(:,1),'HKstack'))
         hkstack.Nobs = 100;
     end
     HKstack_P           = hkstack;
-    HKstack_P.Esum      = Esum2         -mingrid(Esum2         );
-    HKstack_P.Esum_orig = HKstack_P.Esum-mingrid(HKstack_P.Esum); % Duplicate HK stack. Might end up replacing other info with my own HK stack. 
+    HKstack_P.Esum      = Esum2          - mingrid(Esum2         );
+    HKstack_P.Esum_orig = HKstack_P.Esum - mingrid(HKstack_P.Esum); % Duplicate HK stack. Might end up replacing other info with my own HK stack. 
     HKstack_P.H_orig    = HKstack_P.H; 
     HKstack_P.K_orig    = HKstack_P.K; 
     HKstack_P.waves     = rfWaves; 
@@ -349,7 +384,8 @@ trudata = struct('BW_Ps',BW_Ps,'BW_Sp',BW_Sp,...
                  'RF_Ps_ccp',RF_Ps_ccp,'RF_Sp_ccp',RF_Sp_ccp,...
                  'HKstack_P',HKstack_P,...
                  'SW_Ray_phV',SW_Ray_phV,'SW_Lov_phV',SW_Lov_phV,'SW_HV',SW_HV,...
-                 'SW_Ray_phV_dal',SW_Ray_phV_dal,'SW_Ray_phV_eks',SW_Ray_phV_eks);
+                 'SW_Ray_phV_dal',SW_Ray_phV_dal,'SW_Ray_phV_eks',SW_Ray_phV_eks,...
+                 'SW_Ray_phV_lyneqeik',SW_Ray_phV_lyneqeik);
 %         warning('brb2022.06.23 did I replace sw_ray_phv in trudata struct?'); 
 
 

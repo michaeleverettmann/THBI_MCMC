@@ -1,4 +1,5 @@
-function [ periods, phV_period, SW_Ray_phV ] = Rph_dispcurve_latlon_single_auth(ilat,ilon,options)
+function [ periods, phV_period, SW_Ray_phV ...
+    ] = Rph_dispcurve_latlon_single_auth(ilat,ilon,options)
     arguments
         ilat
         ilon
@@ -31,7 +32,8 @@ elseif strcmp(options.dataset, 'EKSTROM');
     periods = [5, 6, 8, 10, 12, 15, 20, 25, 30, 35, 40]';
     phV_period = disp_curve_AN_latlon(periods,ilat,ilon,datadir);
 elseif strcmp(options.dataset, 'LYNNER_EQ_EIK') % Colton's Eikonal earthquake phase velocities. 
-    warning('No colton eq eikonal yet'); 
+    ddir = [seismoddir,'ENAM_RAYLEIGH_LYNNER_EQ_EIK/'];
+    [periods, phV_period] = load_EQphV_data_lyneik(ilat,ilon,ddir);
 elseif strcmp(options.dataset, 'LYNNER_EQ_HELM') % Colton's Eikonal earthquake phase velocities. 
     warning('No colton EQ_HELM'); 
 elseif strcmp(options.dataset, 'LYNNER_ANT') % Colton's Eikonal earthquake phase velocities. 
