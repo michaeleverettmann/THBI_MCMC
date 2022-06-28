@@ -138,7 +138,7 @@ save([resdir,'/par'],'par');
 % save par and copy the parms.m file to the results directory
 eval(sprintf('! cp parms/bayes_inv_parms.m %s',resdir))
 
-allpdytp = parse_dtype_all(par);
+% allpdytp = parse_dtype_all(par);
 
 %% ========================  LOAD + PREP DATA  ========================
 [trudata,par] = a2_LOAD_DATA(par);
@@ -206,8 +206,8 @@ mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep
 
 
 %% % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-warning('BB2021.11.22 Not in parallel!!!')
+parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+% for asdfasdf = [1:10]; warning('BB2021.11.22 Not in parallel!!!'); end; 
 par = PR.Value; 
 trudata = TD.Value; 
 
@@ -256,6 +256,7 @@ fprintf('  > Processing results\n')
  = c1_PROCESS_RESULTS( misfits_perchain,allmodels_perchain,par,1,[resdir,'/modMisfits']);
 
 [ hypparm_trends ] = plot_HYPERPARAMETER_TRENDS( allmodels_perchain,[resdir,'/hyperparmtrend.pdf'] );
+plot_MISFIT_TRENDS(par,allmodels_perchain,misfits_perchain_original,resdir );
 plot_KNOT_TRENDS( allmodels_perchain,par,[resdir,'/knottrends']  )
 
 posterior = c2_BUILD_POSTERIOR(allmodels_collated,par,par.res.zatdep);

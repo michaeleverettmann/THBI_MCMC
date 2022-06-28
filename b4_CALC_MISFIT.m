@@ -62,49 +62,57 @@ for id = 1:length(par.inv.datatypes)
                 trudata.(dtype)(itr).PSV(:,1) = rf_tru_weight; 
                 predata.(dtype)(itr).PSV(:,1) = rf_pre_weight; 
 
-                try %^ Plot -- put in try loop. No need to stop inversion if this plot doesn't work. 
-                    if par.inv.verbose  || (par.ii == par.inv.niter); 
-                        figure(1); clf; hold on; 
-                        box on; 
-                        set(gcf, 'color', 'white', 'pos', [-742 527 530 387]);
-                        set(gca, 'linewidth', 1); 
-                        xlabel('Depth (km)'); 
-                        title('Receiver function weighting', 'fontweight', 'normal', ...
-                            'fontsize', 16); 
-                        lineWidths = 2; 
-
-
-                        yyaxis left; 
-                        yticks([]); 
-                        shiftVal = 2 * rms(rf_tru); 
-                        rf_tru_hand = plot(zz, rf_tru+shiftVal       , ...
-                            '-k','linewidth', lineWidths); 
-                        rf_pre_hand = plot(zz, rf_pre-shiftVal       , ...
-                            '-k','linewidth', lineWidths);  
-                        rf_tru_weight_hand = plot(zz, rf_tru_weight+shiftVal, ...
-                            '-b','linewidth', lineWidths);  
-                        rf_pre_weight_hand = plot(zz, rf_pre_weight-shiftVal, ...
-                            '-b','linewidth', lineWidths);  
-
-                        yyaxis right; 
-                        ylabel('Weight'); 
-                        weight_hand = plot(zz, weight, ...
-                            ':k','linewidth', lineWidths); 
-
-                        legend([rf_tru_hand, rf_tru_weight_hand, weight_hand], ...
-                            'Original', 'Weighted','Weight'); 
-                        yyaxis left; 
-                        text(gca, 0,  shiftVal*1.3, 'Observed' , 'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle'); 
-                        text(gca, 0, -shiftVal*1.3, 'Predicted', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle'); 
-
-                        ax = gca;ax.YAxis(1).Color = 'k';ax.YAxis(2).Color = 'k';
-
-                        if (par.ii == par.inv.niter) 
-                            exportgraphics(gcf, sprintf('%s/rf_weighting_%s.pdf',par.res.resdir,par.res.chainstr));
-                        end
+                % Plot stuff on the later iteration. But ii isn't always a
+                % part of par... Have to do obnoxious stuff...
+                plot_the_thing = par.inv.verbose; 
+                if isfield(par, 'ii'); 
+                    if par.ii == par.inv.niter; 
+                        plot_the_thing = true; 
                     end
-                catch e
-                    warning('Could not plot rf weighting scheme. Delete this try catch when you know this plotting works.\n%s',getReport(e))
+                end
+%                 try %^ Plot -- put in try loop. No need to stop inversion if this plot doesn't work. 
+                if plot_the_thing; 
+                    figure(1); clf; hold on; 
+                    box on; 
+                    set(gcf, 'color', 'white', 'pos', [-742 527 530 387]);
+                    set(gca, 'linewidth', 1); 
+                    xlabel('Depth (km)'); 
+                    title('Receiver function weighting', 'fontweight', 'normal', ...
+                        'fontsize', 16); 
+                    lineWidths = 2; 
+
+
+                    yyaxis left; 
+                    yticks([]); 
+                    shiftVal = 2 * rms(rf_tru); 
+                    rf_tru_hand = plot(zz, rf_tru+shiftVal       , ...
+                        '-k','linewidth', lineWidths); 
+                    rf_pre_hand = plot(zz, rf_pre-shiftVal       , ...
+                        '-k','linewidth', lineWidths);  
+                    rf_tru_weight_hand = plot(zz, rf_tru_weight+shiftVal, ...
+                        '-b','linewidth', lineWidths);  
+                    rf_pre_weight_hand = plot(zz, rf_pre_weight-shiftVal, ...
+                        '-b','linewidth', lineWidths);  
+
+                    yyaxis right; 
+                    ylabel('Weight'); 
+                    weight_hand = plot(zz, weight, ...
+                        ':k','linewidth', lineWidths); 
+
+                    legend([rf_tru_hand, rf_tru_weight_hand, weight_hand], ...
+                        'Original', 'Weighted','Weight'); 
+                    yyaxis left; 
+                    text(gca, 0,  shiftVal*1.3, 'Observed' , 'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle'); 
+                    text(gca, 0, -shiftVal*1.3, 'Predicted', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle'); 
+
+                    ax = gca;ax.YAxis(1).Color = 'k';ax.YAxis(2).Color = 'k';
+
+                    if (par.ii == par.inv.niter) 
+                        exportgraphics(gcf, sprintf('%s/rf_weighting_%s.pdf',par.res.resdir,par.res.chainstr));
+                    end
+%                     end
+%                 catch e
+%                     warning('Could not plot rf weighting scheme. Delete this try catch when you know this plotting works.\n%s',getReport(e))
                 end %^ end plot
             end          
             

@@ -1,5 +1,4 @@
 function [ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,data,posterior )
-%[ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,data )
 
 ID = [par.data.stadeets.nwk '.' par.data.stadeets.sta '_finalmod'];
 
@@ -196,18 +195,22 @@ if any(strcmp(pdtyps(:,1),'SW'))
                     
     if any(strcmp(pdtyps(:,2),'Ray')), itp = par.inv.datatypes(find(strcmp(pdtyps(:,2),'Ray'),1,'first'));
         par_mineos = struct('R_or_L','R','ID',ID);
-        [SW.Ray.phV,SW.Ray.grV] = run_mineos(modminrun,data.(itp{1}).periods,par_mineos,1,0,par.inv.verbose);
+        [SW.Ray.phV,SW.Ray.grV] = run_mineos(...
+            modminrun,data.(itp{1}).for_mod_info.all_periods,par_mineos,1,0,par.inv.verbose);
     end
     if any(strcmp(pdtyps(:,2),'Lov')), itp = par.inv.datatypes(find(strcmp(pdtyps(:,2),'Lov'),1,'first'));
         par_mineos = struct('R_or_L','L','ID',ID);
-        [SW.Lov.phV,SW.Lov.grV] = run_mineos(modminrun,data.(itp{1}).periods,par_mineos,1,0,par.inv.verbose);
+        [SW.Lov.phV,SW.Lov.grV] = run_mineos(...
+            modminrun,data.(itp{1}).for_mod_info.all_periods,par_mineos,1,0,par.inv.verbose);
     end
     if any(strcmp(pdtyps(:,2),'HV')), itp = par.inv.datatypes(find(strcmp(pdtyps(:,2),'HV'),1,'first'));
-        SW.HV.HVr = run_HVkernel(modminrun,data.(itp{1}).periods,'final',1,0,par.inv.verbose);
+        SW.HV.HVr = run_HVkernel(...
+            modminrun,data.(itp{1}).for_mod_info.all_periods,'final',1,0,par.inv.verbose);
     end
     for id = 1:length(par.inv.datatypes)
         dtype = par.inv.datatypes{id}; pdtyp=parse_dtype(dtype); if ~strcmp(pdtyp{1},'SW'),continue; end
-        final_predata.(dtype).(pdtyp{3}) = SW.(pdtyp{2}).(pdtyp{3});
+        final_predata.(dtype).(pdtyp{3}) = interp1(data.(dtype).for_mod_info.all_periods, ...
+            SW.(pdtyp{2}).(pdtyp{3}), data.(dtype).periods);
     end
 
 end

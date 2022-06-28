@@ -1,4 +1,4 @@
-function [ trudata,zeroDstr ] = load_data( par )
+function [ trudata,zeroDstr,par ] = load_data( par )
 %[ trudata,cheatstr ] = load_data( par )
 paths = getPaths(); 
 
@@ -11,7 +11,6 @@ S_win = [-35 5] ;
 tapertime = 2;
 samprate = 10;
 zeroDstr = []; % whether or not the daughter component is zeroed at the time of the parent
-% zeroDstr = '_zeroDstr';
 
 wd = pwd;
 
@@ -20,15 +19,6 @@ sta = par.data.stadeets.sta;
 nwk = par.data.stadeets.nwk;
 
 seismoddir = [paths.models_seismic '/']; 
-% seismoddir = '/Volumes/data/models_seismic/';
-% if ~exist(seismoddir,'dir')
-%     try
-%         seismoddir = '/Volumes/eilon_data/models_seismic/';
-%     catch
-%         error('NO SEISMOD DIR FOUND');
-%     end
-% end
-%      
 
 %% work out which data types to grab
 allpdytp = parse_dtype_all(par);
@@ -192,6 +182,7 @@ end
 
 %% ------------------------------------------------------------------
 %% ----------------------  SURFACE WAVE DATA  ----------------------
+SW_Ray_phV_structures = struct(''); % capture any rayleigh phv datasets. Might want to modify to not just be phv and Rayleigh. 
 if any(strcmp(allpdytp(:,1),'SW'))
 
     %% Phase velocity data
@@ -203,22 +194,93 @@ if any(strcmp(allpdytp(:,1),'SW'))
 
     %% -------- Rayleigh waves
     if any(strcmp(allpdytp(strcmp(allpdytp(:,1),'SW'),2),'Ray'))
-        [Rperiods,RphV]  = Rph_dispcurve_latlon( slat,slon); % grab composite of AN and EQ
+        
+        % Determine which Rayleigh wave datasets to use. 
+        phv_modifiers = {}; 
+        for idata = 1:size(allpdytp,1); 
+            isRayPhv = strcmp(allpdytp{idata,1},'SW') && ...
+                strcmp(allpdytp{idata,2},'Ray') && ...
+                strcmp(allpdytp{idata,3},'phV'); % Indecies of data where we care about authors.  
+            if isRayPhv; 
+                phv_modifiers{end+1} = allpdytp{idata,4}; 
+            end
+        end 
+        % phv_modifiers should either be empty of have cells with modifiers.
+            
+        
+%         [Rperiods,RphV]  = Rph_dispcurve_latlon( slat,slon); % grab composite of AN and EQ
         % err = error_curve_EQ_latlon( 1./periods,avar.slat,avar.slon,phVerrordir);
-
-        if ~isempty(RphV)
-            [Rperiods,iT] = sort(Rperiods);
-            RphV = RphV(iT);
-            SW_Ray_phV = struct('periods',Rperiods,'phV',RphV,'sigma',[]);
-        else
-            SW_Ray_phV=[];
+        
+        % Procedure for adding in another phase velocity (or similar)
+        % dataset. 1. Put data in models_seismic folder. 2: make a script
+        % that loads and plots all the data. 3. Make script that loads one
+        % stations data (e.g. load_EQphV_data_lynhelm.m). 4. Modify
+        % Rph_dispcurve_latlon_single_auth to accept the relevant "dataset"
+        % variable and run your loading script. 5. Use Rph_dispcurve_latlon_single_auth on it below -- this is basically done for you. 
+        all_periods = []'; % keep track of all periods that any data set used. 
+        for idtype = [1:length(par.inv.datatypes)]; 
+            thisdtype = par.inv.datatypes{idtype}; 
+            if contains(thisdtype, 'SW_Ray'); 
+                [Rperiods_i,RphV,SW_Ray_phV_struct]=...
+                    Rph_dispcurve_latlon_single_auth(slat,slon,'dataset',thisdtype); 
+                if isempty(SW_Ray_phV_struct); % Don't keep this dataset if there is no data for the station. 
+                    warning(['Could not get data for %s. ',...
+                        '\n Not using this datatype! ',...
+                        'Removing from par.inv.datatypes.'],thisdtype); 
+                    par.inv.datatypes{idtype} = []; % Can't keep datatype in par.inv.datatypes if we don't have that datatype. par.inv.datatypes stays same size throughout the loop. Later, we will clear the empty cells from par.inv.datatypes. 
+                    continue; 
+                end
+                all_periods = [all_periods; Rperiods_i]; 
+                SW_Ray_phV_structures(1).(thisdtype) = SW_Ray_phV_struct; 
+            end
         end
+        
+        % brb2022.06.28 below is old way of loading many surface wave datasets. It was a pain and not automatic, and couldn't address cases where one data set was not available for a station. Delete when you know you don't need it. 
+%         [Rperiods1,RphV,SW_Ray_phV_dal]=...
+%             Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','SW_Ray_phV_dal');
+%         [Rperiods2,RphV,SW_Ray_phV_eks]=...
+%             Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','SW_Ray_phV_eks');
+%         [Rperiods3,RphV,SW_Ray_phV_lyneqeik]=...
+%             Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','SW_Ray_phV_lyneqeik');
+%         [Rperiods4,RphV,SW_Ray_phV_lyneqhelm]=...
+%             Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','SW_Ray_phV_lyneqhelm');
+%         [Rperiods5,RphV,SW_Ray_phV_lynant]=...
+%             Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','SW_Ray_phV_lynant');
+%         all_periods = unique(sort([Rperiods1; Rperiods2; Rperiods3; Rperiods4; Rperiods5])); 
+
+        all_periods = unique(sort(all_periods)); 
+        min_period = min([all_periods]); 
+        max_period = max([all_periods]); 
+        periods_calc = all_periods; % Just run calculations at the periods where authors made their measurements. Could optionally calculate at predefined periods and interpolate from those periods for individual datasets, but I don't thin kwe gain anything. . 
+        n_periods_calc = length(periods_calc); 
+        for_mod_info = struct('n_periods_calc', n_periods_calc,...
+            'all_periods', all_periods,...
+            'min_period',min_period,'max_period',max_period,...
+            'periods_calc',periods_calc); % Information on what forward modelling needs to be done. We don't want to do forward modelling once for each seperate author. Instead, forward model once, accounting for every author simultaneously. 
+        
+        % Attach forward modelling structure to each Rayleigh wave structure. 
+        fns = fieldnames(SW_Ray_phV_structures); 
+        for ifn = [1:length(fns)]; 
+            SW_Ray_phV_structures.(fns{ifn}).for_mod_info = for_mod_info; 
+        end
+        
+        % brb2022.06.28 Old way of attaching forward model info structure to dataset structures. 
+%         SW_Ray_phV_eks                .for_mod_info = for_mod_info; % Forward modelling shouldn't change for any author. We forward model once, and interpolate from those results.
+%         SW_Ray_phV_dal                .for_mod_info = for_mod_info; 
+%         SW_Ray_phV_lyneqeik           .for_mod_info = for_mod_info; 
+%         SW_Ray_phV_lyneqhelm          .for_mod_info = for_mod_info; 
+%         SW_Ray_phV_lynant             .for_mod_info = for_mod_info; 
+
     end
 
     %% -------- Love waves
 	if any(strcmp(allpdytp(strcmp(allpdytp(:,1),'SW'),2),'Lov'))
         [Lperiods,LphV]  = Lph_dispcurve_latlon( slat,slon); % 
+        % brb2022.06.27. Only have one Love wave dataset right now. But if
+        % we want multiple, we can use the Raleigh wave code strategy above
+        % to do so. 
 
+        % %!%! brb2022.06.24 Put this in Lph_dispcurve_latlon_oneauthr
         if ~isempty(LphV)
             [Lperiods,iT] = sort(Lperiods);
             LphV = LphV(iT);
@@ -226,6 +288,19 @@ if any(strcmp(allpdytp(:,1),'SW'))
         else
             SW_Lov_phV=[];
         end
+        
+        all_periods = unique(sort(Lperiods)); 
+        min_period = min([all_periods]); 
+        max_period = max([all_periods]); 
+        periods_calc = all_periods; 
+        n_periods_calc = length(periods_calc); 
+        for_mod_info = struct('n_periods_calc', n_periods_calc,...
+            'all_periods', all_periods,...
+            'min_period',min_period,'max_period',max_period,...
+            'periods_calc',periods_calc); % Information on what forward modelling needs to be done. We don't want to do forward modelling once for each seperate author. Instead, forward model once, accounting for every author simultaneously. 
+        
+        SW_Lov_phV.for_mod_info = for_mod_info; % Forward modelling shouldn't change for any author...
+
     end
 
     %% -------- Rayleigh HV ratios
@@ -246,6 +321,18 @@ if any(strcmp(allpdytp(:,1),'SW'))
         else
             SW_HV=[];
         end
+        
+        
+        all_periods = unique(sort(HVperiods)); 
+        min_period = min([all_periods]); 
+        max_period = max([all_periods]); 
+        periods_calc = all_periods; % No need for extra periods here unless we are bringing in more HV datasets. 
+        n_periods_calc = length(all_periods); 
+        for_mod_info = struct('n_periods_calc', n_periods_calc,...
+            'all_periods', all_periods,...
+            'min_period',min_period,'max_period',max_period,...
+            'periods_calc',periods_calc); % Information on what forward modelling needs to be done. We don't want to do forward modelling once for each seperate author. Instead, forward model once, accounting for every author simultaneously. 
+        SW_HV.for_mod_info = for_mod_info; 
     end
 
 end
@@ -291,8 +378,8 @@ if any(strcmp(allpdytp(:,1),'HKstack'))
         hkstack.Nobs = 100;
     end
     HKstack_P           = hkstack;
-    HKstack_P.Esum      = Esum2         -mingrid(Esum2         );
-    HKstack_P.Esum_orig = HKstack_P.Esum-mingrid(HKstack_P.Esum); % Duplicate HK stack. Might end up replacing other info with my own HK stack. 
+    HKstack_P.Esum      = Esum2          - mingrid(Esum2         );
+    HKstack_P.Esum_orig = HKstack_P.Esum - mingrid(HKstack_P.Esum); % Duplicate HK stack. Might end up replacing other info with my own HK stack. 
     HKstack_P.H_orig    = HKstack_P.H; 
     HKstack_P.K_orig    = HKstack_P.K; 
     HKstack_P.waves     = rfWaves; 
@@ -323,6 +410,15 @@ trudata = struct('BW_Ps',BW_Ps,'BW_Sp',BW_Sp,...
                  'HKstack_P',HKstack_P,...
                  'SW_Ray_phV',SW_Ray_phV,'SW_Lov_phV',SW_Lov_phV,'SW_HV',SW_HV);
 
+% Loop over SW Rayleigh phV datasets and add them to trudata if they exist.
+fns = fieldnames(SW_Ray_phV_structures); 
+for ifn = [1:length(fns)]; 
+    thisfn = fns{ifn}; 
+    trudata.(thisfn) = SW_Ray_phV_structures.(thisfn); 
+end
+
+% If we could not use some datatype, clear that from par.inv.datatypes. 
+par.inv.datatypes = par.inv.datatypes(~cellfun(@isempty, par.inv.datatypes)); % Remove datatypes where we didn't have data (those should be empty now for rayleigh waves). 
 
 cd(wd);
 

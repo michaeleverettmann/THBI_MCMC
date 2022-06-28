@@ -38,8 +38,7 @@ for id = 1:length(par.inv.datatypes)
 
         case {'Ray','Lov'}
 
-            % calc. perturbation values from 0==>1 and use to calc dc/c
-
+            % calc. perturbation values from 0==>1 and use to calc dc/c           
             Np = length(Kbase.(pdtyp{2}).phV);
             est_dc_c = zeros(Np,1);
 
@@ -55,9 +54,26 @@ for id = 1:length(par.inv.datatypes)
                     est_dc_c(ip) = est_dc_c(ip) + dr'*(K.*dval);
                 end
             end
-
-            % estimated model1 phase velocities
-            predata.(dtype).phV = (1+est_dc_c).*Kbase.(pdtyp{2}).(pdtyp{3});
+            
+            % est_dc_c applies to all periods in K. But a specific dataset might not have all those periods. Interpolate est_dc_c to the same periods of this dataset. 
+            period_interp   = predata.(dtype).periods; % We want est_dc_c at these periods. 
+            period_k        = Kbase.(pdtyp{2}).periods; % We have est_dc_c at these periods
+            est_dc_c_interp = interp1(period_k, est_dc_c, period_interp, 'spline'); % "spline"... shouldn't matter each of period_interp is in period_k. But, I used linear in case of future code changes. 
+            phV_interp      = interp1(period_k, Kbase.(pdtyp{2}).(pdtyp{3}), period_interp, 'spline'); 
+            predata.(dtype).phV = (1+est_dc_c_interp).*phV_interp; % estimated model1 phase velocities
+            %!%! Modify if including group velocity. if pdtyp{3} grV, interpolate that. Otherwise, phV. 
+            
+% % %             % Check interpolated and actual phase velocities match. Comment out if you believe this is working. 
+% % %             figure(1); clf; hold on; box on; set(gca, 'linewidth', 1.5);
+% % %             set(gcf, 'pos', [-929 622 484 300], 'color', 'white'); 
+% % %             xlabel('Period (s)'); ylabel('Phase velocity (km/s)'); 
+% % %             title('Velocity (phase/group), all periods versus interpolated for this dataset', 'fontweight', 'normal'); 
+% % %             hand_full   = plot(Kbase.(pdtyp{2}).periods, Kbase.(pdtyp{2}).(pdtyp{3}), ...
+% % %                 '-o', 'color', 'k'); 
+% % %             hand_interp = plot(predata.(dtype).periods , phV_interp,                 ...
+% % %                 '-x', 'color', 'b', 'linewidth', 1.5); 
+% % %             lgd = legend([hand_full, hand_interp], 'All freq', 'Interp freq'); 
+% % %             set(lgd, 'loc', 'best'); 
 
 %% --------------------  HV ratios  --------------------
    

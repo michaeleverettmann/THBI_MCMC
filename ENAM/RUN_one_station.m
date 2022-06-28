@@ -58,7 +58,7 @@ overwrite = true;
 
 % Copy what you want to run here. 
 STAMP_all = {...
-    'all_fast',...
+    'many_sw_authors',...
 %     'RF_Sp_ccp_only',...
 %     'SW_HV_only_one_chain',...
 %     'ccp_weights_2',...% } --- End   test to see influence of different data types independently
@@ -83,8 +83,8 @@ for istamp = [1:length(STAMP_all)];
     %%%%% Important! Must define network and station before runnig this! 
     % If we have not defined network and station, use default US.CEH
     if ~ (exist('network_manual', 'var') && exist('station_manual', 'var')) ; 
-        network_manual = 'US'; 
-        station_manual = 'CEH'; 
+        network_manual = 'TA'; 
+        station_manual = 'O53A'; 
         fprintf('\nReseting to %s.%s\n',network_manual,station_manual)
     end
     disp('Network and station') 
