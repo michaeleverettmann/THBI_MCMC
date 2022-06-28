@@ -56,6 +56,7 @@ fprintf('  > Plotting model suite\n')
 [ suite_of_models ] = c3_BUILD_MODEL_SUITE(allmodels_collated,par );
 plot_SUITE_of_MODELS( suite_of_models,posterior,1,[resdir_fig,'/suite_of_models.png'],[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
 plot_HEATMAP_ALLMODELS(suite_of_models,par,1,[resdir_fig,'/heatmap_of_models.pdf']);
+plot_HEATMAP_ALLMODELS_shallow(suite_of_models,par,1,[resdir_fig,'/heatmap_of_models.pdf']);
 final_model = c4_FINAL_MODEL(posterior,allmodels_collated,par,1,[resdir_fig,'/final_model']);
 plot_FINAL_MODEL( final_model,posterior,1,[resdir_fig,'/final_model.pdf'],true,[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
 

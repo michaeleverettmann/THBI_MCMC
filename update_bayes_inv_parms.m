@@ -378,6 +378,14 @@ elseif strcmp(stamp, 'many_sw_authors_fast');
     par.inv.cooloff                   = 80; 
     par.inv.nchains                   = 3   ; % Less chains. So we can run more stations. 
 
+elseif strcmp(stamp, 'add_sediment_try2'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqeik','SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+    par.inv.niter                     = 300; 
+    par.inv.burnin                    = 100; 
+    par.inv.cooloff                   = 80; 
+    par.inv.nchains                   = 4   ; % Less chains. So we can run more stations. 
 
 
 
