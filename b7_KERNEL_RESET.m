@@ -60,7 +60,7 @@ for id = 1:length(par.inv.datatypes)
         MINEOS_file_delete = 1;
         ifplot = 0;
         
-        grV = SW_precise.(pdtyp{2}).grV
+        grV = SW_precise.(pdtyp{2}).grV; 
         phV = SW_precise.(pdtyp{2}).phV; 
         
         par_mineos = struct('R_or_L',pdtyp{2},'phV_or_grV',pdtyp{3},'ID',ID);

@@ -256,6 +256,7 @@ fprintf('  > Processing results\n')
  = c1_PROCESS_RESULTS( misfits_perchain,allmodels_perchain,par,1,[resdir,'/modMisfits']);
 
 [ hypparm_trends ] = plot_HYPERPARAMETER_TRENDS( allmodels_perchain,[resdir,'/hyperparmtrend.pdf'] );
+plot_MISFIT_TRENDS(par,allmodels_perchain,misfits_perchain_original,resdir );
 plot_KNOT_TRENDS( allmodels_perchain,par,[resdir,'/knottrends']  )
 
 posterior = c2_BUILD_POSTERIOR(allmodels_collated,par,par.res.zatdep);

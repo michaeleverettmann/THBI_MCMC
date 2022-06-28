@@ -126,11 +126,14 @@ elseif strcmp(pdt{1},'SW')
         parsed_dtype{3} = 'grV'; 
     end
     % Modifications
-%     if any(strcmpi(pdt,'Eks')); % brb2022.06.21. Add in author or other modifications... not a great system, since strings in different positions could match strings in this position. 
-%         parsed_dtype{4} = 'Eks'; 
-%     elseif any(strcmpi(pdt,'Lyn')); 
-%         parsed_dtype{4} = 'Lyn'; 
-%     end
+    if any(strcmpi(pdt,'eks')); % brb2022.06.21. Add in author or other modifications... not a great system, since strings in different positions could match strings in this position. EDIT I don't think it makes a difference if i have this code here or not?  
+        parsed_dtype{4} = 'eks'; 
+    elseif any(strcmpi(pdt,'dal')); 
+        parsed_dtype{4} = 'dal'; 
+    elseif any(strcmpi(pdt,'lyneqeik')); 
+        parsed_dtype{4} = 'lyneqeik'; 
+        % SW_Ray_phV_lyneqeik
+    end
 end
 
 

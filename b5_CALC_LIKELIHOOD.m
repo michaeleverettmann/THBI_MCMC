@@ -61,6 +61,7 @@ for id = 1:length(par.inv.datatypes)
     
     misfit.chi2.(dtype) = chi2;
     misfit.rms.(dtype) = rms;
+    misfit.logL.(dtype) = logL(id); % brb2022.06.28, see if this gives us insight into relative importance of different datatypes in driving inversion. 
 end
 
 %% collate

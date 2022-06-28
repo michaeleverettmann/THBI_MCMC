@@ -96,7 +96,7 @@ else
 	end
     
     %% LOAD THE DATA!!
-    [trudata,zeroDstr] = load_data(par);
+    [trudata,zeroDstr,par] = load_data(par);
     par.data.stadeets.sta = [par.data.stadeets.sta,zeroDstr];
     
     if isempty(trudata), return; end
