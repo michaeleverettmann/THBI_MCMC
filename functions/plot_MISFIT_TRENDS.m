@@ -70,6 +70,32 @@ end
 
 exportgraphics(gcf, [resdir '/datatype_misfits_sigma.jpeg'], 'Resolution', resolution);
 
-fprintf('\nWe should now have misfit.logL for each data type. Also plot that.\n'); 
+
+% Plot likelihood corresponding to each datatype. 
+figure(157), clf, set(gcf,'pos',position), hold on;  
+h = tiledlayout(n_rows, n_cols, 'TileSpacing', 'tight', 'Padding', 'compact');% Tight, compact, and normal. 
+sgtitle('Likelihood (log) contribution')
+
+for idat = [1:ndattyps]; 
+    thisdat = par.inv.datatypes{idat}; 
+    
+    ax=nexttile(idat, [1,1]); 
+    hold on; box on; set(gca, 'linewidth', box_line_width); 
+%     ylim(ylimits); 
+%     set(gca, 'yscale', 'log');     
+    
+    title(replace(thisdat, '_', ' '), 'fontweight', 'normal');
+
+    for ichain = [1:length(misfits)]; 
+        misfiti = misfits{ichain}; 
+         
+        thisval = [misfiti.logL_indivdat.(thisdat)]'; 
+        iter = misfiti.iter; 
+       
+        scatter(iter, thisval, dot_size, 'filled');
+    end
+end
+
+exportgraphics(gcf, [resdir '/datatype_misfits_loglik.jpeg'], 'Resolution', resolution);
     
 end

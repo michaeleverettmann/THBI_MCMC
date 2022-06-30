@@ -26,16 +26,22 @@ end
 
 SW = struct('Ray',struct('phV',[],'grV',[],'eigfiles',[]),'Lov',struct('phV',[],'grV',[],'eigfiles',[]),'HV',struct('HVr',[],'HVK_new',[]));
 
-if any(strcmp(allpdytp(:,2),'HV')), itp = par.inv.datatypes(find(strcmp(allpdytp(:,2),'HV'),1,'first'));
-    [SW.HV.HVr,SW.HV.HVK_new] = run_HVkernel(model,predata.(itp{1}).for_mod_info.periods_calc,['HV_',ID],1,0,par.inv.verbose);
+if any(strcmp(allpdytp(:,2),'HV'))
+    itp = par.inv.datatypes(find(strcmp(allpdytp(:,2),'HV'),1,'first'));
+    [SW.HV.HVr,SW.HV.HVK_new] = run_HVkernel(...
+        model,predata.(itp{1}).for_mod_info.periods_calc,['HV_',ID],1,0,par.inv.verbose);
 end
-if any(strcmp(allpdytp(:,2),'Lov')), itp = par.inv.datatypes(find(strcmp(allpdytp(:,2),'Lov'),1,'first'));
+if any(strcmp(allpdytp(:,2),'Lov'))
+    itp = par.inv.datatypes(find(strcmp(allpdytp(:,2),'Lov'),1,'first'));
     par_mineos = struct('R_or_L','L','ID',ID);
-    [SW.Lov.phV,SW.Lov.grV,SW.Lov.eigfiles] = run_mineos(model,predata.(itp{1}).for_mod_info.periods_calc,par_mineos,0,0,par.inv.verbose);
+    [SW.Lov.phV,SW.Lov.grV,SW.Lov.eigfiles] = run_mineos(...
+        model,predata.(itp{1}).for_mod_info.periods_calc,par_mineos,0,0,par.inv.verbose);
 end
-if any(strcmp(allpdytp(:,2),'Ray')), itp = par.inv.datatypes(find(strcmp(allpdytp(:,2),'Ray'),1,'first'));
+if any(strcmp(allpdytp(:,2),'Ray'))
+    itp = par.inv.datatypes(find(strcmp(allpdytp(:,2),'Ray'),1,'first'));
     par_mineos = struct('R_or_L','R','ID',ID);
-    [SW.Ray.phV,SW.Ray.grV,SW.Ray.eigfiles] = run_mineos(model,predata.(itp{1}).for_mod_info.periods_calc,par_mineos,0,0,par.inv.verbose);
+    [SW.Ray.phV,SW.Ray.grV,SW.Ray.eigfiles] = run_mineos(...
+        model,predata.(itp{1}).for_mod_info.periods_calc,par_mineos,0,0,par.inv.verbose);
 end
 
 for id = 1:length(par.inv.datatypes)
