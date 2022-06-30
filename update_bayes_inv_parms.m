@@ -13,10 +13,10 @@ str_temp = split(stamp, '/');
 % cooloff_only = 3000; 
 % nchains_only = 12; 
 % 
-niter_only   = 400; 
-burnin_only  = 100; 
-cooloff_only =  70; 
-nchains_only = 4; warning('Short "only" stamp');  
+niter_only   = 600  ; 
+burnin_only  = 150  ; 
+cooloff_only = 120  ; 
+nchains_only = 3    ; warning('Short "only" stamp');  
 
 % niter_only   = 4000; 
 % burnin_only  = 1000; 

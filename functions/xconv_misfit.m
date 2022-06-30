@@ -33,10 +33,31 @@ Hobs = Hobs(:);
 Vpre = Vpre(:);
 Hpre = Hpre(:);
 
-e = conv(Vobs,Hpre,'full') - conv(Hobs,Vpre,'full');
-% e = conv(Vobs,Hpre,'same') - conv(Hobs,Vpre,'same');
+VobsHpre = conv(Vobs,Hpre,'full'); 
+HobsVpre = conv(Hobs,Vpre,'full'); 
+
+e = VobsHpre - VobsHpre;
 
 misfit2 = e'*e;
+
+
+ifplot = false; if ifplot; warning('Setting ifplot = true'); end; 
+if ifplot; 
+    figure(201); clf; hold on; set(gcf, 'color', 'white', 'pos', [-1161 339 749 186]); 
+    h = tiledlayout(1,2, 'TileSpacing', 'compact'); 
+
+    nexttile(1); cla; hold on; box on; set(gca, 'LineWidth', 1.5); 
+    plot(VobsHpre); 
+    plot(HobsVpre); 
+    xlim([50, 600]); 
+    title('Cross-convolution (arbitrary x units)', 'fontweight', 'normal'); 
+
+    nexttile(2); cla; hold on; box on; set(gca, 'LineWidth', 1.5); 
+    plot(Vobs); 
+    plot(Vpre); 
+    % xlim([1, length(Vobs)]); 
+    title('Raw receiver functions', 'fontweight', 'normal'); 
+end
 
 end
 

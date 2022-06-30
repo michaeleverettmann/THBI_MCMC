@@ -71,6 +71,7 @@ if any(isnan(laymodel.rho))
 end
 
 
+ifplot = false; if ifplot; warning('Setting ifplot = true'); end; 
 if ifplot
     figure(1); clf, hold on; set(gcf, 'color', 'white'); 
     box on; 

@@ -39,4 +39,20 @@ end % now we have a starting model!
 % figure(23); clf; hold on
 % set(gca,'ydir','reverse')
 
+%%% See the model. 
+% figure(1); clf; hold on; 
+% tiledlayout(1,3); 
+% 
+% nexttile; hold on; box on; set(gca, 'YDir', 'reverse'); 
+% title('Rho'); 
+% plot(model.rho, model.z); 
+% 
+% nexttile; hold on; box on; set(gca, 'YDir', 'reverse'); 
+% title('Vs'); 
+% plot(model.VS, model.z); 
+% 
+% nexttile; hold on; box on; set(gca, 'YDir', 'reverse'); 
+% title('Vp'); 
+% plot(model.VP, model.z); 
+
 end

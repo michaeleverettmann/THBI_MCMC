@@ -8,7 +8,7 @@
 clc; clear; 
 run('../../a0_STARTUP_BAYES.m');
 
-resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/S58A_TA_dat1/many_sw_authors'; 
+resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
 resdir_fig = '/Users/brennanbrunsvik/Documents/temp/remake_thbi_figures'; 
 prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat'; 
 
@@ -30,7 +30,6 @@ allmodels_perchain_orig = allmodels_perchain;
 
 %%% Only temporary things here! Things to make your specific files run. 
     par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
-        'SW_Ray_phV_lyneqeik',...
         'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
 
 %% Do some tests. This is modified from run_all_chains.m

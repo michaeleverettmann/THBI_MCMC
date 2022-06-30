@@ -55,6 +55,15 @@ if isempty(laymodel)
     end
 end
 
+% figure(1); clf; hold on; 
+% % plot(laymodel.zlayt, laymodel.zlayb); 
+% % laymodel.zlayt - laymodel.zlayb
+% scatter(laymodel.zlayt,1+ones(size(laymodel.zlayt))); 
+% scatter(laymodel.zlayb,ones(size(laymodel.zlayb))); 
+% ylim([-30, 10]); 
+
+
+
 
 %% ===================  SP RFs FROM PROPAGATOR MATRIX  ====================
 rayp = predata.RF_Sp_ccp.rayp;
@@ -156,20 +165,21 @@ predata.RF_Sp_ccp.PSV = [RF_Pw,RF_SV];
 
 
 %% ifplot....
-
+ifplot = false; if ifplot; warning('Setting ifplot = true'); end; 
 if ifplot
     zz  = predata.RF_Sp_ccp.zz;
     RFz = predata.RF_Sp_ccp.PSV;
    
-    figure(2), clf, set(gcf,'position',[368 417 776 928]);
+    figure(2), clf, set(gcf,'position',[-1358 247 776 796], 'color', 'white');
+    tiledlayout(1,2,'TileSpacing', 'compact'); 
         
-    subplot(1,2,1)
+	nexttile; cla; hold on; box on; set(gca, 'linewidth', 1.5); 
     plot(RFz(:,1),zz,'Linewidth',2)
     title('P comp (= CCP)','fontsize',19,'fontweight','bold')
     set(gca,'ydir','reverse','xlim',0.3*[-1 1],...
         'ylim',[-par.datprocess.CCP.parent_zw/2 par.datprocess.CCP.Zwin.def(2)])
 
-    subplot(1,2,2)
+	nexttile; cla; hold on; box on; set(gca, 'linewidth', 1.5); 
     plot(RFz(:,2),zz,'Linewidth',2)
     xlim(par.datprocess.Sp.Twin.def);
     set(gca,'ydir','reverse','xlim',[-1 1],...
