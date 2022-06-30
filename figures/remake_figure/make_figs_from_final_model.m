@@ -8,7 +8,9 @@
 clc; clear; 
 run('../../a0_STARTUP_BAYES.m');
 
-resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
+% resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
+resdir_data = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv/O53A_TA_dat1/RF_Sp_ccp_only'; 
+
 resdir_fig = '/Users/brennanbrunsvik/Documents/temp/remake_thbi_figures'; 
 prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat'; 
 
@@ -29,8 +31,11 @@ allmodels_perchain_orig = allmodels_perchain;
 [par, ~] = update_bayes_inv_parms(par, 'many_sw_authors'); 
 
 %%% Only temporary things here! Things to make your specific files run. 
-    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
-        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+% par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+%     'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+par.inv.datatypes = {'RF_Sp_ccp'}; 
+
+par = update_bayes_inv_parms(par, 'RF_Sp_ccp_only'); 
 
 %% Do some tests. This is modified from run_all_chains.m
 

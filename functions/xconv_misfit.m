@@ -36,7 +36,7 @@ Hpre = Hpre(:);
 VobsHpre = conv(Vobs,Hpre,'full'); 
 HobsVpre = conv(Hobs,Vpre,'full'); 
 
-e = VobsHpre - VobsHpre;
+e = VobsHpre - HobsVpre;
 
 misfit2 = e'*e;
 

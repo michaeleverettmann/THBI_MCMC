@@ -11,25 +11,26 @@ function   [misfits,allmodels,savedat] = b9_SAVE_RESULT(iter,log_likelihood,misf
 % the numnber saved for iterations less than the current iteration. That
 % way if we reset the model of the MCMC, it will back-track and write over
 % old saves, too. 
-N = sum(misfits.iter < iter & misfits.iter~=0) + 1;
+N                            = sum(misfits.iter < iter & misfits.iter~=0) + 1;
 
-likelihood = exp(log_likelihood);
-misfits.lastlogL = log_likelihood;
-misfits.lastL = likelihood;
-misfits.globmaxL = max(misfits.globmaxL,likelihood);
+likelihood                   = exp(log_likelihood);
+misfits.lastlogL             = log_likelihood;
+misfits.lastL                = likelihood;
+misfits.globmaxL             = max(misfits.globmaxL,likelihood);
 
-misfits.logLike(N,1) = log_likelihood;
-misfits.Like(N,1) = likelihood;
+misfits.logLike(N,1)         = log_likelihood;
+misfits.Like(N,1)            = likelihood;
 
-misfits.chi2sum(N,1)    = misfit.chi2sum;
+misfits.chi2sum(N,1)         = misfit.chi2sum;
+misfits.logL_indivdat(N,1)   = misfit.logL_indivdat; 
 
-misfits.chi2(N,1) = misfit.chi2; % chi2 is the chi-squared misfit for each data type, accounting for data error, i.e. E2/sig/sig
-misfits.rms(N,1) = misfit.rms; % rms is the root mean squared error for each dat type, i.e. sqrt(E2/N)
-misfits.E2(N,1) = misfit.E2; % E2 is the normalised, weighted, sum of squared errors
+misfits.chi2(N,1)            = misfit.chi2; % chi2 is the chi-squared misfit for each data type, accounting for data error, i.e. E2/sig/sig
+misfits.rms(N,1)             = misfit.rms; % rms is the root mean squared error for each dat type, i.e. sqrt(E2/N)
+misfits.E2(N,1)              = misfit.E2; % E2 is the normalised, weighted, sum of squared errors
 
-misfits.time(N,1) = (now-time0)*86400; % in seconds
-misfits.iter(N,1) = iter;
-misfits.Nstored = N;
+misfits.time(N,1)            = (now-time0)*86400; % in seconds
+misfits.iter(N,1)            = iter;
+misfits.Nstored              = N;
 
 %% MODEL
 % N = allmodels(1).Nstored+1;

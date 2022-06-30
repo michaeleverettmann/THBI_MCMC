@@ -216,6 +216,7 @@ trudata = TD.Value;
     run_one_chain(par, trudata, nwk, sta, iii)
 
 end % parfor loop
+
 %%
 [ram_copy_stats] = ram_to_HD(paths, resdir, nwk, sta); % Copy final results from ram to hard disk. 
 [~,duRam] = system(sprintf('du -h %s',paths.ramDrive)); 
