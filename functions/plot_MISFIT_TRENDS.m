@@ -76,10 +76,13 @@ figure(157), clf, set(gcf,'pos',position), hold on;
 h = tiledlayout(n_rows, n_cols, 'TileSpacing', 'tight', 'Padding', 'compact');% Tight, compact, and normal. 
 sgtitle('Likelihood (log) contribution')
 
+each_ax = []; 
+each_lim = []; 
 for idat = [1:ndattyps]; 
     thisdat = par.inv.datatypes{idat}; 
     
     ax=nexttile(idat, [1,1]); 
+    each_ax = [each_ax; ax]; 
     hold on; box on; set(gca, 'linewidth', box_line_width); 
 %     ylim(ylimits); 
 %     set(gca, 'yscale', 'log');     
@@ -94,7 +97,11 @@ for idat = [1:ndattyps];
        
         scatter(iter, thisval, dot_size, 'filled');
     end
+    each_lim = [each_lim; prctile(thisval,1); max(thisval)]; 
+%     ylim([prctile(thisval,1), max(thisval)]); 
 end
+
+ylim(each_ax, [min(each_lim), max(each_lim)]); 
 
 exportgraphics(gcf, [resdir '/datatype_misfits_loglik.jpeg'], 'Resolution', resolution);
     

@@ -9,7 +9,7 @@ clc; clear;
 run('../../a0_STARTUP_BAYES.m');
 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
-resdir_data = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv/O53A_TA_dat1/RF_Sp_ccp_only'; 
+resdir_data = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv/O53A_TA_dat1/SW_all'; 
 
 resdir_fig = '/Users/brennanbrunsvik/Documents/temp/remake_thbi_figures'; 
 prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat'; 
@@ -28,14 +28,16 @@ load(prior_path);
 
 misfits_perchain_orig = misfits_perchain; 
 allmodels_perchain_orig = allmodels_perchain; 
-[par, ~] = update_bayes_inv_parms(par, 'many_sw_authors'); 
+[par, ~] = update_bayes_inv_parms(par, 'SW_all'); 
 
 %%% Only temporary things here! Things to make your specific files run. 
 % par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
 %     'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
-par.inv.datatypes = {'RF_Sp_ccp'}; 
+% par.inv.datatypes = {'RF_Sp_ccp'}; 
+par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+    'SW_Lov_phV', 'SW_HV'}; 
 
-par = update_bayes_inv_parms(par, 'RF_Sp_ccp_only'); 
+% par = update_bayes_inv_parms(par, 'RF_Sp_ccp_only'); 
 
 %% Do some tests. This is modified from run_all_chains.m
 
@@ -92,7 +94,7 @@ end
 
 [ final_misfit ] = b4_CALC_MISFIT( trudata,final_predata,par,0, 'plotRFError',true );
 [ final_log_likelihood,final_misfit ] = b5_CALC_LIKELIHOOD( final_misfit,trudata,final_model.hyperparms,par );
-% plot_TRUvsPRE( trudata,final_predata,1,[resdir_fig,'/final_true_vs_pred_data.pdf'], allmodels_collated);
+plot_TRUvsPRE( trudata,final_predata,1,[resdir_fig,'/final_true_vs_pred_data.pdf'], allmodels_collated);
 plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,1,[resdir_fig,'/final_true_vs_pred_data_wavs.png']);
 % plot_TRUvsPRE_WAVEFORMS_indiv_figs(trudata,final_predata,1,[resdir,'/final_true_vs_pred_data_wavs.pdf']);
 % save([resdir_fig,'/final_misfit'],'final_misfit');

@@ -13,10 +13,10 @@ str_temp = split(stamp, '/');
 % cooloff_only = 3000; 
 % nchains_only = 12; 
 % 
-niter_only   = 1000 ; 
-burnin_only  = 200  ; 
-cooloff_only = 150  ; 
-nchains_only = 3    ; warning('Short "only" stamp');  
+niter_only   = 3000; 
+burnin_only  = 200 ;  
+cooloff_only = 100 ; 
+nchains_only = 3   ; warning('Short "only" stamp');  
 
 % niter_only   = 4000; 
 % burnin_only  = 1000; 
@@ -396,6 +396,8 @@ elseif strcmp(stamp, 'SW_all');
     par.inv.burnin                    = burnin_only ; 
     par.inv.cooloff                   = cooloff_only; 
     par.inv.nchains                   = nchains_only;     
+    
+    par.inv.verbose = false; 
 
 
 

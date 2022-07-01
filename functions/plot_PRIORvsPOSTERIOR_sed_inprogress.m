@@ -12,10 +12,12 @@ end
  
 %% Set up plot
 figure(19), clf, set(gcf,'pos',[100 100 1440 796]);
+htile = tiledlayout(3,8,'TileSpacing','compact'); 
 cls = get(groot,'defaultAxesColorOrder');
 
 %% Moho depth
-subplot(341), cla, hold on
+% subplot(341), cla, hold on
+nexttile(1, [1,2]); cla; hold on; box on; set(gca, 'linewidth', 1.5); 
 X = midpts(linspace(par.mod.sed.hmin+par.mod.crust.hmin,par.mod.sed.hmax+par.mod.crust.hmax,20));
 No = hist(posterior.zmoh,X)/posterior.Nstored;
 Ni = hist(prior.zmoh,X)/prior.Nstored;
@@ -23,7 +25,7 @@ bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
 bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
 set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
         'xlim',[par.mod.sed.hmin+par.mod.crust.hmin par.mod.sed.hmax+par.mod.crust.hmax],'ylim',[0 axlim(gca,4)])
-title('Moho depth (km)','fontsize',16)
+title('Moho depth (km)','fontsize',16, 'FontWeight', 'normal')
 
 if par.inv.synthTest; 
     global TRUEmodel
@@ -32,9 +34,42 @@ if par.inv.synthTest;
     plot([zmoh, zmoh], [yplt(1), yplt(2)], 'b', 'LineWidth', 2); 
 end
 
+%% Sed
+% subplot(341), cla, hold on
+nexttile(3); cla; hold on; box on; set(gca, 'linewidth', 1.5); 
+% X = midpts(linspace(par.mod.sed.hmin+par.mod.crust.hmin,par.mod.sed.hmax+par.mod.crust.hmax,20));
+X = midpts(linspace(0,par.mod.sed.hmax,40));
+No = hist(posterior.zsed,X)/posterior.Nstored;
+Ni = hist(prior.zsed,X)/prior.Nstored;
+bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
+bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
+set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
+        'xlim',[0 par.mod.sed.hmax],'ylim',[0 axlim(gca,4)])
+title('Sediment depth (km)','fontsize',16, 'FontWeight', 'normal')
+if par.inv.synthTest; 
+    global TRUEmodel
+    zsed = TRUEmodel.zsed; 
+    yplt = get(gca, 'ylim'); 
+    plot([zsed, zsed], [yplt(1), yplt(2)], 'b', 'LineWidth', 2); 
+end
 
-
-
+% subplot(341), cla, hold on
+nexttile(4); cla; hold on; box on; set(gca, 'linewidth', 1.5); 
+% X = midpts(linspace(par.mod.sed.hmin+par.mod.crust.hmin,par.mod.sed.hmax+par.mod.crust.hmax,20));
+X = midpts(linspace(0,0.5,40));
+No = hist(posterior.zsed,X)/posterior.Nstored;
+Ni = hist(prior.zsed,X)/prior.Nstored;
+bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
+bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
+set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
+        'xlim',[0 max(X)],'ylim',[0 axlim(gca,4)])
+title('Sediment depth (km)','fontsize',16, 'FontWeight', 'normal')
+if par.inv.synthTest; 
+    global TRUEmodel
+    zsed = TRUEmodel.zsed; 
+    yplt = get(gca, 'ylim'); 
+    plot([zsed, zsed], [yplt(1), yplt(2)], 'b', 'LineWidth', 2); 
+end
 
 %% V crust bottom (commented out top)
 % subplot(342), cla, hold on
@@ -47,7 +82,7 @@ end
 %         'xlim',[par.mod.crust.vsmin,par.mod.crust.vsmax],'ylim',[0 axlim(gca,4)])
 % title('Vs crust top (km/s)','fontsize',16)
 
-subplot(342), cla, hold on
+nexttile(9, [1,2]); cla; hold on; box on; set(gca, 'linewidth', 1.5); 
 X = midpts(linspace(par.mod.crust.vsmin,par.mod.crust.vsmax,20));
 No = hist(posterior.VScrustbot,X)/posterior.Nstored;
 Ni = hist(prior.VScrustbot,X)/prior.Nstored;
@@ -55,7 +90,7 @@ bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
 bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
 set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
         'xlim',[par.mod.crust.vsmin,par.mod.crust.vsmax],'ylim',[0 axlim(gca,4)])
-title('Vs crust bot (km/s)','fontsize',16)
+title('Vs crust bot (km/s)','fontsize',16, 'FontWeight', 'normal')
 
 
 if par.inv.synthTest; 
@@ -65,7 +100,7 @@ if par.inv.synthTest;
 end
 
 %% Moho dVs
-subplot(343), cla, hold on
+nexttile(17, [1,2]); cla; hold on; box on; set(gca, 'linewidth', 1.5); 
 X = midpts(linspace(0,30,20));
 No = hist(posterior.fdVSmoh,X)/posterior.Nstored;
 Ni = hist(prior.fdVSmoh,X)/prior.Nstored;
@@ -73,7 +108,7 @@ bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
 bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
 set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
         'ylim',[0 axlim(gca,4)])
-title('fractional dVs at Moho (%)','fontsize',16)
+title('fractional dVs at Moho (%)','fontsize',16, 'fontweight', 'normal')
 
 if par.inv.synthTest; 
     vscTemp = TRUEmodel.crustmparm.VS_sp(end); 
@@ -84,7 +119,7 @@ if par.inv.synthTest;
 end
 
 %% H-K value
-subplot(344), cla, hold on
+nexttile(23, [1,2]); cla; hold on; box on; set(gca, 'linewidth', 1.5); 
 % Xh = linspace(par.mod.sed.hmin+par.mod.crust.hmin,par.mod.sed.hmax+par.mod.crust.hmax,30);
 % Xk = linspace(par.mod.crust.vpvsmin,par.mod.crust.vpvsmax,20);
 % No = histcounts2(posterior.vpvs,posterior.zmoh,Xk,Xh); No = No/maxgrid(No);
@@ -96,11 +131,11 @@ plot(posterior.vpvs,posterior.zmoh,'.r','markersize',2)
 set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
      'xlim',[par.mod.crust.vpvsmin,par.mod.crust.vpvsmax],...
      'ylim',[par.mod.sed.hmin+par.mod.crust.hmin par.mod.sed.hmax+par.mod.crust.hmax])
-title('H-K comparison','fontsize',16)
+title('H-K comparison','fontsize',16, 'FontWeight', 'normal')
 
 
 %% Crustal Vp/Vs
-subplot(345), cla, hold on
+nexttile(15, [1,2]); cla; hold on; box on; set(gca, 'linewidth', 1.5); 
 X = midpts(linspace(par.mod.crust.vpvsmin,par.mod.crust.vpvsmax,20));
 No = hist(posterior.vpvs,X)/posterior.Nstored;
 Ni = hist(prior.vpvs,X)/prior.Nstored;
@@ -108,7 +143,7 @@ bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
 bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
 set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
         'xlim',[par.mod.crust.vpvsmin,par.mod.crust.vpvsmax],'ylim',[0 axlim(gca,4)]) 
-title('Crust Vp/Vs ratio','fontsize',16)
+title('Crust Vp/Vs ratio','fontsize',16, 'FontWeight', 'normal')
 
 if par.inv.synthTest; 
     vpvsTemp = TRUEmodel.crustmparm.vpvs; 
@@ -117,8 +152,9 @@ if par.inv.synthTest;
 end
 
 %% Crust radial anisotropy
+
 if par.mod.crust.ximin~=par.mod.crust.ximax
-subplot(346), cla, hold on
+nexttile(7, [1,2]); cla; hold on; box on; set(gca, 'linewidth', 1.5); 
 X = midpts(linspace(par.mod.crust.ximin,par.mod.crust.ximax,20));
 No = hist(posterior.xicrust,X)/posterior.Nstored;
 Ni = hist(prior.cxi,X)/prior.Nstored;
@@ -126,7 +162,7 @@ bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
 bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
 set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
         'xlim',[par.mod.crust.ximin,par.mod.crust.ximax],'ylim',[0 axlim(gca,4)]) 
-title('Crust Xi value','fontsize',16)
+title('Crust Xi value','fontsize',16, 'FontWeight', 'normal')
 
 if par.inv.synthTest; 
     xiTemp = TRUEmodel.crustmparm.xi; 
@@ -140,7 +176,7 @@ end
 
 %% Mantle radial anisotropy
 if par.mod.mantle.ximin~=par.mod.mantle.ximax
-subplot(347), cla, hold on
+nexttile(5, [1,2]); cla; hold on; box on; set(gca, 'linewidth', 1.5); 
 X = midpts(linspace(par.mod.mantle.ximin,par.mod.mantle.ximax,20));
 No = hist(posterior.ximant,X)/posterior.Nstored;
 Ni = hist(prior.mxi,X)/prior.Nstored;
@@ -148,7 +184,7 @@ bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
 bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
 set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
         'xlim',[par.mod.mantle.ximin,par.mod.mantle.ximax],'ylim',[0 axlim(gca,4)]) 
-title('Mantle Xi value','fontsize',16)
+title('Mantle Xi value','fontsize',16, 'FontWeight', 'normal')
 end
 
 %% Width of mantle NVG
@@ -184,7 +220,7 @@ nvindm = [nvind(di0(c==max(c))):nvind(di1(c==max(c)))]';
 Lnvg_pri(ii) = diff(prior.zatdep(nvindm([1,end])));
 end
 
-subplot(348), cla, hold on
+nexttile(13, [1,2]); cla; hold on; box on; set(gca, 'linewidth', 1.5); 
 X = midpts(linspace(0,200,40));
 No = hist(Lnvg_post,X)/posterior.Nstored;
 Ni = hist(Lnvg_pri,X)/prior.Nstored;
@@ -192,66 +228,30 @@ bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
 bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
 set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
         'xlim',[0,200],'ylim',[0 axlim(gca,4)]) 
-title('max NVG width (km)','fontsize',16)
+title('max NVG width (km)','fontsize',16, 'FontWeight', 'normal')
 
 
-%% velocity at depth
-X = midpts(linspace(par.mod.mantle.vsmin,par.mod.mantle.vsmax,20));
-zdo = [55,67,90,100,120,150,180,250]; 
-for iz = 1:length(zdo)
-    izdo(iz,1) = crossing(prior.zatdep,[],zdo(iz));
-    izdo(iz,2) = crossing(posterior.zatdep,[],zdo(iz));
-end
-for iz = 1:length(zdo)
-subplot(3,8,16+iz), cla, hold on
-No = hist(posterior.VSmantle(:,izdo(iz,2)),X)/posterior.Nstored;
-Ni = hist(prior.VSmantle(:,izdo(iz,1)),X)/prior.Nstored;
-bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
-bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
-% legend(num2str(model_summary.zmantle(:)),'location','northwest')
-set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
-        'xlim',[par.mod.mantle.vsmin par.mod.mantle.vsmax],'ylim',[0 axlim(gca,4)],...
-        'xtick',unique(round_level([par.mod.mantle.vsmin:0.1:par.mod.mantle.vsmax],0.3))) 
-title(sprintf('Vs at %.0f km',prior.zatdep(izdo(iz))),'fontsize',16)
-end
-
-
-%% Sed
-% subplot(341), cla, hold on
-subplot(3,8,12+1), cla, hold on
-% X = midpts(linspace(par.mod.sed.hmin+par.mod.crust.hmin,par.mod.sed.hmax+par.mod.crust.hmax,20));
-X = midpts(linspace(0,par.mod.sed.hmax,40));
-No = hist(posterior.zsed,X)/posterior.Nstored;
-Ni = hist(prior.zsed,X)/prior.Nstored;
-bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
-bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
-set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
-        'xlim',[0 par.mod.sed.hmax],'ylim',[0 axlim(gca,4)])
-title('Sed depth (km)','fontsize',16)
-if par.inv.synthTest; 
-    global TRUEmodel
-    zsed = TRUEmodel.zsed; 
-    yplt = get(gca, 'ylim'); 
-    plot([zsed, zsed], [yplt(1), yplt(2)], 'b', 'LineWidth', 2); 
-end
-
-% subplot(341), cla, hold on
-subplot(3,8,12+2), cla, hold on
-% X = midpts(linspace(par.mod.sed.hmin+par.mod.crust.hmin,par.mod.sed.hmax+par.mod.crust.hmax,20));
-X = midpts(linspace(0,0.5,40));
-No = hist(posterior.zsed,X)/posterior.Nstored;
-Ni = hist(prior.zsed,X)/prior.Nstored;
-bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
-bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
-set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
-        'xlim',[0 max(X)],'ylim',[0 axlim(gca,4)])
-title('Sed depth (km)','fontsize',16)
-if par.inv.synthTest; 
-    global TRUEmodel
-    zsed = TRUEmodel.zsed; 
-    yplt = get(gca, 'ylim'); 
-    plot([zsed, zsed], [yplt(1), yplt(2)], 'b', 'LineWidth', 2); 
-end
+% % % %% velocity at depth
+% % % X = midpts(linspace(par.mod.mantle.vsmin,par.mod.mantle.vsmax,20));
+% % % zdo = [55,67,90,100,120,150,180,250]; 
+% % % for iz = 1:length(zdo)
+% % %     izdo(iz,1) = crossing(prior.zatdep,[],zdo(iz));
+% % %     izdo(iz,2) = crossing(posterior.zatdep,[],zdo(iz));
+% % % end
+% % % for iz = 1:length(zdo)
+% % % subplot(3,8,16+iz), cla, hold on
+% % % % nexttile(9, [1, 1/2]); cla; hold on; box on; set(gca, 'linewidth', 1.5); 
+% % % 
+% % % No = hist(posterior.VSmantle(:,izdo(iz,2)),X)/posterior.Nstored;
+% % % Ni = hist(prior.VSmantle(:,izdo(iz,1)),X)/prior.Nstored;
+% % % bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
+% % % bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
+% % % % legend(num2str(model_summary.zmantle(:)),'location','northwest')
+% % % set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
+% % %         'xlim',[par.mod.mantle.vsmin par.mod.mantle.vsmax],'ylim',[0 axlim(gca,4)],...
+% % %         'xtick',unique(round_level([par.mod.mantle.vsmin:0.1:par.mod.mantle.vsmax],0.3))) 
+% % % title(sprintf('Vs at %.0f km',prior.zatdep(izdo(iz))),'fontsize',16)
+% % % end
 
 
 %% title

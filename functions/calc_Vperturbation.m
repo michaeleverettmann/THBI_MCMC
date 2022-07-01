@@ -11,21 +11,91 @@ if nargin <3 || isempty(ifplot)
     ifplot=false;
 end
 
-%% (brb2022.05.18 - updated to fix glitch with array sizes) Still testing. 
-% modptb has to have the same z as model1. But model0 sometimes has
-% different z. Resample model0 z onto model1, so we can an approximation of
-% perterbation values at each depth.
-% fprintf('\nOld nz: %1.0f',model0.Nz); %!%! Remove. For testing. 
-[unique_z, iz, ~] = unique(model0.z,'first'); % Aim to find duplicate z values. Next we change them, for interp1. 
-index_to_dupes = find(not(ismember(1:numel(model0.z),iz))); % Should give second occurance of each(?) duplicated value. 
-model0.z(index_to_dupes) = model0.z(index_to_dupes) + 0.0001; % Shift duplicated Z values down slightly so that we can use interp1. This code should do nothing if there are no duplicates.  
-each_param = {'Panis', 'Sanis', 'rho', 'VP', 'VS', 'z0', 'z'}; % List all parameters in model that have nz values. 
-for i_param = [1:length(each_param)]; 
-    param = each_param{i_param}; 
-    model0.(param) = interp1(model0.z, model0.(param), model1.z); % Resample model0. parameters to the model1.z depths. 
+%% brb2022.06.30. Interpolate models onto upsampled basis, then take m1 back to m0.z. 
+% If a discontinuity depth changes, we would have problems. 
+% Z indicies of m0 and m1 might not correspond to similar depths, and dv at some depth
+% might not have the desired meaning anymore in our kernels K.
+% THen using K to find dc stops working well. 
+% Solution: Sample m1 onto m0.z, but do so by taking the most
+% representative average of m1 in the viscinity of m0.z. 
+% For a coarse m0.z, discontinuities can't be captured properly through
+% simple interpolation. 
+plot_upscale_interp = false; 
+if ~ isequal(model0.z, model1.z); 
+    if plot_upscale_interp; 
+        model1_plot = model1; 
+        model0_plot = model0; 
+    end
+   
+    each_param = {'Panis', 'Sanis', 'rho', 'VP', 'VS', 'z0', 'z'}; % List all parameters in model that have nz values. 
+    dz0 = diff(model0.z); 
+    dz1 = diff(model1.z); 
+    disc0 = find(dz0==0); 
+    disc1 = find(dz1==0); 
+    model0_unique = model0; 
+    model1_unique = model1; 
+    model0_unique.z(disc0  ) = model0_unique.z(disc0  ) - 0.0001; % Remove duplicate z values so we can use interp1. 
+    model0_unique.z(disc0+1) = model0_unique.z(disc0+1) + 0.0001; 
+    model1_unique.z(disc1  ) = model1_unique.z(disc1  ) - 0.0001; 
+    model1_unique.z(disc1+1) = model1_unique.z(disc1+1) + 0.0001; 
+
+    % Establish z points for upscaling, and spacing between points for weighting. 
+    z_upsc = unique([...
+        0; 0.01; 0.02; 0.03; 0.04; 0.05; 0.06; 0.08; 
+        logspace(log10(0.1), log10(10),30)';...
+        linspace(10, 100, 200)'; ...
+        linspace(100, 300, 100)'; ...
+        model0_unique.z]); % Will upscale/upsample to this basis, then back down to model0 basis. 
+    mid_z = (z_upsc(1:end-1) + z_upsc(2:end) ) / 2; 
+    dz_mid = zeros(size(z_upsc)); 
+    dz_mid(2:end  ) =                   z_upsc(2:end  ) - mid_z; % Distance from z_upsc to midpoint above it. 
+    dz_mid(1:end-1) = dz_mid(1:end-1) + mid_z - z_upsc(1:end-1); % Distance from z_upsc to midpoint below it. To check: does sum(dz_mid) = max(z_upsc)? Yes - brb2022.07.01. 
+    old_z_midpts = [min(model0.z)-1; (model0.z(2:end) + model0.z(1:end-1))./2; max(model0.z)+1 ]; % For deciding how to associate z_upsc model values to which old z indecies. 
+
+    % Upscale model1.  
+    for i_param = 1:length(each_param); 
+        param = each_param{i_param}; 
+        model1_unique.(param) = interp1(model1_unique.z, model1_unique.(param), z_upsc, 'linear'); % Linear avoids instabilities around discontinuities that we might find with cubic, splines, etc. brb2022.07.01
+    end
+    model1_unique.z = z_upsc; 
+
+    nz0 = length(model0.z); 
+    for i_param = 1:length(each_param); 
+        param         = each_param{i_param}; 
+        array_upsamp  = model1_unique.(param); % Upsampled resolution
+        array_newbase = nan(size(model0.z)); % Lower resolution - main result of this block of code. 
+
+        for idep = 1:nz0;
+            this_dep = and( (old_z_midpts(idep  ) <= model1_unique.z) ,...
+                            (old_z_midpts(idep+1) >=  model1_unique.z) ); % These upsampled incicies will correspond to the previous indecies. 
+%             array_newbase(idep) = mean(array_upsamp(this_dep)); % Resample model0. parameters to the model1.z depths. 
+            array_newbase(idep) = sum(array_upsamp(this_dep) .* dz_mid(this_dep)) ...
+                ./ sum(dz_mid(this_dep)); % Simple integral average 
+        end
+        if any(isnan(array_newbase)); 
+            error('Nan values during K perterbation upscaling.'); 
+        end
+        model1.(param) = array_newbase; 
+    end    
+    model1.z = model0.z; 
+
+    if plot_upscale_interp; 
+        figure(1005); clf; hold on; 
+        h = tiledlayout(1,2,'TileSpacing', 'compact'); 
+        nexttile(); cla; hold on; set(gca, 'ydir', 'reverse'); box on; set(gca, 'LineWidth', 1.5); ylim([-5, 300]); 
+        hmo  = plot(model0_plot.VS  , model0_plot.z); % Handle model 0. 
+        hm1  = plot(model1_plot.VS  , model1_plot.z); 
+        hm1i = plot(model1     .VS  , model1     .z); % Handle model 1 interpolated/averaged onto model 0 basis. 
+        leg = legend([hmo hm1 hm1i], {'m0', 'm1 orig', 'm1 averaged onto m0 basis'}, 'location', 'best');    
+        title('VS used for making Kbase'); 
+
+        nexttile(); cla; hold on; set(gca, 'ydir', 'reverse'); box on; set(gca, 'LineWidth', 1.5); ylim([-5, 60]); 
+        hmo  = plot(model0_plot.VS       , model0_plot.z); % Handle model 0. 
+        hm1  = plot(model1_plot.VS - 0.4 , model1_plot.z); 
+        hm1i = plot(model1     .VS + 0.4 , model1     .z); % Handle model 1 interpolated/averaged onto model 0 basis. 
+        title('Highlighting possible problems\nShifted for clarity'); 
+    end
 end
-model0.Nz = length(model0.z); 
-% fprintf('New nz: %1.0f\n',model1.Nz); %!%! Remove. For testing. 
 
 %% Radial anisotropy
 xi0  = 1 + model0.Sanis/100;  % assumes Sanis is a percentage of anis about zero

@@ -26,7 +26,7 @@ nchain = nchainOrig;
         Pm_prior1 = calc_Pm_prior(model1,par);  % Calculate prior probability of new model
         [ modptb ] = calc_Vperturbation( Kbase.modelk,model1);
         ptbnorm = 0.5*(norm(modptb.dvsv) + norm(modptb.dvsh)) + norm(modptb.dvpv);
-		if par.inv.verbose, fprintf('    Perturbation %.2f\n',ptbnorm); end
+		if par.inv.verbose, fprintf('\n    Perturbation %.2f\n',ptbnorm); end
     end
 
     % quickly plot model (if not in parallel and if verbose)
