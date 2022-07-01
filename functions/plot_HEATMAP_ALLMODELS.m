@@ -41,7 +41,8 @@ hmpp = log(hmpp); hmpp(isinf(hmpp)) = -20;
 
 
 %% Plot
-figure(25); clf; set(gcf,'pos',[-1011 247 841 721])
+fig_num = 25; 
+figure(fig_num); clf; set(gcf,'pos',[-1011 247 841 721])
 ax1 = axes(gcf,'pos',[0.13 0.11 0.35 0.815], 'linewidth', 1.5); hold on; box on; 
 ax2 = axes(gcf,'pos',[0.52 0.11 0.35 0.815], 'linewidth', 1.5); hold on; box on; 
 ax3 = axes(gcf,'pos',[0.91 0.11 0.02 0.815], 'linewidth', 1.5); hold on; box on; 
@@ -81,7 +82,7 @@ set(hcby,'rotation',270,'pos',[3.2 -2.5 0]);
 %% SAVE
 if ifsave
     fprintf('   saving fig\n');
-    save2pdf(25,ofile,'/');
+    save2pdf(fig_num,ofile,'/');
 end
 
 end

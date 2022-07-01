@@ -13,10 +13,10 @@ str_temp = split(stamp, '/');
 % cooloff_only = 3000; 
 % nchains_only = 12; 
 % 
-niter_only   = 3000; 
-burnin_only  = 200 ;  
-cooloff_only = 100 ; 
-nchains_only = 3   ; warning('Short "only" stamp');  
+niter_only   = 600; 
+burnin_only  = 50 ;  
+cooloff_only = 30 ; 
+nchains_only = 8  ; 
 
 % niter_only   = 4000; 
 % burnin_only  = 1000; 
@@ -383,10 +383,10 @@ elseif strcmp(stamp, 'add_sediment_try2');
     par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
         'SW_Ray_phV_lyneqeik','SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
         'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
-    par.inv.niter                     = 300; 
-    par.inv.burnin                    = 100; 
-    par.inv.cooloff                   = 80; 
-    par.inv.nchains                   = 4   ; % Less chains. So we can run more stations. 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;  
 
 elseif strcmp(stamp, 'SW_all'); 
     par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
