@@ -217,11 +217,7 @@ trudata = TD.Value;
 
 end % parfor loop
 
-%%
-[ram_copy_stats] = ram_to_HD(paths, resdir, nwk, sta); % Copy final results from ram to hard disk. 
-[~,duRam] = system(sprintf('du -h %s',paths.ramDrive)); 
-fprintf('\nDisk usage of ram drive after moving files off of it: \n%s\n', duRam )
-cd(resdir); % Get back out of ram and go to stations hard drive folder 
+[ram_copy_stats] = ram_to_HD(paths, resdir, nwk, sta); % Copy final results from ram to hard disk. Also remove the ram drive for this station, and change directory to main results folder for this statino. 
 
 if profileRun; % Get results from profiling. 
     mpiprofile off; 
