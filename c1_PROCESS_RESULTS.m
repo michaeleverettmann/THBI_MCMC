@@ -202,7 +202,7 @@ chi2_alldata = nan(nchains,length(par.inv.datatypes));
 % gather average rms errors of each chain
 nchainsRej = 4;
 nIterRej = 500; 
-if (nchains < nchainsRej) || (par.inv.niter < nIterRej); % bb2021.09.17 I copied this (if nchains... else... end) from Jon's version of the code, where the else block is all that was in Zach's. If you have too few chains, they often fail here due to some... glitch? 
+if (nchains <= nchainsRej) || (par.inv.niter < nIterRej); % bb2021.09.17 I copied this (if nchains... else... end) from Jon's version of the code, where the else block is all that was in Zach's. If you have too few chains, they often fail here due to some... glitch? 
     warning('BRENNAN WARNING: nchains is less than %1.0f or nIter is less than %1.0f. Thus, NOT rejecting chains. Only use this few of chains if you are debugging.', nchainsRej, nIterRej)
     goodchains = 1:nchains;
 else

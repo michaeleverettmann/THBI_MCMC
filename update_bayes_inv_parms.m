@@ -8,15 +8,15 @@ str_temp = split(stamp, '/');
 
 
 % { Different data types alone
-% niter_only   = 16000; 
-% burnin_only  = 4000; 
-% cooloff_only = 3000; 
-% nchains_only = 12; 
+niter_only   = 16000; 
+burnin_only  = 4000; 
+cooloff_only = 3000; 
+nchains_only = 12; 
 % 
-niter_only   = 400; 
-burnin_only  = 100; 
-cooloff_only =  70; 
-nchains_only = 4; warning('Short "only" stamp');  
+% niter_only   = 600; 
+% burnin_only  = 50 ;  
+% cooloff_only = 30 ; 
+% nchains_only = 8  ; 
 
 % niter_only   = 4000; 
 % burnin_only  = 1000; 
@@ -213,7 +213,8 @@ elseif strcmp(stamp, 'SW_HV_only');
     par.inv.niter                     = niter_only  ; 
     par.inv.burnin                    = burnin_only ; 
     par.inv.cooloff                   = cooloff_only; 
-    par.inv.nchains                   = nchains_only;     
+    par.inv.nchains                   = nchains_only;    
+
 % { --- ONE CHAIN Different data types alone
 elseif strcmp(stamp, 'SW_Ray_phV_only_one_chain'); 
     par.inv.datatypes                 = {'SW_Ray_phV'};
@@ -378,8 +379,25 @@ elseif strcmp(stamp, 'many_sw_authors_fast');
     par.inv.cooloff                   = 80; 
     par.inv.nchains                   = 3   ; % Less chains. So we can run more stations. 
 
+elseif strcmp(stamp, 'add_sediment_try2'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqeik','SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;  
 
-
+elseif strcmp(stamp, 'SW_all'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqeik', 'SW_Ray_phV_lyneqhelm', 'SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'SW_HV'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
+    
+    par.inv.verbose = false; 
 
 
 

@@ -87,13 +87,13 @@ modl.starting.HKappa.startAtHK = true; % Starting model at maximum of hkappa sta
 
 modl.sed = struct(...
     ... thickness of the sediments
-                     'hmax',0.0                  ,... %5 max sed layer thickness, km
+                     'hmax',5.0                  ,... %5 max sed layer thickness, km
                      'hmin',0.0                  ,... %0 min sed layer thickness, km
-                     'hstd',0.0                  ,... % std of sed layer thickness for perturbation, km
+                     'hstd',0.5                  ,... % std of sed layer thickness for perturbation, km
     ... shear velocity of the sediments
                      'vsmax',3.3                 ,... % max sed velocity, km/s
-                     'vsmin',2.8                 ,... % min sed velocity, km/s
-                     'vsstd',0.00                 );  % std of sed velocity for perturbation, km/s
+                     'vsmin',0.5                 ,... % min sed velocity, km/s
+                     'vsstd',0.08                 );  % std of sed velocity for perturbation, km/s
 
 modl.crust = struct(...
     ... thickness of the crust

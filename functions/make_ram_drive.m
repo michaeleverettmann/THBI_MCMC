@@ -4,7 +4,7 @@ function [ramDir]=make_ram_drive(options);
         options.linuxRam = '/dev/shm/ramDriveTHBI';  
         options.macRam = '/Volumes/ramDriveTHBI';
         options.stamp = ''; % stamp. Dont put a slash here.  
-        options.ramMb = 1000; 
+        options.ramMb = 2048; 
     end
 %% Function to check whether a ram drive is present, make one if it is not, and return that ram drives position. 
 % Needed for using temp files really fast throughout THBI. 

@@ -3,9 +3,11 @@ function plot_quickmodel(par,model,model1)
 
 global TRUEmodel
 
-if isempty(gcp('nocreate')) && par.inv.verbose 
+% if isempty(gcp('nocreate')) && par.inv.verbose 
+if par.inv.verbose 
+
         
-    figure(85);clf,set(gcf,'pos',[1194 4 622 529])
+    figure(85);clf,set(gcf,'pos',[-725 399 622 529])
     ax1 = subplot(1,2,1); hold on, 
     ax2 = subplot(1,2,2); hold on, 
 

@@ -109,6 +109,29 @@ wd = pwd;
 % % % end
 % % % figure(1); clf; hold on; set(gca, 'ydir', 'reverse'); xlabel('VS'); ylabel('Depth'); box on; grid on; 
 % % % plot(model.VS, model.z); 
+% % % model.VS (1:2) = model.VS (3); 
+% % % model.VP (1:2) = model.VP (3); 
+% % % model.rho(1:2) = model.rho(3); 
+% % % warning('Removing sediment in mineos'); 
+
+
+%%% Test what happens if we leave sediment and smooth beneath that. 
+%%% brb2022.06.30. Conclusion: For at least one failed mineos run, this
+%%% allows the mineos to run. The combination of a complex sediment and
+%%% complexity in the lower part of the model can break mineos, but it is
+%%% not just sediment or just the lowe rpart of the model to blame. 
+% % % figure(1); clf; hold on; set(gca, 'ydir', 'reverse'); xlabel('VS'); ylabel('Depth'); box on; grid on; 
+% % % warning('Leaving sediment and smoothing the rest'); 
+% % % plot(model.VS, model.z); 
+% % % fnames = {'VS', 'VP', 'rho'};
+% % % for ifn = 1:length(fnames); 
+% % %     fn = fnames{ifn}; 
+% % %     thisdat = model.(fn); 
+% % %     thisdat(5:end) = smoothdata(thisdat(5:end)); 
+% % %     model.(fn) = thisdat; 
+% % % end
+% % % plot(model.VS, model.z); 
+
 % % % ifplot = true; 
 % % % ifverbose = true; 
 % % % %%%
@@ -188,7 +211,6 @@ end
 if lrun > parm.maxrunN
 %     fprintf('More than %u tries; breaking mineos eig loop\n',parm.maxrunN);
     error('bb2021.09.21 error: More than %u tries; breaking mineos eig loop\n',parm.maxrunN);
-    asdfas;lkadf % Delete this - I was worried parfor was ignoring "error"
 end
 
 

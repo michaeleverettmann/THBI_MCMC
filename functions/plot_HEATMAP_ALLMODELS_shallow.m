@@ -17,11 +17,20 @@ end
 % TRrho = TRUEmodel.rho;
 % TRZ = TRUEmodel.Z;
 
+max_depth = 15; % km
+
 sm = suite_of_models;
+
+keep_shallow = sm.Z < (max_depth + 5); 
+sm.Z = sm.Z(keep_shallow); 
+sm.rho = sm.rho(keep_shallow,:); 
+sm.VP = sm.VP(keep_shallow,:);  
+sm.VS = sm.VS(keep_shallow,:);  
+
 
 Xvs = [par.mod.sed.vsmin:0.04:par.mod.mantle.vsmax];
 Xvp = [1.3*par.mod.sed.vsmin:0.04:par.mod.mantle.vsmax*2];
-Nz  = length(sm(1).Z);
+Nz  = length(sm(1).Z  );
 
 hmps = zeros(Nz,length(Xvs));
 hmpp = zeros(Nz,length(Xvp));
@@ -41,11 +50,17 @@ hmpp = log(hmpp); hmpp(isinf(hmpp)) = -20;
 
 
 %% Plot
-fig_num = 25; 
+fig_num = 26; 
 figure(fig_num); clf; set(gcf,'pos',[-1011 247 841 721])
 ax1 = axes(gcf,'pos',[0.13 0.11 0.35 0.815], 'linewidth', 1.5); hold on; box on; 
 ax2 = axes(gcf,'pos',[0.52 0.11 0.35 0.815], 'linewidth', 1.5); hold on; box on; 
 ax3 = axes(gcf,'pos',[0.91 0.11 0.02 0.815], 'linewidth', 1.5); hold on; box on; 
+
+xlim(ax1,[0.5 4.9])
+xlim(ax2,[1.5 8.8])
+
+ylim(ax1,[0,15]); 
+ylim(ax2,[0,15]); 
 
 
 %% data
@@ -53,11 +68,10 @@ contourf(ax1,Xvs,sm.Z,hmps,[-5:0.1:-0.1],'edgecolor','none');
 contourf(ax2,Xvp,sm.Z,hmpp,[-5:0.1:-0.1],'edgecolor','none');
 
 %% pretty
-xlim(ax1,[3 4.9])
-xlim(ax2,[5.4 8.8])
 
-set(ax1,'ydir','reverse','fontsize',15,'ytick',[0:25:max(sm.Z)],'color','none');
-set(ax2,'ydir','reverse','fontsize',15,'yticklabel','','ytick',[0:25:max(sm.Z)],'color','none');
+
+set(ax1,'ydir','reverse','fontsize',15,'ytick',[0:5:max(sm.Z)],'color','none');
+set(ax2,'ydir','reverse','fontsize',15,'yticklabel','','ytick',[0:5:max(sm.Z)],'color','none');
 set(ax3,'visible','off')
 
 title(ax1,'Vs','fontsize',24)

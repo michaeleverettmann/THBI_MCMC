@@ -68,6 +68,13 @@ while ~feof(fid)
     % rewind one if no error line
     if ~ifer, fseek(fid,fpos,-1); fgets(fid); end
     
+    field_names = fieldnames(HVK_fs); 
+    for ifn = 1:length(field_names); 
+        if any(isnan([HVK_fs.(field_names{ifn})])); 
+            error('Nan values in HV kernel! Not usuable. Is this fixable? brb2022.07.01'); % brb2022.07.01 I'm finding nan values at some indicies. This is sneaky and can break the rest of the code: An integral over kenel with any nan will be nan, so this kernel will be completely uselss as is. 
+        end
+    end
+    
 end
 fclose(fid);
 
