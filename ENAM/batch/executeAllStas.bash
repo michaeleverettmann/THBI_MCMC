@@ -28,7 +28,7 @@ do
     # Run "task" on network, station, and echo the process_ID to $pid file. 
     echo "sbatch batch/executeOneStation.bash '$lineSta'"
     sbatch batch/executeOneStation.bash $lineSta
-    sleep 1.0
+    # sleep 1.0
 done < $staList
 
 wait 

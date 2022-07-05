@@ -9,33 +9,37 @@ clc; clear;
 run('../../a0_STARTUP_BAYES.m');
 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
-resdir_data = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv/R54A_TA_dat1/SW_all'; 
-
+% resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/R54A_TA_dat1/add_sediment_try2'; 
+resdir_data = '/Users/brennanbrunsvik/Documents/temp/junk/trimmed'; 
 resdir_fig = '/Users/brennanbrunsvik/Documents/temp/remake_thbi_figures'; 
 prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat'; 
 
 %% Load files from the inversion. 
-mat_files = ls([resdir_data '/*.mat']); 
-mat_files = regexp(mat_files,'\n','split'); 
+% mat_files = ls([resdir_data '/*.mat']); 
+% mat_files = regexp(mat_files,'\n','split'); 
+fprintf('\n Loading prior \n'); 
+load(prior_path); % Load this before other things - prior.mat also has par which might be outdated. 
+
+mat_files = {[resdir_data '/misfits_perchain_orig.mat'],...
+    [resdir_data '/allmodels_perchain_orig.mat'],...
+    [resdir_data '/trudata_USE.mat'],[resdir_data '/par.mat']}; % These variables are all that are totally required. 
+
 for i_mat_file = 1:length(mat_files); 
     if isempty(mat_files{i_mat_file}); continue; end; % we get an empty value after last \n when splitting string into multiple cells. 
     fprintf('\nLoading %s\n',mat_files{i_mat_file}); 
     load(mat_files{i_mat_file}); 
 end
 
-fprintf('\n Loading prior \n'); 
-load(prior_path); 
-
 misfits_perchain_orig = misfits_perchain; 
 allmodels_perchain_orig = allmodels_perchain; 
-[par, ~] = update_bayes_inv_parms(par, 'SW_all'); 
+[par, ~] = update_bayes_inv_parms(par, 'add_sediment_try2'); 
 
 %%% Only temporary things here! Things to make your specific files run. 
-% par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
-%     'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
-% par.inv.datatypes = {'RF_Sp_ccp'}; 
 par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
-    'SW_Lov_phV', 'SW_HV'}; 
+    'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+% par.inv.datatypes = {'RF_Sp_ccp'}; 
+% par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+%     'SW_Lov_phV', 'SW_HV'}; 
 
 % par = update_bayes_inv_parms(par, 'RF_Sp_ccp_only'); 
 

@@ -154,7 +154,7 @@ else
 end
 
 % save data
-save([par.res.resdir,'/trudata_ORIG'],'trudata');
+% save([par.res.resdir,'/trudata_ORIG'],'trudata');
 
 %% PROCESS - window, filter data 
 for idt = 1:length(par.inv.datatypes)

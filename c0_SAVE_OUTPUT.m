@@ -1,4 +1,4 @@
-function c0_SAVE_OUTPUT(resdir,misfits_perchain,allmodels_perchain) %#ok<INUSD>
+function c0_SAVE_OUTPUT(resdir,misfits_perchain,allmodels_perchain,par) %#ok<INUSD>
 %  c0_SAVE_OUTPUT(resdir,misfits_perchain,allmodels_perchain)
 % 
 %  Function to save the important outputs from the inversion into the
@@ -6,5 +6,7 @@ function c0_SAVE_OUTPUT(resdir,misfits_perchain,allmodels_perchain) %#ok<INUSD>
 
 save([resdir,'/misfits_perchain_orig'],'misfits_perchain');
 save([resdir,'/allmodels_perchain_orig'],'allmodels_perchain');
+save([resdir,'/par'],'par'); % Par can get modified. 
+
 
 end

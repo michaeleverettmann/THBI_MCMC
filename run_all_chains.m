@@ -237,7 +237,7 @@ end
 %% ----------------------- End loop on chains  ----------------------------
 %% ========================================================================
 %% ========================================================================
-c0_SAVE_OUTPUT(resdir,misfits_perchain,allmodels_perchain);
+c0_SAVE_OUTPUT(resdir,misfits_perchain,allmodels_perchain,par);
 
 fprintf('Duration of entire run: %.0f s\n',(now-t)*86400)
 plot_invtime(misfits_perchain,[resdir,'/invTime.pdf']);
@@ -274,15 +274,20 @@ plot_HEATMAP_ALLMODELS_shallow(suite_of_models,par,1,[resdir,'/heatmap_of_models
 
 %% Save some things
 fprintf('  > Saving misfits, allmods, posterior, model suite\n')
-save([resdir,'/misfits_perchain'],'misfits_perchain');
-save([resdir,'/allmodels_perchain'],'allmodels_perchain');
 save([resdir,'/posterior'],'posterior');
-% save([resdir,'/allmods_collated'],'allmodels_collated');
-save([resdir,'/mod_suite'],'suite_of_models');
 save([resdir,'/goodchains'],'goodchains');
 try
 save([resdir,'/SWs_pred'],'SWs_perchain');
 end
+
+take_lots_of_space = false; 
+if take_lots_of_space; 
+    save([resdir,'/misfits_perchain'],'misfits_perchain'); % Already saved the "orig" version of this. 
+    save([resdir,'/allmodels_perchain'],'allmodels_perchain'); % Already saved the "orig" version of this. Not savingthis now. We save the original version earlier. This takes a lot of space, so I'm prioritizing the unmodified misfits which we can re-use to get back to this point without running the inversion. 
+%     save([resdir,'/allmods_collated'],'allmodels_collated');
+    save([resdir,'/mod_suite'],'suite_of_models');
+end
+
 
 %% Final interpolated model with errors
 % If you have to few iterations/chains, there aren't enough models, and you
@@ -333,3 +338,10 @@ end
 
 % clear('TRUEmodel')
 % return
+if ~ take_lots_of_space % Clear some space while we are at it and saving things. 
+    fprintf('\nRemoving velocity profile files (allmodels should still have those)\n'); 
+    system(sprintf('rm ./*%s.%s*vel_profile',nwk,sta)); 
+    fprintf('\nRemoving invState files\n'); 
+    system(sprintf('rm ./%s.%s*invState',nwk,sta)); 
+end
+

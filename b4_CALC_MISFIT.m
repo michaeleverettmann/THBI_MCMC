@@ -65,11 +65,11 @@ for id = 1:length(par.inv.datatypes)
                 % Plot stuff on the later iteration. But ii isn't always a
                 % part of par... Have to do obnoxious stuff...
                 plot_the_thing = par.inv.verbose; 
-                if isfield(par, 'ii'); 
-                    if par.ii == par.inv.niter; 
-                        plot_the_thing = true; 
-                    end
-                end
+%                 if isfield(par, 'ii'); 
+%                     if par.ii == par.inv.niter; 
+%                         plot_the_thing = true; 
+%                     end
+%                 end
 %                 try %^ Plot -- put in try loop. No need to stop inversion if this plot doesn't work. 
                 if plot_the_thing; 
                     figure(1); clf; hold on; 

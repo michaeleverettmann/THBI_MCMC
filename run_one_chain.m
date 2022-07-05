@@ -87,7 +87,7 @@ par.hkResetInfo = struct('timesReset',0, 'timesSWKernelsReset',0); % Structure t
 while ii < par.inv.niter
     
 earlyFailNum = 100; 
-save_model_if_error = (ii > earlyFailNum); 
+save_model_if_error = false; % Make this true, or something like (ii > earlyFailNum) if you want to get the models that are breaking the code.  
 if save_model_if_error && (fail_chain > 0); 
     if exist('e', 'var'); thiserr = e; else; thiserr = '??????'; end
     save(sprintf('%s/model-caused-error_%s_ii-%1.0f_time-%s.mat',...
@@ -179,7 +179,7 @@ end
 % % % %%%
 
 % Maintenance in case folder is getting filled up during last iterations. 
-[~,~]=clean_ram(ii,par,'clearRamInterval',200) % Prevent large amount of files from building up in ram, which can dramatically slow down matlab. If the ram is getting very full, then there is probably a problem!
+[~,~]=clean_ram(ii,par,'clearRamInterval',500) % Prevent large amount of files from building up in ram, which can dramatically slow down matlab. If the ram is getting very full, then there is probably a problem!
 if ~strcmp(pwd,par.res.chainExecFold); 
     warning('\nSomehow you left the ram folder! This can tremendously slow down code execute. Changing back (note that cd is slow)... Fix it. brb2022.04.02'); 
     cd(par.res.chainExecFold); 
@@ -638,6 +638,7 @@ diary off
 [mvStatus, mvMessage]=system('mv -v ./* ..'); 
 fprintf('\nMoving files from chain folder (%s)\n  to network folder (..).  \n  Result:\n  %s\n',pwd,mvMessage)
 if ~mvStatus==0; warning('Possible problem moving files from chain folder to station folder. brb2022.03.30'); end
+
 
 
 end

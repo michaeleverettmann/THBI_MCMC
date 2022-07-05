@@ -8,15 +8,15 @@ str_temp = split(stamp, '/');
 
 
 % { Different data types alone
-% niter_only   = 16000; 
-% burnin_only  = 4000; 
-% cooloff_only = 3000; 
-% nchains_only = 12; 
+niter_only   = 16000; 
+burnin_only  = 4000; 
+cooloff_only = 3000; 
+nchains_only = 12; 
 % 
-niter_only   = 100; 
-burnin_only  = 20 ;  
-cooloff_only = 15 ; 
-nchains_only = 3  ; 
+% niter_only   = 300; 
+% burnin_only  = 50 ;  
+% cooloff_only = 15 ; 
+% nchains_only = 3  ; 
 
 % niter_only   = 4000; 
 % burnin_only  = 1000; 
@@ -399,7 +399,14 @@ elseif strcmp(stamp, 'SW_all');
     
     par.inv.verbose = false; 
 
-
+elseif strcmp(stamp, 'all_highres_layer'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm', 'SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'SW_HV', 'RF_Sp_ccp', 'HKstack_P'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
 
 
 end

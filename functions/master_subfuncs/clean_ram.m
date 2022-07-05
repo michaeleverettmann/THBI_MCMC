@@ -2,7 +2,7 @@ function [clearStat,clearMessage]=clean_ram(ii,par,options)
     arguments
         ii
         par
-        options.clearRamInterval=10
+        options.clearRamInterval=500
         options.verbose=false
     end
 
