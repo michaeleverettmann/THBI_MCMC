@@ -15,7 +15,7 @@ end
 % If a discontinuity depth changes, we would have problems. 
 % Z indicies of m0 and m1 might not correspond to similar depths, and dv at some depth
 % might not have the desired meaning anymore in our kernels K.
-% THen using K to find dc stops working well. 
+% Then using K to find dc stops working well. 
 % Solution: Sample m1 onto m0.z, but do so by taking the most
 % representative average of m1 in the viscinity of m0.z. 
 % For a coarse m0.z, discontinuities can't be captured properly through
@@ -50,12 +50,15 @@ if ~ isequal(model0.z, model1.z);
     dz_mid = zeros(size(z_upsc)); 
     dz_mid(2:end  ) =                   z_upsc(2:end  ) - mid_z; % Distance from z_upsc to midpoint above it. 
     dz_mid(1:end-1) = dz_mid(1:end-1) + mid_z - z_upsc(1:end-1); % Distance from z_upsc to midpoint below it. To check: does sum(dz_mid) = max(z_upsc)? Yes - brb2022.07.01. 
-    old_z_midpts = [min(model0.z)-1; (model0.z(2:end) + model0.z(1:end-1))./2; max(model0.z)+1 ]; % For deciding how to associate z_upsc model values to which old z indecies. 
+    old_z_midpts = [min(model0.z)-1;...
+        (model0.z(2:end) + model0.z(1:end-1))./2;...
+        max(model0.z)+1 ]; % For deciding how to associate z_upsc model values to which old z indecies. 
 
     % Upscale model1.  
     for i_param = 1:length(each_param); 
         param = each_param{i_param}; 
-        model1_unique.(param) = interp1(model1_unique.z, model1_unique.(param), z_upsc, 'linear'); % Linear avoids instabilities around discontinuities that we might find with cubic, splines, etc. brb2022.07.01
+        model1_unique.(param) = interp1(...
+            model1_unique.z, model1_unique.(param), z_upsc, 'linear'); % Linear avoids instabilities around discontinuities that we might find with cubic, splines, etc. brb2022.07.01
     end
     model1_unique.z = z_upsc; 
 
@@ -69,7 +72,8 @@ if ~ isequal(model0.z, model1.z);
             this_dep = and( (old_z_midpts(idep  ) <= model1_unique.z) ,...
                             (old_z_midpts(idep+1) >=  model1_unique.z) ); % These upsampled incicies will correspond to the previous indecies. 
 %             array_newbase(idep) = mean(array_upsamp(this_dep)); % Resample model0. parameters to the model1.z depths. 
-            array_newbase(idep) = sum(array_upsamp(this_dep) .* dz_mid(this_dep)) ...
+            array_newbase(idep) = sum(...
+                array_upsamp(this_dep) .* dz_mid(this_dep)) ...
                 ./ sum(dz_mid(this_dep)); % Simple integral average 
         end
         if any(isnan(array_newbase)); 
@@ -82,14 +86,16 @@ if ~ isequal(model0.z, model1.z);
     if plot_upscale_interp; 
         figure(1005); clf; hold on; 
         h = tiledlayout(1,2,'TileSpacing', 'compact'); 
-        nexttile(); cla; hold on; set(gca, 'ydir', 'reverse'); box on; set(gca, 'LineWidth', 1.5); ylim([-5, 300]); 
+        nexttile(); cla; hold on; set(gca, 'ydir', 'reverse'); 
+        box on; set(gca, 'LineWidth', 1.5); ylim([-5, 300]); 
         hmo  = plot(model0_plot.VS  , model0_plot.z); % Handle model 0. 
         hm1  = plot(model1_plot.VS  , model1_plot.z); 
         hm1i = plot(model1     .VS  , model1     .z); % Handle model 1 interpolated/averaged onto model 0 basis. 
         leg = legend([hmo hm1 hm1i], {'m0', 'm1 orig', 'm1 averaged onto m0 basis'}, 'location', 'best');    
         title('VS used for making Kbase'); 
 
-        nexttile(); cla; hold on; set(gca, 'ydir', 'reverse'); box on; set(gca, 'LineWidth', 1.5); ylim([-5, 60]); 
+        nexttile(); cla; hold on; set(gca, 'ydir', 'reverse'); 
+        box on; set(gca, 'LineWidth', 1.5); ylim([-5, 60]); 
         hmo  = plot(model0_plot.VS       , model0_plot.z); % Handle model 0. 
         hm1  = plot(model1_plot.VS - 0.4 , model1_plot.z); 
         hm1i = plot(model1     .VS + 0.4 , model1     .z); % Handle model 1 interpolated/averaged onto model 0 basis. 
