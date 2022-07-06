@@ -10,19 +10,19 @@ run('../../a0_STARTUP_BAYES.m');
 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/R54A_TA_dat1/add_sediment_try2'; 
-resdir_data = '/Users/brennanbrunsvik/Documents/temp/junk/trimmed'; 
+resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/O53A_TA_dat1/all_highres_layer'; 
 resdir_fig = '/Users/brennanbrunsvik/Documents/temp/remake_thbi_figures'; 
 prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat'; 
 
 %% Load files from the inversion. 
-% mat_files = ls([resdir_data '/*.mat']); 
-% mat_files = regexp(mat_files,'\n','split'); 
+mat_files = ls([resdir_data '/*.mat']); 
+mat_files = regexp(mat_files,'\n','split'); 
 fprintf('\n Loading prior \n'); 
 load(prior_path); % Load this before other things - prior.mat also has par which might be outdated. 
 
-mat_files = {[resdir_data '/misfits_perchain_orig.mat'],...
-    [resdir_data '/allmodels_perchain_orig.mat'],...
-    [resdir_data '/trudata_USE.mat'],[resdir_data '/par.mat']}; % These variables are all that are totally required. 
+% mat_files = {[resdir_data '/misfits_perchain_orig.mat'],...
+%     [resdir_data '/allmodels_perchain_orig.mat'],...
+%     [resdir_data '/trudata_USE.mat'],[resdir_data '/par.mat']}; % These variables are all that are totally required. 
 
 for i_mat_file = 1:length(mat_files); 
     if isempty(mat_files{i_mat_file}); continue; end; % we get an empty value after last \n when splitting string into multiple cells. 
@@ -32,11 +32,11 @@ end
 
 misfits_perchain_orig = misfits_perchain; 
 allmodels_perchain_orig = allmodels_perchain; 
-[par, ~] = update_bayes_inv_parms(par, 'add_sediment_try2'); 
+% [par, ~] = update_bayes_inv_parms(par, 'add_sediment_try2'); 
 
 %%% Only temporary things here! Things to make your specific files run. 
-par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
-    'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+% par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+%     'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
 % par.inv.datatypes = {'RF_Sp_ccp'}; 
 % par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
 %     'SW_Lov_phV', 'SW_HV'}; 
@@ -49,11 +49,17 @@ par.res.resdir = resdir_fig; % For saving files to new location
 par.inv.synthTest = false; % Get an error without this. 
 mkdir(resdir_fig); 
     
+% goodChainManual = logical([ones(12,1)]); warning('brb2022.07.06: Setting good chains manual'); 
+% goodChainManual(2:end,:)=false; 
+% goodChainManual = logical([zeros(12,1)]); warning('brb2022.07.06: Setting good chains manual'); 
+% goodChainManual(3)=true; 
+goodChainManual = []; 
+
 [misfits_perchain,allmodels_perchain,goodchains,...
      misfits_perchain_original,...
      allmodels_perchain_original,...
      allmodels_collated] ...
-     = c1_PROCESS_RESULTS( misfits_perchain_orig,allmodels_perchain_orig,par,1,[resdir_fig,'/modMisfits'])
+     = c1_PROCESS_RESULTS( misfits_perchain_orig,allmodels_perchain_orig,par,1,[resdir_fig,'/modMisfits'],goodChainManual)
 
 [ hypparm_trends ] = plot_HYPERPARAMETER_TRENDS( allmodels_perchain,[resdir_fig,'/hyperparmtrend.pdf'] );
 plot_MISFIT_TRENDS(par,allmodels_perchain,misfits_perchain_original,resdir_fig );
@@ -70,11 +76,11 @@ plot_HEATMAP_ALLMODELS_shallow(suite_of_models,par,1,[resdir_fig,'/heatmap_of_mo
 final_model = c4_FINAL_MODEL(posterior,allmodels_collated,par,1,[resdir_fig,'/final_model']);
 plot_FINAL_MODEL( final_model,posterior,1,[resdir_fig,'/final_model.pdf'],true,[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
 
-par.datprocess.HKappa = struct(              ...
-                       'min_error', 0.002,           ... % Add this much "error" to h-kappa stacks (error of 0 can result in sigma inverting improperly)
-                       'scale_error', 1,           ... % Multiply h-kappa error by this constant. Sigma needs to be scaled accordingly. If using 100, we can think of it like percent. 
-                       'weightDistanceMax', 0,   ... % At start of burnin, gives 0 to 1 weight toward the (scaled) Euclidian distance from HKappa energy maximum. In otherwords, this tends toward disregarding the actual energy value, and pays attention to its position. 
-                       'weightDistanceMin', 0); 
+% % par.datprocess.HKappa = struct(              ...
+% %                        'min_error', 0.002,           ... % Add this much "error" to h-kappa stacks (error of 0 can result in sigma inverting improperly)
+% %                        'scale_error', 1,           ... % Multiply h-kappa error by this constant. Sigma needs to be scaled accordingly. If using 100, we can think of it like percent. 
+% %                        'weightDistanceMax', 0,   ... % At start of burnin, gives 0 to 1 weight toward the (scaled) Euclidian distance from HKappa energy maximum. In otherwords, this tends toward disregarding the actual energy value, and pays attention to its position. 
+% %                        'weightDistanceMin', 0); 
                    
 [ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,trudata,posterior );
 

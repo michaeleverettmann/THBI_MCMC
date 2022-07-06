@@ -73,7 +73,7 @@ Nz = length(Z);
 
 fprintf('  > Gathering models (layer-wise)\n    & fitting gaussians to each parm/depth\n      ')
 
-variable = {'VS','VP','rho'};
+variable = {'VS','VP','rho','Sanis','Panis'}; % If you add other variables to inversion, put them here. brb2022.07.06
 for iv = 1:length(variable)
     fprintf('%s... ',variable{iv});
 
@@ -81,6 +81,7 @@ varz = zeros(Nz,Nm);
 for ii = 1:Nm
     varz(:,ii) = linterp(allmodels(ii).z,allmodels(ii).(variable{iv}),Z);
 end 
+
 
 lb = zeros(Nz,1); ub = lb; 
 l1std = lb;  u1std = lb; 

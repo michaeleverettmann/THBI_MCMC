@@ -10,34 +10,40 @@ for id = 1:length(par.inv.datatypes)
 end
 
 %% ===================  LAYERISE PROFILE  ===================
-% [zlayt,zlayb,Vslay,Vplay,rholay] = ...
-%     layerise(final_model.Z,final_model.VSav,par.forc.mindV,1,final_model.VPav,final_model.rhoav); 
-% nlay = length(Vslay);
-% laymodel = struct('zlayt',zlayt,'zlayb',zlayb,'Vs',Vslay,'Vp',Vplay,'rho',rholay,'nlay',nlay);
-% if any(isnan(laymodel.rho))
-%     error('NaN densities')
-% end
 
-[zlayt,zlayb,Vslay] = ...
-    layerise(final_model.Z,final_model.VSav,par.forc.mindV,1); 
+[zlayt,zlayb,Vslay,...
+    Vplay,rholay,xilay,philay] = ...
+    layerise(final_model.Z,final_model.VSav,par.forc.mindV,0,...
+    final_model.VPav, final_model.rhoav, ...
+    final_model.Sanisav./100+1,final_model.Panisav./100+1); 
 nlay = length(Vslay);
+etalay = ones(nlay,1); % eta anisotropy TODO get eta from model. eta is not in model right now, so can't yet. 
 
-% S to P and rho structure
-zsed = final_model.Zd(1).mu;
-zmoh = final_model.Zd(2).mu;
-xs = 1:mindex(zlayb,zsed); if zsed==0, xs = []; end
-xc = mindex(zlayt,zsed):mindex(zlayb,zmoh);
-xm = mindex(zlayt,zmoh):nlay;
-Vplay = [sed_vs2vp(Vslay(xs));...
-         final_model.vpvsav*Vslay(xc);...
-         mantle_vs2vp(Vslay(xm),mean([zlayt(xm),zlayb(xm)],2))];
-rholay = [sed_vs2rho(Vslay([xs,xc]));...
-          mantle_vs2rho(Vslay(xm),mean([zlayt(xm),zlayb(xm)],2))];
-xilay = [zeros(length(xs),1);...
-         final_model.xicrav*ones(length(xc),1);...
-         final_model.ximaav*ones(length(xm),1)]; % S radial anisotropy
-philay = ones(nlay,1); % P radial anisotropy
-etalay = ones(nlay,1); % eta anisotropy
+% Commented is the way of getting  rho, xi etc. But since we are looking over a suite of models that had different discontinuity depths, its better to just average over those suits of models. I think. Maybe. brb2022.07.06. 
+% % % [zlayt,zlayb,Vslay,Vplay,rholay] = ...
+% % %     layerise(final_model.Z,final_model.VSav,par.forc.mindV,1,final_model.VPav,final_model.rhoav); 
+% % % nlay = length(Vslay);
+% % % laymodel = struct('zlayt',zlayt,'zlayb',zlayb,'Vs',Vslay,'Vp',Vplay,'rho',rholay,'nlay',nlay);
+% % % if any(isnan(laymodel.rho))
+% % %     error('NaN densities')
+% % % end
+% % % % S to P and rho structure
+% % % zsed = final_model.Zd(1).mu;
+% % % zmoh = final_model.Zd(2).mu;
+% % % xs = 1:mindex(zlayb,zsed); if zsed==0, xs = []; end
+% % % xc = mindex(zlayt,zsed):mindex(zlayb,zmoh);
+% % % xm = mindex(zlayt,zmoh):nlay;
+% % % Vplay = [sed_vs2vp(Vslay(xs));...
+% % %          final_model.vpvsav*Vslay(xc);...
+% % %          mantle_vs2vp(Vslay(xm),mean([zlayt(xm),zlayb(xm)],2))];
+% % % rholay = [sed_vs2rho(Vslay([xs,xc]));...
+% % %           mantle_vs2rho(Vslay(xm),mean([zlayt(xm),zlayb(xm)],2))];
+% % % xilay = [zeros(length(xs),1);...
+% % %          final_model.xicrav*ones(length(xc),1);...
+% % %          final_model.ximaav*ones(length(xm),1)]; % S radial anisotropy
+% % % philay = ones(nlay,1); % P radial anisotropy
+% % % etalay = ones(nlay,1); % eta anisotropy
+% % % if any(xilay==0); error('xi probably shouldnt be zero but should be one. Check notes brb2022.07.06.'); end
 
 laymodel = struct('zlayt',zlayt,'zlayb',zlayb,'Vs',Vslay,'Vp',Vplay,'rho',rholay,'nlay',nlay,'xi',xilay,'phi',philay,'eta',etalay);
 if any(isnan(laymodel.rho))
@@ -181,17 +187,13 @@ end
 
 %% ===================  CALCULATE SURPHASE WAVE VELOCITIES  ===================
 if any(strcmp(pdtyps(:,1),'SW'))
-    % Radial S anis
-    xi = zeros(size(final_model.Z));
-    xi((final_model.Z>final_model.Zd(1).mu) & (final_model.Z<=final_model.Zd(2).mu)) = final_model.xicrav;
-    xi(final_model.Z>final_model.Zd(2).mu) = final_model.ximaav;
-    
+
     modminrun = struct('z',final_model.Z,...
                        'VS',final_model.VSav,...
                         'VP',final_model.VPav,...
                         'rho',final_model.rhoav,...
-                        'Sanis',100*(xi-1),...
-                        'Panis',zeros(size(final_model.Z)));
+                        'Sanis',final_model.Sanisav,...
+                        'Panis',final_model.Panisav);
                     
     if any(strcmp(pdtyps(:,2),'Ray')), itp = par.inv.datatypes(find(strcmp(pdtyps(:,2),'Ray'),1,'first'));
         par_mineos = struct('R_or_L','R','ID',ID);
@@ -310,12 +312,11 @@ if any(strcmp(pdtyps(:,1),'HKstack'))
     fm.VS = final_model.VSav; 
     fm.z = fm.Z; % this is why we should always use cammel case! 
     fm.vpvs = fm.vpvsav; 
-   
-    ptemp = posterior; 
-    ptemp.phicrust = 1; warning('Assuming phi = 1 for making final HK stack')
+    fm.Panis = fm.Panisav; 
+    fm.Sanis = fm.Sanisav; 
     
     [final_predata, par] = hk_forward_model(...
-        par, fm, final_predata, pdtyps, 'posterior', ptemp, ...
+        par, fm, final_predata, pdtyps, ...
         'insistRerun', true); 
     
     plot_HK_stack(final_predata.HKstack_P.Hgrid,...

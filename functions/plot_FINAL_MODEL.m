@@ -27,6 +27,8 @@ ax3(2) = axes('pos',[0.8179 0.11 0.15 0.210]); hold on
 %% Vertical 1D profiles
 variable = {'VS','VP','rho'};
 xlims = [[3.2,4.9];[5.9 9.1];[2.6 3.7]];
+% % % variable = {'Sanis','Panis'}; % If want to see other variables, can uncomment this. 
+% % % xlims = [[-10 10]; [-1 1]];
 for iv = 1:length(variable)
 
 fill(ax(iv),[final_model.([variable{iv},'sig1'])(:,1);...
