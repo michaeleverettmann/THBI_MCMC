@@ -21,6 +21,7 @@ figure(156), clf, set(gcf,'pos',position), hold on;
 h = tiledlayout(n_rows, n_cols, 'TileSpacing', 'tight', 'Padding', 'compact');% Tight, compact, and normal. 
 sgtitle('RMS Mismatch')
 
+% if length(misfits)==1; misfits = {misfits}; end % Just for debugging. 
 for idat = [1:ndattyps]; 
     thisdat = par.inv.datatypes{idat}; 
     
