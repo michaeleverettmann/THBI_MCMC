@@ -130,13 +130,13 @@ if fail_chain > 0; % Problem -- There are various ways of dealing with this.
         fprintf('\n :(   :(   :(   :(   :(   :(   :(   :(   :(   :(   \n'); 
         if ii - Kbase.itersave > 50; % Last Kbase has to be a decent model - immediately after making Kbase (currently this is at lines 580 during the inversion) we checked for signs of forward model failure. Kbase is also made in initiate model around line 60. If that Kbase was broken, the inversion would reset at iteration 1. 
             warning([failInfoStr 'High fail chain. Reset to last Kbase.']); 
-            model = Kbase.modelk; ii = Kbase.itersave; % Rewind to last model    
+            KbaseUseReset = Kbase; 
             resetData = true; 
             fail_total = fail_total + 1; 
         else % Last Kbase might also be bad. Go back two models. 
             if ~isempty(KbasePrev); 
                 warning([failInfoStr 'High fail chain. Reset to last KbasePrev (NOT Kbase).']); 
-                model = KbasePrev.modelk; ii = KbasePrev.itersave; 
+                KbaseUseReset = KbasePrev; 
                 resetData = true; 
                 fail_total = fail_total + 1; 
             else; % We don't know if last Kbase is good, and we only have one Kbase. Just reset the chain: we must not be very far anyway.  
@@ -146,14 +146,12 @@ if fail_chain > 0; % Problem -- There are various ways of dealing with this.
             end
         end
     end
-    
-    fprintf('\nNow on iteration %1.0f',ii); 
-    iter_fail(end+1) = ii; 
-    
+       
     if resetData; 
         try; 
             fprintf(['\n *********************************************** \n',...
                 'Trying to reset data according to previous Kbase.\n'])
+            model = KbaseUseReset.modelk; ii = KbaseUseReset.itersave; 
             [predata,laymodel] = b3__INIT_PREDATA(model,par,trudata,0 );
             predata = b3_FORWARD_MODEL_BW( model,laymodel,par,predata,ID,0,predataPrev); % brb2022.04.12 The arguments to forward_model_bw were in the wrong order. Probaly an old version of the code. 
             predata = b3_FORWARD_MODEL_RF_ccp( model,laymodel,par,predata,ID,0 );
@@ -174,6 +172,9 @@ if fail_chain > 0; % Problem -- There are various ways of dealing with this.
             break;
         end
     end
+    
+    fprintf('\nNow on iteration %1.0f\n',ii); 
+    iter_fail(end+1) = ii; 
     %!%! Code to break chain entirely if reset to many times.     
 end
 % % % %%%
@@ -555,14 +556,16 @@ try
         try
             if par.inv.verbose; fprintf('\nTrying to reset K.\n'); end
             % reset the kernels using the current model
-            KbasePrev = Kbase; 
-            [Kbase,predata] = b7_KERNEL_RESET(model,Kbase,predata,ID,ii,par,1);
+            [KbaseNew,predata] = b7_KERNEL_RESET(model,Kbase,predata,ID,ii,par,1);
             if ifforwardfail(predata,par) % Sometimes kernel reset gives nans, but doesn't explicitly fail? 
                 fail_chain=fail_chain+1; ifpass=0;
                 error('Failed making new kernels! Fail_chain %.0f, ii=%1.0f\n',fail_chain,ii)
             end
+            KbasePrev = Kbase; % Now that we knot b7 worked, we can define Kbaseprev to be the last Kbase we had. 
+            Kbase = KbaseNew; 
             fail_reset = 0;
             ptbnorm = 0; 
+            display_new_likelihood = false; 
         catch e 
             fprintf('\nbrb Kernel reset fail. Error was: \n --------\n %s\n --------\n',getReport(e)); 
             % rewind back to last Kbase model that worked!
@@ -576,19 +579,25 @@ try
             predata = b3_FORWARD_MODEL_SW_kernel( model,Kbase,par,predata );
             predataPrev = predata; % Keep track of last predata. To keep the previous complete HK stack.            
             fail_reset = fail_reset+1;
-            fail_chain = fail_chain + 1; 
+            fail_chain = fail_chain+1; % This should not cause the if fail_chain > 15, then reset, code to execute. Unless we had a ton of fails just before this. In which case, should we add 1 to fail_chain? or set fail_chain to 0 after a successful kernel reset?  
+            fail_total = fail_total+1; 
             if ifforwardfail(predata,par); 
                 warning('You should always be able to rewind to a model and run all forward modelling on it. A model wasnt accepted if we couldnt run the forward modelling. What is happening?. We simply have to exit the inversion.'); 
-%                 fprintf('\nREMOVE THIS LINE saving temporarily\n'); 
-%                 save
                 fail_chain = - 100; 
                 break;
             end
+            display_new_likelihood = true; % Temporary debugging. 
+        end
+        if display_new_likelihood; % Temporary debugging. 
+            fprintf('\nBefore resetting kernels, old log_likelihood %3.3f\n',log_likelihood);
         end
         % need to also reset likelihood and misfit to the new, precise data (likelihood may have been artificially high due to kernel forward  calc. approximation - if so, need to undo this, or chain will get stuck once we reset kernels).
         [log_likelihood,misfit] = b8_LIKELIHOOD_RESET(par,predata,trudata,Kbase,model.datahparm);
         Pm_prior = calc_Pm_prior(model,par);
         nchain = 0;
+        if display_new_likelihood; % Temporary debugging. 
+            fprintf('\nAfter resetting kernels, new log_likelihood %3.3f\n',log_likelihood);
+        end
     end
 
     
