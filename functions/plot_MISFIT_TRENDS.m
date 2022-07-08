@@ -73,7 +73,7 @@ exportgraphics(gcf, [resdir '/datatype_misfits_sigma.jpeg'], 'Resolution', resol
 
 
 % Plot likelihood corresponding to each datatype. 
-figure(157), clf, set(gcf,'pos',position), hold on;  
+figure(158), clf, set(gcf,'pos',position), hold on;  
 h = tiledlayout(n_rows, n_cols, 'TileSpacing', 'tight', 'Padding', 'compact');% Tight, compact, and normal. 
 sgtitle('Likelihood (log) contribution')
 

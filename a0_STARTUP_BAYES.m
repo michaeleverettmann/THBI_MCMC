@@ -34,6 +34,8 @@ addpath([bayesdir,'functions/plotting/progress']) % For doing some things with h
 addpath([bayesdir,'functions/master_subfuncs']); % Trying to break up master par into many subfunctions
 addpath([bayesdir,'functions/handle_errors']);
 addpath([bayesdir,'functions/plotting/plot_data_heatmap']); 
+addpath([bayesdir,'functions/plotting/sensitivity']); 
+
 
 % path of sub functions that I got online but don't know if I can legally
 % distribute. bb2021.09.14

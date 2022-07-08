@@ -10,7 +10,7 @@ run('../../a0_STARTUP_BAYES.m');
 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/R54A_TA_dat1/add_sediment_try2'; 
-resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/R54A_TA_dat1/all_highres_layer'; 
+resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/O53A_TA_dat1/all_highres_layer'; 
 resdir_fig = '/Users/brennanbrunsvik/Documents/temp/remake_thbi_figures'; 
 prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat'; 
 
@@ -53,7 +53,7 @@ mkdir(resdir_fig);
 % goodChainManual(2:end,:)=false; 
 % goodChainManual = logical([zeros(12,1)]); warning('brb2022.07.06: Setting good chains manual'); 
 % goodChainManual(3)=true; 
-goodChainManual = []; 
+goodChainManual = [4]; 
 
 [misfits_perchain,allmodels_perchain,goodchains,...
      misfits_perchain_original,...
@@ -62,8 +62,77 @@ goodChainManual = [];
      = c1_PROCESS_RESULTS( misfits_perchain_orig,allmodels_perchain_orig,par,1,[resdir_fig,'/modMisfits'],goodChainManual)
 
 [ hypparm_trends ] = plot_HYPERPARAMETER_TRENDS( allmodels_perchain,[resdir_fig,'/hyperparmtrend.pdf'] );
-plot_MISFIT_TRENDS(par,allmodels_perchain,misfits_perchain_original,resdir_fig );
+plot_MISFIT_TRENDS(par,allmodels_perchain,misfits_perchain,resdir_fig );
  
+
+% % % %%% Temporary test to evaluate models at problematic points
+% % % chain = allmodels_perchain{1}; 
+% % % % find([chain.iter]==7725) 7725
+% % % figure(1);clf; hold on; set(gcf,'color', 'white'); 
+% % % set(gca, 'ydir', 'reverse'); 
+% % % figure(2);clf; hold on; set(gcf,'color', 'white'); 
+% % % 
+% % % % for ichain = [304, 305]; % 7, 304, 305
+% % % % for ichain = [232, 233]; % 7, 304, 305
+% % % for ichain = [309,310]; % 7, 304, 305
+% % %     figure(1); 
+% % %     mod = chain(ichain); 
+% % %     plot(mod.VS, mod.z, 'DisplayName', num2str(ichain) ); 
+% % %     figure(2); 
+% % %     [predata,laymodel] = b3__INIT_PREDATA(mod,par,trudata,0 ); 
+% % %     [ predata,SW ] = b3_FORWARD_MODEL_SW_precise( mod,par,predata,'junk' );
+% % %     plot(predata.SW_HV.periods, predata.SW_HV.HVr,...
+% % %         'DisplayName', num2str(ichain) ); 
+% % %     [Kbase,predata] = b7_KERNEL_RESET(mod,[],predata,'junk',1,par,1); 
+% % %     
+% % %     % Kernels for HV
+% % %     z_limits = [-2, 300]; 
+% % %     HVK_1=Kbase.HV.KHV; Np = length(HVK_1); 
+% % %     figure(88), clf; set(gcf,'pos',[-1347 303 1323 713]); hold on ;
+% % %     each_var = {'Kzh_Vs','Kzh_Vp','Kzh_rho'}; % Also have 'Kph_Vs','Kph_Vp','Kph_rho',
+% % %     h=tiledlayout(1,length(each_var)+2,'TileSpacing','compact'); 
+% % % %     ax1 = subplot(1,2,1); cla, hold on;
+% % % %     ax2 = subplot(1,2,2); cla, hold on;   
+% % % %     h = {}; % zeros(Np,1);
+% % %     for ivar = 1:length(each_var); 
+% % %         this_var = each_var{ivar}; 
+% % %         nexttile(ivar); cla; hold on; box on; 
+% % %         set(gca, 'ydir', 'reverse', 'LineWidth', 1.5); 
+% % %         ylim(z_limits); 
+% % %         title(strrep(this_var, '_', ' ')); 
+% % %         for ip = 1:Np
+% % %             plot(HVK_1{ip}.(this_var)/1e3,0.5*(HVK_1{ip}.Z1+HVK_1{ip}.Z2),...
+% % %                 '-','linewidth',2, 'DisplayName',num2str(HVK_1{ip}.period));
+% % %         end  
+% % %         if ivar == 1; 
+% % %             leg=legend('Location', 'best'); 
+% % %         end
+% % %     end
+% % %     
+% % %     nexttile(ivar+1); cla; hold on; box on; set(gca, 'ydir', 'reverse', 'LineWidth', 1.5); 
+% % %     title('Model'); 
+% % %     ylim(z_limits); 
+% % %     plot(mod.VS , mod.z, 'linewidth', 2, 'DisplayName', 'Vs' ); 
+% % %     plot(mod.VP , mod.z, 'linewidth', 2, 'DisplayName', 'Vp' ); 
+% % %     plot(mod.rho, mod.z, 'linewidth', 2, 'DisplayName', 'rho'); 
+% % %     legend('Location', 'best'); 
+% % %     
+% % %     
+% % %     nexttile(ivar+2); cla; hold on; box on; set(gca,'ydir', 'reverse', 'LineWidth', 1.5); 
+% % %     title('Ellipticity'); ylabel('Period'); 
+% % %     plot(predata.SW_HV.HVr, predata.SW_HV.periods, 'linewidth', 2, 'DisplayName', 'rho'); 
+% % %     xlim([0.6, 0.85]); 
+% % %     grid on; 
+% % %     
+% % %     nexttile(1); ylabel('Depth (km)'); 
+% % %     
+% % %     exportgraphics(gcf, sprintf('%s/HV_kernels_%1.0f.pdf',resdir_fig,ichain)); 
+% % %     
+% % % end
+% % % figure(1); legend(); 
+% % % figure(2); legend(); 
+
+%%%
 
 posterior = c2_BUILD_POSTERIOR(allmodels_collated,par,par.res.zatdep);
 plot_MODEL_SUMMARY(posterior,par,1,[resdir_fig,'/modMisfits.pdf']); 
@@ -109,3 +178,20 @@ plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,1,[resdir_fig,'/final_true_vs_pre
 % plot_TRUvsPRE_WAVEFORMS_indiv_figs(trudata,final_predata,1,[resdir,'/final_true_vs_pred_data_wavs.pdf']);
 % save([resdir_fig,'/final_misfit'],'final_misfit');
 plot_FIG2_FIT_MODEL( final_model,posterior,prior,par,1,[resdir_fig,'/fig2_FIT_MODEL.pdf'])
+
+%%% Plot kernels for final model. 
+model = final_model; 
+model.VS = model.VSav; 
+model.VP = model.VPav; 
+model.rho = model.rhoav; 
+model.Panis = model.Panisav; 
+model.Sanis = model.Sanisav; 
+model.z = model.Z; 
+[Kbase,~] = b7_KERNEL_RESET(model,[],trudata,'junk',0,par,1); 
+plot_sensitivity_kernel_hv(Kbase.HV.KHV,'model',model,'predata',final_predata,...
+    'filename',sprintf('%s/sensitivity_hv.pdf',resdir_fig) ); 
+plot_sensitivity_kernel_ray(Kbase.Ray.Kph,'model',model,'predata',final_predata,...
+    'filename',sprintf('%s/sensitivity_ray.pdf',resdir_fig) ); 
+plot_sensitivity_kernel_love(Kbase.Lov.Kph,'model',model,'predata',final_predata,...
+    'filename',sprintf('%s/sensitivity_love.pdf',resdir_fig) ); 
+%%% End plot kernels for final model. 
