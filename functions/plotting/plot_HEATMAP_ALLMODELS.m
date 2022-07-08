@@ -1,12 +1,12 @@
-function [hmps,hmpp] = plot_HEATMAP_ALLMODELS(suite_of_models,par,ifsave,ofile)
+function [hmps,hmpp] = plot_HEATMAP_ALLMODELS(suite_of_models, final_model, par, ifsave, ofile)
 % [hmps,hmpp] = plot_HEATMAP_ALLMODELS(suite_of_models,par,ifsave,ofile)
 % 
 % function to plot a heatmap pdf of the velocity models
 
-if nargin<3 || isempty(ifsave)
+if nargin<4 || isempty(ifsave)
     ifsave = false; % default is not to save
 end
-if nargin<4 || isempty(ofile)
+if nargin<5 || isempty(ofile)
     ofile = 'figs/heatmap_models_fig.pdf';
 end
 
@@ -51,6 +51,14 @@ ax3 = axes(gcf,'pos',[0.91 0.11 0.02 0.815], 'linewidth', 1.5); hold on; box on;
 %% data
 contourf(ax1,Xvs,sm.Z,hmps,[-5:0.1:-0.1],'edgecolor','none');
 contourf(ax2,Xvp,sm.Z,hmpp,[-5:0.1:-0.1],'edgecolor','none');
+
+%% mean model
+fm_line_width = 2; 
+fm_color      = 'red'; 
+plot(ax1, final_model.VSav, final_model.Z, ...
+    'LineWidth', fm_line_width, 'Color', fm_color); 
+plot(ax2, final_model.VPav, final_model.Z, ...
+    'LineWidth', fm_line_width, 'Color', fm_color); 
 
 %% pretty
 xlim(ax1,[3 4.9])

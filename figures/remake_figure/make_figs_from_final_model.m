@@ -53,7 +53,7 @@ mkdir(resdir_fig);
 % goodChainManual(2:end,:)=false; 
 % goodChainManual = logical([zeros(12,1)]); warning('brb2022.07.06: Setting good chains manual'); 
 % goodChainManual(3)=true; 
-goodChainManual = [4]; 
+goodChainManual = []; 
 
 [misfits_perchain,allmodels_perchain,goodchains,...
      misfits_perchain_original,...
@@ -140,10 +140,10 @@ plot_PRIORvsPOSTERIOR(prior,posterior,par,1,[resdir_fig,'/prior2posterior.pdf'])
 fprintf('  > Plotting model suite\n')
 [ suite_of_models ] = c3_BUILD_MODEL_SUITE(allmodels_collated,par );
 plot_SUITE_of_MODELS( suite_of_models,posterior,1,[resdir_fig,'/suite_of_models.png'],[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
-plot_HEATMAP_ALLMODELS(suite_of_models,par,1,[resdir_fig,'/heatmap_of_models.pdf']);
-plot_HEATMAP_ALLMODELS_shallow(suite_of_models,par,1,[resdir_fig,'/heatmap_of_models_shallow.pdf']);
 final_model = c4_FINAL_MODEL(posterior,allmodels_collated,par,1,[resdir_fig,'/final_model']);
 plot_FINAL_MODEL( final_model,posterior,1,[resdir_fig,'/final_model.pdf'],true,[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
+plot_HEATMAP_ALLMODELS(suite_of_models,final_model,par,1,[resdir_fig,'/heatmap_of_models.pdf']);
+plot_HEATMAP_ALLMODELS_shallow(suite_of_models,final_model,par,1,[resdir_fig,'/heatmap_of_models_shallow.pdf']);
 
 % % par.datprocess.HKappa = struct(              ...
 % %                        'min_error', 0.002,           ... % Add this much "error" to h-kappa stacks (error of 0 can result in sigma inverting improperly)
@@ -179,19 +179,5 @@ plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,1,[resdir_fig,'/final_true_vs_pre
 % save([resdir_fig,'/final_misfit'],'final_misfit');
 plot_FIG2_FIT_MODEL( final_model,posterior,prior,par,1,[resdir_fig,'/fig2_FIT_MODEL.pdf'])
 
-%%% Plot kernels for final model. 
-model = final_model; 
-model.VS = model.VSav; 
-model.VP = model.VPav; 
-model.rho = model.rhoav; 
-model.Panis = model.Panisav; 
-model.Sanis = model.Sanisav; 
-model.z = model.Z; 
-[Kbase,~] = b7_KERNEL_RESET(model,[],trudata,'junk',0,par,1); 
-plot_sensitivity_kernel_hv(Kbase.HV.KHV,'model',model,'predata',final_predata,...
-    'filename',sprintf('%s/sensitivity_hv.pdf',resdir_fig) ); 
-plot_sensitivity_kernel_ray(Kbase.Ray.Kph,'model',model,'predata',final_predata,...
-    'filename',sprintf('%s/sensitivity_ray.pdf',resdir_fig) ); 
-plot_sensitivity_kernel_love(Kbase.Lov.Kph,'model',model,'predata',final_predata,...
-    'filename',sprintf('%s/sensitivity_love.pdf',resdir_fig) ); 
-%%% End plot kernels for final model. 
+%Plot kernels for final model. 
+plot_all_sensitivity_kernels(final_model,trudata,par,Kbase,resdir_fig)

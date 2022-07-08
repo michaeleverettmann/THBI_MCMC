@@ -268,9 +268,6 @@ plot_PRIORvsPOSTERIOR(prior,posterior,par,1,[resdir,'/prior2posterior.pdf'])
 fprintf('  > Plotting model suite\n')
 [ suite_of_models ] = c3_BUILD_MODEL_SUITE(allmodels_collated,par );
 plot_SUITE_of_MODELS( suite_of_models,posterior,1,[resdir,'/suite_of_models.png'],[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
-plot_HEATMAP_ALLMODELS(suite_of_models,par,1,[resdir,'/heatmap_of_models.pdf']);
-plot_HEATMAP_ALLMODELS_shallow(suite_of_models,par,1,[resdir,'/heatmap_of_models_shallow.pdf']);
-
 
 %% Save some things
 fprintf('  > Saving misfits, allmods, posterior, model suite\n')
@@ -294,6 +291,8 @@ end
 % will get an error in c4_FINAL_MODEL. 
 final_model = c4_FINAL_MODEL(posterior,allmodels_collated,par,1,[resdir,'/final_model']);
 plot_FINAL_MODEL( final_model,posterior,1,[resdir,'/final_model.pdf'],true,[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
+plot_HEATMAP_ALLMODELS(suite_of_models,final_model,par,1,[resdir,'/heatmap_of_models.pdf']);
+plot_HEATMAP_ALLMODELS_shallow(suite_of_models,final_model,par,1,[resdir,'/heatmap_of_models_shallow.pdf']);
 
 %% predict data with the final model, and calculate the error!
 [ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,trudata,posterior );
@@ -326,6 +325,9 @@ save([resdir,'/final_misfit'],'final_misfit');
 
 
 plot_FIG2_FIT_MODEL( final_model,posterior,prior,par,1,[resdir,'/fig2_FIT_MODEL.pdf']);
+
+%Plot kernels for final model. 
+plot_all_sensitivity_kernels(final_model,trudata,par,Kbase,resdir)
 
 % did we save the data?
 if ifsavedat
