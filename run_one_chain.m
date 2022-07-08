@@ -151,19 +151,17 @@ if fail_chain > 0; % Problem -- There are various ways of dealing with this.
         try; 
             fprintf(['\n *********************************************** \n',...
                 'Trying to reset data according to previous Kbase.\n'])
-            model = KbaseUseReset.modelk; ii = KbaseUseReset.itersave; 
-            [predata,laymodel] = b3__INIT_PREDATA(model,par,trudata,0 );
-            predata = b3_FORWARD_MODEL_BW( model,laymodel,par,predata,ID,0,predataPrev); % brb2022.04.12 The arguments to forward_model_bw were in the wrong order. Probaly an old version of the code. 
-            predata = b3_FORWARD_MODEL_RF_ccp( model,laymodel,par,predata,ID,0 );
-            predata = b3_FORWARD_MODEL_SW_kernel( model,Kbase,par,predata );
-            predataPrev = predata; % Keep track of last predata. To keep the previous complete HK stack. 
-            [log_likelihood,misfit] = b8_LIKELIHOOD_RESET(par,predata,trudata,Kbase,model.datahparm);             % need to also reset likelihood and misfit to the new, precise data (likelihood may have been artificially high due to kernel forward  calc. approximation - if so, need to undo this, or chain will get stuck once we reset kernels).
-            Pm_prior = calc_Pm_prior(model,par);
-            nchain = 0;
+            
+                [model, ii, predata, predataPrev, laymodel, ...
+                    log_likelihood, misfit, Pm_prior, nchain] = ...
+                    reverse_inversion_to_last_kbase(...
+                        KbaseUseReset, par, trudata, predata, ID, predataPrev)
+                    
             fail_chain = 0; 
             if ifforwardfail(predata,par); 
                 error('How is it possible to have forward fail now when we successfully did forward modelling with this model earlier? Ending inversion.'); 
             end
+            
         catch 
             warning('You should always be able to rewind to a model and run all forward modelling on it. A model wasnt accepted if we couldnt run the forward modelling. What is happening?. We simply have to exit the inversion.'); 
 %             fprintf('\nREMOVE THIS LINE saving temporarily\n'); 
@@ -210,13 +208,9 @@ end
 %% SAVE inv state every Nsavestate iterations
 if rem(ii,par.inv.Nsavestate)==0
     save_inv_state(par.res.resdir,chainstr,allmodels,misfits)
-%     [ram_copy_stats] = ram_to_HD(paths, chainstr, mainDir, nwk, sta); % bb2021.12.07 this is time consuming if done often. Just do at end of inversion. Copy current results from ram to hard disk. 
 end
 
 try
-%     if ii == 3; error('Fake'); end % One error at ii = 5
-%     if (ii > 10) && (ii < 20); error('Fake'); end % 10 errors 20 to 30
-%     if (ii > 80) && (ii < 90); error('Fake');  end % 10 errors 20 to 30
     
     %% Figure out if chain is too slow or unstable. 
     % TODO changed from 4 to 1 times par.inv.savepern. So fairly verbose. 
@@ -353,10 +347,8 @@ try
             predata = predat_process( predata,par.inv.datatypes{idt},par);
         end
 
-        newK = false; % brb2022.07.01. Will remove. I'm in the process of not using SW precise at this point in the inversion. 
+        newK = false; % brb2022.07.01. TODO Will remove. I'm in the process of not using SW precise at this point in the inversion. 
     end % only redo data if model has changed
-
-%      plot_TRUvsPRE(trudata,predata);
 
     % continue if any Sp or PS inhomogeneous or nan or weird output
     if ifforwardfail(predata,par)
@@ -386,16 +378,7 @@ try
        
 %% ========================  ACCEPTANCE CRITERION  ========================
     [ ifaccept ] = b6_IFACCEPT( log_likelihood1,log_likelihood,temp,p_bd*ifpass,Pm_prior1,Pm_prior);
-    
-% % %     %%% Temporary %!%!%!%!
-% % %     if ifaccept; 
-% % %         datamap.RF_Sp_ccp(ii).rf = predata.RF_Sp_ccp.PSV(:,1);
-% % %     else
-% % %         datamap.RF_Sp_ccp(ii).rf = predataPrev.RF_Sp_ccp.PSV(:,1); 
-% % %     end
-% % %     %%% Temporary %!%!%!%!
-    
-    
+
 %%% Figure out if chain is stuck
     stuckIfNoChange = 20; % p of not changing 13 times in row is about 0.0001. if there is 50% chance of acceptance each time and nothing has gone wrong.  
     if (ii>stuckIfNoChange+1) 
@@ -404,9 +387,6 @@ try
         % try at least a few iterations. 
         accptArr = [accept_info.ifaccept]; % In case this wasn't already an array - it shouldn't be necessary after initializing ifaccept as an array brb2022.05.17
         if all( ~accptArr(ii-stuckIfNoChange:ii-1) ); % last stuckIfNoChange have been rejected. Somethings wrong! 
-% % %             ifaccept = true; % Just accept this model. Hopefully will get us away from the model region that breaks the code.  Temporary solution. 
-% % %             newK=true; % We might have got stuck because kernels needed to be reset. Let's reset them. 
-% % %             fprintf('\nbrb2022.04.06 Stuck! Didnt accept model for %1.0f iterations. Simply accepted a new model to get unstuck. ii=%1.0f\n',stuckIfNoChange,ii)
             fprintf(['\nbrb2022.04.06 Stuck! Didnt accept model for %1.0f iterations.\n  ',...
                      'What errors came before this?. ii=%1.0f\n  ',...
                      'log like prev and current: %f3.2f, -> %f3.2f\n',...
@@ -417,20 +397,9 @@ try
                 nchain = nchain + 50; 
             end
             fprintf(' -> nchain now: %1.0f\n', nchain); 
-
-% % %             logLikArr = [accept_info(:).log_likelihood]; 
-% % %             iterLik = [ii-stuckIfNoChange:ii-2];
-% % %             logLikArr=logLikArr(iterLik);
-% % %             figure(1); clf; hold on; plot(iterLik,logLikArr); 
-% % %             ylabel('Log lik'); xlabel('Iter'); 
         end
     end
-    %!%!
 %%% End figure out if chain is stuck. 
-    
-% % %     if (ifaccept && non_acceptk == 2); 
-% % %         disp('Accepted the second perturbation') 
-% % %     end
     
     if delay_reject_bool; % brb2022.04.12 
         if (~ifaccept); 
@@ -505,8 +474,6 @@ try
         misfit = misfit1;
         predat_save = predat_save1;
 
-
-
     %% UPDATE KERNEL if needed
 % % % % %         if newK==true
 % % % % %             fprintf('\nModel changed ptbnorm=%1.3f since last kernel set. Running !=sw_precise and ==kernel_reset at ii=%1.0f.\n',ptbnorm,ii) 
@@ -546,60 +513,41 @@ try
         resetK = true;
     end
     if (ifaccept) && (ptbnorm/par.inv.kerneltolmax > random('unif',par.inv.kerneltolmed/par.inv.kerneltolmax,1,1)); 
+        fprintf('\n RECALCULATING %s KERNEL at iter %.0f - ptbnorm large = %1.3f\n',chainstr,ii,ptbnorm);
         resetK = true; 
     end
     
     par.hkResetInfo.timesSWKernelsReset = par.hkResetInfo.timesSWKernelsReset ...
     + int16(resetK); % If we are resetting surface wave kernels, also remake HK stacks with our current models parameters... but maybe only every N times kernel resets... 
     
-    if resetK
-        try
+    if resetK % Kernel recalculation
+        try % Try making new kernels based on the last (or just barely) accepted model. 
             if par.inv.verbose; fprintf('\nTrying to reset K.\n'); end
-            % reset the kernels using the current model
-            [KbaseNew,predata] = b7_KERNEL_RESET(model,Kbase,predata,ID,ii,par,1);
-            if ifforwardfail(predata,par) % Sometimes kernel reset gives nans, but doesn't explicitly fail? 
-                fail_chain=fail_chain+1; ifpass=0;
-                error('Failed making new kernels! Fail_chain %.0f, ii=%1.0f\n',fail_chain,ii)
-            end
-            KbasePrev = Kbase; % Now that we knot b7 worked, we can define Kbaseprev to be the last Kbase we had. 
-            Kbase = KbaseNew; 
-            fail_reset = 0;
-            ptbnorm = 0; 
-            display_new_likelihood = false; 
-        catch e 
+            [Kbase, KbasePrev, predata, log_likelihood, misfit, Pm_prior, nchain] = ...
+                compare_kernel_full_calc(...
+                    model, Kbase, predata, trudata, ID, par, fail_chain, ...
+                    ii, ifpass, misfit, ptbnorm, log_likelihood); 
+        catch e % If it doesn't work, rewind to last Kbase model that worked. 
             fprintf('\nbrb Kernel reset fail. Error was: \n --------\n %s\n --------\n',getReport(e)); 
-            % rewind back to last Kbase model that worked!
             fprintf('Kernel reset BROKE at %s-%.0f... REWIND to %s-%.0f <<<<<<<<<<<<<<< \n',chainstr,ii,chainstr,Kbase.itersave)
-            model = Kbase.modelk;
-            ii = Kbase.itersave;
-
-            [predata,laymodel] = b3__INIT_PREDATA(model,par,trudata,0 );
-            predata = b3_FORWARD_MODEL_BW( model,laymodel,par,predata,ID,0,predataPrev); % brb2022.04.12 The arguments to forward_model_bw were in the wrong order. Probaly an old version of the code. 
-            predata = b3_FORWARD_MODEL_RF_ccp( model,laymodel,par,predata,ID,0 );
-            predata = b3_FORWARD_MODEL_SW_kernel( model,Kbase,par,predata );
-            predataPrev = predata; % Keep track of last predata. To keep the previous complete HK stack.            
+            
+            KbaseUseReset = Kbase; 
+            [model, ii, predata, predataPrev, laymodel, ...
+                log_likelihood, misfit, Pm_prior, nchain] = ...
+                reverse_inversion_to_last_kbase(...
+                    KbaseUseReset, par, trudata, predata, ID, predataPrev);             
+            
             fail_reset = fail_reset+1;
             fail_chain = fail_chain+1; % This should not cause the if fail_chain > 15, then reset, code to execute. Unless we had a ton of fails just before this. In which case, should we add 1 to fail_chain? or set fail_chain to 0 after a successful kernel reset?  
             fail_total = fail_total+1; 
+            
             if ifforwardfail(predata,par); 
                 warning('You should always be able to rewind to a model and run all forward modelling on it. A model wasnt accepted if we couldnt run the forward modelling. What is happening?. We simply have to exit the inversion.'); 
                 fail_chain = - 100; 
                 break;
             end
-            display_new_likelihood = true; % Temporary debugging. 
-        end
-        if display_new_likelihood; % Temporary debugging. 
-            fprintf('\nBefore resetting kernels, old log_likelihood %3.3f\n',log_likelihood);
-        end
-        % need to also reset likelihood and misfit to the new, precise data (likelihood may have been artificially high due to kernel forward  calc. approximation - if so, need to undo this, or chain will get stuck once we reset kernels).
-        [log_likelihood,misfit] = b8_LIKELIHOOD_RESET(par,predata,trudata,Kbase,model.datahparm);
-        Pm_prior = calc_Pm_prior(model,par);
-        nchain = 0;
-        if display_new_likelihood; % Temporary debugging. 
-            fprintf('\nAfter resetting kernels, new log_likelihood %3.3f\n',log_likelihood);
         end
     end
-
     
 catch e % e is an MException struct
     fail_chain = fail_chain+1;
