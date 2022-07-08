@@ -8,20 +8,20 @@ str_temp = split(stamp, '/');
 
 
 % { Different data types alone
-niter_only   = 16000; 
-burnin_only  = 4000; 
-cooloff_only = 3000; 
-nchains_only = 12; 
-% 
+% niter_only   = 16000; 
+% burnin_only  = 4000 ; 
+% cooloff_only = 3000 ; 
+% nchains_only = 12   ; 
+% % 
 % niter_only   = 300; 
 % burnin_only  = 50 ;  
 % cooloff_only = 15 ; 
-% nchains_only = 3  ; 
+% nchains_only = 1  ; 
 
-% niter_only   = 4000; 
-% burnin_only  = 1000; 
-% cooloff_only = 800 ; 
-% nchains_only = 16  ; 
+niter_only   = 3000; 
+burnin_only  = 500; 
+cooloff_only = 300 ; 
+nchains_only = 3  ; 
 % niter_only   = 600; 
 % burnin_only  = 100; 
 % cooloff_only = 80 ; 

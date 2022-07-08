@@ -33,6 +33,7 @@ addpath([bayesdir,'functions/hKappaFunk']) % For doing some things with h-kappa 
 addpath([bayesdir,'functions/plotting/progress']) % For doing some things with h-kappa stacks. 
 addpath([bayesdir,'functions/master_subfuncs']); % Trying to break up master par into many subfunctions
 addpath([bayesdir,'functions/handle_errors']);
+addpath([bayesdir,'functions/plotting']); 
 addpath([bayesdir,'functions/plotting/plot_data_heatmap']); 
 addpath([bayesdir,'functions/plotting/sensitivity']); 
 
