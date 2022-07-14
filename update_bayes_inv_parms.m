@@ -18,9 +18,9 @@ str_temp = split(stamp, '/');
 % cooloff_only = 15 ; 
 % nchains_only = 1  ; 
 
-niter_only   = 3000; 
-burnin_only  = 500; 
-cooloff_only = 300 ; 
+niter_only   = 1000; 
+burnin_only  = 300; 
+cooloff_only = 200 ; 
 nchains_only = 3  ; 
 % niter_only   = 600; 
 % burnin_only  = 100; 
@@ -408,6 +408,68 @@ elseif strcmp(stamp, 'all_highres_layer');
     par.inv.cooloff                   = cooloff_only; 
     par.inv.nchains                   = nchains_only;     
 
+elseif strcmp(stamp, 'simplify'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm', 'SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'SW_HV', 'RF_Sp_ccp'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
+  
+    
+    
+    par.mod.sed.hmax                  = 0     ; 
+    par.mod.sed.hstd                  = 0     ; 
+    par.mod.crust.vpvsmax             = 1.8   ; 
+    par.mod.crust.vpvsmin             = 1.8   ; % Can't use HK stack if there is no vpvs variatoin. 
+    par.mod.crust.vpvsstd             = 0     ; 
+    par.mod.crust.ximax               = 1     ; 
+    par.mod.crust.ximin               = 1     ; 
+    par.mod.crust.xistd               = 0     ; 
+    par.mod.force_no_new_prior        = true  ; % For debugging only. 
+elseif strcmp(stamp, 'no_sed'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm', 'SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'SW_HV', 'RF_Sp_ccp'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
+  
+    
+    
+    par.mod.sed.hmax                  = 0     ; 
+    par.mod.sed.hstd                  = 0     ; 
+    par.mod.force_no_new_prior        = true  ; % For debugging only. 
+elseif strcmp(stamp, 'no_vpvs'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm', 'SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'SW_HV', 'RF_Sp_ccp'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
+  
+    
+   
+    par.mod.crust.vpvsmax             = 1.8   ; 
+    par.mod.crust.vpvsmin             = 1.8   ; % Can't use HK stack if there is no vpvs variatoin. 
+    par.mod.crust.vpvsstd             = 0     ; 
+    par.mod.force_no_new_prior        = true  ; % For debugging only. 
+elseif strcmp(stamp, 'no_xi'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm', 'SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'SW_HV', 'RF_Sp_ccp'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
+  
+    par.mod.crust.ximax               = 1     ; 
+    par.mod.crust.ximin               = 1     ; 
+    par.mod.crust.xistd               = 0     ; 
+    par.mod.force_no_new_prior        = true  ; % For debugging only. 
 
 end
 

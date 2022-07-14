@@ -3,6 +3,16 @@ function [Kbase, KbasePrev, predata, log_likelihood, misfit, Pm_prior, nchain] =
         model, Kbase, predata, trudata, ID, par, fail_chain, ...
         ii, ifpass, misfit, ptbnorm, log_likelihood, ifaccept); 
    
+% Temp. Remake old model. 
+model0 = Kbase.modelk; 
+[Kbase0,predata0] = b7_KERNEL_RESET(model0,Kbase,predata,ID,ii,par,1);
+% [Kbase0.HV.HVr, Kbase.HV.HVr] % < were same 
+
+[predata1,laymodel1] = b3__INIT_PREDATA(model,par,trudata,0 );
+[predata1,par] = b3_FORWARD_MODEL_BW(model,laymodel1,par,predata1,ID,0,predata);
+predata1 = b3_FORWARD_MODEL_RF_ccp(   model,laymodel1,par,predata1,ID,0 );
+predata1 = b3_FORWARD_MODEL_SW_kernel(model,Kbase0,par,predata1 );
+% [predata.SW_HV.HVr, predata1.SW_HV.HVr] % < were same
 
 [KbaseNew,predataNew] = b7_KERNEL_RESET(model,Kbase,predata,ID,ii,par,1);
 
@@ -45,6 +55,7 @@ for ifn = 1:length(fns);
     lik_drop_mak_fig = -inf; % if lik_drop_mak_fig < 5; warning('Making extra HV kernel plots'); end;  % Temporary. Should make this very high. 
     if (abs(logL_diff) > lik_drop_mak_fig) && strcmp(fn,'SW_HV') ; % This shouldn't happen. Make some plots. 
         % Compare HV from previous Kbase, new Kbase, and with the current model based on old Kbase + kernels. 
+        
         LW = 1.5; 
         figure(3); clf; hold on; set(gcf, 'pos', [-1215 280 894 638]); 
         tiledlayout(1,3,'TileSpacing','compact'); 
@@ -121,8 +132,6 @@ for ifn = 1:length(fns);
             'filename',sprintf('%s/%s_ii_%1.0f_sensitivity_hv_new.pdf',...
             par.res.resdir,par.res.chainstr,par.ii) )
         %%% End sensitivity kernels. 
-        save( sprintf('%s/%s_ii_%1.0f_likelihood_drop_hv_workspace.mat',...
-            par.res.resdir, par.res.chainstr, ii ) ); 
     end
 end
 

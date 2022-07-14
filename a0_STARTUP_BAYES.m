@@ -62,6 +62,7 @@ addpath([hd '/MATLAB/seis_tools-master']); % bb2021.08.04 Adding because some fu
 % addpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup_alt'); % bb2021.08.04 Need taup
 
 addpath([hd '/MATLAB/EilonmyFUNCTIONS']); % bb2021.08.04 added to get "maxab"
+% addpath([hd '/MATLAB/integration/simps']); % For using simpsons rule integration. 
 
 % Some things needed for TauP
 javaaddpath([hd '/MATLAB/seizmo/mattaup/lib/MatTauP-2.1.1.jar']); 

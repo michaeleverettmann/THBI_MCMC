@@ -85,6 +85,8 @@ modl.dz = 2;                                        % depth spacing of model, km
 
 modl.starting.HKappa.startAtHK = true; % Starting model at maximum of hkappa stack
 
+modl.force_no_new_prior = false; % For debugging. Force not making a new emperical prior, even if we change acceptable model parameters. 
+
 modl.sed = struct(...
     ... thickness of the sediments
                      'hmax',5.0                  ,... %5 max sed layer thickness, km

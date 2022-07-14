@@ -156,7 +156,7 @@ else
     redoprior = true;
 end
 
-if redoprior
+if ~par.mod.force_no_new_prior && redoprior
     fprintf('  > Building prior distribution from %.0f runs\n',max([par.inv.niter,1e5]))
     prior = a3_BUILD_EMPIRICAL_PRIOR(par,max([par.inv.niter,1e5]),14,par.res.zatdep);
     plot_MODEL_SUMMARY(prior,par,1,[resdir,'/prior_fig.pdf']);
@@ -327,7 +327,7 @@ save([resdir,'/final_misfit'],'final_misfit');
 plot_FIG2_FIT_MODEL( final_model,posterior,prior,par,1,[resdir,'/fig2_FIT_MODEL.pdf']);
 
 %Plot kernels for final model. 
-plot_all_sensitivity_kernels(final_model,trudata,par,Kbase,resdir)
+plot_all_sensitivity_kernels(final_model,trudata,par,resdir)
 
 % did we save the data?
 if ifsavedat

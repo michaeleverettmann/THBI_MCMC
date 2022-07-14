@@ -11,6 +11,9 @@ if nargin <3 || isempty(ifplot)
     ifplot=false;
 end
 
+% ifplot = true; 
+plot_upscale_interp = ifplot; 
+
 %% brb2022.06.30. Interpolate models onto upsampled basis, then take m1 back to m0.z. 
 % If a discontinuity depth changes, we would have problems. 
 % Z indicies of m0 and m1 might not correspond to similar depths, and dv at some depth
@@ -20,7 +23,6 @@ end
 % representative average of m1 in the viscinity of m0.z. 
 % For a coarse m0.z, discontinuities can't be captured properly through
 % simple interpolation. 
-plot_upscale_interp = false; 
 if ~ isequal(model0.z, model1.z); 
     if plot_upscale_interp; 
         model1_plot = model1; 
@@ -164,7 +166,7 @@ drho = nan(N,1);
 dvsav = nan(N,1);
 dvpav = nan(N,1);
 
-% insert dvals for coincident points
+% % insert dvals for coincident points
 dvsv(zbothi0) = card1.vsv(zbothi1)./card0.vsv(zbothi0) - 1;
 dvsh(zbothi0) = card1.vsh(zbothi1)./card0.vsh(zbothi0) - 1;
 dvpv(zbothi0) = card1.vpv(zbothi1)./card0.vpv(zbothi0) - 1;
@@ -173,14 +175,17 @@ drho(zbothi0) = card1.rho(zbothi1)./card0.rho(zbothi0) - 1;
 dvsav(zbothi0) = card1.vsvgt(zbothi1)./card0.vsvgt(zbothi0) - 1;
 dvpav(zbothi0) = card1.vpvgt(zbothi1)./card0.vpvgt(zbothi0) - 1;
 
-% insert dvals for non-coincident points (resolve onto card0 basis)
-dvsv(zdiffi0) = linterp(zz1,card1.vsv,zz0(zdiffi0))./card0.vsv(zdiffi0) - 1;
-dvsh(zdiffi0) = linterp(zz1,card1.vsh,zz0(zdiffi0))./card0.vsh(zdiffi0) - 1;
-dvpv(zdiffi0) = linterp(zz1,card1.vpv,zz0(zdiffi0))./card0.vpv(zdiffi0) - 1;
-dvph(zdiffi0) = linterp(zz1,card1.vph,zz0(zdiffi0))./card0.vph(zdiffi0) - 1;
-drho(zdiffi0) = linterp(zz1,card1.rho,zz0(zdiffi0))./card0.rho(zdiffi0) - 1;
-dvsav(zdiffi0) = linterp(zz1,card1.vsvgt,zz0(zdiffi0))./card0.vsvgt(zdiffi0) - 1;
-dvpav(zdiffi0) = linterp(zz1,card1.vpvgt,zz0(zdiffi0))./card0.vpvgt(zdiffi0) - 1;
+if ~isempty(zdiffi0); 
+    warning('m0.z ~= m1.z. This is odd: m1 should have been projected onto m0.z basis. brb2022.07.11'); 
+    % insert dvals for non-coincident points (resolve onto card0 basis)
+    dvsv(zdiffi0) = linterp(zz1,card1.vsv,zz0(zdiffi0))./card0.vsv(zdiffi0) - 1;
+    dvsh(zdiffi0) = linterp(zz1,card1.vsh,zz0(zdiffi0))./card0.vsh(zdiffi0) - 1;
+    dvpv(zdiffi0) = linterp(zz1,card1.vpv,zz0(zdiffi0))./card0.vpv(zdiffi0) - 1;
+    dvph(zdiffi0) = linterp(zz1,card1.vph,zz0(zdiffi0))./card0.vph(zdiffi0) - 1;
+    drho(zdiffi0) = linterp(zz1,card1.rho,zz0(zdiffi0))./card0.rho(zdiffi0) - 1;
+    dvsav(zdiffi0) = linterp(zz1,card1.vsvgt,zz0(zdiffi0))./card0.vsvgt(zdiffi0) - 1;
+    dvpav(zdiffi0) = linterp(zz1,card1.vpvgt,zz0(zdiffi0))./card0.vpvgt(zdiffi0) - 1;
+end
 
 % fix nans
 dvsv(card0.vsv==0) = 0; if any(isnan(dvsv)), error('nans in dvsv'); end
@@ -222,6 +227,38 @@ if ifplot
     title(ax4,'Vph','fontsize',20);xlabel(ax4,'$\mathbf{dV_{PH}/V_{PH}}$','interpreter','latex','fontsize',19)
     title(ax5,'rho','fontsize',20);xlabel(ax5,'$\mathbf{d\rho/\rho}$','interpreter','latex','fontsize',19)
     ylabel(ax1,'\textbf{Depth (km)}','interpreter','latex','fontsize',19)
+    sgtitle('Comparisons from cardfile'); 
+
+    figure(45); clf; set(gcf,'pos',[331 384+800 1537 614])
+    ax1 = subplot(1,5,1); 
+    ax2 = subplot(1,5,2); 
+    ax3 = subplot(1,5,3); 
+    ax4 = subplot(1,5,4); 
+    ax5 = subplot(1,5,5); 
+    
+    plot(ax1,model0.VS,model0.z,'linewidth',2, 'color', 'k');
+    plot(ax1,model1.VS,model1.z,'linewidth',2, 'color', 'r');
+    plot(ax2,(model1.VS-model0.VS)./model0.VS,model0.z,'linewidth',2, 'color', 'k');
+    plot(ax3,model0.VP,model0.z,'linewidth',2, 'color', 'k');
+    plot(ax3,model1.VP,model1.z,'linewidth',2, 'color', 'r');
+    plot(ax4,(model1.VP-model0.VP)./model0.VP,model0.z,'linewidth',2, 'color', 'k');
+    plot(ax5,(model1.rho-model0.rho)./model0.rho,model0.z,'linewidth',2, 'color', 'k');
+
+    
+    set(ax1,'ydir','reverse','fontsize',15,'ylim',[0 500])
+    set(ax2,'ydir','reverse','fontsize',15,'ylim',[0 500])
+    set(ax3,'ydir','reverse','fontsize',15,'ylim',[0 500])
+    set(ax4,'ydir','reverse','fontsize',15,'ylim',[0 500])
+    set(ax5,'ydir','reverse','fontsize',15,'ylim',[0 500])
+    
+    title(ax1,'Vs','fontsize',20);%xlabel(ax1,'$\mathbf{dV_{SV}/V_{SV}}$','interpreter','latex','fontsize',19)
+    title(ax2,'Dvs','fontsize',20);%xlabel(ax2,'$\mathbf{dV_{SH}/V_{SH}}$','interpreter','latex','fontsize',19)
+    title(ax3,'Vp','fontsize',20);%xlabel(ax3,'$\mathbf{dV_{PV}/V_{PV}}$','interpreter','latex','fontsize',19)
+    title(ax4,'Dvp','fontsize',20);%xlabel(ax4,'$\mathbf{dV_{PH}/V_{PH}}$','interpreter','latex','fontsize',19)
+    title(ax5,'Drho','fontsize',20);%xlabel(ax5,'$\mathbf{d\rho/\rho}$','interpreter','latex','fontsize',19)
+    ylabel(ax1,'\textbf{Depth (km)}','interpreter','latex','fontsize',19)
+    sgtitle('(m1-m0)/m0: Comparison directly between m0 and m1 variables. '); 
+    
 end
 
 end

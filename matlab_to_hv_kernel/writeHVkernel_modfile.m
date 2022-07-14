@@ -20,6 +20,7 @@ end
   
 Re = 6371;
 dz = 1.0; % vertical resolution for output
+% dz = 0.25; % %!%! trying really fine hv resolution
 nfreq = length(freqs);
 
 %% Q values - Grab PREM

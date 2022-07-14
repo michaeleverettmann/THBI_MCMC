@@ -80,29 +80,52 @@ for id = 1:length(par.inv.datatypes)
         case {'HV'}
 
             % these should be the same each time...
-            dvs_vs = linterp(modptb.Z,modptb.dvsav,0.5*(Kbase.(pdtyp{2}).KHV{1}.Z1 + Kbase.(pdtyp{2}).KHV{1}.Z2));
-            dvp_vp = linterp(modptb.Z,modptb.dvpav,0.5*(Kbase.(pdtyp{2}).KHV{1}.Z1 + Kbase.(pdtyp{2}).KHV{1}.Z2));
-            drh_rh = linterp(modptb.Z,modptb.drho, 0.5*(Kbase.(pdtyp{2}).KHV{1}.Z1 + Kbase.(pdtyp{2}).KHV{1}.Z2));
-            zzz = 0.5*(Kbase.(pdtyp{2}).KHV{1}.Z1 + Kbase.(pdtyp{2}).KHV{1}.Z2);
+            zzz = [Kbase.(pdtyp{2}).KHV{1}.Z1(1); ... % Include 0 so we dull full integration. 
+                0.5*(Kbase.(pdtyp{2}).KHV{1}.Z1 + Kbase.(pdtyp{2}).KHV{1}.Z2); ...
+                Kbase.(pdtyp{2}).KHV{1}.Z2(end)]; ;
+            dvs_vs = linterp(modptb.Z,modptb.dvsav,zzz);
+            dvp_vp = linterp(modptb.Z,modptb.dvpav,zzz);
+            drh_rh = linterp(modptb.Z,modptb.drho, zzz);
 
+% % %             %%% Plot interpolation
+% % %             figure(2001); clf; hold on; 
+% % %             tiledlayout(1,3, 'TileSpacing', 'compact'); 
+% % %             
+% % %             nexttile(1); cla; hold on; box on; set(gca, 'ydir', 'reverse', 'ylim', [-2, 300]); 
+% % %             scatter(dvs_vs, zzz); 
+% % %             scatter(modptb.dvsav,modptb.Z); 
+% % %             %%%
+            
             Np = length(Kbase.(pdtyp{2}).(pdtyp{3}));        
             for ip = 1:Np
                 if ~isequal(zzz,0.5*(Kbase.(pdtyp{2}).KHV{ip}.Z1 + Kbase.(pdtyp{2}).KHV{ip}.Z2))
-                dvs_vs = linterp(modptb.Z,modptb.dvsav,0.5*(Kbase.(pdtyp{2}).KHV{ip}.Z1 + Kbase.(pdtyp{2}).KHV{ip}.Z2));
-                dvp_vp = linterp(modptb.Z,modptb.dvpav,0.5*(Kbase.(pdtyp{2}).KHV{ip}.Z1 + Kbase.(pdtyp{2}).KHV{ip}.Z2));
-                drh_rh = linterp(modptb.Z,modptb.drho, 0.5*(Kbase.(pdtyp{2}).KHV{ip}.Z1 + Kbase.(pdtyp{2}).KHV{ip}.Z2));
+                    zzz = [Kbase.(pdtyp{2}).KHV{ip}.Z1(1); ... % Include 0 so we dull full integration. 
+                        0.5*(Kbase.(pdtyp{2}).KHV{ip}.Z1 + Kbase.(pdtyp{2}).KHV{ip}.Z2); ...
+                        Kbase.(pdtyp{2}).KHV{ip}.Z2(end)]; ;
+                    dvs_vs = linterp(modptb.Z,modptb.dvsav,zzz);
+                    dvp_vp = linterp(modptb.Z,modptb.dvpav,zzz);
+                    drh_rh = linterp(modptb.Z,modptb.drho, zzz);
                 end
-                dHV = sum(dvs_vs.*Kbase.(pdtyp{2}).KHV{ip}.Kzh_Vs + ...
-                          dvp_vp.*Kbase.(pdtyp{2}).KHV{ip}.Kzh_Vp + ...
-                          drh_rh.*Kbase.(pdtyp{2}).KHV{ip}.Kzh_rho);
-                predata.(dtype).HVr(ip) = Kbase.(pdtyp{2}).(pdtyp{3})(ip) - dHV; % I think the signs are correct here!
-            end
 
-
-            
-            
+                % Get kernels. 
+                Kzh_Vs  = Kbase.(pdtyp{2}).KHV{ip}.Kzh_Vs ; 
+                Kzh_Vp  = Kbase.(pdtyp{2}).KHV{ip}.Kzh_Vp ; 
+                Kzh_rho = Kbase.(pdtyp{2}).KHV{ip}.Kzh_rho; 
+                
+                % Add values for z=0 and end, so we can use trapz for integral. 
+                Kzh_Vs  = [Kzh_Vs(1) ; Kzh_Vs ; Kzh_Vs(end) ]; 
+                Kzh_Vp  = [Kzh_Vp(1) ; Kzh_Vp ; Kzh_Vp(end) ]; 
+                Kzh_rho = [Kzh_rho(1); Kzh_rho; Kzh_rho(end)]; 
+                
+                dHV = sum(trapz(zzz, ...
+                                     (dvs_vs.*Kzh_Vs + ...
+                                      dvp_vp.*Kzh_Vp + ...
+                                      drh_rh.*Kzh_rho) )); % Trapz returns three values: the integral over each kernel. Then we need to sum each of those.           
+                
+                predata.(dtype).HVr(ip) = 1./( (1./Kbase.(pdtyp{2}).(pdtyp{3})(ip)) + dHV ); % Predata has HV, not ZH. Toshiros kernels are dZH. So add dZH to our 1/HV, then convert back to HV. brb2022.07.14
+%                 predata.(dtype).HVr(ip) = Kbase.(pdtyp{2}).(pdtyp{3})(ip) - dHV; % Zach's version, which didn't consider HV versus ZH
+            end           
     end
-
 end
 
 
