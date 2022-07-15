@@ -1,15 +1,16 @@
 function []=plot_sensitivity_kernel_love(k, options); 
     arguments
         k
+        options.dat=[] % Structure containing vector of data and periods. Like struct('HVr', hv_vector, 'periods', prediod_vector); 
         options.z_limits=[-2,300]
         options.model=[]; 
         options.predata=[]; 
         options.filename=[]; 
     end
-model=options.model; 
-predata=options.predata; 
-
-Np = length(k); 
+    
+dat   = options.dat; 
+model = options.model; 
+Np    = length(k); 
 
 figure(88); clf; hold on;
 set(gcf,'pos',[-1347 303 1323 713], 'color', 'white'); 
@@ -37,25 +38,31 @@ for ivar = 1:length(each_var);
 end
 
 if ~isempty(model); 
-    nexttile(ivar+1); cla; hold on; box on; set(gca, 'ydir', 'reverse', 'LineWidth', 1.5); 
+    ivar = ivar + 1; 
+    nexttile(ivar); cla; hold on; box on; set(gca, 'ydir', 'reverse', 'LineWidth', 1.5); 
     title('Model', 'fontweight', 'normal'); 
     ylim(options.z_limits); 
+    grid on; 
     set(gca, 'YTickLabel', []); 
     plot(model.VS , model.z, 'linewidth', 2, 'DisplayName', 'Vs' ); 
     plot(model.VP , model.z, 'linewidth', 2, 'DisplayName', 'Vp' ); 
     plot(model.rho, model.z, 'linewidth', 2, 'DisplayName', 'rho'); 
     legend('Location', 'best'); 
-    grid on; 
 end
 
-% % % if ~isempty(predata); 
-% % %     nexttile(ivar+2); cla; hold on; box on; set(gca,'ydir', 'reverse', 'LineWidth', 1.5); 
-% % %     title('Rayleigh Phv', 'fontweight', 'normal'); 
-% % %     ylabel('Period'); 
-% % % %     plot(predata., predata.SW_HV.periods,...
-% % % %         'linewidth', 2, 'DisplayName', 'rho'); 
-% % %     grid on;
-% % % end
+if ~isempty(dat); 
+    ivar = ivar + 1; 
+    nexttile(ivar); cla; hold on; box on; set(gca,'ydir', 'reverse', 'LineWidth', 1.5); 
+    title('Love Phv', 'fontweight', 'normal'); 
+    ylabel('Period'); 
+    xlabel('V (km/s)'); 
+%     xlim(
+%     ylim(
+    set(gca, 'YScale', 'log'); 
+    grid off; grid on; 
+    plot(dat.phV,dat.periods,...
+        'linewidth', 2)
+end
 
 if ~isempty(options.filename); 
     exportgraphics(gcf, options.filename); 
