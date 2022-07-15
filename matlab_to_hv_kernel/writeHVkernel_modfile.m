@@ -19,8 +19,7 @@ end
 
   
 Re = 6371;
-dz = 1.0; % vertical resolution for output
-% dz = 0.25; % %!%! trying really fine hv resolution
+dz = 1; % vertical resolution for output. brb2022.07.15 Doesn't seem to work if less than 1. But that can probably be fixed.  
 nfreq = length(freqs);
 
 %% Q values - Grab PREM

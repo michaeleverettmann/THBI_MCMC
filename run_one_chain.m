@@ -513,6 +513,7 @@ try
         resetK = true;
     end
     if (ifaccept) && (ptbnorm/par.inv.kerneltolmax > random('unif',par.inv.kerneltolmed/par.inv.kerneltolmax,1,1)); 
+%     if (ifaccept) && (ptbnorm>0.6); 
         fprintf('\n RECALCULATING %s KERNEL at iter %.0f - ptbnorm large = %1.3f\n',chainstr,ii,ptbnorm);
         resetK = true; 
     end

@@ -123,6 +123,42 @@ for ifn = 1:length(fns);
         %%% End sensitivity kernels. 
         save( sprintf('%s/%s_ii_%1.0f_likelihood_drop_hv_workspace.mat',...
             par.res.resdir, par.res.chainstr, ii ) ); 
+    if (abs(logL_diff) > lik_drop_mak_fig) && strcmp(fn,'SW_Ray_phV_eks') ; % % Temporary
+        % Compare HV from previous Kbase, new Kbase, and with the current model based on old Kbase + kernels. 
+        LW = 1.5; 
+        figure(4); clf; hold on; set(gcf, 'pos', [-1215 280 894 638]); 
+        tiledlayout(1,3,'TileSpacing','compact'); 
+        
+        ray = Kbase.Ray ; 
+        rayNew = KbaseNew.Ray; 
+
+        %%% Rayleigh wave phase velocities. 
+        nexttile(1, [1,1]); cla; hold on; box on; 
+        set(gca, 'ydir', 'reverse', 'LineWidth', 1.5);  
+        xlim([2.5, 4.5]); 
+        ylim([min(ray.periods-1.5), max(ray.periods+5)]); 
+        set(gca, 'yscale', 'log'); 
+        grid off; grid on;  % Log scale requires turning grid off before on
+               
+        plot(ray.phV, ray.periods, ...
+            'DisplayName', 'Old phv (full calc)', 'LineWidth', LW, ...
+            'Color', 'k');
+        
+        plot(rayNew.phV, rayNew.periods, ...
+            'DisplayName', 'New phv (full calc)', 'LineWidth', LW, ...
+            'Color', 'blue');
+        
+        for ifn2 = 1:length(fns); 
+            fn2 = fns{ifn2}; 
+            if ~contains(fn2, 'SW_Ray_phV'); 
+                continue
+            end
+            plot(predata.(fn2).phV, predata.(fn2).periods, ...
+                'DisplayName', 'New phV (from kernels)', 'LineWidth', LW, ...
+                'Color', 'r');
+        end
+        legend('Location', 'Best'); 
+        xlabel('Rayleigh phase velocity (km/s)'); ylabel('Period');
     end
 end
 

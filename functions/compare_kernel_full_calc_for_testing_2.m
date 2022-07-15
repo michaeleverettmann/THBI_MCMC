@@ -1,79 +1,11 @@
-% function [Kbase, KbasePrev, predata, log_likelihood, misfit, Pm_prior, nchain] = ...
-%     compare_kernel_full_calc(...
-%         model, Kbase, predata, trudata, ID, par, fail_chain, ...
-%         ii, ifpass, misfit, ptbnorm, log_likelihood, ifaccept); 
-%    
-    
-% % % % Temp. Remake old model. 
-% % % model0 = Kbase.modelk; 
-% % % [Kbase0,predata0] = b7_KERNEL_RESET(model0,Kbase,predata,ID,ii,par,1);
-% % % % [Kbase0.HV.HVr, Kbase.HV.HVr] % < were same 
 
-% Interpolate onto old model basis. 
-% % % %%% Let's do some shinanigains to model, the new one, and figure out what's
-% % % %%% wrong. 
-% % % parm_change = {'VS', 'VP', 'rho', 'Sanis', 'Panis'}; % 'z', 'z0', 
-% % % model_copy = model; 
-% % % for iparm = 1:length(parm_change); 
-% % %     this_parm = parm_change{iparm}; 
-% % %     model.(this_parm) = ...
-% % %         linterp(model_copy.z, model_copy.(this_parm), model0.z); 
-% % % end
-% % % model.z = model0.z ; 
-% % % model.z0= model0.z0; 
-% % %     
-    
-% Interpolate onto new model basis. 
 model0 = Kbase.modelk; 
-% [Kbase0.HV.HVr, Kbase.HV.HVr] % < were same 
-%%% Let's do some shinanigains to model, the new one, and figure out what's
-%%% wrong. 
-parm_change = {'VS', 'VP', 'rho', 'Sanis', 'Panis'}; % 'z', 'z0', 
-model_copy = model0; 
-% Use just one of these interpolation loops. 
-% % % for iparm = 1:length(parm_change); 
-% % %     this_parm = parm_change{iparm}; 
-% % %     model0.(this_parm) = ...
-% % %         linterp(model0.z, model0.(this_parm), model.z);     
-% % % % %     %%% Make two models equivalent in some depth range
-% % %     ngauss = 2; 
-% % %     imean = 1; 
-% % %     gwin = gausswin(ngauss); 
-% % %     gwin(1:ceil(ngauss/2)) = 1; 
-% % %     model.(this_parm)(imean:imean+ngauss-1) = ...
-% % %         gwin .* model0.(this_parm)(imean:imean+ngauss-1) + ...
-% % %         (1-gwin) .* model.(this_parm)(imean:imean+ngauss-1)
-% % % end
-% % % model0.z = model.z ; 
-% % % model0.z0= model.z0; 
-%%%% model0.Nz = length(model0.z); 
 
-% % % % new_z = linspace(0, 300, 300)'; % Optional, can use at base of next for loop 
-% % % new_z = [0; logspace(log10(0.1), log10(10), 50)'; [11:300]'];
-% % % model0.z (model0.z (1:end-1)==model0.z (2:end)) = model0.z (model0.z (1:end-1)==model0.z (2:end)) - 0.01; 
-% % % model.z  (model .z (1:end-1)==model .z (2:end)) = model .z (model .z (1:end-1)==model .z (2:end)) - 0.01; 
-% % % model0.z0(model0.z0(1:end-1)==model0.z0(2:end)) = model0.z0(model0.z0(1:end-1)==model0.z0(2:end)) - 0.01; 
-% % % model.z0 (model .z0(1:end-1)==model .z0(2:end)) = model .z0(model .z0(1:end-1)==model .z0(2:end)) - 0.01; 
-% % % 
-% % % for iparm = 1:length(parm_change); 
-% % %     this_parm = parm_change{iparm}; 
-% % %     model0.(this_parm) = ...
-% % %             interp1(model0.z, model0.(this_parm), new_z, 'pchip');    
-% % %     model.(this_parm) = ...
-% % %         interp1(model.z, model.(this_parm), new_z, 'pchip');     
-% % % end
-% % % model0.z = new_z ; model0.z0 = new_z ; 
-% % % model.z = new_z ; model.z0 = new_z; 
-% % % model0.Nz = length(new_z); model.Nz = length(new_z); 
-
-%%% Yet another fake model 1. 
 model = model0; 
-ind1 = 1; ind2 = 2; 
-model.VS (ind1:ind2) = model.VS (ind1:ind2) + 1; 
-model.VP (ind1:ind2) = model.VP (ind1:ind2) + 1; 
-model.rho(ind1:ind2) = model.rho(ind1:ind2) + 1; 
+% model.sedparm.VS = model.
+model.sedmparm.h = model.sedmparm.h + 2; 
 
-%%%
+model = make_mod_from_parms(model, par); 
 
 figure(1); clf; hold on; plot(model0.VS, model0.z); plot(model.VS, model.z); set(gca, 'ydir', 'reverse'); 
 Kbase.modelk = model0; 
