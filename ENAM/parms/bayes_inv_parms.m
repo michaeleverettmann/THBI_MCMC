@@ -203,7 +203,7 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
 
                  
 %% Forward calc. parms
-forc = struct(      'mindV',0.05                 ,... % min delta Vs for layerising
+forc = struct(      'mindV',0.01                 ,... % min delta Vs for layerising
                     'nsamps',2^11                ,... % number of samples (more means longer run time) - brb2022.06.08 I don't think this actually gets passed to propmat. 
                     'PSVorZR','PSV'             ,... % whether to rotate data into PSV or keep in ZR
                     'synthperiod',2              );  % period for propmat response

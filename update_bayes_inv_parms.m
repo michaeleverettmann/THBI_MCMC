@@ -8,20 +8,20 @@ str_temp = split(stamp, '/');
 
 
 % { Different data types alone
-% niter_only   = 16000; 
-% burnin_only  = 4000 ; 
-% cooloff_only = 3000 ; 
-% nchains_only = 12   ; 
+niter_only   = 16000; 
+burnin_only  = 4000 ; 
+cooloff_only = 3000 ; 
+nchains_only = 12   ; 
 % % 
 % niter_only   = 300; 
 % burnin_only  = 50 ;  
 % cooloff_only = 15 ; 
-% nchains_only = 1  ; 
+% nchains_only = 4  ; 
 
-niter_only   = 1000; 
-burnin_only  = 300; 
-cooloff_only = 200 ; 
-nchains_only = 3  ; 
+% niter_only   = 1000; 
+% burnin_only  = 300; 
+% cooloff_only = 200 ; 
+% nchains_only = 3  ; 
 % niter_only   = 600; 
 % burnin_only  = 100; 
 % cooloff_only = 80 ; 
@@ -470,6 +470,27 @@ elseif strcmp(stamp, 'no_xi');
     par.mod.crust.ximin               = 1     ; 
     par.mod.crust.xistd               = 0     ; 
     par.mod.force_no_new_prior        = true  ; % For debugging only. 
+    
+    
+    
+elseif strcmp(stamp, 'propmat_res_0_01'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;  
+    par.forc.mindV                    = 0.01; %  
+elseif strcmp(stamp, 'propmat_res_0_1'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;  
+    par.forc.mindV                    = 0.1; %      
 
 end
 

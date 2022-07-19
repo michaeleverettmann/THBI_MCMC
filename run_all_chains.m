@@ -1,6 +1,8 @@
 clear % clear all to make sure we use values below
 close all
 
+time_start_inversion = now() * 24; % In hours. 
+
 global run_params
 paths = getPaths(); 
 
@@ -347,3 +349,5 @@ if ~ take_lots_of_space % Clear some space while we are at it and saving things.
     system(sprintf('rm ./%s.%s*invState',nwk,sta)); 
 end
 
+time_end_inversion = now() * 24; % In hours. 
+fprintf('\nInversion took a total of %2.5f hours. \n',time_end_inversion-time_start_inversion); 

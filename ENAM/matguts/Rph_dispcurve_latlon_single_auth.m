@@ -41,7 +41,7 @@ elseif strcmp(options.dataset, 'SW_Ray_phV_lyneqeik') % Colton's Eikonal earthqu
     
 elseif strcmp(options.dataset, 'SW_Ray_phV_lyneqhelm') % Colton's Eikonal earthquake phase velocities. 
     ddir = [seismoddir,'ENAM_RAYLEIGH_LYNNER_EQ_HELM/'];
-    periods = [20,25,32,40,50,60,80,100]'; 
+    periods = [25,32,40,50,60,80,100]'; 
     [periods, phV_period] = load_EQphV_data_lynhelm(ilat,ilon,ddir, 'periods', periods);
     
 elseif strcmp(options.dataset, 'SW_Ray_phV_lynant') % Colton's Eikonal earthquake phase velocities. 

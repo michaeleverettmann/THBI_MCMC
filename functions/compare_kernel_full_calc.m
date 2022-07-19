@@ -45,135 +45,135 @@ for ifn = 1:length(fns);
         sprintf('l_like %10.3f -> %10.3f. | Diff  %10.3f : %s\\n', ...
         logL, logLNew, logL_diff, fn)]; 
     %%% End strings for each data fit. 
-
-    lik_drop_mak_fig = -inf; % if lik_drop_mak_fig < 5; warning('Making extra HV kernel plots'); end;  % Temporary. Should make this very high. 
-    if (abs(logL_diff) > lik_drop_mak_fig) && strcmp(fn,'SW_HV') ; % This shouldn't happen. Make some plots. 
-        % Compare HV from previous Kbase, new Kbase, and with the current model based on old Kbase + kernels. 
-        LW = 1.5; 
-        figure(3); clf; hold on; set(gcf, 'pos', [-1215 280 894 638]); 
-        tiledlayout(1,3,'TileSpacing','compact'); 
-
-        %%% HV ratio
-        nexttile(1, [1,1]); cla; hold on; box on; 
-        set(gca, 'ydir', 'reverse', 'LineWidth', 1.5);  
-        xlim([0.6, 1.2]); 
-        ylim([min(trudata.SW_HV.periods-1.5), max(trudata.SW_HV.periods+5)]); 
-        set(gca, 'yscale', 'log'); 
-        grid off; grid on;  % Log scale requires turning grid off before on
-        
-        plot(trudata.SW_HV.HVr, trudata.SW_HV.periods, ...
-            'DisplayName', 'Goal', 'LineWidth', LW*3/2, ...
-            'Color', 'Green'); 
-        
-        sw_hv = Kbase.HV; 
-        plot(sw_hv.HVr, sw_hv.periods, ...
-            'DisplayName', 'Old HV (full calc)', 'LineWidth', LW, ...
-            'Color', 'k');
-        
-        sw_hv = KbaseNew.HV; 
-        plot(sw_hv.HVr, sw_hv.periods, ...
-            'DisplayName', 'New HV (full calc)', 'LineWidth', LW, ...
-            'Color', 'blue');
-        
-        sw_hv = predata.(fn); 
-        plot(sw_hv.HVr, sw_hv.periods, ...
-            'DisplayName', 'New HV (from kernels)', 'LineWidth', LW, ...
-            'Color', 'r');
-       
-        legend('Location', 'Best'); 
-        xlabel('H/V ratio'); ylabel('Period');
-        
-        mismatch = rms(predata.(fn).HVr - KbaseNew.HV.HVr); % Mistmach between kernel and new full forward model
-        dC_est   = rms(predata.(fn).HVr - Kbase   .HV.HVr); % dC predicted from kernel
-        dC_full  = rms(Kbase   .HV.HVr  - KbaseNew.HV.HVr); % dC based on full calculations 
-        %%% End HV ratio
-
-        %%% Models
-        nexttile(2, [1,2]); hold on; box on; 
-        set(gca, 'ydir', 'reverse', 'LineWidth', 1.5); 
-        plot([Kbase.modelk.VS, Kbase.modelk.VP], Kbase.modelk.z, ...
-            'DisplayName', 'Previous kernel model', 'LineWidth', LW, ...
-            'Color', 'k');
-        plot([KbaseNew.modelk.VS,KbaseNew.modelk.VP], KbaseNew.modelk.z, ...
-            'DisplayName', 'New kernel model', 'LineWidth', LW, ...
-            'Color', 'blue');
-        leg=legend('Location', 'Best'); 
-        xlabel('V'); ylabel('Depth (km)'); 
-        ylim([-5, max(Kbase.modelk.z)]); 
-        %%% End models
-
-        sgtitle(sprintf(...
-            ['HV kernel versus full calculation.\nIteration=%6.0f. ',...
-            'Model pertubation norm = %3.2f. ',...
-            'Change in log-likelihood = %3.5f\n',...
-            'RMS of: Kernel error: %1.4f -- dC kernel: %1.4f -- dC full model: %1.4f.'],... 
-            par.ii, ptbnorm, logL_diff,...
-            mismatch, dC_est, dC_full)); 
-        
-
-        exportgraphics(gcf, sprintf('%s/%s_ii_%1.0f_likelihood_drop_hv.pdf',...
-            par.res.resdir, par.res.chainstr, ii ) ); % %!%! Temporary 
-
-        %%% Plot sensitivity kernels from old and new Kbase. 
-        % If they are very different then we need to update kernels more often. 
-        plot_sensitivity_kernel_hv(Kbase.HV.KHV   , 'dat', Kbase.HV   ,... 
-            'model',Kbase.modelk   ,...
-            'filename',sprintf('%s/%s_ii_%1.0f_sensitivity_hv_old.pdf', ...
-            par.res.resdir, par.res.chainstr, par.ii) ); % Old kernels
-        
-        plot_sensitivity_kernel_hv(KbaseNew.HV.KHV, 'dat', KbaseNew.HV, ...
-            'model',KbaseNew.modelk,...
-            'filename',sprintf('%s/%s_ii_%1.0f_sensitivity_hv_new.pdf',...
-            par.res.resdir, par.res.chainstr, par.ii) ); % New kernels
-        %%% End sensitivity kernels.
-        
-        %%%
-% % %         plot_sensitivity_kernel_hv_grid(Kbase.HV.KHV   , 'dat', Kbase.HV   ,... 
+% % % 
+% % %     lik_drop_mak_fig = -inf; % if lik_drop_mak_fig < 5; warning('Making extra HV kernel plots'); end;  % Temporary. Should make this very high. 
+% % %     if (abs(logL_diff) > lik_drop_mak_fig) && strcmp(fn,'SW_HV') ; % This shouldn't happen. Make some plots. 
+% % %         % Compare HV from previous Kbase, new Kbase, and with the current model based on old Kbase + kernels. 
+% % %         LW = 1.5; 
+% % %         figure(3); clf; hold on; set(gcf, 'pos', [-1215 280 894 638]); 
+% % %         tiledlayout(1,3,'TileSpacing','compact'); 
+% % % 
+% % %         %%% HV ratio
+% % %         nexttile(1, [1,1]); cla; hold on; box on; 
+% % %         set(gca, 'ydir', 'reverse', 'LineWidth', 1.5);  
+% % %         xlim([0.6, 1.2]); 
+% % %         ylim([min(trudata.SW_HV.periods-1.5), max(trudata.SW_HV.periods+5)]); 
+% % %         set(gca, 'yscale', 'log'); 
+% % %         grid off; grid on;  % Log scale requires turning grid off before on
+% % %         
+% % %         plot(trudata.SW_HV.HVr, trudata.SW_HV.periods, ...
+% % %             'DisplayName', 'Goal', 'LineWidth', LW*3/2, ...
+% % %             'Color', 'Green'); 
+% % %         
+% % %         sw_hv = Kbase.HV; 
+% % %         plot(sw_hv.HVr, sw_hv.periods, ...
+% % %             'DisplayName', 'Old HV (full calc)', 'LineWidth', LW, ...
+% % %             'Color', 'k');
+% % %         
+% % %         sw_hv = KbaseNew.HV; 
+% % %         plot(sw_hv.HVr, sw_hv.periods, ...
+% % %             'DisplayName', 'New HV (full calc)', 'LineWidth', LW, ...
+% % %             'Color', 'blue');
+% % %         
+% % %         sw_hv = predata.(fn); 
+% % %         plot(sw_hv.HVr, sw_hv.periods, ...
+% % %             'DisplayName', 'New HV (from kernels)', 'LineWidth', LW, ...
+% % %             'Color', 'r');
+% % %        
+% % %         legend('Location', 'Best'); 
+% % %         xlabel('H/V ratio'); ylabel('Period');
+% % %         
+% % %         mismatch = rms(predata.(fn).HVr - KbaseNew.HV.HVr); % Mistmach between kernel and new full forward model
+% % %         dC_est   = rms(predata.(fn).HVr - Kbase   .HV.HVr); % dC predicted from kernel
+% % %         dC_full  = rms(Kbase   .HV.HVr  - KbaseNew.HV.HVr); % dC based on full calculations 
+% % %         %%% End HV ratio
+% % % 
+% % %         %%% Models
+% % %         nexttile(2, [1,2]); hold on; box on; 
+% % %         set(gca, 'ydir', 'reverse', 'LineWidth', 1.5); 
+% % %         plot([Kbase.modelk.VS, Kbase.modelk.VP], Kbase.modelk.z, ...
+% % %             'DisplayName', 'Previous kernel model', 'LineWidth', LW, ...
+% % %             'Color', 'k');
+% % %         plot([KbaseNew.modelk.VS,KbaseNew.modelk.VP], KbaseNew.modelk.z, ...
+% % %             'DisplayName', 'New kernel model', 'LineWidth', LW, ...
+% % %             'Color', 'blue');
+% % %         leg=legend('Location', 'Best'); 
+% % %         xlabel('V'); ylabel('Depth (km)'); 
+% % %         ylim([-5, max(Kbase.modelk.z)]); 
+% % %         %%% End models
+% % % 
+% % %         sgtitle(sprintf(...
+% % %             ['HV kernel versus full calculation.\nIteration=%6.0f. ',...
+% % %             'Model pertubation norm = %3.2f. ',...
+% % %             'Change in log-likelihood = %3.5f\n',...
+% % %             'RMS of: Kernel error: %1.4f -- dC kernel: %1.4f -- dC full model: %1.4f.'],... 
+% % %             par.ii, ptbnorm, logL_diff,...
+% % %             mismatch, dC_est, dC_full)); 
+% % %         
+% % % 
+% % %         exportgraphics(gcf, sprintf('%s/%s_ii_%1.0f_likelihood_drop_hv.pdf',...
+% % %             par.res.resdir, par.res.chainstr, ii ) ); % %!%! Temporary 
+% % % 
+% % %         %%% Plot sensitivity kernels from old and new Kbase. 
+% % %         % If they are very different then we need to update kernels more often. 
+% % %         plot_sensitivity_kernel_hv(Kbase.HV.KHV   , 'dat', Kbase.HV   ,... 
 % % %             'model',Kbase.modelk   ,...
-% % %             'filename',sprintf('%s/%s_ii_%1.0f_sensitivity_hv_old_grid.pdf', ...
+% % %             'filename',sprintf('%s/%s_ii_%1.0f_sensitivity_hv_old.pdf', ...
 % % %             par.res.resdir, par.res.chainstr, par.ii) ); % Old kernels
 % % %         
-        %%%
-        
-        save( sprintf('%s/%s_ii_%1.0f_likelihood_drop_hv_workspace.mat',...
-            par.res.resdir, par.res.chainstr, ii ) ); 
-    if (abs(logL_diff) > lik_drop_mak_fig) && strcmp(fn,'SW_Ray_phV_eks') ; % % Temporary
-        % Compare HV from previous Kbase, new Kbase, and with the current model based on old Kbase + kernels. 
-        LW = 1.5; 
-        figure(4); clf; hold on; set(gcf, 'pos', [-1215 280 894 638]); 
-        tiledlayout(1,3,'TileSpacing','compact'); 
-        
-        ray = Kbase.Ray ; 
-        rayNew = KbaseNew.Ray; 
-
-        %%% Rayleigh wave phase velocities. 
-        nexttile(1, [1,1]); cla; hold on; box on; 
-        set(gca, 'ydir', 'reverse', 'LineWidth', 1.5);  
-        xlim([2.5, 4.5]); 
-        ylim([min(ray.periods-1.5), max(ray.periods+5)]); 
-        set(gca, 'yscale', 'log'); 
-        grid off; grid on;  % Log scale requires turning grid off before on
-               
-        plot(ray.phV, ray.periods, ...
-            'DisplayName', 'Old phv (full calc)', 'LineWidth', LW, ...
-            'Color', 'k');
-        
-        plot(rayNew.phV, rayNew.periods, ...
-            'DisplayName', 'New phv (full calc)', 'LineWidth', LW, ...
-            'Color', 'blue');
-        
-        for ifn2 = 1:length(fns); 
-            fn2 = fns{ifn2}; 
-            if ~contains(fn2, 'SW_Ray_phV'); 
-                continue
-            end
-            plot(predata.(fn2).phV, predata.(fn2).periods, ...
-                'DisplayName', 'New phV (from kernels)', 'LineWidth', LW, ...
-                'Color', 'r');
-        end
-        legend('Location', 'Best'); 
-        xlabel('Rayleigh phase velocity (km/s)'); ylabel('Period');
-    end
+% % %         plot_sensitivity_kernel_hv(KbaseNew.HV.KHV, 'dat', KbaseNew.HV, ...
+% % %             'model',KbaseNew.modelk,...
+% % %             'filename',sprintf('%s/%s_ii_%1.0f_sensitivity_hv_new.pdf',...
+% % %             par.res.resdir, par.res.chainstr, par.ii) ); % New kernels
+% % %         %%% End sensitivity kernels.
+% % %         
+% % %         %%%
+% % % % % %         plot_sensitivity_kernel_hv_grid(Kbase.HV.KHV   , 'dat', Kbase.HV   ,... 
+% % % % % %             'model',Kbase.modelk   ,...
+% % % % % %             'filename',sprintf('%s/%s_ii_%1.0f_sensitivity_hv_old_grid.pdf', ...
+% % % % % %             par.res.resdir, par.res.chainstr, par.ii) ); % Old kernels
+% % % % % %         
+% % %         %%%
+% % %         
+% % %         save( sprintf('%s/%s_ii_%1.0f_likelihood_drop_hv_workspace.mat',...
+% % %             par.res.resdir, par.res.chainstr, ii ) ); 
+% % %     if (abs(logL_diff) > lik_drop_mak_fig) && strcmp(fn,'SW_Ray_phV_eks') ; % % Temporary
+% % %         % Compare HV from previous Kbase, new Kbase, and with the current model based on old Kbase + kernels. 
+% % %         LW = 1.5; 
+% % %         figure(4); clf; hold on; set(gcf, 'pos', [-1215 280 894 638]); 
+% % %         tiledlayout(1,3,'TileSpacing','compact'); 
+% % %         
+% % %         ray = Kbase.Ray ; 
+% % %         rayNew = KbaseNew.Ray; 
+% % % 
+% % %         %%% Rayleigh wave phase velocities. 
+% % %         nexttile(1, [1,1]); cla; hold on; box on; 
+% % %         set(gca, 'ydir', 'reverse', 'LineWidth', 1.5);  
+% % %         xlim([2.5, 4.5]); 
+% % %         ylim([min(ray.periods-1.5), max(ray.periods+5)]); 
+% % %         set(gca, 'yscale', 'log'); 
+% % %         grid off; grid on;  % Log scale requires turning grid off before on
+% % %                
+% % %         plot(ray.phV, ray.periods, ...
+% % %             'DisplayName', 'Old phv (full calc)', 'LineWidth', LW, ...
+% % %             'Color', 'k');
+% % %         
+% % %         plot(rayNew.phV, rayNew.periods, ...
+% % %             'DisplayName', 'New phv (full calc)', 'LineWidth', LW, ...
+% % %             'Color', 'blue');
+% % %         
+% % %         for ifn2 = 1:length(fns); 
+% % %             fn2 = fns{ifn2}; 
+% % %             if ~contains(fn2, 'SW_Ray_phV'); 
+% % %                 continue
+% % %             end
+% % %             plot(predata.(fn2).phV, predata.(fn2).periods, ...
+% % %                 'DisplayName', 'New phV (from kernels)', 'LineWidth', LW, ...
+% % %                 'Color', 'r');
+% % %         end
+% % %         legend('Location', 'Best'); 
+% % %         xlabel('Rayleigh phase velocity (km/s)'); ylabel('Period');
+% % %     end
 end
 
 d_log = log_likelihoodNew-log_likelihood; 
