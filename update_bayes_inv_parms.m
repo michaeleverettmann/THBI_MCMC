@@ -257,29 +257,6 @@ elseif strcmp(stamp, 'HKstack_P___SW_HV_only__only');
     par.inv.nchains                   = nchains_only;  
 % } ---
 
-
-elseif strcmp(stamp, 'all_demo'); 
-    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
-    par.mod.starting.HKappa.startAtHK = true;   
-    par.inv.niter                     = 500; 
-    par.inv.burnin                    = 100 ; 
-    par.inv.cooloff                   = 80 ; 
-    par.inv.nchains                   = 1  ; 
-elseif strcmp(stamp, 'all_002'); 
-    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
-    par.mod.starting.HKappa.startAtHK = true;   
-    par.inv.niter                     = niter_only; 
-    par.inv.burnin                    = burnin_only ; 
-    par.inv.cooloff                   = cooloff_only ; 
-    par.inv.nchains                   = nchains_only   ; 
-elseif strcmp(stamp, 'all_no_hv'); 
-    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'}; 
-    par.mod.starting.HKappa.startAtHK = true;   
-    par.inv.niter                     = 16000; 
-    par.inv.burnin                    = 5000 ; 
-    par.inv.cooloff                   = 4000 ; 
-    par.inv.nchains                   = 16   ; 
-    
     
 elseif strcmp(stamp, 'HK_fast'); 
     par.inv.datatypes                 = {'HKstack_P'};
@@ -471,8 +448,29 @@ elseif strcmp(stamp, 'no_xi');
     par.mod.crust.xistd               = 0     ; 
     par.mod.force_no_new_prior        = true  ; % For debugging only. 
     
+
+   
+elseif strcmp(stamp, 'all_003'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only ; 
+    par.inv.nchains                   = nchains_only   ; 
+elseif strcmp(stamp, 'all_no_hv'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only ; 
+    par.inv.nchains                   = nchains_only   ; 
+        
     
     
+ %%% COnclusion of next two tests: use higher synth period, and 10 km
+ %%% spacing of layers, and dv doesn't matter but 0.15 is fine. 
 elseif strcmp(stamp, 'propmat_res_0_01'); 
     par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
         'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...

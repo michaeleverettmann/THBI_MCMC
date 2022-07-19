@@ -10,7 +10,7 @@ run('../../a0_STARTUP_BAYES.m');
 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/R54A_TA_dat1/add_sediment_try2'; 
-resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/O53A_TA_dat1/all_highres_layer'; 
+resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/R54A_TA_dat1/all_highres_layer'; 
 resdir_fig = '/Users/brennanbrunsvik/Documents/temp/remake_thbi_figures'; 
 prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat'; 
 
@@ -150,7 +150,8 @@ plot_HEATMAP_ALLMODELS_shallow(suite_of_models,final_model,par,1,[resdir_fig,'/h
 % %                        'scale_error', 1,           ... % Multiply h-kappa error by this constant. Sigma needs to be scaled accordingly. If using 100, we can think of it like percent. 
 % %                        'weightDistanceMax', 0,   ... % At start of burnin, gives 0 to 1 weight toward the (scaled) Euclidian distance from HKappa energy maximum. In otherwords, this tends toward disregarding the actual energy value, and pays attention to its position. 
 % %                        'weightDistanceMin', 0); 
-                   
+% par.forc.mindV = 0.05; warning('Changing propmat resolution');  
+par.forc.synthperiod = 4; warning('Changing propmat Period');  
 [ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,trudata,posterior );
 
 % distribute data for different processing (e.g. _lo, _cms)
