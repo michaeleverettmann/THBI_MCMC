@@ -21,10 +21,20 @@ else
     Kbase = options.Kbase; 
 end
 
-plot_sensitivity_kernel_hv(Kbase.HV.KHV,'dat',Kbase.HV,'model',model,...
-    'filename',sprintf('%s/sensitivity_hv.pdf',resdir) ); 
-plot_sensitivity_kernel_ray(Kbase.Ray.Kph,'dat',Kbase.Ray,'model',model,...
-    'filename',sprintf('%s/sensitivity_ray.pdf',resdir) ); 
-plot_sensitivity_kernel_love(Kbase.Lov.Kph,'dat',Kbase.Lov,'model',model,...
-    'filename',sprintf('%s/sensitivity_love.pdf',resdir) ); 
+if any( contains(string(par.inv.datatypes), 'SW_HV'    ))
+    plot_sensitivity_kernel_hv(Kbase.HV.KHV,'dat',Kbase.HV,'model',model,...
+        'filename',sprintf('%s/sensitivity_hv.pdf',resdir) ); 
+end
+
+if any( contains(string(par.inv.datatypes), 'SW_Ray_phV'))
+    plot_sensitivity_kernel_ray(Kbase.Ray.Kph,'dat',Kbase.Ray,'model',model,...
+        'filename',sprintf('%s/sensitivity_ray.pdf',resdir) ); 
+end
+
+if any( contains(string(par.inv.datatypes), 'SW_Lov_phV'))
+    plot_sensitivity_kernel_love(Kbase.Lov.Kph,'dat',Kbase.Lov,'model',model,...
+        'filename',sprintf('%s/sensitivity_love.pdf',resdir) ); 
+end
+
+
 end

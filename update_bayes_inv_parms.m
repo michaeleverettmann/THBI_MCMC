@@ -490,6 +490,17 @@ elseif strcmp(stamp, 'propmat_res_0_1');
     par.inv.nchains                   = nchains_only;  
     par.forc.mindV                    = 0.1; %      
 
+elseif strcmp(stamp, 'all_sp_weight'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only ; 
+    par.inv.nchains                   = nchains_only   ;     
+    par.datprocess.CCP.weight_depth_val = [-10,0.3 ; 50,0.3 ; 100,1 ; 6371,1]; % Upweight at depth. This gets normalized.  
+
+    
 end
 
 inv = par.inv; 
