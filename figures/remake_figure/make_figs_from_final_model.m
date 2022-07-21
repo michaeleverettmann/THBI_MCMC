@@ -10,9 +10,9 @@ run('../../a0_STARTUP_BAYES.m');
 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/R54A_TA_dat1/add_sediment_try2'; 
-resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/R54A_TA_dat1/all_highres_layer'; 
+resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/T58A_TA_dat1/all_no_hv'; 
 resdir_fig = '/Users/brennanbrunsvik/Documents/temp/remake_thbi_figures'; 
-prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat'; 
+prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat' ; 
 
 %% Load files from the inversion. 
 mat_files = ls([resdir_data '/*.mat']); 
@@ -63,76 +63,6 @@ goodChainManual = [];
 
 [ hypparm_trends ] = plot_HYPERPARAMETER_TRENDS( allmodels_perchain,[resdir_fig,'/hyperparmtrend.pdf'] );
 plot_MISFIT_TRENDS(par,allmodels_perchain,misfits_perchain,resdir_fig );
- 
-
-% % % %%% Temporary test to evaluate models at problematic points
-% % % chain = allmodels_perchain{1}; 
-% % % % find([chain.iter]==7725) 7725
-% % % figure(1);clf; hold on; set(gcf,'color', 'white'); 
-% % % set(gca, 'ydir', 'reverse'); 
-% % % figure(2);clf; hold on; set(gcf,'color', 'white'); 
-% % % 
-% % % % for ichain = [304, 305]; % 7, 304, 305
-% % % % for ichain = [232, 233]; % 7, 304, 305
-% % % for ichain = [309,310]; % 7, 304, 305
-% % %     figure(1); 
-% % %     mod = chain(ichain); 
-% % %     plot(mod.VS, mod.z, 'DisplayName', num2str(ichain) ); 
-% % %     figure(2); 
-% % %     [predata,laymodel] = b3__INIT_PREDATA(mod,par,trudata,0 ); 
-% % %     [ predata,SW ] = b3_FORWARD_MODEL_SW_precise( mod,par,predata,'junk' );
-% % %     plot(predata.SW_HV.periods, predata.SW_HV.HVr,...
-% % %         'DisplayName', num2str(ichain) ); 
-% % %     [Kbase,predata] = b7_KERNEL_RESET(mod,[],predata,'junk',1,par,1); 
-% % %     
-% % %     % Kernels for HV
-% % %     z_limits = [-2, 300]; 
-% % %     HVK_1=Kbase.HV.KHV; Np = length(HVK_1); 
-% % %     figure(88), clf; set(gcf,'pos',[-1347 303 1323 713]); hold on ;
-% % %     each_var = {'Kzh_Vs','Kzh_Vp','Kzh_rho'}; % Also have 'Kph_Vs','Kph_Vp','Kph_rho',
-% % %     h=tiledlayout(1,length(each_var)+2,'TileSpacing','compact'); 
-% % % %     ax1 = subplot(1,2,1); cla, hold on;
-% % % %     ax2 = subplot(1,2,2); cla, hold on;   
-% % % %     h = {}; % zeros(Np,1);
-% % %     for ivar = 1:length(each_var); 
-% % %         this_var = each_var{ivar}; 
-% % %         nexttile(ivar); cla; hold on; box on; 
-% % %         set(gca, 'ydir', 'reverse', 'LineWidth', 1.5); 
-% % %         ylim(z_limits); 
-% % %         title(strrep(this_var, '_', ' ')); 
-% % %         for ip = 1:Np
-% % %             plot(HVK_1{ip}.(this_var)/1e3,0.5*(HVK_1{ip}.Z1+HVK_1{ip}.Z2),...
-% % %                 '-','linewidth',2, 'DisplayName',num2str(HVK_1{ip}.period));
-% % %         end  
-% % %         if ivar == 1; 
-% % %             leg=legend('Location', 'best'); 
-% % %         end
-% % %     end
-% % %     
-% % %     nexttile(ivar+1); cla; hold on; box on; set(gca, 'ydir', 'reverse', 'LineWidth', 1.5); 
-% % %     title('Model'); 
-% % %     ylim(z_limits); 
-% % %     plot(mod.VS , mod.z, 'linewidth', 2, 'DisplayName', 'Vs' ); 
-% % %     plot(mod.VP , mod.z, 'linewidth', 2, 'DisplayName', 'Vp' ); 
-% % %     plot(mod.rho, mod.z, 'linewidth', 2, 'DisplayName', 'rho'); 
-% % %     legend('Location', 'best'); 
-% % %     
-% % %     
-% % %     nexttile(ivar+2); cla; hold on; box on; set(gca,'ydir', 'reverse', 'LineWidth', 1.5); 
-% % %     title('Ellipticity'); ylabel('Period'); 
-% % %     plot(predata.SW_HV.HVr, predata.SW_HV.periods, 'linewidth', 2, 'DisplayName', 'rho'); 
-% % %     xlim([0.6, 0.85]); 
-% % %     grid on; 
-% % %     
-% % %     nexttile(1); ylabel('Depth (km)'); 
-% % %     
-% % %     exportgraphics(gcf, sprintf('%s/HV_kernels_%1.0f.pdf',resdir_fig,ichain)); 
-% % %     
-% % % end
-% % % figure(1); legend(); 
-% % % figure(2); legend(); 
-
-%%%
 
 posterior = c2_BUILD_POSTERIOR(allmodels_collated,par,par.res.zatdep);
 plot_MODEL_SUMMARY(posterior,par,1,[resdir_fig,'/modMisfits.pdf']); 
