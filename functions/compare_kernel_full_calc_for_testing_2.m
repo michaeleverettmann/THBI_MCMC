@@ -1,14 +1,14 @@
 
-model0 = Kbase.modelk; 
+[ model ] = make_mod_from_parms( model,par );
+[ model0 ] = make_mod_from_parms( Kbase.modelk ,par );
 
-model = model0; 
-% model.sedparm.VS = model.
-model.sedmparm.h = model.sedmparm.h + 2; 
 
-model = make_mod_from_parms(model, par); 
+% model0 = Kbase.modelk; 
+
+% model = model0; 
+
 
 figure(1); clf; hold on; plot(model0.VS, model0.z); plot(model.VS, model.z); set(gca, 'ydir', 'reverse'); 
-Kbase.modelk = model0; 
 [Kbase,predata] = b7_KERNEL_RESET(model0,Kbase,predata,ID,ii,par,1);
 predata = b3_FORWARD_MODEL_SW_kernel(model,Kbase,par,predata );
 % [model0.VS, model.VS, model0.z, model.z]
