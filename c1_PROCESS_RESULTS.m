@@ -82,15 +82,32 @@ for iii = 1:nchains
 
     bestind = [1:length(mf.iter)]';
     bestind(mf.iter <= par.inv.burnin) = []; % kill all before burnin
+    
+    %%% Remove models that had particularly low liklihood. These could come up if resetting kernels causes a huge drop in likelihood. Bad models might be accepted around those iterations, so just ignore them. 
+    % Currently done on per-chain basis. Might be better to do across all chains combined, but we would risk eliminating chains who sampled local minima (even if the local minima is the true earth model). 
+    logL_dtype = nan(length(bestind),length(par.inv.datatypes));
+    for id = 1:length(par.inv.datatypes)
+        dtype = par.inv.datatypes{id};
+        logL = [mf.logL_indivdat.(dtype)]'; % all logL, including outside of bestind. 
+        logL_dtype(:,id) = logL(bestind); 
+    end
+    logL_mean = mean(logL_dtype, 1); % Mean of logl for each data type. 
+    logL_std = std(logL_dtype,1); 
+    cutoff_logL = logL_mean - 3*logL_std; % Cutoff values, too low of logL to keep. 
+    ignore_logL = any(logL_dtype < cutoff_logL, 2); % For each iteration, remove it if any of the data types had log L below cutoff. 
+    bestind(ignore_logL) = []; 
+    perc_removed = 100 * sum(ignore_logL) / length(ignore_logL); 
+    fprintf(['\nRemoved %1.2f%% of models from chain %1.0f due to logL'...
+        '< mean - 3(?) std of logL for some datype.\n'], perc_removed, iii); 
+    %%% END remove models that had particularly low likelihood 
 
     if ~isinf(par.inv.bestNmod2keep) % subset if not inf to keep. Else keep all
-
     if par.inv.bestNmod2keep>0 % if specifying how many to keep based on low error
 
         score_overall = zeros(length(bestind),length(par.inv.datatypes));
         for id = 1:length(par.inv.datatypes)
             dtype = par.inv.datatypes{id};
-            pdtyp = parse_dtype(dtype);
+%             pdtyp = parse_dtype(dtype);
     %         if strcmp(pdtype{1},'BW') && (~strcmp(pdtype{3},'def') || ~strcmp(pdtype{4},'def')), continue; end
             chi2 = [mf.chi2.(dtype)]';
             [~,irank_mf] = sort(sum(chi2(bestind,:),2));

@@ -89,34 +89,34 @@ modl.force_no_new_prior = false; % For debugging. Force not making a new emperic
 
 modl.sed = struct(...
     ... thickness of the sediments
-                     'hmax',5.0                  ,... %5 max sed layer thickness, km
+                     'hmax',8.0                  ,... %5 max sed layer thickness, km
                      'hmin',0.0                  ,... %0 min sed layer thickness, km
                      'hstd',0.5                  ,... % std of sed layer thickness for perturbation, km
     ... shear velocity of the sediments
                      'vsmax',3.3                 ,... % max sed velocity, km/s
                      'vsmin',0.5                 ,... % min sed velocity, km/s
-                     'vsstd',0.08                 );  % std of sed velocity for perturbation, km/s
+                     'vsstd',0.08 * 2                 );  % std of sed velocity for perturbation, km/s
 
 modl.crust = struct(...
     ... thickness of the crust
                      'hmax',70                   ,... %60 max xtal crust thickness, km % Shen and Ritzwoller 2016 Don't show anything above ~55 km in eastern US. bb2021.10.26
-                     'hmin',25                   ,... %10 min xtal crust thickness, km % bb2021.10.26 Going VERY shallow because we will go offshore, expecting down to about 7 km thickness (Shuck et al., 2019). We don't want priors to thicken the offshore crust. 
+                     'hmin',15                   ,... %10 min xtal crust thickness, km % bb2021.10.26 Going VERY shallow because we will go offshore, expecting down to about 7 km thickness (Shuck et al., 2019). We don't want priors to thicken the offshore crust. 
                      'hstd',2.5                    ,... % std of xtal crust thickness, for perturbation, km
                 ... gaussian prior probability for crust thickness - mean=30, std=10
                      'h_pprior',@(h) 1,...exp(-(h-30).^2/4.^2),... % prior probability 
     ... shear velocity in the crust
-                     'vsmax',4.4                 ,...4.5 % max crust spline velocity, km/s bb2021.10.26 changes from 4.3 to 4.4... Shen and Ritzwoller Fig 12 shows lower crustal velocity going above 4.2 
+                     'vsmax',4.6                 ,...4.5 % max crust spline velocity, km/s bb2021.10.26 changes from 4.3 to 4.4... Shen and Ritzwoller Fig 12 shows lower crustal velocity going above 4.2 
                      'vsmin',2.5                 ,...3.3 % min crust spline velocity, km/s bb2021.10.26 ?? Not sure about this one. There must be a theoretical limit. Shen2016 shows SUPER low velocities in Gulf of Mexico, which is clearly a consequence of sediment. North/East of that, values are higher than 2.8. 
                      'vsstd',0.08                ,... % std of crust spline velocity for perturbation, km/s
     ... Vp/Vs in the crust
                      'vpvsmax',2.1               ,...1.9 % max crust vpvs ratio bb2021.10.26 Changed from 1.9 because station LSCT seemed to want a very high Vp/Vs! Looks like Jon also went with 2.1. 
-                     'vpvsmin',1.6               ,...1.65 % min crust vpvs ratio
+                     'vpvsmin',1.5               ,...1.65 % min crust vpvs ratio
                      'vpvsstd',0.01              ,... % std of crust vpvs ratio for perturbation, km/s
                 ... gaussian prior probability for VpVs - mean=1.8, std=0.05
                      'vpvs_pprior',@(vpvs) 1,...exp(-(vpvs-1.7).^2/0.03.^2),... % prior probability 
     ... Xi in the crust
                      'ximax',1.2                 ,...1.05 % min crust Vs radial anis value % bb2021.10.26 Changed from 1.1 because Station LSCT suggests we want wider psi bounds. 
-                     'ximin',0.75                 ,...1.00 % min crust Vs radial anis value % bb2021.10.26 Changed from 0.9 to 0.75 because station LSCT wanted SUPER low psi. THIS MIGHT BE A CONSEQUENCE OF HAVING MANTLE PSI = 1. .9 to 1.1 was suggested by GLOBAL and thus lower resolution compilation of Porrit et al., 2021. 
+                     'ximin',0.8                 ,...1.00 % min crust Vs radial anis value % bb2021.10.26 Changed from 0.9 to 0.75 because station LSCT wanted SUPER low psi. THIS MIGHT BE A CONSEQUENCE OF HAVING MANTLE PSI = 1. .9 to 1.1 was suggested by GLOBAL and thus lower resolution compilation of Porrit et al., 2021. 
                      'xistd',0.01                ,... % std of crust Vs radial anis value
     ... knots in the crust
                      'kdstd',2                   ,... % std of knot movement, for perturbation, km
@@ -125,7 +125,7 @@ modl.crust = struct(...
 
 modl.mantle = struct(...
     ... shear velocity in the mantle
-                     'vsmax',5.1                 ,...4.9 % max mantle spline velocity, km/s bb2021.10.26 I haven't seen more than about 4.9 in Shen and Ritzwoller or even full waveform models. BUT the pdfs in Shen and Ritzwoller did clip at 4. 9 (Figure 8). So 5.1 seems good. 
+                     'vsmax',5.4                 ,...4.9 % max mantle spline velocity, km/s bb2021.10.26 I haven't seen more than about 4.9 in Shen and Ritzwoller or even full waveform models. BUT the pdfs in Shen and Ritzwoller did clip at 4. 9 (Figure 8). So 5.1 seems good. 
                      'vsmin',3.7                 ,...3.7 % min mantle spline velocity, km/s bb2021.10.26 Long et al., 2021 harrisonburg anomaly compilation shows velocities all above about 4.2 km/s... so 3.7 can definatley handle mantle anomalies like this. 
                      'vsstd',0.08                ,... % std of mantle spline velocity for perturbation, km/s
     ... Xi in the mantle
@@ -249,7 +249,7 @@ cond = struct(  'pos_moho',         true         ,... % No negative moho jumps
                 'pos_crustdV',      false         ,... % Monotonic increase of V(p/s) in crust
                 'nobigdVmoh',       true         ,... % No Vs moho jumps exceeding 30%
                 'no_moho_sharpgrad',true         ,... % No strong or negative gradients on either side of the Moho
-                'noVSgt49',         true         );  % No VS exceeding 4.9 km/s
+                'noVSgt49',         false        );  % No VS exceeding 4.9 km/s
             
 %% Synthetic data parms 
 synth = struct( 'gcarcs',[70]                 ,... % average gcarc

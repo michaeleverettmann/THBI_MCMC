@@ -51,7 +51,7 @@ a = [
    360.000      1.8498
    410.000      1.8425];
 
-vpvs = interp1(a(:,1),a(:,2),Zkm, 'cubic'); % Cubic interpolation gives smooth results, so it doesn't artificially introduce a layer that our modelling didn't insert. 
+vpvs = interp1(a(:,1),a(:,2),Zkm, 'linear'); % Cubic interpolation gives smooth results, so it doesn't artificially introduce a layer that our modelling didn't insert. 
 
 % figure(1); clf; hold on; plot(vpvs)
 

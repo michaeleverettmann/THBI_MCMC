@@ -37,8 +37,11 @@ for idat = [1:ndattyps];
          
         thisval = [misfiti.rms.(thisdat)]'; 
         iter = misfiti.iter; 
-       
-        scatter(iter, thisval, dot_size, 'filled');
+        
+        bestmods = misfiti.bestmods; 
+        scatter(iter( bestmods), thisval( bestmods), dot_size,      'filled');
+        scatter(iter(~bestmods), thisval(~bestmods), dot_size, 'k', 'filled');
+
     end
 end
 
@@ -96,7 +99,11 @@ for idat = [1:ndattyps];
         thisval = [misfiti.logL_indivdat.(thisdat)]'; 
         iter = misfiti.iter; 
        
-        scatter(iter, thisval, dot_size, 'filled');
+%         scatter(iter, thisval, dot_size, 'filled');
+        
+        bestmods = misfiti.bestmods; 
+        scatter(iter( bestmods), thisval( bestmods), dot_size,      'filled');
+        scatter(iter(~bestmods), thisval(~bestmods), dot_size, 'k', 'filled');
     end
     each_lim = [each_lim; prctile(thisval,1); max(thisval)]; 
 %     ylim([prctile(thisval,1), max(thisval)]); 
