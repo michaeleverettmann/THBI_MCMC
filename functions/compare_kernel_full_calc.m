@@ -1,8 +1,8 @@
 function [Kbase, KbasePrev, predata, log_likelihood, misfit, Pm_prior, nchain, ifpass] = ...
     compare_kernel_full_calc(...
         model, Kbase, predata, trudata, ID, par, fail_chain, ...
-        ii, ifpass, misfit, ptbnorm, log_likelihood, ifaccept); 
-   
+        ii, ifpassIn, misfit, ptbnorm, log_likelihood, ifaccept); 
+ifpass = ifpassIn; % Sometimes there is a weird thing taking in and returning a variable. 
 
 [KbaseNew,predataNew] = b7_KERNEL_RESET(model,Kbase,predata,ID,ii,par,1);
 
