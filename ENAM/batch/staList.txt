@@ -1,2 +1,4 @@
 TA R54A
+TA T58A 
+TA O53A
 # For some reason have to have a final line that isn't used. Note: format is NET STA

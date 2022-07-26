@@ -1,53 +1,3 @@
-
-% % % %%% brb2022.03.07 Real run
-% % % inv = struct(    'synthTest',false                ,...
-% % %                  'verbose',false                 ,... % option to spit out more information+plots
-% % %                  'niter',16000                     ,... % Number of iterations
-% % %                  'burnin',5000                    ,... % don't record results before burnin iterations
-% % %                  'cooloff',4000                   ,... % # of iterations over which temperature declines as erf
-% % %                  'tempmax',5                      ,... % maximum multiple of all standard deviations
-% % %                  'saveperN',25                   ,... % save only every saveperN iterations    % bb2021.09.14 savig each one, since I have 100 iterations, this way we can still do probability math (taking the 5 most poorly performing models... otherwise, we get code errors later on).    
-% % %                  'bestNmod2keep',-15000           ,... % keep only the best N models in each chain, defined here
-% % %                  'kerneltolmax',1.5              ,... % kernel max. tolerance - max norm of perturbation before re-calc kernels
-% % %                  'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-% % %                  'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-% % %                  'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-% % %                  'nchains',16                    ,... % number of chains to start in parallel
-% % %                  'Nsavestate',100                ,... % Niter per which the state of the parallel inversion is saved in .mat file
-% % %                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
-% % %                  'BWclust',1                     ,... % option to use only one c x             
-% % %                  'datatypes',{{'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}})  ; 
-% % %              %                  'datatypes',{{'SW_HV'}}) 
-% % %                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
-% % %                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
-% % %                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
-% 
-% % % % brb2022.03.07 Debugging run
-% % % inv = struct(    'synthTest',false                ,...
-% % %                  'verbose',false                 ,... % option to spit out more information+plots
-% % %                  'niter',500                    ,... % Number of iterations
-% % %                  'burnin',100                    ,... % don't record results before burnin iterations
-% % %                  'cooloff',80                    ,... % # of iterations over which temperature declines as erf
-% % %                  'tempmax',5                     ,... % maximum multiple of all standard deviations
-% % %                  'saveperN',20                   ,... % save only every saveperN iterations    % bb2021.09.14 savig each one, since I have 100 iterations, this way we can still do probability math (taking the 5 most poorly performing models... otherwise, we get code errors later on).    
-% % %                  'bestNmod2keep',-5000           ,... % keep only the best N models in each chain, defined here
-% % %                  'kerneltolmax',1.5              ,... % kernel max. tolerance - max norm of perturbation before re-calc kernels
-% % %                  'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-% % %                  'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-% % %                  'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-% % %                  'nchains',1                   ,... % number of chains to start in parallel
-% % %                  'Nsavestate',100                ,... % Niter per which the state of the parallel inversion is saved in .mat file
-% % %                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
-% % %                  'BWclust',1                     ,... % option to use only one c x             
-% % %                  'datatypes',{{'HKstack_P'}}); 
-% % % %                   'datatypes',{{'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}}); 
-% % % 
-% % %              %                  'datatypes',{{'SW_HV'}}) 
-% % %                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
-% % %                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
-% % %                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
-% % %                                 %          'HKstack_x' with x='P'
-%%% brb2022.03.08 run on MAc. 
 inv = struct(    'synthTest',false                ,...
                  'verbose',false                 ,... % option to spit out more information+plots
                  'niter',16000                     ,... % Number of iterations
@@ -60,7 +10,7 @@ inv = struct(    'synthTest',false                ,...
                  'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-                 'nchains',16                    ,... % number of chains to start in parallel
+                 'nchains',12                    ,... % number of chains to start in parallel
                  'Nsavestate',100                ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x             
@@ -69,10 +19,7 @@ inv = struct(    'synthTest',false                ,...
 % % %                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
 % % %                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
 % % %                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
-% % % % % %                                 
-% % % % inv.verbose = true
 
-warning('No HV data!'); 
 profileRun = false; % Whether to do an mpi profile to learn what parts of code take much time
                                 
 %% Model parms
@@ -203,10 +150,10 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
 
                  
 %% Forward calc. parms
-forc = struct(      'mindV',0.15                 ,... % min delta Vs for layerising
+forc = struct(      'mindV',0.075                 ,... % delta Vs for layerising. Smaller is finer. Also scales vertical spacing of layers when there are no velocity changes. See layerise. 
                     'nsamps',2^11                ,... % number of samples (more means longer run time) - brb2022.06.08 I don't think this actually gets passed to propmat. 
                     'PSVorZR','PSV'             ,... % whether to rotate data into PSV or keep in ZR
-                    'synthperiod',4              );  % period for propmat response
+                    'synthperiod',2.5              );  % period for propmat response
                 
 %% Data processing parms
 datprocess=struct( 'normdata',true               ,... % normalise data in processing
@@ -239,8 +186,7 @@ datprocess=struct( 'normdata',true               ,... % normalise data in proces
                        'min_error', 0.002,           ... % Add this much "error" to h-kappa stacks (error of 0 can result in sigma inverting improperly)
                        'scale_error', 1,           ... % Multiply h-kappa error by this constant. Sigma needs to be scaled accordingly. If using 100, we can think of it like percent. 
                        'weightDistanceMax', 0,   ... % At start of burnin, gives 0 to 1 weight toward the (scaled) Euclidian distance from HKappa energy maximum. In otherwords, this tends toward disregarding the actual energy value, and pays attention to its position. 
-                       'weightDistanceMin', 0));     % At end of burnin, give this much weight 0 to 1 to distance from h,k where E is max.     	 
-%                     
+                       'weightDistanceMin', 0));     % At end of burnin, give this much weight 0 to 1 to distance from h,k where E is max.     	     
          
 %% Model Conditions
 cond = struct(  'pos_moho',         true         ,... % No negative moho jumps
