@@ -89,6 +89,16 @@ stations_request = struct('lat_lims',sta_latlims,'lon_lims',sta_lonlims,'chans',
 % grab stations
 stations_IRIS = irisFetch.Stations('station','*','*','*','BH?',...
     'boxcoordinates',[sta_latlims,sta_lonlims],'StartAfter',starttime,'StartBefore',startbytime);
+
+%%% For loading station details later. Sort of a hack...
+for ista = 1:length({stations_IRIS.NetworkCode}); 
+    stadeets_netsta = stations_IRIS(ista); 
+    save(sprintf('%sstadeets_%s_%s.mat',...
+        paths.rawdatadir,stadeets_netsta.NetworkCode,stadeets_netsta.StationCode),...
+        'stadeets_netsta'); 
+end
+%%%
+
 %only include stations satisfying longevity
 starter = datenum({stations_IRIS.StartDate}');
 for ed = 1:length(stations_IRIS); % This isn't vectorized because it's a cell function and that was a pain. bb2021.09.27

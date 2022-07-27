@@ -3,7 +3,6 @@ function [model, ii, predata, predataPrev, laymodel, ...
     reverse_inversion_to_last_kbase(...
     Kbase, par, trudata, predata, ID, predataPrev);  
     
-
 model = Kbase.modelk; 
 ii = Kbase.itersave; 
 [predata,laymodel] = b3__INIT_PREDATA(model,par,trudata,0 );
@@ -14,6 +13,5 @@ predataPrev = predata; % Keep track of last predata. To keep the previous comple
 [log_likelihood,misfit] = b8_LIKELIHOOD_RESET(par,predata,trudata,Kbase,model.datahparm);
 Pm_prior = calc_Pm_prior(model,par);
 nchain = 0;
-
 
 end

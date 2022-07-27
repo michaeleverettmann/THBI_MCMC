@@ -71,6 +71,8 @@ switch pdtyp{1}
             case 'Ray', 
                 ax = ax9; 
                 ylabstr = 'Phase Velocity (km/s)';
+                set(ax, 'xscale', 'log'); 
+                xticks(ax, [5, 10, 20, 40, 60, 100, 180]); 
             case 'Lov', 
                 ax = ax9; 
                 ylabstr = 'Phase Velocity (km/s)';
@@ -78,9 +80,11 @@ switch pdtyp{1}
                 ax = ax11;
                 ylabstr = 'H/V ratio'; 
                 errorbar(ax,trudata.(dtype).periods,trudata.(dtype).HVr,2*trudata.(dtype).sigma.*ones(size(trudata.(dtype).periods)),'k')
+                set(ax, 'xscale', 'log'); 
+                xticks(ax, [16, 20, 30, 40, 50, 70, 90]); 
         end
-    hp(1) = plot(ax,trudata.(dtype).periods,trudata.(dtype).(pdtyp{3}),'k.-','linewidth',3,'markersize',40);
-    hp(2) = plot(ax,predata.(dtype).periods,predata.(dtype).(pdtyp{3}),'r.-','linewidth',1.5,'markersize',30);
+    hp(1) = plot(ax,trudata.(dtype).periods,trudata.(dtype).(pdtyp{3}),'ko-','linewidth',2,'markersize',10);
+    hp(2) = plot(ax,predata.(dtype).periods,predata.(dtype).(pdtyp{3}),'r-x','linewidth',2,'markersize',10);
     hl = legend(ax,hp,'True','Pred','Location','SouthEast'); set(hl,'fontsize',15);
     set(ax,'fontsize',15)
     xlabel(ax,'Period (s)','fontsize',18)

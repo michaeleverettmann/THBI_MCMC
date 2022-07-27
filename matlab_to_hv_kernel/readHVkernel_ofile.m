@@ -84,7 +84,8 @@ if isequal(doperiods,rswperiods)
     HVr = HVr_fs;
     phV = phV_fs;
     grV = grV_fs;
-    HVK = cell(Np,1); fns = fieldnames(HVK_fs);
+    HVK = cell(Np,1); 
+    fns = fieldnames(HVK_fs);
     for ip = 1:Np
         for ifn = 1:length(fns)
         HVK{ip}.(fns{ifn}) = HVK_fs(ip).(fns{ifn});

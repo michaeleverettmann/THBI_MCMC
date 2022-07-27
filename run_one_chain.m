@@ -127,7 +127,7 @@ if fail_chain > 0; % Problem -- There are various ways of dealing with this.
     
     %%% If later fail
     if fail_chain > 15; 
-        fprintf('\n :(   :(   :(   :(   :(   :(   :(   :(   :(   :(   \n'); 
+        fprintf('\n :| :| :| :| :| :| :| :| :| :|   \n'); 
         if ii - Kbase.itersave > 50; % Last Kbase has to be a decent model - immediately after making Kbase (currently this is at lines 580 during the inversion) we checked for signs of forward model failure. Kbase is also made in initiate model around line 60. If that Kbase was broken, the inversion would reset at iteration 1. 
             warning([failInfoStr 'High fail chain. Reset to last Kbase.']); 
             KbaseUseReset = Kbase; 
@@ -155,17 +155,17 @@ if fail_chain > 0; % Problem -- There are various ways of dealing with this.
                 [model, ii, predata, predataPrev, laymodel, ...
                     log_likelihood, misfit, Pm_prior, nchain] = ...
                     reverse_inversion_to_last_kbase(...
-                        KbaseUseReset, par, trudata, predata, ID, predataPrev)
+                        KbaseUseReset, par, trudata, predata, ID, predataPrev); 
                     
             fail_chain = 0; 
             if ifforwardfail(predata,par); 
                 error('How is it possible to have forward fail now when we successfully did forward modelling with this model earlier? Ending inversion.'); 
             end
             
-        catch 
-            warning('You should always be able to rewind to a model and run all forward modelling on it. A model wasnt accepted if we couldnt run the forward modelling. What is happening?. We simply have to exit the inversion.'); 
-%             fprintf('\nREMOVE THIS LINE saving temporarily\n'); 
-%             save
+        catch e
+            warning('\n-----------\nCHAIN BROKE. You should always be able to rewind to a model and run all forward modelling on it. A model wasnt accepted if we couldnt run the forward modelling. We simply have to exit the inversion. Report: \n%s\n--------------\n',getReport(e)); 
+            for asdfasdf=[1:30]; fprintf('\nREMOVE THIS SAVE LINE saving temporarily\n'); end
+            save([par.res.resdir '/fail_rewind_chain_' num2str(iii) '.mat'])
             fail_chain = - 100; 
             break;
         end
@@ -219,8 +219,6 @@ try
             par.data.stadeets.sta,par.data.stadeets.nwk,chainstr,ii,...
             avgTime, timeStartIter(ii)/ii); end
     if par.inv.verbose, pause(0.05); end
-    ifaccept=false;
-    ifpass = false;
     newK = false; resetK = false;
     if fail_chain>19
         fail_total = fail_total + 1;
@@ -279,8 +277,10 @@ try
 %         if par.inv.verbose, fprintf('TEMPERATURE = %.2f\n',temp); end
 %     end
 
+    ifpass = false;
+    ifaccept=false;
     while ifpass == false % only keep calculating if model passes (otherwise save and move on)
-
+    
 %% ===========================  PERTURB  ===========================
     if ii==1; log_likelihood1 = -Inf; model1 = model; ptbnorm = nan; ...
             Pm_prior1k = Pm_prior; end
@@ -356,7 +356,7 @@ try
         fprintf('Forward model error, fail_chain %.0f, ii=%1.0f\n',fail_chain,ii)
         break;
     else
-        fail_chain = 0;
+        fail_chain = 0; % Not sure this is necessary. brb2022.07.26 this is done also at line 374. 
     end
        
 
@@ -373,11 +373,12 @@ try
 
     fail_chain = 0;
     predat_save1 = predata0;
-
-    end % while ifpass
-       
+    
 %% ========================  ACCEPTANCE CRITERION  ========================
+    % brb2022.07.26 Moving ifaccept info ifpass loop. Otherwise, if there is a try catch error, then... the ifpass loop is broken.  Then b6 is ran with log_likelihood (previous model) and log_likelihood1 (previously accepted model, same model?).  Now we can actually accept the model, even though it broke the code? 
     [ ifaccept ] = b6_IFACCEPT( log_likelihood1,log_likelihood,temp,p_bd*ifpass,Pm_prior1,Pm_prior);
+    
+    end % while ifpass
 
 %%% Figure out if chain is stuck
     stuckIfNoChange = 20; % p of not changing 13 times in row is about 0.0001. if there is 50% chance of acceptance each time and nothing has gone wrong.  
@@ -512,7 +513,8 @@ try
         fprintf('\n RECALCULATING %s KERNEL at iter %.0f - chain too long\n',chainstr,ii);
         resetK = true;
     end
-    if (ifaccept) && (ptbnorm/par.inv.kerneltolmax > random('unif',par.inv.kerneltolmed/par.inv.kerneltolmax,1,1)); 
+%     if (ifaccept) && (ptbnorm/par.inv.kerneltolmax > random('unif',par.inv.kerneltolmed/par.inv.kerneltolmax,1,1)); 
+    if (ifaccept) && (ptbnorm>2); 
         fprintf('\n RECALCULATING %s KERNEL at iter %.0f - ptbnorm large = %1.3f\n',chainstr,ii,ptbnorm);
         resetK = true; 
     end
@@ -521,9 +523,9 @@ try
     + int16(resetK); % If we are resetting surface wave kernels, also remake HK stacks with our current models parameters... but maybe only every N times kernel resets... 
     
     if resetK % Kernel recalculation
-        try % Try making new kernels based on the last (or just barely) accepted model. 
+        try % Try making new kernels based on the last accepted model. 
             if par.inv.verbose; fprintf('\nTrying to reset K.\n'); end
-            [Kbase, KbasePrev, predata, log_likelihood, misfit, Pm_prior, nchain] = ...
+            [Kbase, KbasePrev, predata, log_likelihood, misfit, Pm_prior, nchain, ifpass] = ...
                 compare_kernel_full_calc(...
                     model, Kbase, predata, trudata, ID, par, fail_chain, ...
                     ii, ifpass, misfit, ptbnorm, log_likelihood, ifaccept); 
@@ -572,7 +574,8 @@ if plot_hk_progress_bool && any(("HKstack_P" == string(par.inv.datatypes)))
         plot_h_kappa_progress2(trudata, allmodels, par.res.resdir, iii, accept_info, ...
             par, trudata.HKstack_P.Esum)
     catch e 
-        fprintf('\nError in plot_h_kappa_progress2: \n ------ \n %s \n ------- \n',getReport(e)); 
+%         fprintf('\nError in plot_h_kappa_progress2: \n ------ \n %s \n ------- \n',getReport(e)); 
+        fprintf('\nError in plot_h_kappa_progress2. Ignoring it for now. \n ------ \n '); 
     end
 end
 
@@ -585,8 +588,6 @@ preSW = nan;
 if isfield(trudata,'SW_Ray')
     SWs_perchain{iii} = preSW;
 end
-
-% save('accept_info', 'accept_info.mat'); 
 
 diary off
 

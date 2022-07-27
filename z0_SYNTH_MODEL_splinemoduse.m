@@ -34,7 +34,8 @@ vpvs_crust = 1.8;
 
 xi_crust = 1.05;
 % xi_crust = 1; warning('no xi in crust')
-xi_mantle = 0.95;
+% xi_mantle = 0.95;
+xi_mantle = 1.0; warning('brb2022.07.26 Changing synthetic model xi_mantle to 1'); 
 
 
 % xi_crust = 1.;

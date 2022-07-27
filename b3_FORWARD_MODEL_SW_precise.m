@@ -30,6 +30,7 @@ if any(strcmp(allpdytp(:,2),'HV'))
     itp = par.inv.datatypes(find(strcmp(allpdytp(:,2),'HV'),1,'first'));
     [SW.HV.HVr,SW.HV.HVK_new] = run_HVkernel(...
         model,predata.(itp{1}).for_mod_info.periods_calc,['HV_',ID],1,0,par.inv.verbose);
+    %%% Toshiro's code should be Z/H, not H/V. Should we invert the "dHV" value we just came up with? Somehow, the values we get back really are HV though...brb2022.07.12. 
 end
 if any(strcmp(allpdytp(:,2),'Lov'))
     itp = par.inv.datatypes(find(strcmp(allpdytp(:,2),'Lov'),1,'first'));

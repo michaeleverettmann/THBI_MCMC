@@ -7,25 +7,27 @@ par = parOrig;
 str_temp = split(stamp, '/'); 
 
 
-% { Different data types alone
-% niter_only   = 16000; 
-% burnin_only  = 4000 ; 
-% cooloff_only = 3000 ; 
-% nchains_only = 12   ; 
+% % % % { Different data types alone
+niter_only   = 16000; 
+burnin_only  = 4000 ; 
+cooloff_only = 3000 ; 
+nchains_only = 12   ; 
 % % 
-% niter_only   = 300; 
-% burnin_only  = 50 ;  
-% cooloff_only = 15 ; 
-% nchains_only = 1  ; 
+% niter_only   = 300  ; 
+% burnin_only  = 50   ;  
+% cooloff_only = 15   ; 
+% nchains_only = 5   ; 
+% par.mod.force_no_new_prior = true; warning('Not making new prior if needed'); 
 
-niter_only   = 3000; 
-burnin_only  = 500; 
-cooloff_only = 300 ; 
-nchains_only = 3  ; 
-% niter_only   = 600; 
-% burnin_only  = 100; 
-% cooloff_only = 80 ; 
-% nchains_only = 2  ; 
+
+% niter_only   = 1000; 
+% burnin_only  = 300; 
+% cooloff_only = 200 ; 
+% nchains_only = 3  ; 
+% niter_only   = 300; 
+% burnin_only  = 30; 
+% cooloff_only = 20 ; 
+% nchains_only = 1  ; 
 
 if     strcmp(stamp, 'ENAM_trial'); 
     disp('Using default parameters') 
@@ -257,29 +259,6 @@ elseif strcmp(stamp, 'HKstack_P___SW_HV_only__only');
     par.inv.nchains                   = nchains_only;  
 % } ---
 
-
-elseif strcmp(stamp, 'all_demo'); 
-    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
-    par.mod.starting.HKappa.startAtHK = true;   
-    par.inv.niter                     = 500; 
-    par.inv.burnin                    = 100 ; 
-    par.inv.cooloff                   = 80 ; 
-    par.inv.nchains                   = 1  ; 
-elseif strcmp(stamp, 'all_002'); 
-    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
-    par.mod.starting.HKappa.startAtHK = true;   
-    par.inv.niter                     = niter_only; 
-    par.inv.burnin                    = burnin_only ; 
-    par.inv.cooloff                   = cooloff_only ; 
-    par.inv.nchains                   = nchains_only   ; 
-elseif strcmp(stamp, 'all_no_hv'); 
-    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'}; 
-    par.mod.starting.HKappa.startAtHK = true;   
-    par.inv.niter                     = 16000; 
-    par.inv.burnin                    = 5000 ; 
-    par.inv.cooloff                   = 4000 ; 
-    par.inv.nchains                   = 16   ; 
-    
     
 elseif strcmp(stamp, 'HK_fast'); 
     par.inv.datatypes                 = {'HKstack_P'};
@@ -408,7 +387,122 @@ elseif strcmp(stamp, 'all_highres_layer');
     par.inv.cooloff                   = cooloff_only; 
     par.inv.nchains                   = nchains_only;     
 
+elseif strcmp(stamp, 'simplify'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm', 'SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'SW_HV', 'RF_Sp_ccp'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
+  
+    
+    
+    par.mod.sed.hmax                  = 0     ; 
+    par.mod.sed.hstd                  = 0     ; 
+    par.mod.crust.vpvsmax             = 1.8   ; 
+    par.mod.crust.vpvsmin             = 1.8   ; % Can't use HK stack if there is no vpvs variatoin. 
+    par.mod.crust.vpvsstd             = 0     ; 
+    par.mod.crust.ximax               = 1     ; 
+    par.mod.crust.ximin               = 1     ; 
+    par.mod.crust.xistd               = 0     ; 
+    par.mod.force_no_new_prior        = true  ; % For debugging only. 
+elseif strcmp(stamp, 'no_sed'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm', 'SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'SW_HV', 'RF_Sp_ccp'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
+  
+    
+    
+    par.mod.sed.hmax                  = 0     ; 
+    par.mod.sed.hstd                  = 0     ; 
+    par.mod.force_no_new_prior        = true  ; % For debugging only. 
+elseif strcmp(stamp, 'no_vpvs'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm', 'SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'SW_HV', 'RF_Sp_ccp'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
+  
+    
+   
+    par.mod.crust.vpvsmax             = 1.8   ; 
+    par.mod.crust.vpvsmin             = 1.8   ; % Can't use HK stack if there is no vpvs variatoin. 
+    par.mod.crust.vpvsstd             = 0     ; 
+    par.mod.force_no_new_prior        = true  ; % For debugging only. 
+elseif strcmp(stamp, 'no_xi'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm', 'SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'SW_HV', 'RF_Sp_ccp'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
+  
+    par.mod.crust.ximax               = 1     ; 
+    par.mod.crust.ximin               = 1     ; 
+    par.mod.crust.xistd               = 0     ; 
+    par.mod.force_no_new_prior        = true  ; % For debugging only. 
+    
 
+   
+elseif strcmp(stamp, 'all_003'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only ; 
+    par.inv.nchains                   = nchains_only   ; 
+elseif strcmp(stamp, 'all_no_hv'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only ; 
+    par.inv.nchains                   = nchains_only   ; 
+        
+    
+    
+ %%% COnclusion of next two tests: use higher synth period, and 10 km
+ %%% spacing of layers, and dv doesn't matter but 0.15 is fine. 
+elseif strcmp(stamp, 'propmat_res_0_01'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;  
+    par.forc.mindV                    = 0.01; %  
+elseif strcmp(stamp, 'propmat_res_0_1'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; 
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;  
+    par.forc.mindV                    = 0.1; %      
+
+elseif strcmp(stamp, 'all_sp_weight'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only ; 
+    par.inv.nchains                   = nchains_only   ;     
+    par.datprocess.CCP.weight_depth_val = [-10,0.3 ; 30,0.3 ; 70,1 ; 6371,1]; % Upweight at depth. This gets normalized.  
+
+    
 end
 
 inv = par.inv; 

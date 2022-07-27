@@ -26,8 +26,12 @@ X = midpts([0:0.1:par.mod.sed.hmax]);  XX = [0*o4,X,par.mod.sed.hmax*o4];
 Nds = hist(posterior.zsed,X); NNds = [Nds(1)*o4,Nds,Nds(end)*o4];
 if sum(Nds~=0)==1
     Zd(1).mu = mean(posterior.zsed); Zd(1).std = par.mod.dz/2;
+    final_model.zsedav = Zd(1).mu; 
+    final_model.zsedsig = Zd(1).std; 
 else
     [Zd(1).std,Zd(1).mu] = gaussfit( XX, NNds, (X(end)-X(1))/4,X(Nds==max(Nds))  );
+    final_model.zsedav = Zd(1).mu; 
+    final_model.zsedsig = Zd(1).std; 
 end
 if Zd(1).mu < 0, Zd(1).mu = 0; end
 
@@ -36,8 +40,12 @@ X = midpts([0:0.5:par.mod.sed.hmax+par.mod.crust.hmax]);
 Nds = hist(posterior.zmoh,X);
 if sum(Nds~=0)==1
     Zd(2).mu = mean(posterior.zmoh); Zd(2).std = par.mod.dz/2;
+    final_model.zmohav = Zd(2).mu; 
+    final_model.zmohsig = Zd(2).std; 
 else
     [Zd(2).std,Zd(2).mu] = gaussfit( X, Nds,(X(end)-X(1))/4, mean(X(Nds==max(Nds))) );
+    final_model.zmohav = Zd(2).mu; 
+    final_model.zmohsig = Zd(2).std; 
 end
 
 %% Indices of models 
@@ -109,6 +117,17 @@ suite_of_models.(variable{iv}) = varz;
 
 end % loop on variables
 fprintf('\n');
+
+%% Alterative VPVS
+% cumtrapz(final_model.Z, 1./(final_model.VPav ./ final_model.VSav)); 
+vpvs_above_depth = cumtrapz(final_model.Z, 1./final_model.VSav ) ./ ...
+    cumtrapz(final_model.Z, 1./final_model.VPav ); % Average vpvs above any depth, where vp and vs correspond to total travel times. 
+is_crust = find(final_model.Z < final_model.zmohav); 
+final_model.vpvsav_v2 = vpvs_above_depth(is_crust(end)); 
+
+vpvs_above_depth3 = cumtrapz(final_model.Z, ...
+    final_model.VPav./final_model.VSav ) ./ final_model.Z; % integral style average. 
+final_model.vpvsav_v3 = vpvs_above_depth3(is_crust(end)); 
 
 
 %%  HYPERPARAMETERS 

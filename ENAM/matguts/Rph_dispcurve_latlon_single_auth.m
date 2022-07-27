@@ -41,7 +41,7 @@ elseif strcmp(options.dataset, 'SW_Ray_phV_lyneqeik') % Colton's Eikonal earthqu
     
 elseif strcmp(options.dataset, 'SW_Ray_phV_lyneqhelm') % Colton's Eikonal earthquake phase velocities. 
     ddir = [seismoddir,'ENAM_RAYLEIGH_LYNNER_EQ_HELM/'];
-    periods = [20,25,32,40,50,60,80,100]'; 
+    periods = [25,32,40,50,60,80,100]'; 
     [periods, phV_period] = load_EQphV_data_lynhelm(ilat,ilon,ddir, 'periods', periods);
     
 elseif strcmp(options.dataset, 'SW_Ray_phV_lynant') % Colton's Eikonal earthquake phase velocities. 
@@ -50,7 +50,7 @@ elseif strcmp(options.dataset, 'SW_Ray_phV_lynant') % Colton's Eikonal earthquak
     [periods, phV_period] = load_ANphV_data_lyn(ilat,ilon,ddir, 'periods', periods);
     
 elseif strcmp(options.dataset, 'JOSH_ANT') % Colton's Eikonal earthquake phase velocities. 
-    warning('No josh ANT'); 
+    error('No josh ANT'); 
 elseif strcmp(options.dataset, 'composite'); 
     warning('Bring in the "composite" stuff from original Rph_dispcurve_latlon.m'); 
 end

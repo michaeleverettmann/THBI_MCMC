@@ -356,16 +356,21 @@ if any(strcmp(allpdytp(:,1),'HKstack'))
         rfWaves.tt = rfWaves.tt'; 
         
         %%% Make my own HK stacks. Seems like phase weighting in IRIS EARS make inversion unstable... brb2022.04.04
-        Esum2 = zeros(size(hkstack.Esum)); 
-        warning('brb2022.02.04: TODO synthetic starting HK stack: making first hk stack using 0.5, 0.3, 0.2 weights. Also using 3.5 as average s crustal velocity, similar to Zhu and Kanamori 2000. These should be parameters. ')
+        
+        fprintf('\nbrb2022.02.04: TODO synthetic starting HK stack: making first hk stack using 0.5, 0.3, 0.2 weights. Also using 3.5 as average s crustal velocity, similar to Zhu and Kanamori 2000. These should be parameters. \n')
+        new_h = [par.mod.crust.hmin-1:0.25:par.mod.crust.hmax+1]'; % No need to go outside prior bounds. Those models will be rejected anyway. However, go just slightly outside model bounds to increase odds of code stability. Go outside prior bounds by at least a few steps, or the prior maximum value might not ever be reached! brb2022.07.27.  
+        new_k = [par.mod.crust.vpvsmin-0.02:0.005:par.mod.crust.vpvsmax+0.02]'; 
+        Esum2 = zeros(length(new_k), length(new_h)); 
+        Nobs = 0; 
         for irf = [1:size(rfWaves.rf,2)]; 
             [Esum2Irf, h2, k2] = HKstack(rfWaves.rf(:,irf), rfWaves.tt', ...
                 rfWaves.rayParmSecDeg(irf)/111.1949, [0.5, 0.3, 0.2], ...
-                3.5,hkstack.H,hkstack.K'); 
+                3.5,new_h,new_k'); 
             Esum2 = Esum2 + Esum2Irf'; 
+            Nobs = Nobs + 1; % Could just use length of rfWaves, but we might start excluding some waveforms at some point. 
         end
         
-        plot_HK_stack(hkstack.H, hkstack.K,Esum2,'title',...
+        plot_HK_stack(new_h, new_k, Esum2,'title',...
             'HK stack with vs=3.5, xi=0. Using to determine starting H and K'); 
         %%% End making my own HK stacks for starting model. 
         
@@ -377,14 +382,17 @@ if any(strcmp(allpdytp(:,1),'HKstack'))
         fprintf('\t Not sure how many EQ in EARS obs - assigning 100\n');
         hkstack.Nobs = 100;
     end
-    HKstack_P           = hkstack;
-    HKstack_P.Esum      = Esum2          - mingrid(Esum2         );
-    HKstack_P.Esum_orig = HKstack_P.Esum - mingrid(HKstack_P.Esum); % Duplicate HK stack. Might end up replacing other info with my own HK stack. 
-    HKstack_P.H_orig    = HKstack_P.H; 
-    HKstack_P.K_orig    = HKstack_P.K; 
-    HKstack_P.waves     = rfWaves; 
+    HKstack_P           = struct(''); 
+    HKstack_P(1).Esum      = Esum2          - mingrid(Esum2         );
+    HKstack_P(1).Esum_orig = HKstack_P.Esum - mingrid(HKstack_P.Esum); % Duplicate HK stack. Might end up replacing other info with my own HK stack. 
+    HKstack_P(1).H_orig    = new_h; % HKstack_P.H; 
+    HKstack_P(1).K_orig    = new_k; % HKstack_P.K; 
+    HKstack_P(1).H         = new_h; % HKstack_P.H; 
+    HKstack_P(1).K         = new_k; % HKstack_P.K; 
+    HKstack_P(1).waves     = rfWaves; 
+    HKstack_P(1).Nobs      = Nobs; 
     
-    HKstack_P.E_by_Esuper_max = ...
+    HKstack_P(1).E_by_Esuper_max = ...
         hk_maximum_possible_value(rfWaves.rf, rfWaves.tt); % Not finished. Try to estimate the highest possible value that could ever be achieved in HK stack. 
     
 end

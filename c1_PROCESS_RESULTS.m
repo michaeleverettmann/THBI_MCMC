@@ -82,15 +82,32 @@ for iii = 1:nchains
 
     bestind = [1:length(mf.iter)]';
     bestind(mf.iter <= par.inv.burnin) = []; % kill all before burnin
+    
+    %%% Remove models that had particularly low liklihood. These could come up if resetting kernels causes a huge drop in likelihood. Bad models might be accepted around those iterations, so just ignore them. 
+    % Currently done on per-chain basis. Might be better to do across all chains combined, but we would risk eliminating chains who sampled local minima (even if the local minima is the true earth model). 
+    logL_dtype = nan(length(bestind),length(par.inv.datatypes));
+    for id = 1:length(par.inv.datatypes)
+        dtype = par.inv.datatypes{id};
+        logL = [mf.logL_indivdat.(dtype)]'; % all logL, including outside of bestind. 
+        logL_dtype(:,id) = logL(bestind); 
+    end
+    logL_mean = mean(logL_dtype, 1); % Mean of logl for each data type. 
+    logL_std = std(logL_dtype,1); 
+    cutoff_logL = logL_mean - 3*logL_std; % Cutoff values, too low of logL to keep. 
+    ignore_logL = any(logL_dtype < cutoff_logL, 2); % For each iteration, remove it if any of the data types had log L below cutoff. 
+    bestind(ignore_logL) = []; 
+    perc_removed = 100 * sum(ignore_logL) / length(ignore_logL); 
+    fprintf(['\nRemoved %1.2f%% of models from chain %1.0f due to logL'...
+        '< mean - 3(?) std of logL for some datype.\n'], perc_removed, iii); 
+    %%% END remove models that had particularly low likelihood 
 
     if ~isinf(par.inv.bestNmod2keep) % subset if not inf to keep. Else keep all
-
     if par.inv.bestNmod2keep>0 % if specifying how many to keep based on low error
 
         score_overall = zeros(length(bestind),length(par.inv.datatypes));
         for id = 1:length(par.inv.datatypes)
             dtype = par.inv.datatypes{id};
-            pdtyp = parse_dtype(dtype);
+%             pdtyp = parse_dtype(dtype);
     %         if strcmp(pdtype{1},'BW') && (~strcmp(pdtype{3},'def') || ~strcmp(pdtype{4},'def')), continue; end
             chi2 = [mf.chi2.(dtype)]';
             [~,irank_mf] = sort(sum(chi2(bestind,:),2));
@@ -114,6 +131,14 @@ for iii = 1:nchains
         bestind = bestind(randperm(length(bestind),min([-par.inv.bestNmod2keep,length(bestind)])));
     end
     end
+    
+% % % % Trying to remove iterations with nan chi2. For some reason I couldn't get rid of those iterations earily enough. 
+% % %     if any(isnan(mf.chi2sum)); % Something sometimes goes wrong and there is a nan liklihood... not really sure how. brb2022.07.18. 
+% % %         bad_ind = find(isnan(mf.chi2sum)); 
+% % %         for ibad_ind = 1:length(bad_ind); 
+% % %             bestind(bestind==bad_ind(ibad_ind)) = []; % bestind might already disinclude nan chi2 models, and then this line of code won't do anything. 
+% % %         end
+% % %     end
     
     mf.bestmods = false(mf.Nstored,1);
     mf.bestmods(bestind) = true;
@@ -216,12 +241,15 @@ else
             dtype = par.inv.datatypes{id};
             % work out chi2 for this dtype (average across all data streams for this dtype)
             chi2 = [mf.chi2.(dtype)]';
-            chi2_alldata(iii,id) = mean(sum(chi2(ind,:),2)); 
+            if any(isnan(chi2(ind))); 
+                fprintf('Nan in chi2, %1.0f cases. Should not happen... Ignoring chi2 for this datatype for this iteration when determining whether this chain was good overall. dtype = %s. \n', sum(isnan(chi2)), dtype); 
+            end
+            chi2_alldata(iii,id) = nanmean(sum(chi2(ind,:),2)); 
             % work out if the chain got stuck - if there is no change to the
             % data over many iterations - must be stuck for 600 iterations to
             % signify
             Nstuck = 600;
-            if any(any(diff(chi2(ind,:),ceil(Nstuck./par.inv.saveperN),1)==0)) 
+            if any(any(diff(chi2(ind,:),ceil(Nstuck./par.inv.saveperN),1)==0)) % if differences between chi2 at index i and i+Nstuck is 0...
                 if strcmp(dtype,'HKstack_P'), continue; end % don't do for HK stack - may stick for ages!
                 fprintf('Chain %s stuck\n',mkchainstr(iii));
                 chi2_alldata(iii,id) = nan; 
@@ -230,9 +258,11 @@ else
     end
 
     % goodchains = true(nchains,1);
-    for id = 1:length(par.inv.datatypes)
+    for id = 1:length(par.inv.datatypes) % brb2022.07.18. This looks across each data type. It finds the mean chi2 across each chain for that datatype. Then it finds the std of chi2 for that datatype (for some reason only considering the chains that had lower than average chi2...?). Then for chains with chi2 greater than the mean + 5 * the standard deviation, for any data type(?), that chain is removed. 
+        % Q: is this block really useful? Some chains will preference one data type over another. It's expected. But when that happens, this block of code will remove that chain often. 
         mean_chi2_dtp = nanmean(chi2_alldata(:,id));
-        std_chi2_gdtp = nanstd(chi2_alldata(chi2_alldata(:,id)<mean_chi2_dtp,id)); % bb2021.09.17 Might get debugging problems here if nanstd(f) calculates on f where f has only 1 non nan value. 
+        std_chi2_gdtp = nanstd(chi2_alldata(chi2_alldata(:,id)<mean_chi2_dtp,id)); % bb2021.09.17 Might get debugging problems here if nanstd(f) calculates on f where f has only 1 non nan value. ::: Why are we calculating the standard deviation only for chains that did better than average? That's not exactly a standard deviation...
+%         std_chi2_gdtp = nanstd(chi2_alldata(:,id)); % bb2021.09.17 Might get debugging problems here if nanstd(f) calculates on f where f has only 1 non nan value. ::: Why are we calculating the standard deviation only for chains that did better than average? That's not exactly a standard deviation...
         goodchains = goodchains & (chi2_alldata(:,id) < mean_chi2_dtp + 5*std_chi2_gdtp); % bb2021.09.17 chains might fail here if you are using small iteration chains for debugging. 
     end
     goodchains=find(goodchains);

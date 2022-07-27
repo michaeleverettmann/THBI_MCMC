@@ -1,4 +1,9 @@
-function [trudata,par] = a2_LOAD_DATA(par)
+function [trudata,par] = a2_LOAD_DATA(par,options)
+    arguments
+        par
+        options.nwk = [] % Must provide if loading real data
+        options.sta = [] % Must provide if loading real data
+    end
 % function to load data (differs depending on which synth or real)
 
 fprintf('LOADING data\n')
@@ -70,30 +75,43 @@ elseif strcmp(par.proj.name,'LAB_tests')
 %% -----------------------------------------------------------------
 %% REAL DATA
 else
-	try 
-        try % Janky try catch in try catch... I cant use internet with slurm on CNSI computers? so have to have a simple solution for loading saved .mat file instead of using irisetch. 
-            stadeets = irisFetch.Stations('station',par.data.stadeets.nwk,par.data.stadeets.sta,'*','*'); 
-            save([par.proj.rawdatadir,'/stadeets.mat'], 'stadeets'); 
-        catch e
-            warning(['brb2022.04.11 Could not irisFetch stadeets. Loading saved file instead. ',...
-              'For this to work, you have to send the stadeets.mat file ',...
-              'to this cluster!!! I did this MANUALLY before.'])
-            stadeets = load([par.proj.rawdatadir,'/stadeets.mat']); 
-            stadeets = stadeets.stadeets; 
-        end    
+% % % 	try 
+% % %         try % Janky try catch in try catch... I cant use internet with slurm on CNSI computers? so have to have a simple solution for loading saved .mat file instead of using irisetch. 
+% % %             stadeets = irisFetch.Stations('station',par.data.stadeets.nwk,par.data.stadeets.sta,'*','*'); 
+% % %             save([par.proj.rawdatadir,'/stadeets.mat'], 'stadeets'); 
+% % %         catch e
+% % %             warning(['brb2022.04.11 Could not irisFetch stadeets. Loading saved file instead. ',...
+% % %               'For this to work, you have to send the stadeets.mat file ',...
+% % %               'to this cluster!!! I did this MANUALLY before.'])
+% % %             stadeets = load([par.proj.rawdatadir,'/stadeets.mat']); 
+% % %             stadeets = stadeets.stadeets; 
+% % %         end    
+
+        if isempty(options.nwk) || isempty(options.sta); 
+            error('Provide nwk and sta to a2_LOAD_DATA.m so we know what to load if you are using real data'); 
+        end
+        
+        fname = [par.proj.rawdatadir,'stadeets_' options.nwk '_' options.sta '.mat']; 
+        
+        if ~ java.io.File(fname).exists(); 
+            error('stadeets file for %s.%s does not exist. Probably you need to run RUN_prep_data on this machine.'); 
+        end
+        
+        stadeets = load(fname); 
+        stadeets = stadeets.stadeets_netsta; 
             
         fns = fieldnames(stadeets);
         for ii = 1:length(fns)
             par.data.stadeets.(fns{ii}) = stadeets.(fns{ii});
         end
         
-	catch e 
-        warning('Could not get stadeets.mat. Might need to send that directly to the cluster computer. Looking for stainfo_master.mat instead - might not work...')
-        fprintf('\nError report was: %s\n',getReport(e)); 
-        load([par.proj.rawdatadir,'/stainfo_master.mat']); 
-        par.data.stadeets.Latitude = stainfo(strcmp({stainfo.StationCode},par.data.stadeets.sta)).Latitude;
-        par.data.stadeets.Longitude = stainfo(strcmp({stainfo.StationCode},par.data.stadeets.sta)).Longitude;
-	end
+% % % 	catch e 
+% % %         warning('Could not get stadeets.mat. Might need to send that directly to the cluster computer. Looking for stainfo_master.mat instead - might not work...')
+% % %         fprintf('\nError report was: %s\n',getReport(e)); 
+% % %         load([par.proj.rawdatadir,'/stainfo_master.mat']); 
+% % %         par.data.stadeets.Latitude = stainfo(strcmp({stainfo.StationCode},par.data.stadeets.sta)).Latitude;
+% % %         par.data.stadeets.Longitude = stainfo(strcmp({stainfo.StationCode},par.data.stadeets.sta)).Longitude;
+% % % 	end
     
     %% LOAD THE DATA!!
     [trudata,zeroDstr,par] = load_data(par);
