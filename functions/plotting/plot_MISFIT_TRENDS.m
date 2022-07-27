@@ -1,5 +1,11 @@
 function [ ] = plot_MISFIT_TRENDS(par,allmodels,misfits,resdir)
 
+if length(misfits) < 2; % below code accesses cell arrays I think. 
+    misfits = {misfits}; 
+    allmodels = {allmodels}; 
+end
+
+
 % Parameters you define. 
 resolution = 200; % DPI. These are possibly supplemental figures. 
 ylimits    = [10^(-2.5), 2]; % Set manually based on what you expect to be the highest versus lowest error and sigma. 
