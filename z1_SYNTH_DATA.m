@@ -204,6 +204,12 @@ for id = 1:length(par.inv.datatypes)
 
     data.(dtype) = struct('periods',SWperiods,pdtyp{3},truSWdat.(pdtyp{3}),'sigma',par.mod.data.prior_sigma.(pdtyp{1}).(pdtyp{2}).(pdtyp{3}));
 
+    data.(dtype).for_mod_info = struct('n_periods_calc', length(SWperiods),...
+        'all_periods', SWperiods,...
+        'min_period',min(SWperiods),'max_period',max(SWperiods),...
+        'periods_calc',SWperiods); % Information on what forward modelling needs to be done. We don't want to do forward modelling once for each seperate author. Instead, forward model once, accounting for every author simultaneously. 
+
+    
 end
 
 

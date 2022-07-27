@@ -20,6 +20,7 @@ inv = struct(    'synthTest',false                ,...
 % % %                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
 % % %                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
 
+
 profileRun = false; % Whether to do an mpi profile to learn what parts of code take much time
                                 
 %% Model parms

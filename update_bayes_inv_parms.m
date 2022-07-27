@@ -7,25 +7,25 @@ par = parOrig;
 str_temp = split(stamp, '/'); 
 
 
-% { Different data types alone
+% % % % { Different data types alone
 niter_only   = 16000; 
 burnin_only  = 4000 ; 
 cooloff_only = 3000 ; 
 nchains_only = 12   ; 
 % % 
-% niter_only   = 300; 
-% burnin_only  = 50 ;  
-% cooloff_only = 15 ; 
-% nchains_only = 4  ; 
+% niter_only   = 1000; 
+% burnin_only  = 50  ;  
+% cooloff_only = 15  ; 
+% nchains_only = 4   ; 
 
 % niter_only   = 1000; 
 % burnin_only  = 300; 
 % cooloff_only = 200 ; 
 % nchains_only = 3  ; 
-% niter_only   = 600; 
-% burnin_only  = 100; 
-% cooloff_only = 80 ; 
-% nchains_only = 2  ; 
+% niter_only   = 300; 
+% burnin_only  = 30; 
+% cooloff_only = 20 ; 
+% nchains_only = 1  ; 
 
 if     strcmp(stamp, 'ENAM_trial'); 
     disp('Using default parameters') 
