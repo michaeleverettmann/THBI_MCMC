@@ -358,8 +358,8 @@ if any(strcmp(allpdytp(:,1),'HKstack'))
         %%% Make my own HK stacks. Seems like phase weighting in IRIS EARS make inversion unstable... brb2022.04.04
         
         fprintf('\nbrb2022.02.04: TODO synthetic starting HK stack: making first hk stack using 0.5, 0.3, 0.2 weights. Also using 3.5 as average s crustal velocity, similar to Zhu and Kanamori 2000. These should be parameters. \n')
-        new_h = [par.mod.crust.hmin-2:0.25:par.mod.crust.hmax+2]'; 
-        new_k = [par.mod.crust.vpvsmin-0.05:0.005:par.mod.crust.vpvsmax+0.05]'; 
+        new_h = [par.mod.crust.hmin-1:0.25:par.mod.crust.hmax+1]'; % No need to go outside prior bounds. Those models will be rejected anyway. However, go just slightly outside model bounds to increase odds of code stability. Go outside prior bounds by at least a few steps, or the prior maximum value might not ever be reached! brb2022.07.27.  
+        new_k = [par.mod.crust.vpvsmin-0.02:0.005:par.mod.crust.vpvsmax+0.02]'; 
         Esum2 = zeros(length(new_k), length(new_h)); 
         Nobs = 0; 
         for irf = [1:size(rfWaves.rf,2)]; 

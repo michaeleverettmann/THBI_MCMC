@@ -13,10 +13,12 @@ burnin_only  = 4000 ;
 cooloff_only = 3000 ; 
 nchains_only = 12   ; 
 % % 
-% niter_only   = 1000; 
-% burnin_only  = 50  ;  
-% cooloff_only = 15  ; 
-% nchains_only = 4   ; 
+% niter_only   = 300  ; 
+% burnin_only  = 50   ;  
+% cooloff_only = 15   ; 
+% nchains_only = 5   ; 
+% par.mod.force_no_new_prior = true; warning('Not making new prior if needed'); 
+
 
 % niter_only   = 1000; 
 % burnin_only  = 300; 
@@ -498,7 +500,7 @@ elseif strcmp(stamp, 'all_sp_weight');
     par.inv.burnin                    = burnin_only ; 
     par.inv.cooloff                   = cooloff_only ; 
     par.inv.nchains                   = nchains_only   ;     
-    par.datprocess.CCP.weight_depth_val = [-10,0.3 ; 50,0.3 ; 100,1 ; 6371,1]; % Upweight at depth. This gets normalized.  
+    par.datprocess.CCP.weight_depth_val = [-10,0.3 ; 30,0.3 ; 70,1 ; 6371,1]; % Upweight at depth. This gets normalized.  
 
     
 end

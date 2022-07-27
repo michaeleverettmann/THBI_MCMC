@@ -1,8 +1,8 @@
 inv = struct(    'synthTest',true                ,...
                  'verbose',false                 ,... % option to spit out more information+plots
-                 'niter',16000                    ,... % Number of iterations
-                 'burnin',4000                    ,... % don't record results before burnin iterations
-                 'cooloff',3000                    ,... % # of iterations over which temperature declines as erf
+                 'niter',3000                    ,... % Number of iterations
+                 'burnin',500                    ,... % don't record results before burnin iterations
+                 'cooloff',400                    ,... % # of iterations over which temperature declines as erf
                  'tempmax',5                     ,... % maximum multiple of all standard deviations
                  'saveperN',25                   ,... % save only every saveperN iterations    % bb2021.09.14 savig each one, since I have 100 iterations, this way we can still do probability math (taking the 5 most poorly performing models... otherwise, we get code errors later on).    
                  'bestNmod2keep',-5000           ,... % keep only the best N models in each chain, defined here
@@ -10,7 +10,7 @@ inv = struct(    'synthTest',true                ,...
                  'kerneltolmed',1.0              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'kerneltolmin',0.5              ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
                  'maxnkchain',350                ,... % kernel min. tolerance - norm of perturbation that is totally acceptable
-                 'nchains',12                   ,... % number of chains to start in parallel
+                 'nchains',4                   ,... % number of chains to start in parallel
                  'Nsavestate',100                ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x  

@@ -41,7 +41,7 @@ switch ptbopts{optflag} % decide what to modify
     case 'ptb_Vmod' % modify VELOCITY somewhere in current model
         
         lithlay = {'sed','crust','mantle'};
-        lay_rel_P = [1.5,3,5]; % relative probabilities of altering each one
+        lay_rel_P = [1,3,5]; % relative probabilities of altering each one
 %%      %!!!!!!!!!!!!!!!!!!!!!!!!!!!
 %%      %!!!!!!!!!!!!!!!!!!!!!!!!!!!
 %%      %!!!!!!!!!!!!!!!!!!!!!!!!!!!

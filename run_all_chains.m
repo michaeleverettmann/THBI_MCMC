@@ -143,7 +143,7 @@ eval(sprintf('! cp parms/bayes_inv_parms.m %s',resdir))
 % allpdytp = parse_dtype_all(par);
 
 %% ========================  LOAD + PREP DATA  ========================
-[trudata,par] = a2_LOAD_DATA(par);
+[trudata,par] = a2_LOAD_DATA(par, 'nwk', nwk, 'sta', sta);
 plot_TRU_WAVEFORMS(trudata);
 % check_data(trudata,par)
 
@@ -218,6 +218,28 @@ trudata = TD.Value;
     run_one_chain(par, trudata, nwk, sta, iii)
 
 end % parfor loop
+
+% % % ii_each_chain = zeros( par.inv.nchains , 1 ); 
+% % % % ii_each_chain = parallel.pool.Constant(ii_each_chain)
+% % % parfor iii = 1:par.inv.nchains; 
+% % % 
+% % % %     ii_each_chain = ii_each_chain + zeros
+% % % %     ii_each_chain = ii_each_chain.Value; 
+% % %     for ii = 1:5; 
+% % % %         arr_mult = ones(par.inv.nchains,1); 
+% % % %         arr_mult(iii) = 0; 
+% % %         arr_add = zeros(par.inv.nchains,1); 
+% % %         arr_add(iii) = ii; 
+% % %         ii_each_chain = max(ii_each_chain, arr_add); 
+% % % %         ii_each_chain = ii_each_chain .* arr_mult + arr_add; 
+% % % %         ii_each_chain = ii_each_chain + arr_add; 
+% % % %         ii_each_chain{iii} = ii; 
+% % % %         if iii == 1; 
+% % % %             disp(ii_each_chain)
+% % % %         end
+% % %         sum(ii_each_chain)
+% % %     end
+% % % end
 
 [ram_copy_stats] = ram_to_HD(paths, resdir, nwk, sta); % Copy final results from ram to hard disk. Also remove the ram drive for this station, and change directory to main results folder for this statino. 
 

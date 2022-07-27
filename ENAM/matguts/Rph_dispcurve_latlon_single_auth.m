@@ -50,7 +50,7 @@ elseif strcmp(options.dataset, 'SW_Ray_phV_lynant') % Colton's Eikonal earthquak
     [periods, phV_period] = load_ANphV_data_lyn(ilat,ilon,ddir, 'periods', periods);
     
 elseif strcmp(options.dataset, 'JOSH_ANT') % Colton's Eikonal earthquake phase velocities. 
-    warning('No josh ANT'); 
+    error('No josh ANT'); 
 elseif strcmp(options.dataset, 'composite'); 
     warning('Bring in the "composite" stuff from original Rph_dispcurve_latlon.m'); 
 end

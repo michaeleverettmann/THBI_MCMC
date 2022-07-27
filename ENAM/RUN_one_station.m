@@ -80,12 +80,14 @@ STAMP_all = {...
 %     STAMP_all = {STAMP}; 
 % end
 
+
+% RUN_prep_data; warning('bb2021.11.15. Doing RUN_prep_data in RUN_one_station - but this only needs to be ran once, not for every station.') % Gets event data and data paths on this computer. 
+% evdata1_database; disp('Temporary - downloading station info in RUN_ALL_STAS.m') 
+
 for istamp = [1:length(STAMP_all)]; 
     STAMP = STAMP_all{istamp}; 
 
     %% setup data and stuff. 
-    % evdata1_database; disp('Temporary - downloading station info in RUN_ALL_STAS.m') 
-    % RUN_prep_data; warning('bb2021.11.15. Doing RUN_prep_data in RUN_one_station - but this only needs to be ran once, not for every station.') % Gets event data and data paths on this computer. 
     run('../a0_STARTUP_BAYES.m')
 
 
