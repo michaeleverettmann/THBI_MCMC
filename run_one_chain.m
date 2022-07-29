@@ -224,12 +224,11 @@ try
     newK = false; resetK = false;
     
     % Newer, simpler way of deciding when to kill chain. Rely on reversing chains. Only consider quitting early if we have done successfull+failed iterations > par.inv.niter. At that point, kill the chain if it fails at resetting X times IN A ROW
-    if (ii_no_reverse > par.inv.niter) && (fail_reset>3) ; % If we did more iterations than we meant to, consider exiting the chain - Then if the kernels fail to reset X times in a row, call it quits. 
+    if (ii_no_reverse > par.inv.niter) && (fail_reset>4) ; % If we did more iterations than we meant to, consider exiting the chain - Then if the kernels fail to reset X times in a row, call it quits. 
         fail_chain = -100; 
         break;
     end  
-    % Sometimes a chain goes 22k iterations when I wanted 16k. Obnoxious. 
-    if ii_no_reverse > (par.inv.niter*19/16) ; % 19/16 works out to 3000 iterations of rewinding for 16000 desired iterations. Bad use of cpu. 
+    if ii_no_reverse > (par.inv.niter * 22000/16000); % Due to reversing, most chains take a little less than 22k iterations to finish if I aimed for 16k. So just stop all chains at 22/16 of par.inv.niter. 
         fail_chain = -100; 
         break;
     end

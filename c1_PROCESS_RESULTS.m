@@ -258,13 +258,25 @@ else
     end
 
     % goodchains = true(nchains,1);
+    fprintf(['\nStarting with %1.0f chains. ',...
+        'Removing some if high chi2 for any dtype'],...
+        sum(goodchains)); 
     for id = 1:length(par.inv.datatypes) % brb2022.07.18. This looks across each data type. It finds the mean chi2 across each chain for that datatype. Then it finds the std of chi2 for that datatype (for some reason only considering the chains that had lower than average chi2...?). Then for chains with chi2 greater than the mean + 5 * the standard deviation, for any data type(?), that chain is removed. 
         % Q: is this block really useful? Some chains will preference one data type over another. It's expected. But when that happens, this block of code will remove that chain often. 
         mean_chi2_dtp = nanmean(chi2_alldata(:,id));
         std_chi2_gdtp = nanstd(chi2_alldata(chi2_alldata(:,id)<mean_chi2_dtp,id)); % bb2021.09.17 Might get debugging problems here if nanstd(f) calculates on f where f has only 1 non nan value. ::: Why are we calculating the standard deviation only for chains that did better than average? That's not exactly a standard deviation...
 %         std_chi2_gdtp = nanstd(chi2_alldata(:,id)); % bb2021.09.17 Might get debugging problems here if nanstd(f) calculates on f where f has only 1 non nan value. ::: Why are we calculating the standard deviation only for chains that did better than average? That's not exactly a standard deviation...
-        goodchains = goodchains & (chi2_alldata(:,id) < mean_chi2_dtp + 5*std_chi2_gdtp); % bb2021.09.17 chains might fail here if you are using small iteration chains for debugging. 
+        keep_this_d = (chi2_alldata(:,id) < mean_chi2_dtp + 5*std_chi2_gdtp); % bb2021.09.17 chains might fail here if you are using small iteration chains for debugging. 
+%         if any(~keep_this_d); 
+%             fprintf(['\nRemoving chain %1.0f for %s, chi2=%1.3f, ',...
+%                 'mean chi2 across chains=%1.3f, std=%1.3f\n\n'],...
+%                 find(~keep_this_d),par.inv.datatypes{id},...
+%                 chi2_alldata(~keep_this_d,id),...
+%                 mean_chi2_dtp,std_chi2_gdtp ); 
+%         end
+        goodchains = goodchains & keep_this_d; 
     end
+    fprintf(['\n -> Ended with %1.0f chains. \n'],sum(goodchains) ); 
     goodchains=find(goodchains);
 end
 

@@ -10,7 +10,7 @@ run('../../a0_STARTUP_BAYES.m');
 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/R54A_TA_dat1/add_sediment_try2'; 
-resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/R54A_TA_dat1/all_sp_weight'; 
+resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/N50A_TA_dat1/all_sp_weight'; 
 resdir_fig = '/Users/brennanbrunsvik/Documents/temp/remake_thbi_figures'; 
 prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat' ; 
 
@@ -52,11 +52,11 @@ par.res.resdir = resdir_fig; % For saving files to new location
 par.inv.synthTest = false; % Get an error without this. 
 mkdir(resdir_fig); 
     
-goodChainManual = logical([ones(12,1)]); warning('brb2022.07.06: Setting good chains manual'); 
+% goodChainManual = logical([ones(12,1)]); warning('brb2022.07.06: Setting good chains manual'); 
 % goodChainManual(2:end,:)=false; 
 % goodChainManual = logical([zeros(12,1)]); warning('brb2022.07.06: Setting good chains manual'); 
 % goodChainManual(3)=true; 
-% goodChainManual = []; 
+goodChainManual = []; 
 
 [misfits_perchain,allmodels_perchain,goodchains,...
      misfits_perchain_original,...
