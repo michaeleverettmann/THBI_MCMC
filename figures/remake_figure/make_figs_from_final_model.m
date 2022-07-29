@@ -10,7 +10,7 @@ run('../../a0_STARTUP_BAYES.m');
 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/R54A_TA_dat1/add_sediment_try2'; 
-resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/V62A_TA_dat1/all_sp_weight'; 
+resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/R54A_TA_dat1/all_sp_weight'; 
 resdir_fig = '/Users/brennanbrunsvik/Documents/temp/remake_thbi_figures'; 
 prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat' ; 
 
@@ -38,8 +38,8 @@ allmodels_perchain_orig = allmodels_perchain;
 % [par, ~] = update_bayes_inv_parms(par, 'add_sediment_try2'); 
 
 %%% Only temporary things here! Things to make your specific files run. 
-par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
-    'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; warning('Updated par inv datatypes'); 
+% par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+%     'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}; warning('Updated par inv datatypes'); 
 % par.inv.datatypes = {'RF_Sp_ccp'}; 
 % par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
 %     'SW_Lov_phV', 'SW_HV'}; 

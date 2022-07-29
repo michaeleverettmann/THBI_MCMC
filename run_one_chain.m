@@ -84,6 +84,7 @@ predat_save = [];
 misfit = [];
 par.hkResetInfo = struct('timesReset',0, 'timesSWKernelsReset',0); % Structure to keep track of when to reset HK stacks. 
 
+ii_no_reverse = 0; 
 while ii < par.inv.niter
     
 earlyFailNum = 100; 
@@ -106,6 +107,7 @@ end
 % % % end
     
 ii = ii+1; par.ii = ii; % bb2022.10.18 Keep track of ii in par for easily plotting how inversion is changing with ii. 
+ii_no_reverse = ii_no_reverse + 1; % This will keep going up, even if we rewind ii. 
 accept_info(ii).fail_chain = fail_chain; 
 accept_info(ii).fail_total = fail_total; 
 
@@ -215,35 +217,48 @@ try
     %% Figure out if chain is too slow or unstable. 
     % TODO changed from 4 to 1 times par.inv.savepern. So fairly verbose. 
     if rem(ii,1*par.inv.saveperN)==0 || ii==1, fprintf(...
-            'Sta %s nwk %s  Iteration %s %1.0f Average comp time (last 100 iter) %2.2f (all) %2.2f\n',...
-            par.data.stadeets.sta,par.data.stadeets.nwk,chainstr,ii,...
+            'Sta %s nwk %s  Iteration %s %1.0f, (%1.0f with rewinds), Average comp time (last 100 iter) %2.2f (all) %2.2f\n',...
+            par.data.stadeets.sta,par.data.stadeets.nwk,chainstr,ii, ii_no_reverse,...
             avgTime, timeStartIter(ii)/ii); end
     if par.inv.verbose, pause(0.05); end
     newK = false; resetK = false;
-    if fail_chain>19
-        fail_total = fail_total + 1;
-        % if not enough saved in this chain, abort and restart
-        if (ii - par.inv.burnin)/par.inv.saveperN < 200
-            fprintf('\nBreak chain -- spot a1\n') 
-            break
-        % if enough saved in chain, abort and keep the incomplete chain
-        else
-            fprintf('\nBreak chain -- spot a2\n')
-            fail_chain = -fail_chain; break
-        end
+    
+    % Newer, simpler way of deciding when to kill chain. Rely on reversing chains. Only consider quitting early if we have done successfull+failed iterations > par.inv.niter. At that point, kill the chain if it fails at resetting X times IN A ROW
+    if (ii_no_reverse > par.inv.niter) && (fail_reset>3) ; % If we did more iterations than we meant to, consider exiting the chain - Then if the kernels fail to reset X times in a row, call it quits. 
+        fail_chain = -100; 
+        break;
+    end  
+    % Sometimes a chain goes 22k iterations when I wanted 16k. Obnoxious. 
+    if ii_no_reverse > (par.inv.niter*19/16) ; % 19/16 works out to 3000 iterations of rewinding for 16000 desired iterations. Bad use of cpu. 
+        fail_chain = -100; 
+        break;
     end
-    if fail_reset>5
-        fail_total = fail_total + 1; 
-        % if cannot reset kernels because current saved model is not viable
-        if (ii - par.inv.burnin)/par.inv.saveperN < 200
-            fprintf('\nBreak chain -- spot a3\n')
-            fail_chain = 100;  break % high fail_chain will mean we restart chain
-        % if enough saved in chain, abort and keep the incomplete chain
-        else
-            fprintf('\nBreak chain -- spot a4\n')
-            fail_chain = -100; break
-        end
-    end
+    
+% % %     if fail_chain>19
+% % %         fail_total = fail_total + 1;
+% % %         % if not enough saved in this chain, abort and restart
+% % %         if (ii - par.inv.burnin)/par.inv.saveperN < 200
+% % %             fprintf('\nBreak chain -- spot a1\n') 
+% % %             break
+% % %         % if enough saved in chain, abort and keep the incomplete chain
+% % %         else
+% % %             fprintf('\nBreak chain -- spot a2\n')
+% % %             fail_chain = -fail_chain; break
+% % %         end
+% % %     end
+    
+% % %     if fail_reset>5
+% % %         fail_total = fail_total + 1; 
+% % %         % if cannot reset kernels because current saved model is not viable
+% % %         if (ii - par.inv.burnin)/par.inv.saveperN < 200
+% % %             fprintf('\nBreak chain -- spot a3\n')
+% % %             fail_chain = 100;  break % high fail_chain will mean we restart chain
+% % %         % if enough saved in chain, abort and keep the incomplete chain
+% % %         else
+% % %             fprintf('\nBreak chain -- spot a4\n')
+% % %             fail_chain = -100; break
+% % %         end
+% % %     end
     
 % % %     %%% Kill chain if too slow. 
 % % %     if avgTime > 1; % Things are running really slow... why? Might want to restart, unless we are at the beginning of iterations. 
@@ -529,6 +544,7 @@ try
                 compare_kernel_full_calc(...
                     model, Kbase, predata, trudata, ID, par, fail_chain, ...
                     ii, ifpass, misfit, ptbnorm, log_likelihood, ifaccept); 
+            fail_reset = 0; 
         catch e % If it doesn't work, rewind to last Kbase model that worked. 
             fprintf('\nbrb Kernel reset fail. Error was: \n --------\n %s\n --------\n',getReport(e)); 
             fprintf('Kernel reset BROKE at %s-%.0f... REWIND to %s-%.0f <<<<<<<<<<<<<<< \n',chainstr,ii,chainstr,Kbase.itersave)

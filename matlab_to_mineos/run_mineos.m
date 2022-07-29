@@ -199,52 +199,61 @@ llasts = llast; lrunstrs = {lrunstr};
 
 %% Re-start iteratively on higher modes if necessary
 % Tmin = max(swperiods);
+tFact = (24 * 60 * 60); % Factor to convert from serial time to seconds. 
+t_start_rerun = now() * tFact(); 
+max_time_rerun = 100; % Don't run mineos for more than this many more seconds.  Otherwise, we could take 100 s per run 100 times!
 while Tmin > min(swperiods)
 
-lrun = lrun + 1; lrunstr = num2str(lrun);
-lmin = llast + parm.l_increment_standard;
+    lrun = lrun + 1; lrunstr = num2str(lrun);
+    lmin = llast + parm.l_increment_standard;
+    modes_done = max(round(llast-lfirst+1)); 
+    
+    if (ifverbose) || (lrun > 10); 
+        fprintf('\n        %4u modes done, failed after mode %u... restarting at %u. Run=%1.0f',modes_done,llast,lmin,lrun)
+    end
+    
+    time_ran = (now() * tFact() - t_start_rerun); 
+    if time_ran > max_time_rerun; % Time since starting to rerun mineos, in seconds.  
+        error('bb2022.07.28 error: Taking %1.2f s to rerun failed Mineos modes. %1.0f modes recalculated.',time_ran, modes_done); 
+    end
+    
+    if lrun > parm.maxrunN
+    %     fprintf('More than %u tries; breaking mineos eig loop\n',parm.maxrunN);
+        error('bb2021.09.21 error: More than %u tries; breaking mineos eig loop\n',parm.maxrunN);
+    end
 
-if (ifverbose) || (lrun > 10); 
-    fprintf('\n        %4u modes done, failed after mode %u... restarting at %u. Run=%1.0f',max(round(llast-lfirst+1)),llast,lmin,lrun)
-end
 
-if lrun > parm.maxrunN
-%     fprintf('More than %u tries; breaking mineos eig loop\n',parm.maxrunN);
-    error('bb2021.09.21 error: More than %u tries; breaking mineos eig loop\n',parm.maxrunN);
-end
+    execfile = [ID,'_',lrunstr,'.run_mineos'];
+    ascfile =  [ID,'_',lrunstr,'.asc'];
+    eigfile =  [ID,'_',lrunstr,'.eig'];
+    modefile = [ID,'_',lrunstr,'.mode'];
 
+    writeMINEOSmodefile( modefile, modetype,lmin,parm.lmax,parm.fmin,parm.fmax )
+    writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
 
-execfile = [ID,'_',lrunstr,'.run_mineos'];
-ascfile =  [ID,'_',lrunstr,'.asc'];
-eigfile =  [ID,'_',lrunstr,'.eig'];
-modefile = [ID,'_',lrunstr,'.mode'];
+    fileattrib(execfile, '+x'); 
+    [status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % run execfile 
+    [errorInfo]=assess_timeout_results(status, cmdout); 
+    %brb2022.04.05 Changing from 100s timeout to 15s. 
 
-writeMINEOSmodefile( modefile, modetype,lmin,parm.lmax,parm.fmin,parm.fmax )
-writeMINEOSexecfile( execfile,cardfile,modefile,eigfile,ascfile,[ID,'.log']);
+    delete(execfile,modefile); % kill files we don't need
 
-fileattrib(execfile, '+x'); 
-[status,cmdout] = system([paths.timeout ' 100 ./',execfile]); % run execfile 
-[errorInfo]=assess_timeout_results(status, cmdout); 
-%brb2022.04.05 Changing from 100s timeout to 15s. 
+    % read asc output
+    [~,llast,lfirst,Tmin] = readMINEOS_ascfile(ascfile,0,skiplines);
 
-delete(execfile,modefile); % kill files we don't need
+    if isempty(llast) % what if that run produced nothing?
+        llast=lmin + parm.l_increment_failed;
+        Tmin = max(swperiods);
+        lfirst = llast+1;
+        delete(ascfile,eigfile); % kill files we don't need
+        continue
+    end
 
-% read asc output
-[~,llast,lfirst,Tmin] = readMINEOS_ascfile(ascfile,0,skiplines);
-
-if isempty(llast) % what if that run produced nothing?
-    llast=lmin + parm.l_increment_failed;
-    Tmin = max(swperiods);
-    lfirst = llast+1;
-    delete(ascfile,eigfile); % kill files we don't need
-    continue
-end
-
-% save eigfiles and ascfiles for stitching together later
-ascfiles{length(ascfiles)+1} = ascfile;
-eigfiles{length(eigfiles)+1} = eigfile;
-llasts(length(eigfiles)) = llast;
-lrunstrs{length(eigfiles)} = lrunstr;
+    % save eigfiles and ascfiles for stitching together later
+    ascfiles{length(ascfiles)+1} = ascfile;
+    eigfiles{length(eigfiles)+1} = eigfile;
+    llasts(length(eigfiles)) = llast;
+    lrunstrs{length(eigfiles)} = lrunstr;
 
 
 end % on while not reached low period

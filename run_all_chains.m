@@ -219,7 +219,9 @@ trudata = TD.Value;
 
 end % parfor loop
 
-% % % ii_each_chain = zeros( par.inv.nchains , 1 ); 
+%%% Some tests to try and make all chains stop at same time. 
+% Chains really have to be totally independent. Can't find a way to do it. 
+% % % % % % ii_each_chain = zeros( par.inv.nchains , 1 ); 
 % % % % ii_each_chain = parallel.pool.Constant(ii_each_chain)
 % % % parfor iii = 1:par.inv.nchains; 
 % % % 
@@ -238,6 +240,21 @@ end % parfor loop
 % % % %             disp(ii_each_chain)
 % % % %         end
 % % %         sum(ii_each_chain)
+% % %     end
+% % % end
+% % % desired_iter = (par.inv.niter-par.inv.burnin) * par.inv.nchains; 
+% % % tot_iter = 0; 
+% % % parfor iii = 1:par.inv.nchains; 
+% % %     ii = 0; 
+% % %     while ii < (2*par.inv.niter); 
+% % %         ii = ii + 1
+% % %         tot_iter = tot_iter + 1; 
+% % %         
+% % % %         should_stop = tot_iter > 9000; 
+% % %         
+% % % %         if tot_iter > desired_iter; 
+% % % %             break 
+% % % %         end
 % % %     end
 % % % end
 
