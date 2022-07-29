@@ -11,7 +11,7 @@ if nargin <3 || isempty(ifplot)
     ifplot=false;
 end
 
-% ifplot = true; 
+% ifplot = true; warning('if plot = true')
 plot_upscale_interp = ifplot; 
 
 %% brb2022.06.30. Interpolate models onto upsampled basis, then take m1 back to m0.z. 
@@ -73,13 +73,19 @@ if ~ isequal(model0.z, model1.z);
         for idep = 1:nz0;
             this_dep = and( (old_z_midpts(idep  ) <= model1_unique.z) ,...
                             (old_z_midpts(idep+1) >=  model1_unique.z) ); % These upsampled incicies will correspond to the previous indecies. 
-%             array_newbase(idep) = mean(array_upsamp(this_dep)); % Resample model0. parameters to the model1.z depths. 
+            
+            if sum(this_dep) == 0; % If no upsampled depths in this range, just pick nearest depth. 
+                [dist_best, i_dist] = min(abs(...
+                    old_z_midpts(idep) - model1_unique.z)); 
+                this_dep = i_dist; 
+            end
+                
             array_newbase(idep) = sum(...
                 array_upsamp(this_dep) .* dz_mid(this_dep)) ...
                 ./ sum(dz_mid(this_dep)); % Simple integral average 
         end
-        if any(isnan(array_newbase)); 
-            error('Nan values during K perterbation upscaling.'); 
+        if any(isnan(array_newbase)); % Should not occur very often
+            fprintf('\nNan values during calc_Vperturbation. brb2022.07.29 There should already be code in place that fixes this. '); 
         end
         model1.(param) = array_newbase; 
     end    
