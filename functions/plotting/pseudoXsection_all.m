@@ -9,7 +9,7 @@ paths = getPaths();
 % proj.dir = [paths.THBIpath '/' proj.name];
 proj = load('~/Documents/UCSB/ENAM/THBI_ENAM/ENAM/INFO/proj.mat'); 
 proj = proj.proj; 
-paths.STAinversions = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/'; % Place where your results are. 
+paths.STAinversions = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/'; % Place where your results are. 
 proj.STAinversions = paths.STAinversions; 
 
 % figPath = '~/Documents/UCSB/ENAM/THBI_ENAM/figures/xsect/'; 
@@ -24,13 +24,14 @@ addpath('/Users/brennanbrunsvik/Documents/repositories/general_data'); % For top
 
 % specify details of this run
 generation = 1; % generation of solution and data processing
-STAMP = 'sage_gage';
+STAMP = 'all_sp_weight';
 
 % Quality thresholds for including stations - important!
 overallQ_thresh = 1; % 2 is good, 1 is ok, 0 is bad
 Sp_Q_thresh = 1; % Sp data quality (same bounds as above)
 
-vlims = [4.15 4.85];
+vlims = [4.15 4.8];
+% vlims = [3.2 4.5];
 vcmp = flipud(jet);
 ccplim = 12;
 ccpcmp = cmap_makecustom([0 0 1],[1 0 0],0.1);
@@ -51,7 +52,7 @@ ofile2 = [figPath 'Xsect1_wCCP_',STAMP];
 Q1 = [lalim(2), lolim(1)];
 Q2 = [lalim(1), lolim(2)]; 
 % lonBounds = sort([Q1(2) Q2(2)]); latBounds = sort([Q1(1) Q2(1)]); 
-offsecmax = .65; %5%  distance off section allowed, in degrees
+offsecmax = 5; %5%  distance off section allowed, in degrees
 % NNW to SSE across Yellowstone
 % ofile1 = ['figs/Xsect2_',STAMP];
 % ofile2 = ['figs/Xsect2_wCCP_',STAMP];
@@ -199,6 +200,7 @@ set(gcf, 'color', 'white');
 ax1 = axes; hold on
 ax2 = axes; hold on
 ax3 = axes; hold on
+ax4 = axes; hold on
 
   
 
@@ -208,6 +210,8 @@ set(ax1,'pos',[x0 0.36 xw ax1Height]);
 % set(ax1,'pos',[x0 0.36 xw 0.62]);
 set(ax2,'pos',[x0 0.22 xw 0.11]);
 set(ax3,'pos',[x0 0.08 xw 0.11]);
+set(ax4,'pos',[x0 0.85 xw 0.11], 'XTick', []); %!%!
+
 
 % Topography
 [topox, topoy, topoz] = get_z_etopo1(...
@@ -289,6 +293,8 @@ for ii = 1:Ngd
 
 	%% plot moho
     hm(ii) = plot(ax1,d_par(ii)+[-dh dh],final_model.Zd(2).mu*[1 1],'m','linewidth',4);hold on
+    
+    plt_sed = plot(ax4,d_par(ii)+[-dh dh],final_model.Zd(1).mu*[1 1],'m','linewidth',4);hold on
 
     % plot NVG
     try
@@ -343,8 +349,8 @@ end
 
 %% cbar
 ax1Pos = get(ax1,'pos'); 
-ax4 = axes(fig,'pos',ax1Pos,'visible','off');
-hcb  = colorbar(ax4); caxis(ax4,vlims); colormap(ax4,vcmp);
+axC = axes(fig,'pos',ax1Pos,'visible','off');
+hcb  = colorbar(axC); caxis(axC,vlims); colormap(axC,vcmp);
 set(hcb,'pos',[ax1Pos(1)+0.01 + ax1Pos(3), ax1Pos(2) 0.017 ax1Pos(4)],'linewidth',2)
 % title(hcb,'\textbf{V$_S$ (km/s)}','fontsize',16,'interpreter','latex','horizontalalignment','left')
 ylabel(hcb, '\textbf{V$_S$ (km/s)}','fontsize',16,'interpreter','latex'); 
@@ -377,10 +383,16 @@ caxis(ax2,[1.55,1.95]);colormap(ax2,spring)
 set(ax3,'fontsize',16,'ylim',[0.95 1.12],'xlim',[0 ceil(max(d_par))+0.5],...
     'color','none','box','on','layer','top','linewidth',1.8,...
     'xticklabels',round_level(loprof,0.1));
+
+set(ax4, 'fontsize', 16, 'ylim', [0, 2.5], 'xlim', [0 ceil(max(d_par))+0.5],...
+    'ydir','reverse','xticklabel','',...
+    'color','none','box','on','layer','top','linewidth',1.8);
+
 caxis(ax3,[0.88,1.12]);colormap(ax3,flipud(spring))
 
 %
 ylabel(ax3,'$\mathbf{\xi}$ \textbf{crust}','fontsize',20,'interpreter','latex')
+ylabel(ax4,'\textbf{Sed (km)}' ,'fontsize',20,'interp','latex','fontweight','bold'); 
 ylabel(ax2,{'\textbf{Crustal}','$\mathbf{V}p/\mathbf{V}s$'},'fontsize',20,'interp','latex','fontweight','bold')
 ylabel(ax1,'\textbf{Depth (km)}','fontsize',20,'interp','latex','fontweight','bold')
 %

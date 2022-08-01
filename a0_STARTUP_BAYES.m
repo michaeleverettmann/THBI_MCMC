@@ -36,6 +36,7 @@ addpath([bayesdir,'functions/handle_errors']);
 addpath([bayesdir,'functions/plotting']); 
 addpath([bayesdir,'functions/plotting/plot_data_heatmap']); 
 addpath([bayesdir,'functions/plotting/sensitivity']); 
+addpath([bayesdir,'functions/plotting/receiver_functions']); 
 
 
 % path of sub functions that I got online but don't know if I can legally

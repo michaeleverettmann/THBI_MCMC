@@ -84,8 +84,8 @@ plot_HEATMAP_ALLMODELS_shallow(suite_of_models,final_model,par,1,[resdir_fig,'/h
 % %                        'weightDistanceMax', 0,   ... % At start of burnin, gives 0 to 1 weight toward the (scaled) Euclidian distance from HKappa energy maximum. In otherwords, this tends toward disregarding the actual energy value, and pays attention to its position. 
 % %                        'weightDistanceMin', 0); 
 % par.forc.mindV = 0.05; warning('Changing propmat resolution');  
-par.forc.synthperiod = 2.5; warning('Changing propmat Period');  
-par.forc.mindV = 0.075; 
+% par.forc.synthperiod = 2.5; warning('Changing propmat Period');  
+% par.forc.mindV = 0.075; 
 [ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,trudata,posterior );
 
 % distribute data for different processing (e.g. _lo, _cms)
