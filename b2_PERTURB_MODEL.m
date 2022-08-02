@@ -122,6 +122,7 @@ switch ptbopts{optflag} % decide what to modify
                     vma = par.mod.crust.vpvsmax;
                     vmi = par.mod.crust.vpvsmin;
                     if V1>vma || V1<vmi, P_bd = 0; return, end
+
                     
                 case 'xi' % 14% chance we modify xi value
                     std = temp.*par.mod.crust.xistd; % get std of perturbation
@@ -419,8 +420,17 @@ switch ptbopts{optflag} % decide what to modify
                         ptb = 'Moho_avV';
                         
                     case 'h'
+                        
+                        %%% Maybe perturb vpvs also. Since trade off between vpvs and h are so covariant. Figure this out now for sigma and stuff, but do the actual vpvs perturbation later so I don't have to modify the ptb thing too much. brb2022.08.02
+                        try_h_and_k = (par.mod.crust.vpvsstd>0) && (rand(1) > 0.5); % 50% chance of also perturbing VPVS. Not sure if it's a good % or not. 
+                        if try_h_and_k; 
+                            sig_scale = 1/sqrt(2); % Multiply sigma by 1/sqrt(2) so the combination of two perturbations tends to give as much total model perturbation as perturbing just one parameter. Otherwise we could overperturb, and never really accept the perturbed model.  
+                        else
+                            sig_scale = 1; 
+                        end
+
                         % modify the moho depth
-                        std = temp.*par.mod.crust.hstd; % get std of perturbation
+                        std = temp .* par.mod.crust.hstd .* sig_scale; % get std of perturbation
                         if std==0, continue; end % don't perturb if no perturbation
                         ptb = 'Moho_h';
 
@@ -508,7 +518,25 @@ switch ptbopts{optflag} % decide what to modify
 %                         if any(model.mantmparm.VS_sp > par.mod.mantle.vsmax) || any(model.mantmparm.VS_sp < par.mod.mantle.vsmin), p_bd = 0; return, end % keep in bounds
 
                         if par.inv.verbose, fprintf('    Changed moho depth from %.2f to %.2f\n',model.sedmparm.h + h0,cmaxz); end
-                
+                        
+                        %%% Maybe perturb vpvs also. Since trade off between vpvs and h are so covariant. 
+                        if try_h_and_k; 
+                            std = temp .* par.mod.crust.vpvsstd .* sig_scale; % get std of perturbation
+                            ptb = [ptb '_crust_vpvs'];
+
+                            V0 = model.crustmparm.vpvs;
+                            V1 = V0 + random('norm',0,std,1); % calc. random perturbation
+
+                            model.crustmparm.vpvs = V1; % insert perturbed val
+                            if par.inv.verbose, fprintf('    Changed crustal vpvs, after changing Moho, from %.2f to %.2f\n',V0,V1); end
+
+                            % within bounds?
+                            vma = par.mod.crust.vpvsmax;
+                            vmi = par.mod.crust.vpvsmin;
+                            if V1>vma || V1<vmi, P_bd = 0; return, end
+                        end
+                        %%% Finish perturb vpvs. 
+                        
                 end % switch on attribute of disc to modify
                 
         end % switch on which discontinuity to modify
