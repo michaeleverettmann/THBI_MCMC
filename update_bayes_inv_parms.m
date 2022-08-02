@@ -12,11 +12,11 @@ niter_only   = 16000;
 burnin_only  = 4000 ; 
 cooloff_only = 3000 ; 
 nchains_only = 12   ; 
-% % 
+% % % 
 % niter_only   = 300  ; 
 % burnin_only  = 50   ;  
-% cooloff_only = 15   ; 
-% nchains_only = 5   ; 
+% cooloff_only = 25   ; 
+% nchains_only = 1   ; 
 % par.mod.force_no_new_prior = true; warning('Not making new prior if needed'); 
 
 
@@ -27,7 +27,7 @@ nchains_only = 12   ;
 % niter_only   = 300; 
 % burnin_only  = 30; 
 % cooloff_only = 20 ; 
-% nchains_only = 1  ; 
+% nchains_only = 3  ; 
 
 if     strcmp(stamp, 'ENAM_trial'); 
     disp('Using default parameters') 
@@ -181,8 +181,8 @@ elseif strcmp(stamp, 'all_001');
     par.mod.starting.HKappa.startAtHK = true;   
     par.inv.niter                     = 16000; 
     par.inv.burnin                    = 6000; 
-    par.inv.cooloff                       = 4500; 
-    par.inv.nchains = 16; 
+    par.inv.cooloff                   = 4500; 
+    par.inv.nchains                   = 16; 
     
     
 % { --- Different data types alone 
@@ -502,7 +502,36 @@ elseif strcmp(stamp, 'all_sp_weight');
     par.inv.nchains                   = nchains_only   ;     
     par.datprocess.CCP.weight_depth_val = [-10,0.3 ; 30,0.3 ; 70,1 ; 6371,1]; % Upweight at depth. This gets normalized.  
 
-    
+elseif strcmp(stamp, 'all_sp_weight_2'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only ; 
+    par.inv.nchains                   = nchains_only   ;     
+    par.datprocess.CCP.weight_depth_val = [-10,0.3 ; 30,0.3 ; 70,1 ; 6371,1]; % Upweight at depth. This gets normalized.  
+
+elseif strcmp(stamp, 'layerise_normal'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only ; 
+    par.inv.nchains                   = nchains_only   ;
+    par.datprocess.CCP.layerise_version   = 'normal'; 
+elseif strcmp(stamp, 'layerise_no_sed_propmat'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only ; 
+    par.inv.nchains                   = nchains_only   ;  
+    par.datprocess.CCP.layerise_version   = 'no_sed'; 
+
+  
 end
 
 inv = par.inv; 
