@@ -3,7 +3,9 @@ function plot_h_kappa_progress2(trudata, allmodelsOrig, resdir, chainNo, ...
 %% brb2022.02.09
 % Make several plots of h-kappa inversion progress. 
 % This applies for just one chain. 
-
+% % % 
+% % % save('/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/workspaces/for_perturbing/plot_hk_progress.mat'); 
+% % % warning('Saving in this function'); 
 
 %% Extract some info
 hStack              = trudata.HKstack_P.H; 
@@ -19,6 +21,13 @@ Pm_prior            = [accept_info.Pm_prior1           ]';
 p_bd                = [accept_info.p_bd                ]'; % Prob associated with birth or death
 ptbnorm             = [accept_info.ptbnorm             ]'; 
 Emax_per_iter       = [accept_info.hk_Emax_per_iter    ]'; % Maximum energy in hk stack made at any iteration
+
+
+hk_pre              = [accept_info.predat_save         ]'; 
+hk_pre              = [hk_pre(:).HKstack_P             ]'; 
+hIter               = [hk_pre(:).H                     ]'; 
+kIter               = [hk_pre(:).K                     ]'; 
+eIter               = [hk_pre(:).E_by_Emax             ]'; 
 
 
 E2 = [misfit.E2]; 
@@ -43,10 +52,6 @@ log_lik             = [accept_info.log_likelihood      ]';
 lik                 = 10 .^ log_lik; 
 iIter               = [accept_info.iter                ]'; 
 sig                 = [accept_info.sig_hk]'; 
-
-allmodels           = [accept_info(:).model            ]; 
-hIter               = [allmodels.zmoh                  ]'; 
-kIter               = [allmodels.vpvs                  ]'; 
 
 
 %% Delayed rejection stuff
@@ -105,6 +110,15 @@ perc2pert = sum([accept_info.non_acceptk]==2) ./ length([accept_info.non_acceptk
 exportgraphics(gcf, [resdir, '/delayed_perturbation_' num2str(chainNo) '.pdf']);  % pdf probably faster here. 
 
 %% Plots with h-k as x and y in plots. 
+
+%%% To make these plots of HK perturbations happen, need to uncomment the
+%%% accept_info(:).model = model in run_one_chain
+% allmodels           = [accept_info(:).model            ] ; 
+% if ~isempty(allmodels); 
+%     hIter               = [allmodels.zmoh                  ]'; 
+%     kIter               = [allmodels.vpvs                  ]'; 
+
+
 figure(1); clf; hold on; 
 set(gcf, 'pos', [[723 198 456 397]]); % [1550, 410, 1500, 1300]); 
 
@@ -155,6 +169,7 @@ exportgraphics(gcf, [resdir '/convergence_info_chain_' num2str(chainNo) '_v0.png
 if par.inv.verbose; 
     exportgraphics(gcf, [resdir '/convergence_info_chain_' num2str(chainNo) '_v0_high-res.png'], 'Resolution', 500);
 end
+% end
 
 %% Plots of liklihood and other useful things, across iterations. 
 if par.inv.verbose; 

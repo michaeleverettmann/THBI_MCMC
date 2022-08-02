@@ -445,7 +445,7 @@ try
     accept_info(ii).ifpass = ifpass; 
     accept_info(ii).misfit = misfit1; 
     accept_info(ii).log_likelihood = log_likelihood1; 
-%     accept_info(ii).model = model1; 
+%     accept_info(ii).model = model1; warning('Saving all models') 
     accept_info(ii).predat_save = predat_save1; 
     accept_info(ii).iter = ii; 
     accept_info(ii).temp = temp; 
@@ -589,8 +589,8 @@ if plot_hk_progress_bool && any(("HKstack_P" == string(par.inv.datatypes)))
         plot_h_kappa_progress2(trudata, allmodels, par.res.resdir, iii, accept_info, ...
             par, trudata.HKstack_P.Esum)
     catch e 
-%         fprintf('\nError in plot_h_kappa_progress2: \n ------ \n %s \n ------- \n',getReport(e)); 
-        fprintf('\nError in plot_h_kappa_progress2. Ignoring it for now. \n ------ \n '); 
+        fprintf('\nError in plot_h_kappa_progress2: \n ------ \n %s \n ------- \n',getReport(e)); 
+%         fprintf('\nError in plot_h_kappa_progress2. Ignoring it for now. \n ------ \n '); 
     end
 end
 
