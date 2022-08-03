@@ -183,7 +183,8 @@ datprocess=struct( 'normdata',true               ,... % normalise data in proces
                       'Zwin'                     ,... %   depth window    
                       struct('def',[20 250])     ,...
                       'layerise_version','normal',... % Just for testing. 
-                      'weight_depth_val',[-10,0.3 ; 30,0.3 ; 70,1 ; 6371,1])    ,... ; % First collumn: Specify depths of interest. Second collumn: Ideal weight at those depths. The weights are a linear interpolation of these points which then go through a Gaussian smoothing filter. 
+                      'weight_depth_val',[-10,0.3 ; 30,0.3 ; 70,1 ; 6371,1],...
+                      'simple_parent_pulse',true )    ,... ; % First collumn: Specify depths of interest. Second collumn: Ideal weight at those depths. The weights are a linear interpolation of these points which then go through a Gaussian smoothing filter. 
                    'HKappa',struct(              ...
                        'min_error', 0.002,           ... % Add this much "error" to h-kappa stacks (error of 0 can result in sigma inverting improperly)
                        'scale_error', 1,           ... % Multiply h-kappa error by this constant. Sigma needs to be scaled accordingly. If using 100, we can think of it like percent. 

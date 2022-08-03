@@ -531,7 +531,18 @@ elseif strcmp(stamp, 'layerise_no_sed_propmat');
     par.inv.nchains                   = nchains_only   ;  
     par.datprocess.CCP.layerise_version   = 'no_sed'; 
 
-  
+elseif strcmp(stamp, 'all_simple_parent'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only ; 
+    par.inv.nchains                   = nchains_only   ;    
+    par.datprocess.CCP.layerise_version   = 'normal'; 
+    par.datprocess.CCP.simple_parent_pulse = true;
+
+    
 end
 
 inv = par.inv; 

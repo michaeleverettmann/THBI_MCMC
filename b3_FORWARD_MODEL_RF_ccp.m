@@ -122,6 +122,23 @@ if isreal(asind(laymodel.Vs*sind(S_inc)./laymodel.Vs(end))) %
     tt_sp_Sar = mean(tt_sp(predat_sp_PSV(:,2)==max(predat_sp_PSV(:,2)))); % estimate main S-wave arrival time from first big upswing
     tt_sp = tt_sp - tt_sp_Sar;
     tt_sp = round_level(tt_sp,0.001);
+    
+    %%% Introduce a fake synthetic parent pulse. To eliminate sediment reverberations from the parent. 
+    %%% The parent pulse used in propmat needs to be exactly the same as I'm defining here. 
+    if ~isfield(par.datprocess.CCP, 'simple_parent_pulse'); 
+        warning('simple_parent_pulse was not an option for these results. Using propmat SV as parent pulse.'); 
+    elseif par.datprocess.CCP.simple_parent_pulse; 
+        % Make waveform parent pulse that propmat makes in sourc1.gauss.f, subroutine incid1
+        std_fact_in_propmat_sourc1_gauss = 1/6; % This factor of 6 is hardwired into propmat!!! If pulse widths start seeming wrong, look in sourc1.gauss (or maybe sourc1?) at the subroutine incid1. npstd=peri*npps/6, that's where 6 comes from. brb2022.08.3 
+        sigma = par.forc.synthperiod * std_fact_in_propmat_sourc1_gauss; % Width of impulse.
+        amp = max(predat_sp_PSV(:,2)); % Magnitude of direct S arrival. 
+        p_simp = amp * exp((-1/(2*sigma^2))*tt_sp.^2); % parent pulse, simplified. 
+% % %             figure(1); clf; hold on; 
+% % %             plot(tt_sp, predat_sp_PSV./(max(max(predat_sp_PSV))) )
+% % %             plot(tt_sp, p_simp)
+        predat_sp_PSV(:,2) = p_simp; 
+    end
+    %%%
 
     Sp_widewind = [-50 10];
     inwind = (tt_sp >= Sp_widewind(1)) & (tt_sp < Sp_widewind(2)); 
