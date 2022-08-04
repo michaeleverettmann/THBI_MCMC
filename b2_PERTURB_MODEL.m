@@ -525,7 +525,11 @@ switch ptbopts{optflag} % decide what to modify
                             ptb = [ptb '_crust_vpvs'];
 
                             V0 = model.crustmparm.vpvs;
-                            V1 = V0 + random('norm',0,std,1); % calc. random perturbation
+                            vpvs_ptb = random('norm',0,std,1); % Calculate the random perturbation. 
+                            if dh / vpvs_ptb > 0; % Important! For this specific vpvs perturbation, we assume a negative correlation between h and vpvs. We know Ps timing depends on h and vpvs with negative covariance. 
+                                vpvs_ptb = - vpvs_ptb; % Force correlation between dh and dk is negative. 
+                            end
+                            V1 = V0 + vpvs_ptb; % calc. random perturbation
 
                             model.crustmparm.vpvs = V1; % insert perturbed val
                             if par.inv.verbose, fprintf('    Changed crustal vpvs, after changing Moho, from %.2f to %.2f\n',V0,V1); end
