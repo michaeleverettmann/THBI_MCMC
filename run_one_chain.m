@@ -446,7 +446,6 @@ try
     accept_info(ii).misfit = misfit1; 
     accept_info(ii).log_likelihood = log_likelihood1; 
 %     accept_info(ii).model = model1; warning('Saving all models') 
-    accept_info(ii).predat_save = predat_save1; 
     accept_info(ii).iter = ii; 
     accept_info(ii).temp = temp; 
     accept_info(ii).ptbnorm = ptbnorm; 
@@ -455,9 +454,11 @@ try
     if any('HKstack_P'==string(par.inv.datatypes)); 
         accept_info(ii).hk_Emax_per_iter = max(max(predata.HKstack_P.Esum)); 
         accept_info(ii).sig_hk = model1.datahparm.sig_HKstack_P; 
+        accept_info(ii).predat_save = struct('HKstack_P', struct('H',predat_save1.HKstack_P.H,'K',predat_save1.HKstack_P.K, 'E_by_Emax',predat_save1.HKstack_P.E_by_Emax)); % Kind of a hack. Used to plot HK stack progress stuff in plot_h_kappa_progress2.m. Don't store the rest of predata thuogh, it takes WAY too much ram. 
     else; 
         accept_info(ii).hk_Emax_per_iter = nan; 
-        accept_info(ii).sig_hk = nan ;
+        accept_info(ii).sig_hk = nan;
+        accept_info(ii).predat_save = nan; 
     end
         
     if ii == 1; accept_info(1) .trudata = trudata; end; % Inefficient, but this is just for testing. 
