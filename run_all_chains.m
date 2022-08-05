@@ -158,12 +158,16 @@ else
     redoprior = true;
 end
 
+% redoprior = true; warning('Forcing redo prior = true'); 
+
 if ~par.mod.force_no_new_prior && redoprior
     fprintf('  > Building prior distribution from %.0f runs\n',max([par.inv.niter,1e5]))
     prior = a3_BUILD_EMPIRICAL_PRIOR(par,max([par.inv.niter,1e5]),14,par.res.zatdep);
     plot_MODEL_SUMMARY(prior,par,1,[resdir,'/prior_fig.pdf']);
     save([proj.dir,'/prior'],'prior','par');
 end
+
+% error('Done with redoing prior. Exiting'); 
 
 %% ---------------------------- INITIATE ----------------------------
 

@@ -25,7 +25,7 @@ nchains_only = 12   ;
 % cooloff_only = 200 ; 
 % nchains_only = 3  ; 
 % niter_only   = 300; 
-% burnin_only  = 30; 
+% burnin_only  = 30 ; 
 % cooloff_only = 20 ; 
 % nchains_only = 3  ; 
 
