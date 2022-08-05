@@ -1,0 +1,54 @@
+Contents of package:
+
+bin - directory containing binary executables:
+	HVkernel (see below)
+	
+src - directory containing source files:
+	PVZH_kernel.f = fortran file for main script
+	rayleigh_sub.f = fortran file containing relevant sub-functions
+	Makefile = make file to compile the HVkernel executable
+		type make HVkernel
+		
+test - directory containing example input and output files from a properly functioning version
+
+matlab2HVkernel - directory containing MATLAB wrapper for this tool 
+
+
+===============
+
+HVkernel
+ - usage: 
+ 	$ HVkernel < infile > outfile
+ - requires an input file with the following format
+ 	Line 1: lowf highf dfreq           (these should all be decimals)
+ 	Line 2: dh nlayout				   (dh should be a decimal)
+ 	Line 3: nlayin					
+ 	Lines 4 to 4+nlayin:  radius, density, Vp, Vs, qp(1/Qp), qs (1/Qs)
+ 	
+
+From Toshiro:
+
+Note that for this particular version right after reading the Qp and Qs, I am just putting them to qp=1/300 and qs=1/200.
+
+This program was written for shallow-structure study in the LA basin.
+
+I also use Saito's programs not EOS. It is different from EOS.
+
+
+The outputs are
+frq,er,gvel0,pvel0,zh0
+frequency, relative error, group vel, phase vel. and ZH which is V/H.
+For a basin, vertical amplitudes can disappear (or even reverses its sign
+leading to prograde motions), so I used V/H (called it ZH). I just avoided
+infinity.
+
+The input structure is fine but since I needed a much coarser layers, 
+the program averages over 1-km intervals in depth.
+You can change that easily for finer results near the end of the main program.
+
+I also attached a paper I wrote on this set of codes.
+
+If you have questions, feel free to ask.
+
+Toshiro
+

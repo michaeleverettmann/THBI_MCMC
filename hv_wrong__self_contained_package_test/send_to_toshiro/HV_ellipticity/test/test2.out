@@ -1,0 +1,408 @@
+       100
+    1  0.0000000E+00  0.2000000E+01  0.2566657E+01  0.4494807E+01  0.2322231E+01
+    2  0.2000000E+01  0.4000000E+01  0.2652469E+01  0.6324935E+01  0.3648736E+01
+    3  0.4000000E+01  0.6000000E+01  0.2740438E+01  0.6676066E+01  0.3946194E+01
+    4  0.6000000E+01  0.8000000E+01  0.2810612E+01  0.6623769E+01  0.3933482E+01
+    5  0.8000000E+01  0.1000000E+02  0.2809948E+01  0.6441496E+01  0.3809041E+01
+    6  0.1000000E+02  0.1200000E+02  0.2812962E+01  0.6419053E+01  0.3807053E+01
+    7  0.1200000E+02  0.1400000E+02  0.2830163E+01  0.6488437E+01  0.3848673E+01
+    8  0.1400000E+02  0.1600000E+02  0.2846257E+01  0.6552093E+01  0.3872113E+01
+    9  0.1600000E+02  0.1800000E+02  0.2845538E+01  0.6549294E+01  0.3756600E+01
+   10  0.1800000E+02  0.2000000E+02  0.2839435E+01  0.6525301E+01  0.3696995E+01
+   11  0.2000000E+02  0.2200000E+02  0.2839300E+01  0.6524764E+01  0.3679130E+01
+   12  0.2200000E+02  0.2400000E+02  0.2843630E+01  0.6541804E+01  0.3683030E+01
+   13  0.2400000E+02  0.2600000E+02  0.2845541E+01  0.6549324E+01  0.3676460E+01
+   14  0.2600000E+02  0.2800000E+02  0.2849041E+01  0.6563004E+01  0.3679400E+01
+   15  0.2800000E+02  0.3000000E+02  0.2861339E+01  0.6610684E+01  0.3710760E+01
+   16  0.3000000E+02  0.3200000E+02  0.2864680E+01  0.6623550E+01  0.3717600E+01
+   17  0.3200000E+02  0.3400000E+02            NaN            NaN            NaN
+   18  0.3400000E+02  0.3600000E+02            NaN            NaN            NaN
+   19  0.3600000E+02  0.3800000E+02            NaN            NaN            NaN
+   20  0.3800000E+02  0.4000000E+02            NaN            NaN            NaN
+   21  0.4000000E+02  0.4200000E+02            NaN            NaN            NaN
+   22  0.4200000E+02  0.4400000E+02            NaN            NaN            NaN
+   23  0.4400000E+02  0.4600000E+02            NaN            NaN            NaN
+   24  0.4600000E+02  0.4800000E+02            NaN            NaN            NaN
+   25  0.4800000E+02  0.5000000E+02            NaN            NaN            NaN
+   26  0.5000000E+02  0.5200000E+02            NaN            NaN            NaN
+   27  0.5200000E+02  0.5400000E+02            NaN            NaN            NaN
+   28  0.5400000E+02  0.5600000E+02            NaN            NaN            NaN
+   29  0.5600000E+02  0.5800000E+02            NaN            NaN            NaN
+   30  0.5800000E+02  0.6000000E+02            NaN            NaN            NaN
+   31  0.6000000E+02  0.6200000E+02            NaN            NaN            NaN
+   32  0.6200000E+02  0.6400000E+02            NaN            NaN            NaN
+   33  0.6400000E+02  0.6600000E+02            NaN            NaN            NaN
+   34  0.6600000E+02  0.6800000E+02            NaN            NaN            NaN
+   35  0.6800000E+02  0.7000000E+02            NaN            NaN            NaN
+   36  0.7000000E+02  0.7200000E+02            NaN            NaN            NaN
+   37  0.7200000E+02  0.7400000E+02            NaN            NaN            NaN
+   38  0.7400000E+02  0.7600000E+02            NaN            NaN            NaN
+   39  0.7600000E+02  0.7800000E+02            NaN            NaN            NaN
+   40  0.7800000E+02  0.8000000E+02            NaN            NaN            NaN
+   41  0.8000000E+02  0.8200000E+02            NaN            NaN            NaN
+   42  0.8200000E+02  0.8400000E+02            NaN            NaN            NaN
+   43  0.8400000E+02  0.8600000E+02            NaN            NaN            NaN
+   44  0.8600000E+02  0.8800000E+02            NaN            NaN            NaN
+   45  0.8800000E+02  0.9000000E+02            NaN            NaN            NaN
+   46  0.9000000E+02  0.9200000E+02            NaN            NaN            NaN
+   47  0.9200000E+02  0.9400000E+02            NaN            NaN            NaN
+   48  0.9400000E+02  0.9600000E+02            NaN            NaN            NaN
+   49  0.9600000E+02  0.9800000E+02            NaN            NaN            NaN
+   50  0.9800000E+02  0.1000000E+03            NaN            NaN            NaN
+   51  0.1000000E+03  0.1020000E+03            NaN            NaN            NaN
+   52  0.1020000E+03  0.1040000E+03            NaN            NaN            NaN
+   53  0.1040000E+03  0.1060000E+03            NaN            NaN            NaN
+   54  0.1060000E+03  0.1080000E+03            NaN            NaN            NaN
+   55  0.1080000E+03  0.1100000E+03            NaN            NaN            NaN
+   56  0.1100000E+03  0.1120000E+03            NaN            NaN            NaN
+   57  0.1120000E+03  0.1140000E+03            NaN            NaN            NaN
+   58  0.1140000E+03  0.1160000E+03            NaN            NaN            NaN
+   59  0.1160000E+03  0.1180000E+03            NaN            NaN            NaN
+   60  0.1180000E+03  0.1200000E+03            NaN            NaN            NaN
+   61  0.1200000E+03  0.1220000E+03            NaN            NaN            NaN
+   62  0.1220000E+03  0.1240000E+03            NaN            NaN            NaN
+   63  0.1240000E+03  0.1260000E+03            NaN            NaN            NaN
+   64  0.1260000E+03  0.1280000E+03            NaN            NaN            NaN
+   65  0.1280000E+03  0.1300000E+03            NaN            NaN            NaN
+   66  0.1300000E+03  0.1320000E+03            NaN            NaN            NaN
+   67  0.1320000E+03  0.1340000E+03            NaN            NaN            NaN
+   68  0.1340000E+03  0.1360000E+03            NaN            NaN            NaN
+   69  0.1360000E+03  0.1380000E+03            NaN            NaN            NaN
+   70  0.1380000E+03  0.1400000E+03            NaN            NaN            NaN
+   71  0.1400000E+03  0.1420000E+03            NaN            NaN            NaN
+   72  0.1420000E+03  0.1440000E+03            NaN            NaN            NaN
+   73  0.1440000E+03  0.1460000E+03            NaN            NaN            NaN
+   74  0.1460000E+03  0.1480000E+03            NaN            NaN            NaN
+   75  0.1480000E+03  0.1500000E+03            NaN            NaN            NaN
+   76  0.1500000E+03  0.1520000E+03            NaN            NaN            NaN
+   77  0.1520000E+03  0.1540000E+03            NaN            NaN            NaN
+   78  0.1540000E+03  0.1560000E+03            NaN            NaN            NaN
+   79  0.1560000E+03  0.1580000E+03            NaN            NaN            NaN
+   80  0.1580000E+03  0.1600000E+03            NaN            NaN            NaN
+   81  0.1600000E+03  0.1620000E+03            NaN            NaN            NaN
+   82  0.1620000E+03  0.1640000E+03            NaN            NaN            NaN
+   83  0.1640000E+03  0.1660000E+03            NaN            NaN            NaN
+   84  0.1660000E+03  0.1680000E+03            NaN            NaN            NaN
+   85  0.1680000E+03  0.1700000E+03            NaN            NaN            NaN
+   86  0.1700000E+03  0.1720000E+03            NaN            NaN            NaN
+   87  0.1720000E+03  0.1740000E+03            NaN            NaN            NaN
+   88  0.1740000E+03  0.1760000E+03            NaN            NaN            NaN
+   89  0.1760000E+03  0.1780000E+03            NaN            NaN            NaN
+   90  0.1780000E+03  0.1800000E+03            NaN            NaN            NaN
+   91  0.1800000E+03  0.1820000E+03            NaN            NaN            NaN
+   92  0.1820000E+03  0.1840000E+03            NaN            NaN            NaN
+   93  0.1840000E+03  0.1860000E+03            NaN            NaN            NaN
+   94  0.1860000E+03  0.1880000E+03            NaN            NaN            NaN
+   95  0.1880000E+03  0.1900000E+03            NaN            NaN            NaN
+   96  0.1900000E+03  0.1920000E+03            NaN            NaN            NaN
+   97  0.1920000E+03  0.1940000E+03            NaN            NaN            NaN
+   98  0.1940000E+03  0.1960000E+03            NaN            NaN            NaN
+   99  0.1960000E+03  0.1980000E+03            NaN            NaN            NaN
+  100  0.1980000E+03  0.2000000E+03            NaN            NaN            NaN
+   3 frequencies
+frq=  0.2000000E-01 -0.1876364E-08  0.3378401E+01  0.3404250E+01 -0.1359630E+01
+       100
+   0.000000   2.000000 -0.8389088E-02  0.6018783E-02  0.8177264E-02  0.3811211E-01 -0.6942965E-02  0.1224462E+00
+   2.000000   4.000000 -0.2572070E-02  0.1461718E-01  0.1092181E-01  0.8259352E-01  0.5316204E-01  0.1391844E+00
+   4.000000   6.000000 -0.3067707E-02  0.1572768E-01  0.8541282E-02  0.7639041E-01  0.6867618E-01  0.1044817E+00
+   6.000000   8.000000 -0.4894283E-02  0.1398983E-01  0.6222274E-02  0.5704658E-01  0.6320727E-01  0.6584944E-01
+   8.000000  10.000000 -0.6345188E-02  0.1158074E-01  0.4723841E-02  0.3470034E-01  0.4994349E-01  0.2985029E-01
+  10.000000  12.000000 -0.6957366E-02  0.1018603E-01  0.4054072E-02  0.2142137E-01  0.4419293E-01  0.5598186E-02
+  12.000000  14.000000 -0.7273401E-02  0.8981529E-02  0.4009075E-02  0.1292830E-01  0.4048994E-01 -0.1023177E-01
+  14.000000  16.000000 -0.7417675E-02  0.7757783E-02  0.4380421E-02  0.5726297E-02  0.3623533E-01 -0.2224889E-01
+  16.000000  18.000000 -0.7179558E-02  0.6276425E-02  0.5700166E-02 -0.3437743E-02  0.2792319E-01 -0.3342403E-01
+  18.000000  20.000000 -0.6751636E-02  0.5379437E-02  0.6845739E-02 -0.1000708E-01  0.2302993E-01 -0.4211724E-01
+  20.000000  22.000000 -0.6281002E-02  0.4727585E-02  0.7913686E-02 -0.1419432E-01  0.1991548E-01 -0.4738460E-01
+  22.000000  24.000000 -0.5805209E-02  0.4181702E-02  0.8934031E-02 -0.1684008E-01  0.1760221E-01 -0.5008879E-01
+  24.000000  26.000000 -0.5241703E-02  0.3700330E-02  0.1004791E-01 -0.1888965E-01  0.1540871E-01 -0.5150292E-01
+  26.000000  28.000000 -0.4689765E-02  0.3282001E-02  0.1108784E-01 -0.2007931E-01  0.1361065E-01 -0.5144333E-01
+  28.000000  30.000000 -0.4290677E-02  0.2880122E-02  0.1187302E-01 -0.2026873E-01  0.1223889E-01 -0.4974454E-01
+  30.000000  32.000000 -0.3990871E-02  0.2663571E-02  0.1241127E-01 -0.2039749E-01  0.1139340E-01 -0.4874188E-01
+  32.000000  34.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  34.000000  36.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  36.000000  38.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  38.000000  40.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  40.000000  42.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  42.000000  44.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  44.000000  46.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  46.000000  48.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  48.000000  50.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  50.000000  52.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  52.000000  54.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  54.000000  56.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  56.000000  58.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  58.000000  60.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  60.000000  62.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  62.000000  64.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  64.000000  66.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  66.000000  68.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  68.000000  70.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  70.000000  72.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  72.000000  74.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  74.000000  76.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  76.000000  78.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  78.000000  80.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  80.000000  82.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  82.000000  84.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  84.000000  86.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  86.000000  88.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  88.000000  90.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  90.000000  92.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  92.000000  94.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  94.000000  96.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  96.000000  98.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  98.000000 100.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 100.000000 102.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 102.000000 104.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 104.000000 106.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 106.000000 108.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 108.000000 110.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 110.000000 112.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 112.000000 114.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 114.000000 116.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 116.000000 118.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 118.000000 120.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 120.000000 122.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 122.000000 124.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 124.000000 126.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 126.000000 128.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 128.000000 130.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 130.000000 132.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 132.000000 134.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 134.000000 136.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 136.000000 138.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 138.000000 140.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 140.000000 142.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 142.000000 144.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 144.000000 146.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 146.000000 148.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 148.000000 150.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 150.000000 152.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 152.000000 154.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 154.000000 156.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 156.000000 158.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 158.000000 160.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 160.000000 162.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 162.000000 164.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 164.000000 166.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 166.000000 168.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 168.000000 170.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 170.000000 172.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 172.000000 174.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 174.000000 176.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 176.000000 178.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 178.000000 180.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 180.000000 182.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 182.000000 184.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 184.000000 186.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 186.000000 188.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 188.000000 190.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 190.000000 192.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 192.000000 194.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 194.000000 196.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 196.000000 198.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 198.000000 200.000000            NaN            NaN            NaN            NaN            NaN            NaN
+frq=  0.1000000E+00 -0.3339970E-07  0.3311965E+01  0.3351112E+01 -0.9908651E+00
+       100
+   0.000000   2.000000 -0.4074145E-01  0.4859036E-01  0.3909615E-01  0.1856095E+00 -0.2599847E-01  0.6311237E+00
+   2.000000   4.000000 -0.2716711E-01  0.7114832E-01  0.1619773E-01  0.1201726E+00  0.1658588E+00  0.8882882E-01
+   4.000000   6.000000 -0.2756713E-01  0.4231844E-01  0.2674391E-01 -0.3494766E-01  0.1202796E+00 -0.2143903E+00
+   6.000000   8.000000 -0.1566576E-01  0.2031338E-01  0.5869631E-01 -0.8323604E-01  0.6412272E-01 -0.2521053E+00
+   8.000000  10.000000  0.6925762E-03  0.1058035E-01  0.8509110E-01 -0.8062882E-01  0.3139031E-01 -0.1982607E+00
+  10.000000  12.000000  0.9789671E-02  0.5650973E-02  0.9257491E-01 -0.5771126E-01  0.1649961E-01 -0.1233599E+00
+  12.000000  14.000000  0.1277124E-01  0.2549323E-02  0.8797041E-01 -0.3608024E-01  0.8121237E-02 -0.6360521E-01
+  14.000000  16.000000  0.1290797E-01  0.8482756E-03  0.7828196E-01 -0.2054320E-01  0.3363213E-02 -0.2448980E-01
+  16.000000  18.000000  0.1337549E-01  0.3588011E-03  0.6922375E-01 -0.9964804E-02  0.1479631E-02 -0.1148991E-02
+  18.000000  20.000000  0.1239907E-01  0.2105401E-03  0.5794219E-01 -0.3356898E-02  0.7998294E-03  0.1128784E-01
+  20.000000  22.000000  0.1059364E-01  0.1253549E-03  0.4662721E-01  0.2754754E-03  0.4473903E-03  0.1649258E-01
+  22.000000  24.000000  0.8617824E-02  0.6719974E-04  0.3659057E-01  0.2003203E-02  0.2381506E-03  0.1746894E-01
+  24.000000  26.000000  0.6947223E-02  0.4471764E-04  0.2843560E-01  0.2726322E-02  0.1440484E-03  0.1638476E-01
+  26.000000  28.000000  0.5483785E-02  0.3189746E-04  0.2179424E-01  0.2820483E-02  0.9170407E-04  0.1429040E-01
+  28.000000  30.000000  0.4163061E-02  0.1524243E-04  0.1640189E-01  0.2517286E-02  0.4575059E-04  0.1180938E-01
+  30.000000  32.000000  0.3537661E-02  0.9226680E-05  0.1384932E-01  0.2310775E-02  0.2890795E-04  0.1044560E-01
+  32.000000  34.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  34.000000  36.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  36.000000  38.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  38.000000  40.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  40.000000  42.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  42.000000  44.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  44.000000  46.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  46.000000  48.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  48.000000  50.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  50.000000  52.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  52.000000  54.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  54.000000  56.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  56.000000  58.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  58.000000  60.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  60.000000  62.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  62.000000  64.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  64.000000  66.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  66.000000  68.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  68.000000  70.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  70.000000  72.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  72.000000  74.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  74.000000  76.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  76.000000  78.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  78.000000  80.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  80.000000  82.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  82.000000  84.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  84.000000  86.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  86.000000  88.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  88.000000  90.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  90.000000  92.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  92.000000  94.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  94.000000  96.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  96.000000  98.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  98.000000 100.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 100.000000 102.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 102.000000 104.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 104.000000 106.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 106.000000 108.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 108.000000 110.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 110.000000 112.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 112.000000 114.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 114.000000 116.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 116.000000 118.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 118.000000 120.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 120.000000 122.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 122.000000 124.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 124.000000 126.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 126.000000 128.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 128.000000 130.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 130.000000 132.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 132.000000 134.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 134.000000 136.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 136.000000 138.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 138.000000 140.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 140.000000 142.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 142.000000 144.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 144.000000 146.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 146.000000 148.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 148.000000 150.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 150.000000 152.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 152.000000 154.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 154.000000 156.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 156.000000 158.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 158.000000 160.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 160.000000 162.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 162.000000 164.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 164.000000 166.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 166.000000 168.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 168.000000 170.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 170.000000 172.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 172.000000 174.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 174.000000 176.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 176.000000 178.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 178.000000 180.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 180.000000 182.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 182.000000 184.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 184.000000 186.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 186.000000 188.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 188.000000 190.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 190.000000 192.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 192.000000 194.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 194.000000 196.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 196.000000 198.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 198.000000 200.000000            NaN            NaN            NaN            NaN            NaN            NaN
+frq=  0.1670000E+00 -0.1285235E-06  0.3174750E+01  0.3309838E+01 -0.8662249E+00
+       100
+   0.000000   2.000000 -0.7377449E-01  0.1023906E+00  0.5409652E-01  0.3023807E+00  0.8997964E-02  0.1009347E+01
+   2.000000   4.000000 -0.4366456E-01  0.1048155E+00  0.2758601E-01 -0.1962200E-01  0.2225559E+00 -0.2992522E+00
+   4.000000   6.000000 -0.9263970E-02  0.3946721E-01  0.1110249E+00 -0.1521693E+00  0.9800958E-01 -0.4317259E+00
+   6.000000   8.000000  0.1905459E-01  0.1073662E-01  0.1542456E+00 -0.9702158E-01  0.3111407E-01 -0.2198333E+00
+   8.000000  10.000000  0.3068068E-01  0.3733605E-02  0.1437713E+00 -0.4060260E-01  0.1015728E-01 -0.6846506E-01
+  10.000000  12.000000  0.2661764E-01  0.1445090E-02  0.1063299E+00 -0.1029501E-01  0.3686198E-02  0.4612156E-03
+  12.000000  14.000000  0.1851231E-01  0.4173284E-03  0.7048598E-01  0.1015315E-02  0.1137084E-02  0.2098287E-01
+  14.000000  16.000000  0.1163627E-01  0.4925101E-04  0.4440150E-01  0.3702533E-02  0.1960978E-03  0.2184036E-01
+  16.000000  18.000000  0.7456293E-02  0.3846005E-05  0.2800260E-01  0.3794567E-02  0.2710996E-04  0.1751919E-01
+  18.000000  20.000000  0.4620635E-02  0.1673546E-05  0.1699696E-01  0.2949318E-02  0.1059352E-04  0.1221642E-01
+  20.000000  22.000000  0.2768553E-02  0.9463884E-06  0.1005151E-01  0.2017111E-02  0.4709811E-05  0.7905815E-02
+  22.000000  24.000000  0.1621816E-02  0.2737345E-06  0.5856457E-02  0.1287645E-02  0.1332492E-05  0.4901945E-02
+  24.000000  26.000000  0.9545853E-03  0.2437853E-06  0.3404633E-02  0.8052722E-03  0.8571606E-06  0.2979150E-02
+  26.000000  28.000000  0.5586999E-03  0.3120967E-06  0.1963699E-02  0.4920890E-03  0.7168938E-06  0.1774793E-02
+  28.000000  30.000000  0.3189761E-03  0.1141783E-06  0.1117970E-02  0.2896504E-03  0.2569625E-06  0.1034892E-02
+  30.000000  32.000000  0.2268692E-03  0.3974306E-07  0.7945302E-03  0.2092311E-03  0.1008835E-06  0.7444967E-03
+  32.000000  34.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  34.000000  36.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  36.000000  38.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  38.000000  40.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  40.000000  42.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  42.000000  44.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  44.000000  46.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  46.000000  48.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  48.000000  50.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  50.000000  52.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  52.000000  54.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  54.000000  56.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  56.000000  58.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  58.000000  60.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  60.000000  62.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  62.000000  64.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  64.000000  66.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  66.000000  68.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  68.000000  70.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  70.000000  72.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  72.000000  74.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  74.000000  76.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  76.000000  78.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  78.000000  80.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  80.000000  82.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  82.000000  84.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  84.000000  86.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  86.000000  88.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  88.000000  90.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  90.000000  92.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  92.000000  94.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  94.000000  96.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  96.000000  98.000000            NaN            NaN            NaN            NaN            NaN            NaN
+  98.000000 100.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 100.000000 102.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 102.000000 104.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 104.000000 106.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 106.000000 108.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 108.000000 110.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 110.000000 112.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 112.000000 114.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 114.000000 116.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 116.000000 118.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 118.000000 120.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 120.000000 122.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 122.000000 124.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 124.000000 126.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 126.000000 128.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 128.000000 130.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 130.000000 132.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 132.000000 134.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 134.000000 136.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 136.000000 138.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 138.000000 140.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 140.000000 142.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 142.000000 144.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 144.000000 146.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 146.000000 148.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 148.000000 150.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 150.000000 152.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 152.000000 154.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 154.000000 156.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 156.000000 158.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 158.000000 160.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 160.000000 162.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 162.000000 164.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 164.000000 166.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 166.000000 168.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 168.000000 170.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 170.000000 172.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 172.000000 174.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 174.000000 176.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 176.000000 178.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 178.000000 180.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 180.000000 182.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 182.000000 184.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 184.000000 186.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 186.000000 188.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 188.000000 190.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 190.000000 192.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 192.000000 194.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 194.000000 196.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 196.000000 198.000000            NaN            NaN            NaN            NaN            NaN            NaN
+ 198.000000 200.000000            NaN            NaN            NaN            NaN            NaN            NaN

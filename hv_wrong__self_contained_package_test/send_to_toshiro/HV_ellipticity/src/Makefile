@@ -1,0 +1,24 @@
+BIN=../bin
+
+#----------------------------------
+#----------------------------------
+
+all:  clean HVkernel
+
+#----------------------------------
+#----------------------------------
+
+
+HVkernel: $(BIN)/HVkernel
+
+$(BIN)/HVkernel: PVZH_kernel.f rayleigh_sub.f
+	-rm -f $(BIN)/HVkernel
+	gfortran -o $(BIN)/HVkernel PVZH_kernel.f  rayleigh_sub.f
+
+# frechet.o: frechet.f interpol_frechet.o interple_frechet.o
+# 	gfortran $(FFLAGS) -c frechet.f
+
+
+#----------------------------------
+clean:
+	-rm -f $(BIN)/HVkernel

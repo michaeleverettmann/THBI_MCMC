@@ -1,0 +1,23 @@
+bin/**
+junk/** 
+
+# Things I generally don't want to commit
+**.a 
+**.o
+**.DS_Store
+**.m~
+**.zip
+**.png
+**.jpg
+**.eps
+**.pdf
+**.svg
+**.tif
+**.html
+**.mat
+**.fig
+**.asv
+./git/*
+
+# Things in test folder that should be generated on one computer 
+# Don't sent the outputs that are generated during testing, but do send the target outputs. 
