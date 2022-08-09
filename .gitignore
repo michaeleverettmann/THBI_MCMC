@@ -49,6 +49,7 @@ SYNTHETICS/**/**.mat
 !**.py
 !**.f
 !**.c
+!README*
 
 junk/**
 # This is just used to hold codes that I later developed and got running. They are elsewhere on my machine.
@@ -72,3 +73,5 @@ matlab_to_hv_kernel/startB.model
 *.jpeg
 investigations/h-kappa-tests/ears_waveforms/Ears/gauss_2.5/**
 figures/xsect/stafile*.txt
+
+.vscode/*

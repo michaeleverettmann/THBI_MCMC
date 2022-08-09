@@ -8,7 +8,7 @@ function [errorInfo]=assess_timeout_results(status, cmdout);
 if (status == 124) % 124 means timeout limit reached. 
     warning(sprintf(['\nError with a system(timeout) call. Timeout limit reached.',...
              '  This is often a cause of a computer running highly parallel, or moving to a new computer.',...
-             '  Try increasing timeout duration just before this line. brb2022.04.12'])); 
+             '  Try increasing timeout duration just before this line. \ncmdout was: \n%s \nbrb2022.04.12'],cmdout)); 
 elseif (status ~= 124) && (status ~= 0)% Don't know what this means. 
     warning('Error with a system(timeout) call. Status=%1.0f. Error occured BEFORE timeout limit. Message shown below. brb2022.04.12',status); 
     fprintf('\n%s\n',cmdout)
