@@ -20,8 +20,9 @@ inv = struct(    'synthTest',false                ,...
 % % %                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
 % % %                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
 
+% Everything below can be copy pasted between real data runs and synthetic runs (as of 2022.08.11). brb
 
-profileRun = false; % Whether to do an mpi profile to learn what parts of code take much time
+profileRun = false; if profileRun; fprintf('\n\nDoing an mpi profile run.\n\n'), end% Whether to do an mpi profile to learn what parts of code take much time
                                 
 %% Model parms
 modl = struct([]);
@@ -211,7 +212,7 @@ synth = struct( 'gcarcs',[70]                 ,... % average gcarc
                 'noise_sigma_BW_Ps',0.012        ,... %0.02 std for random added noise for PsRFs
                 'noise_sigma_RF_Sp',0.009        ,... %0.02 std for random added noise for SpRFs
                 'noise_sigma_RF_Ps',0.012        ,... %0.02 std for random added noise for PsRFs
-                'surf_Vp_Vs',[6.1 3.55]          ,... % [VP, VS] surface velocity values - if empty, uses True vals
+                'surf_Vp_Vs',[6.1 3.55]          ,... % [VP, VS] surface velocity values - if empty, uses True vals % bb2022.02.08 Not sure what these are. Different sets of values are used in z0_SYNTH_MODEL...
                 'SW_Ray_phV_periods',logspace(log10(6),log10(167),22)',...  % Rayleigh wave phV periods
                 'SW_Ray_grV_periods',logspace(log10(6),log10(40),10)',...  % Rayleigh wave phV periods
                 'SW_Lov_phV_periods',logspace(log10(6),log10(40),10)',...  % Love wave phV periods
