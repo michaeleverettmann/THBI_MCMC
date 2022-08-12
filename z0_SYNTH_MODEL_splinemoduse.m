@@ -56,6 +56,29 @@ elseif strcmp(ver, 'sed_deep'); % Original(ish) version.
 
     xi_crust = 1.05;
     xi_mantle = 1.0; 
+elseif strcmp(ver, 'crat_2mld'); % Original(ish) version. 
+    selev = 0; 
+    h_sed = 1; 
+    h_crust = 45;
+
+    vs_sed = [1.5 2.5]; 
+
+    kvs_crust = [3.3 3.33 3.74 3.81]';
+    cknots = linspace(h_sed, h_sed+h_crust,3)';
+    fcknots = (cknots-h_sed)/h_crust;
+    k_crust = length(cknots);
+
+    kvs_mantle = [          4.1    4.3,  3.8,  4.4,  4.55, 4.65, 4.3, 4.8, 4.8,  4.825  4.7,  4.6, 4.5, 4.5  ]'; %<
+    mknots =     [h_sed+h_crust,      60,   80,   100,  120,  140,  160, 180,  200,   220, 240, 260,    par.mod.maxz   ]'; %<
+    
+    
+    fmknots = (mknots-h_sed-h_crust)/(par.mod.maxz-h_sed-h_crust);
+    k_mantle = length(mknots);
+
+    vpvs_crust = 1.8;
+
+    xi_crust = 1.05;
+    xi_mantle = 1.0; 
 end
 
 %% DERIVATIVE PARMS
@@ -96,7 +119,8 @@ model = struct('sedmparm',sed,'crustmparm',crust,'mantmparm',mantle,...
            
 %% TURN PARMS INTO REAL TARGET MODEL
 TRUEmodel = make_mod_from_parms(model,par);
-% plot_quickmodel(par,model,model); warning('Remove this line'); 
+% % % plot_PARAMETERISATION( TRUEmodel )
+% % % plot_quickmodel(par,TRUEmodel,TRUEmodel); warning('Remove this line'); 
 % same format...
 
 TRUEmodel.Z = TRUEmodel.z;
