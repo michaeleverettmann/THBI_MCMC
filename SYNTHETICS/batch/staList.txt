@@ -1,0 +1,4 @@
+testnwk crat_2mld
+testnwk sed_deep
+testnwk orig
+# For some reason have to have a final line that isn't used. Note: format is NET STA
