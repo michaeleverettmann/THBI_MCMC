@@ -7,56 +7,50 @@ end
 
 global TRUEmodel TLM
 
-% ver = 'orig'; % Index for model parameters to choose from. 
-ver = [par.stadeets.sta]'; % Treat the station as determining what model to load. 
-if strcmp(ver, 'teststa'); ver = 'orig'; end; % Backward compatibility. 
 
 %% CHOOSE CUSTOM KEY PARAMETERS
-% For important parameters I modified, I'll try to do a %<
-% Or maybe put the parameters I want to modify from base at the top
-if strcmp(ver, 'orig'); % Original(ish) version. 
-    selev = 0;
-    h_sed = 0;
-    h_crust = 45;
+selev = 0;
+h_sed = 0;
+h_crust = 45;
 
-    vs_sed = [3.3 3.3];
+vs_sed = [3.3 3.3];
 
-    kvs_crust = [3.3 3.33 3.74 3.81]';
-    cknots = linspace(h_sed, h_sed+h_crust,3)';
-    fcknots = (cknots-h_sed)/h_crust;
-    k_crust = length(cknots);
+kvs_crust = [3.3 3.33 3.74 3.81]';
+cknots = linspace(h_sed, h_sed+h_crust,3)';
+fcknots = (cknots-h_sed)/h_crust;
+k_crust = length(cknots);
 
-    kvs_mantle = [4.1 4.3  4.4 4.0 4.1 4.43]';
-    mknots = [h_sed+h_crust, 60, 110, 140, par.mod.maxz]';
-    fmknots = (mknots-h_sed-h_crust)/(par.mod.maxz-h_sed-h_crust);
-    k_mantle = length(mknots);
+% kvs_mantle = [4.1 4.4 4.4 4.15 4.2];
+kvs_mantle = [4.1 4.3  4.4 4.0 4.1 4.43]';
+mknots = [h_sed+h_crust, 60, 110, 140, par.mod.maxz]';
+fmknots = (mknots-h_sed-h_crust)/(par.mod.maxz-h_sed-h_crust);
+k_mantle = length(mknots);
 
-    vpvs_crust = 1.8;
+% sharper LAB
 
-    xi_crust = 1.05;
-    xi_mantle = 1.0; 
-elseif strcmp(ver, 'sed_deep'); % Original(ish) version. 
-    selev = 0; 
-    h_sed = 4.1; %<
-    h_crust = 45;
+vpvs_crust = 1.8;
+% vpvs_crust = 1.6; warning('Changing synthetic vpvs_crust')
 
-    vs_sed = [1.5 2.5]; %<
 
-    kvs_crust = [3.3 3.33 3.74 3.81]';
-    cknots = linspace(h_sed, h_sed+h_crust,3)';
-    fcknots = (cknots-h_sed)/h_crust;
-    k_crust = length(cknots);
+xi_crust = 1.05;
+% xi_crust = 1; warning('no xi in crust')
+% xi_mantle = 0.95;
+xi_mantle = 1.0; warning('brb2022.07.26 Changing synthetic model xi_mantle to 1'); 
 
-    kvs_mantle = [4.1 4.3  4.4 4.0 4.1 4.43]';
-    mknots = [h_sed+h_crust, 60, 110, 140, par.mod.maxz]';
-    fmknots = (mknots-h_sed-h_crust)/(par.mod.maxz-h_sed-h_crust);
-    k_mantle = length(mknots);
 
-    vpvs_crust = 1.8;
+% xi_crust = 1.;
+% xi_mantle = 1.;
+% warning("removing anisotropy from the synthetic model")
 
-    xi_crust = 1.05;
-    xi_mantle = 1.0; 
-end
+% % % brb2022.02.18 Save a few models in par...
+% % % Should set these elsewhere...
+% % par.synth.model.h_crust     = h_crust; 
+% % par.synth.model.selev       = selev; 
+% % par.synth.model.h_sed       = h_sed; 
+% % par.synth.model.vs_sed      = vs_sed; 
+% % par.synth.model.vpvs_Crust  = vpvs_crust; 
+% % par.synth.model.xi_crust    = xi_crust; 
+% % par.synth.model.xi_mantle   = xi_mantle; 
 
 %% DERIVATIVE PARMS
 % DEPTHS
@@ -81,6 +75,7 @@ zm = unique([mminz:par.mod.dz:mmaxz,mmaxz])';
 % OVERALL
 M = 1 + 2 + 1 + k_crust + k_mantle + 1;
 
+
 %% MAKE ALL PARAMETER STRUCTURES
 sed = struct('h',h_sed,'VS',vs_sed);
 crust = struct('h',h_crust,'Nsp',k_crust+1,'Nkn',k_crust,'VS_sp',kvs_crust,'vpvs',vpvs_crust,'xi',xi_crust,'splines',cspbasis,'knots',cknots,'fknots',fcknots,'z_sp',zc);
@@ -96,7 +91,6 @@ model = struct('sedmparm',sed,'crustmparm',crust,'mantmparm',mantle,...
            
 %% TURN PARMS INTO REAL TARGET MODEL
 TRUEmodel = make_mod_from_parms(model,par);
-% plot_quickmodel(par,model,model); warning('Remove this line'); 
 % same format...
 
 TRUEmodel.Z = TRUEmodel.z;
