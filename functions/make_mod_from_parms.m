@@ -10,14 +10,17 @@ mpc = model.crustmparm;
 mpm = model.mantmparm;
 
 %% SEDIMENTS
-zs = [0,mps.h]';
+zs0     = [0,mps.h]'; % This is all that's initially parameterised with sediment. 
+vs_sed0 = mps.VS(:);
 
-vs_sed = mps.VS(:);
+zs = unique([0:par.mod.dz:mps.h,mps.h])'; % Now up-interpolate to steps of dz
+vs_sed = linterp(zs0, vs_sed0, zs); % Now up-interpolate to steps of dz
+
 vp_sed = sed_vs2vp(vs_sed);
 rho_sed = sed_vs2rho(vs_sed);
 xi_sed = ones(size(zs));
 
-if diff(zs)==0; zs=[]; vs_sed=[]; vp_sed=[]; rho_sed=[]; xi_sed=[]; end
+if diff(zs0)==0; zs=[]; vs_sed=[]; vp_sed=[]; rho_sed=[]; xi_sed=[]; end
 
 %% CRUST
 cminz = mps.h;
