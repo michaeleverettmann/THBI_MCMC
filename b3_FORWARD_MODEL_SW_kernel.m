@@ -122,8 +122,64 @@ for id = 1:length(par.inv.datatypes)
                                       dvp_vp.*Kzh_Vp + ...
                                       drh_rh.*Kzh_rho) )); % Trapz returns three values: the integral over each kernel. Then we need to sum each of those.           
                 
+                                  
+                % Test. See if we can get discontinuity kernel going. 
+                Kzh_d = Kbase.(pdtyp{2}).KHV{ip}.Kzh_d; 
+                dHV_disc = 0; 
+                fns = {'zmoh', 'zsed'}; % Field names to work on
+                for ifn = 1:length(fns);
+                    fn = fns{ifn}; 
+                    d_z_disc = model.(fn)- Kbase.modelk.(fn); 
+                    d_z_disc = - d_z_disc; 
+                    iz_old = and(Kbase.(pdtyp{2}).KHV{ip}.Z1 < Kbase.modelk.(fn),...
+                        Kbase.modelk.(fn) <= Kbase.(pdtyp{2}).KHV{ip}.Z2);
+                    dHV_disc = dHV_disc + Kzh_d(iz_old) * d_z_disc; 
+%                     fprintf('\nHV contribution from disc: dHV=%1.5f, dz_disc=%1.2f\n',dHV_disc, d_z_disc);
+                end
+                
+%                 d_zmoh = model.zmoh - Kbase.modelk.zmoh; 
+% %                 d_zmoh = - d_zmoh; % Toshiro's code might be by radius, not depth
+%                 Kzh_d = Kbase.(pdtyp{2}).KHV{ip}.Kzh_d; 
+%                 izmoh_old = and(Kbase.(pdtyp{2}).KHV{ip}.Z1 < Kbase.modelk.zmoh,...
+%                     Kbase.modelk.zmoh <= Kbase.(pdtyp{2}).KHV{ip}.Z2); 
+%                 dHV_disc = Kzh_d(izmoh_old) * d_zmoh; 
+                
+                dHV = dHV + dHV_disc; 
+                fprintf('\nHV contribution from disc: dHV=%1.5f, dzmoh=%1.2f\n',dHV_disc, nan);
+                
+%                  [izmoh_old , Kbase.(pdtyp{2}).KHV{ip}.Z1, Kbase.(pdtyp{2}).KHV{ip}.Z2, Kzh_d]
+
+%                 predata.(dtype).HVr(ip) = ( Kbase.(pdtyp{2}).(pdtyp{3})(ip)) + dHV ); % Predata has HV, not ZH. Toshiros kernels are dZH. So add dZH to our 1/HV, then convert back to HV. brb2022.07.14
                 predata.(dtype).HVr(ip) = 1./( (1./Kbase.(pdtyp{2}).(pdtyp{3})(ip)) + dHV ); % Predata has HV, not ZH. Toshiros kernels are dZH. So add dZH to our 1/HV, then convert back to HV. brb2022.07.14
 %                 predata.(dtype).HVr(ip) = Kbase.(pdtyp{2}).(pdtyp{3})(ip) - dHV; % Zach's version, which didn't consider HV versus ZH
+% % %                 dHV = sum(trapz(zzz, ...
+% % %                                      (dvs_vs.*Kzh_Vs + ...
+% % %                                       dvp_vp.*Kzh_Vp + ...
+% % %                                       drh_rh.*Kzh_rho) )); % Trapz returns three values: the integral over each kernel. Then we need to sum each of those.           
+% % %                 
+% % % %                 dHV = trapz(zzz, dvs_vs.*Kzh_Vs ); 
+% % %                 
+% % %                 hv0 = Kbase.(pdtyp{2}).(pdtyp{3})(ip); 
+% % %                 pdat = hv0; 
+% % %                 trapz(zzz, 1./(hv0)
+% % %                 predata.(dtype).HVr(ip) = 1./( (1./Kbase.(pdtyp{2}).(pdtyp{3})(ip)) + dHV ); % Predata has HV, not ZH. Toshiros kernels are dZH. So add dZH to our 1/HV, then convert back to HV. brb2022.07.14
+% % %                 predata.(dtype).HVr(ip) = pdat; 
+% % %                                   
+% % %                 % Test. See if we can get discontinuity kernel going. 
+% % %                 d_zmoh = model.zmoh - Kbase.modelk.zmoh; 
+% % %                 d_zmoh = - d_zmoh; % Toshiro's code might be by radius, not depth
+% % %                 Kzh_d = Kbase.(pdtyp{2}).KHV{ip}.Kzh_d; 
+% % %                 izmoh_old = and(Kbase.(pdtyp{2}).KHV{ip}.Z1 < model.zmoh,...
+% % %                     model.zmoh <= Kbase.(pdtyp{2}).KHV{ip}.Z2); 
+% % %                 dHV_disc = Kzh_d(izmoh_old) * d_zmoh; 
+% % %                 
+% % %                 dHV = dHV + dHV_disc; 
+% % %                 fprintf('\nHV contribution from disc: dHV=%1.5f, dzmoh=%1.2f\n',dHV_disc, d_zmoh);
+% % % 
+% % % %                 predata.(dtype).HVr(ip) = ( Kbase.(pdtyp{2}).(pdtyp{3})(ip)) + dHV ); % Predata has HV, not ZH. Toshiros kernels are dZH. So add dZH to our 1/HV, then convert back to HV. brb2022.07.14
+% % %                 predata.(dtype).HVr(ip) = 1./( (1./Kbase.(pdtyp{2}).(pdtyp{3})(ip)) + dHV ); % Predata has HV, not ZH. Toshiros kernels are dZH. So add dZH to our 1/HV, then convert back to HV. brb2022.07.14
+% % % %                 predata.(dtype).HVr(ip) = Kbase.(pdtyp{2}).(pdtyp{3})(ip) - dHV; % Zach's version, which didn't consider HV versus ZH
+
             end           
     end
 end

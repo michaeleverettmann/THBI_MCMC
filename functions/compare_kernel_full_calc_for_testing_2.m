@@ -2,6 +2,8 @@
 [ model ] = make_mod_from_parms( model,par );
 [ model0 ] = make_mod_from_parms( Kbase.modelk ,par );
 
+par.inv.verbose = 1; 
+
 
 % model0 = Kbase.modelk; 
 
