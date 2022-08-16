@@ -60,13 +60,14 @@ while ~feof(fid)
     HVK_fs(ik,1).Kzh_d  = c{9}; 
     
     Kzh_d = HVK_fs(ik,1).Kzh_d; 
-%     Kzh_d(2:end-1) = Kzh_d(3:end)-Kzh_d(1:end-2); 
-%     Kzh_d(1) = Kzh_d(2); % Not sure what to do about top and bottom of model. 
-%     Kzh_d(end) = Kzh_d(end-1); 
-%     HVK_fs(ik,1).Kzh_d = Kzh_d; 
-    Kzh_d_diff = diff(Kzh_d); 
-    Kzh_d = max([[Kzh_d_diff;0], [0;Kzh_d_diff]], [], 2); % Don't know whether to associate with each point the diff to the point above or below. So just give the larger of the two values. 
+    Kzh_d(2:end-1) = Kzh_d(3:end)-Kzh_d(1:end-2); 
+    Kzh_d(1) = Kzh_d(2); % Not sure what to do about top and bottom of model. 
+    Kzh_d(end) = Kzh_d(end-1); 
     HVK_fs(ik,1).Kzh_d = Kzh_d; 
+    
+%     Kzh_d_diff = diff(Kzh_d); 
+%     Kzh_d = max([[Kzh_d_diff;0], [0;Kzh_d_diff]], [], 2); % Don't know whether to associate with each point the diff to the point above or below. So just give the larger of the two values. 
+%     HVK_fs(ik,1).Kzh_d = Kzh_d; 
     
     % account for possibilty of error
     fpos = ftell(fid);
@@ -142,7 +143,13 @@ if ifplot
         end
         set(gca,'ydir','reverse','fontsize',15)
         title(regexprep(fns{ifn},'_','-'))
-%         ylim([0,20]); warning('Fake y lim in readHVkernel_ofile.m plotting'); 
 
+% This commented code changes limits to compare with Tanimoto 2009 GJI
+%         ylim([0,20]); warning('Fake y lim in readHVkernel_ofile.m plotting'); 
+%         if strcmp(fns{ifn},'Kzh_d'); 
+%             xlim([-3e-3, 3e-3]); 
+%         else
+%             xlim([-.5, .5]); 
+%         end
     end
 end
