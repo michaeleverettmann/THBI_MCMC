@@ -129,7 +129,7 @@ else
     end
 end
 
-ifplot = 1; if(ifplot); warning('Forcing ifplot = 1'); end
+% ifplot = 1; if(ifplot); warning('Forcing ifplot = 1'); end
 if ifplot
     figure(3001);clf, 
     fns = {'Kzh_Vp','Kzh_Vs','Kzh_rho','Kzh_d'};

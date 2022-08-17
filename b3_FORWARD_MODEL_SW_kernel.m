@@ -123,37 +123,37 @@ for id = 1:length(par.inv.datatypes)
                                       drh_rh.*Kzh_rho) )); % Trapz returns three values: the integral over each kernel. Then we need to sum each of those.           
                 
                                   
-                % Test. See if we can get discontinuity kernel going. 
-                Kzh_d = Kbase.(pdtyp{2}).KHV{ip}.Kzh_d; 
-                dHV_disc = 0; 
-                fns = {'zmoh', 'zsed'}; % Field names to work on
-                for ifn = 1:length(fns);
-                    fn = fns{ifn}; 
-                    d_z_disc = model.(fn)- Kbase.modelk.(fn); 
-                    d_z_disc = - d_z_disc; 
-                    iz_old = and(Kbase.(pdtyp{2}).KHV{ip}.Z1 < Kbase.modelk.(fn),...
-                        Kbase.modelk.(fn) <= Kbase.(pdtyp{2}).KHV{ip}.Z2);
-                    iz_old = find(iz_old); 
-                    
-                    % Temporary test. 
-%                     iz_old = [max(iz_old-3,1):...
-%                         min(iz_old+3,length(Kbase.(pdtyp{2}).KHV{ip}.Z1))]'; % Sort of like we are perturbing multiple layers. Moho/sed layer is most significant, but a steep v gradient can effectively be more layers about the Moho
-                    %
-                    
-                    dHV_disc = dHV_disc + sum(Kzh_d(iz_old) .* d_z_disc); 
-%                     fprintf('\nHV contribution from disc: dHV=%1.5f, dz_disc=%1.2f\n',dHV_disc, d_z_disc);
-                end
-                
-%                 d_zmoh = model.zmoh - Kbase.modelk.zmoh; 
-% %                 d_zmoh = - d_zmoh; % Toshiro's code might be by radius, not depth
-%                 Kzh_d = Kbase.(pdtyp{2}).KHV{ip}.Kzh_d; 
-%                 izmoh_old = and(Kbase.(pdtyp{2}).KHV{ip}.Z1 < Kbase.modelk.zmoh,...
-%                     Kbase.modelk.zmoh <= Kbase.(pdtyp{2}).KHV{ip}.Z2); 
-%                 dHV_disc = Kzh_d(izmoh_old) * d_zmoh; 
-                
-                dHV = dHV + dHV_disc; % brb2022.08.16 Seems like discontinuity kernels work, but not in conjunction with volume perturbation kernels. 
-%                 dHV = dHV_disc; 
-                fprintf('\nHV contribution from disc: dHV=%1.5f, dzmoh=%1.2f\n',dHV_disc, nan);
+% % % %                 % Test. See if we can get discontinuity kernel going. 
+% % % %                 Kzh_d = Kbase.(pdtyp{2}).KHV{ip}.Kzh_d; 
+% % % %                 dHV_disc = 0; 
+% % % %                 fns = {'zmoh', 'zsed'}; % Field names to work on
+% % % %                 for ifn = 1:length(fns);
+% % % %                     fn = fns{ifn}; 
+% % % %                     d_z_disc = model.(fn)- Kbase.modelk.(fn); 
+% % % %                     d_z_disc = - d_z_disc; 
+% % % %                     iz_old = and(Kbase.(pdtyp{2}).KHV{ip}.Z1 < Kbase.modelk.(fn),...
+% % % %                         Kbase.modelk.(fn) <= Kbase.(pdtyp{2}).KHV{ip}.Z2);
+% % % %                     iz_old = find(iz_old); 
+% % % %                     
+% % % %                     % Temporary test. 
+% % % % %                     iz_old = [max(iz_old-3,1):...
+% % % % %                         min(iz_old+3,length(Kbase.(pdtyp{2}).KHV{ip}.Z1))]'; % Sort of like we are perturbing multiple layers. Moho/sed layer is most significant, but a steep v gradient can effectively be more layers about the Moho
+% % % %                     %
+% % % %                     
+% % % %                     dHV_disc = dHV_disc + sum(Kzh_d(iz_old) .* d_z_disc); 
+% % % % %                     fprintf('\nHV contribution from disc: dHV=%1.5f, dz_disc=%1.2f\n',dHV_disc, d_z_disc);
+% % % %                 end
+% % % %                 
+% % % % %                 d_zmoh = model.zmoh - Kbase.modelk.zmoh; 
+% % % % % %                 d_zmoh = - d_zmoh; % Toshiro's code might be by radius, not depth
+% % % % %                 Kzh_d = Kbase.(pdtyp{2}).KHV{ip}.Kzh_d; 
+% % % % %                 izmoh_old = and(Kbase.(pdtyp{2}).KHV{ip}.Z1 < Kbase.modelk.zmoh,...
+% % % % %                     Kbase.modelk.zmoh <= Kbase.(pdtyp{2}).KHV{ip}.Z2); 
+% % % % %                 dHV_disc = Kzh_d(izmoh_old) * d_zmoh; 
+% % % %                 
+% % % %                 dHV = dHV + dHV_disc; % brb2022.08.16 Seems like discontinuity kernels work, but not in conjunction with volume perturbation kernels. 
+% % % % %                 dHV = dHV_disc; 
+% % % %                 fprintf('\nHV contribution from disc: dHV=%1.5f, dzmoh=%1.2f\n',dHV_disc, nan);
                 
 %                  [izmoh_old , Kbase.(pdtyp{2}).KHV{ip}.Z1, Kbase.(pdtyp{2}).KHV{ip}.Z2, Kzh_d]
 
