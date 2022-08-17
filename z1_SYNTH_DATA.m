@@ -175,6 +175,22 @@ end
 
 end % doing body waves
 
+%% Get Sp CCP stacks
+dz = 0.5; 
+zz = [-15:dz:300]';
+gcarcs = par.synth.gcarcs(1); 
+if length(par.synth.gcarcs)>1; error('Only have Sp CCP ready for 1 gcarc. You need to build a loop over more, or just use one gcarc.'); end
+tpS = tauptime('deg',gcarc,'phases','S'); 
+rayps = tpS.rayparameter;
+dof_per_z=1/par.datprocess.CCP.parent_zw; 
+data.RF_Sp_ccp = struct('zz',zz,'rayp',rayps,'dz',dz,'nsamp',length(zz),'dof_per_z',dof_per_z); 
+warning('Fake degree of freedom'); 
+
+% par.inv.datatypes{6} = 'RF_Sp_ccp'
+[data] = b3_FORWARD_MODEL_RF_ccp(TRUEmodel, TLM, par, data, 'temporary', 1)
+%!%! Probably add noise here. 
+%%
+
 
 %% ===================  CALCULATE PHASE VELOCITIES  ===================
 % % Use Menke phV solver method on layered model 
