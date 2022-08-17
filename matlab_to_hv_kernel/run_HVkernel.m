@@ -94,14 +94,13 @@ end
 %% read modes output
 if status~=124
     try
-    [HVr,HVK,phV,grV] = readHVkernel_ofile(ofile,swperiods,ifplot);
-    HVr = -1./HVr;
+        [HVr,HVK,phV,grV] = readHVkernel_ofile(ofile,swperiods,ifplot);
+        HVr = -1./HVr;
     catch e 
-        fprintf('\n%s\n',getReport(e)); 
         error(['some error - check model file layers not too thin!\n',...
             'brb2022.05.31 - This can also happen to HV code if ',...
             'velocities toward base of model become super low. See tests from today.',...
-            'We would want to reject those models anyway...'])
+            'We would want to reject those models anyway... Error code was:\n %s\n'],getReport(e))
     end
     phV = phV(:);
     grV = grV(:);

@@ -28,7 +28,7 @@ doperiods = nan(Nf,1);
 HVr_fs = zeros(Nf,1);
 HVK_fs = struct('Z1',[],'Z2',[],...
               'Kph_Vs',[],'Kph_Vp',[],'Kph_rho',[],...
-              'Kzh_Vs',[],'Kzh_Vp',[],'Kzh_rho',[]);
+              'Kzh_Vs',[],'Kzh_Vp',[],'Kzh_rho',[], 'Kzh_d',[]);
 phV_fs = zeros(Nf,1);
 grV_fs = zeros(Nf,1);
 fE_fs = zeros(Nf,1);
@@ -48,7 +48,7 @@ while ~feof(fid)
     % how many lines coming?
     line=fgetl(fid); % read line with # of lines of model
     nmod=str2double(line);
-    c = textscan(fid,'%n %n %n %n %n %n %n %n',nmod); % ztop,zbot,Kph_rho,Kph_vp,Kph_vs,Kzh_rho,Kzh_vp,Kzh,vp
+    c = textscan(fid,'%n %n %n %n %n %n %n %n %n',nmod); % ztop,zbot,Kph_rho,Kph_vp,Kph_vs,Kzh_rho,Kzh_vp,Kzh,vp
     HVK_fs(ik,1).Z1 = c{1};
     HVK_fs(ik,1).Z2 = c{2};
     HVK_fs(ik,1).Kph_rho = c{3};
@@ -57,6 +57,17 @@ while ~feof(fid)
     HVK_fs(ik,1).Kzh_rho = c{6};
     HVK_fs(ik,1).Kzh_Vp = c{7};
     HVK_fs(ik,1).Kzh_Vs = c{8};
+    HVK_fs(ik,1).Kzh_d  = c{9}; 
+    
+    Kzh_d = HVK_fs(ik,1).Kzh_d; 
+    Kzh_d(2:end-1) = Kzh_d(3:end)-Kzh_d(1:end-2); 
+    Kzh_d(1) = Kzh_d(2); % Not sure what to do about top and bottom of model. 
+    Kzh_d(end) = Kzh_d(end-1); 
+    HVK_fs(ik,1).Kzh_d = Kzh_d; 
+    
+%     Kzh_d_diff = diff(Kzh_d); 
+%     Kzh_d = max([[Kzh_d_diff;0], [0;Kzh_d_diff]], [], 2); % Don't know whether to associate with each point the diff to the point above or below. So just give the larger of the two values. 
+%     HVK_fs(ik,1).Kzh_d = Kzh_d; 
     
     % account for possibilty of error
     fpos = ftell(fid);
@@ -118,11 +129,12 @@ else
     end
 end
 
+ifplot = 1; if(ifplot); warning('Forcing ifplot = 1'); end
 if ifplot
-    figure(3);clf, 
-    fns = {'Kzh_Vp','Kzh_Vs','Kzh_rho'};
+    figure(3001);clf, 
+    fns = {'Kzh_Vp','Kzh_Vs','Kzh_rho','Kzh_d'};
     for ifn = 1:length(fns)
-        subplot(1,3,ifn),hold on
+        subplot(1,length(fns),ifn),hold on; box on; 
         for ip = 1:ik
             plot(HVK_fs(ip).(fns{ifn}),HVK_fs(ip).Z1,':');
         end
@@ -131,5 +143,13 @@ if ifplot
         end
         set(gca,'ydir','reverse','fontsize',15)
         title(regexprep(fns{ifn},'_','-'))
+
+% This commented code changes limits to compare with Tanimoto 2009 GJI
+%         ylim([0,20]); warning('Fake y lim in readHVkernel_ofile.m plotting'); 
+%         if strcmp(fns{ifn},'Kzh_d'); 
+%             xlim([-3e-3, 3e-3]); 
+%         else
+%             xlim([-.5, .5]); 
+%         end
     end
 end

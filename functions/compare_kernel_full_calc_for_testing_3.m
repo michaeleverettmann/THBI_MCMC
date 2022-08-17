@@ -1,6 +1,13 @@
+load('/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/workspaces/kernel_testing/examples_2022-07-13/no_sed_radanis_vpvs/TA.R54A_C_ii_500_likelihood_drop_hv_workspace.mat'); 
 
-[ model ] = make_mod_from_parms( model,par );
-[ model0 ] = make_mod_from_parms( Kbase.modelk ,par );
+model  = Kbase.modelk; 
+model0 = Kbase.modelk; 
+
+% model0.crustmparm.h = model0.crustmparm.h - 1; 
+% model.crustmparm.h  = model.crustmparm.h  + .75;  
+
+% [ model ] = make_mod_from_parms( model,par );
+% [ model0 ] = make_mod_from_parms( model0 ,par );
 
 par.inv.verbose = 1; 
 
