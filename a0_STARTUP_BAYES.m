@@ -126,6 +126,8 @@ paths = struct(    'CADMINEOS',      [hd '/Documents/repositories/Peoples_codes/
                    'models_seismic', [hd '/Documents/repositories/data/models_seismic'], ...
                    'ramDrive',        ramDrive); % TODO This will have to be set to automatically change depending on the computer.  /dev/shm/brunsvikRam /Volumes/brunsvikRAM
 
+addpath(sprintf('%s/SEMum2_avg_VS',paths.models_seismic)); % brb2022.08.16 Average global models for synthetic tests.                 
+               
 paths.rawdatadir =    [paths.THBIpath '/data/STAsrawdat/']; % bb2021.09.28 if this takes too much local storage, put it on external drives. 
 paths.STAinversions = [paths.THBIpath '/data/STASinv/'   ]; % bb2021.09.28 if this takes too much local storage, put it on external drives. 
 % 'rawdatadir', ['/Volumes/data/',proj.name,'/THBI/STAsrawdat/'],... % bb2021.09.28 Could use these locations to keep data on NAS. Not so important though if you aren't downloading a bunch of waveform data I think. 

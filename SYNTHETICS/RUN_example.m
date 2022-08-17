@@ -38,7 +38,7 @@ run_params.STAMP = STAMP; % NEED - some identifier for this inversion run
 run_params.overwrite = 1; % do you want to overwrite previous results?
 if ~ (exist('network_manual', 'var') && exist('station_manual', 'var')) ; 
     network_manual = 'testnwk'; 
-    station_manual = 'crat_2mld'; 
+    station_manual = 'cont_Phan'; 
     fprintf('\nReseting to %s.%s\n',network_manual,station_manual)
 end
 run_params.sta = station_manual; % name of station

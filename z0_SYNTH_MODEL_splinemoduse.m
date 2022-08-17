@@ -9,7 +9,10 @@ global TRUEmodel TLM
 
 % ver = 'orig'; % Index for model parameters to choose from. 
 ver = [par.stadeets.sta]'; % Treat the station as determining what model to load. 
+
 if strcmp(ver, 'teststa'); ver = 'orig'; end; % Backward compatibility. 
+
+use_splines = false; 
 
 %% CHOOSE CUSTOM KEY PARAMETERS
 % For important parameters I modified, I'll try to do a %<
@@ -35,6 +38,8 @@ if strcmp(ver, 'orig'); % Original(ish) version.
 
     xi_crust = 1.05;
     xi_mantle = 1.0; 
+    
+    use_splines = true; 
 elseif strcmp(ver, 'sed_deep'); % Original(ish) version. 
     selev = 0; 
     h_sed = 4.1; %<
@@ -56,6 +61,8 @@ elseif strcmp(ver, 'sed_deep'); % Original(ish) version.
 
     xi_crust = 1.05;
     xi_mantle = 1.0; 
+    
+    use_splines = true; 
 elseif strcmp(ver, 'crat_2mld'); % Original(ish) version. 
     selev = 0; 
     h_sed = 1; 
@@ -79,49 +86,99 @@ elseif strcmp(ver, 'crat_2mld'); % Original(ish) version.
 
     xi_crust = 1.05;
     xi_mantle = 1.0; 
+    
+    use_splines = true; 
 end
 
-%% DERIVATIVE PARMS
-% DEPTHS
-cminz = h_sed;
-cmaxz = h_sed+h_crust;
-zc = unique([cminz:par.mod.dz:cmaxz,cmaxz])';
-mminz = h_sed+h_crust;
-mmaxz = par.mod.maxz + selev;
-zm = unique([mminz:par.mod.dz:mmaxz,mmaxz])';
-% CRUST splines
-% dzsp = (cmaxz-cminz)/(k_crust-2);
-% knots = [repmat(cminz,1,3),cminz:dzsp:cmaxz,repmat(cmaxz,1,3)]';
-% sp = fastBSpline.lsqspline(knots,2,linspace(cminz,cmaxz,k_crust)',kvs_crust); % dummy velocities as placeholder
-% cspbasis = sp.getBasis(zc); cspbasis = cspbasis(:,2:end-1);
-[ cspbasis ] = make_splines( cknots,par, zc);
-% MANTLE splines
-% dzsp = (mmaxz-mminz)/(k_mantle-2);
-% knots = [repmat(mminz,1,3),mminz:dzsp:mmaxz,repmat(mmaxz,1,3)]';
-% sp = fastBSpline.lsqspline(knots,2,linspace(mminz,mmaxz,k_mantle)',kvs_mantle); % dummy velocities as placeholder
-% mspbasis = sp.getBasis(zm); mspbasis = mspbasis(:,2:end-1);
-[ mspbasis ] = make_splines( mknots,par, zm);
-% OVERALL
-M = 1 + 2 + 1 + k_crust + k_mantle + 1;
 
-%% MAKE ALL PARAMETER STRUCTURES
-sed = struct('h',h_sed,'VS',vs_sed);
-crust = struct('h',h_crust,'Nsp',k_crust+1,'Nkn',k_crust,'VS_sp',kvs_crust,'vpvs',vpvs_crust,'xi',xi_crust,'splines',cspbasis,'knots',cknots,'fknots',fcknots,'z_sp',zc);
-mantle = struct('Nkn',k_mantle,'Nsp',k_mantle+1,'VS_sp',kvs_mantle,'xi',xi_mantle,'splines',mspbasis,'knots',mknots,'fknots',fmknots,'z_sp',zm);
-% data = struct('sigmaPsRF',par.mod.data.prior_sigmaPsRF,...
-%               'sigmaSpRF',par.mod.data.prior_sigmaSpRF,...
-%               'sigmaSW',par.mod.data.prior_sigmaSW);
-data = ([]);
+if use_splines; 
+    %% DERIVATIVE PARMS
+    % DEPTHS
+    cminz = h_sed;
+    cmaxz = h_sed+h_crust;
+    zc = unique([cminz:par.mod.dz:cmaxz,cmaxz])';
+    mminz = h_sed+h_crust;
+    mmaxz = par.mod.maxz + selev;
+    zm = unique([mminz:par.mod.dz:mmaxz,mmaxz])';
+    % CRUST splines
+    % dzsp = (cmaxz-cminz)/(k_crust-2);
+    % knots = [repmat(cminz,1,3),cminz:dzsp:cmaxz,repmat(cmaxz,1,3)]';
+    % sp = fastBSpline.lsqspline(knots,2,linspace(cminz,cmaxz,k_crust)',kvs_crust); % dummy velocities as placeholder
+    % cspbasis = sp.getBasis(zc); cspbasis = cspbasis(:,2:end-1);
+    [ cspbasis ] = make_splines( cknots,par, zc);
+    % MANTLE splines
+    % dzsp = (mmaxz-mminz)/(k_mantle-2);
+    % knots = [repmat(mminz,1,3),mminz:dzsp:mmaxz,repmat(mmaxz,1,3)]';
+    % sp = fastBSpline.lsqspline(knots,2,linspace(mminz,mmaxz,k_mantle)',kvs_mantle); % dummy velocities as placeholder
+    % mspbasis = sp.getBasis(zm); mspbasis = mspbasis(:,2:end-1);
+    [ mspbasis ] = make_splines( mknots,par, zm);
+    % OVERALL
+    M = 1 + 2 + 1 + k_crust + k_mantle + 1;
 
-%% MODEL WITH ALL PARMS
-model = struct('sedmparm',sed,'crustmparm',crust,'mantmparm',mantle,...
-               'datahparm',data,'M',M,'selev',selev);
-           
-%% TURN PARMS INTO REAL TARGET MODEL
-TRUEmodel = make_mod_from_parms(model,par);
-% % % plot_PARAMETERISATION( TRUEmodel )
-% % % plot_quickmodel(par,TRUEmodel,TRUEmodel); warning('Remove this line'); 
-% same format...
+    %% MAKE ALL PARAMETER STRUCTURES
+    sed = struct('h',h_sed,'VS',vs_sed);
+    crust = struct('h',h_crust,'Nsp',k_crust+1,'Nkn',k_crust,'VS_sp',kvs_crust,'vpvs',vpvs_crust,'xi',xi_crust,'splines',cspbasis,'knots',cknots,'fknots',fcknots,'z_sp',zc);
+    mantle = struct('Nkn',k_mantle,'Nsp',k_mantle+1,'VS_sp',kvs_mantle,'xi',xi_mantle,'splines',mspbasis,'knots',mknots,'fknots',fmknots,'z_sp',zm);
+    % data = struct('sigmaPsRF',par.mod.data.prior_sigmaPsRF,...
+    %               'sigmaSpRF',par.mod.data.prior_sigmaSpRF,...
+    %               'sigmaSW',par.mod.data.prior_sigmaSW);
+    data = ([]);
+
+    %% MODEL WITH ALL PARMS
+    model = struct('sedmparm',sed,'crustmparm',crust,'mantmparm',mantle,...
+                   'datahparm',data,'M',M,'selev',selev);
+
+    %% TURN PARMS INTO REAL TARGET MODEL
+    TRUEmodel = make_mod_from_parms(model,par);
+    % % % plot_PARAMETERISATION( TRUEmodel )
+    % % % plot_quickmodel(par,TRUEmodel,TRUEmodel); warning('Remove this line'); 
+    % same format...
+end
+
+
+if ~use_splines; 
+    % For now, ver has to be one of the options in SEMum2_avg. 
+    
+    
+    % % % is_crust = find(TRUEmodel.z==45); 
+    % % % is_crust = is_crust(1); 
+    % % % vs_c = TRUEmodel.VS(1:is_crust); 
+    % % % z_c = TRUEmodel.z(1:is_crust); 
+    vs_c = [3.3000    3.3067    3.3162    3.3284    3.3435    3.3612    3.3818    3.4051    3.4312 3.4600    3.4916    3.5260    3.5617    3.5955    3.6272    3.6567    3.6840    3.7093 3.7324    3.7534    3.7722    3.7889    3.8035    3.8100]'; 
+    z_c = [0     2     4     6     8    10    12    14    16    18    20    22    24    26    28    30    32    34 36    38    40    42    44    45]'; 
+
+    vs_c = vs_c + 0.5; 
+    
+    % Load mantle model. 
+    SEMum2_avg = SEMum2_avgprofiles(); 
+    z0  = SEMum2_avg.Z; 
+    vs0 = SEMum2_avg.(ver);
+
+    % "continuous" model. 
+    z_m = [0:par.mod.dz:300]'; 
+    z_m = unique(sort([z_m; z_c(end)])); % Make sure Moho depth is in mantle model. 
+    z_m = z_m(z_m>=z_c(end)); % Just keep mantle depths and vals from SEM model. 
+    vs_m = interp1(z0, vs0, z_m, 'spline', 'extrap');
+
+    % % % Quick plot to make sure interpolation and extrapolation aren't messing anything up too much. 
+    % figure(1); clf; hold on; set(gca, 'ydir', 'reverse'); plot(vs, z); plot(vs0, z0); 
+
+    %% MAKE ALL PARAMETER STRUCTURES
+    sed = struct('h',0,'VS',[3.3 3.3]);
+    crust = struct('h',max(z_c),'vpvs',1.75,'xi',1.05);
+    mantle = struct('xi',1);
+    model = struct('sedmparm',sed,'crustmparm',crust,'mantmparm',mantle,...
+                   'M', nan, 'datahparm', nan, 'selev',0);
+
+    %% TURN PARMS INTO REAL TARGET MODEL
+    TRUEmodel = make_mod_from_parms(model,par,'use_splines',false,...
+        'vs', struct('crust', vs_c, 'mantle', vs_m),...
+        'z' , struct('crust', z_c, 'mantle', z_m));
+    
+    h_crust = model.sedmparm.h + model.crustmparm.h; 
+end
+
+
 
 TRUEmodel.Z = TRUEmodel.z;
 TRUEmodel.vs = TRUEmodel.VS;

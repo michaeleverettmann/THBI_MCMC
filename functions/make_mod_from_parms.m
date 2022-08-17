@@ -1,4 +1,11 @@
-function [ model ] = make_mod_from_parms( model,par )
+function [ model ] = make_mod_from_parms( model,par, options )
+    arguments
+        model
+        par
+        options.use_splines = true; 
+        options.vs = struct('crust',[],'mantle',[]); 
+        options.z  = struct('crust',[],'mantle',[]); 
+    end
 % [ model ] = make_mod_from_parms( model )
 % 
 % make the 1D model vectors and important model values from the three
@@ -23,23 +30,31 @@ xi_sed = ones(size(zs));
 if diff(zs0)==0; zs=[]; vs_sed=[]; vp_sed=[]; rho_sed=[]; xi_sed=[]; end
 
 %% CRUST
-cminz = mps.h;
-cmaxz = mps.h+mpc.h;
-zc = unique([cminz:par.mod.dz:cmaxz,cmaxz])';
-
-vs_crust = sum(mpc.splines*diag(mpc.VS_sp),2);
+if options.use_splines; 
+    cminz = mps.h;
+    cmaxz = mps.h+mpc.h;
+    zc = unique([cminz:par.mod.dz:cmaxz,cmaxz])';
+    vs_crust = sum(mpc.splines*diag(mpc.VS_sp),2);
+else
+    vs_crust = options.vs.crust; 
+    zc = options.z.crust; 
+end
 vp_crust = vs_crust*mpc.vpvs; %!%!%! brb2022.06.03 TODO here can make the od vpvs jump at moho work better by tapering the transition of  vpvs crust to vpvs mantle
 rho_crust = sed_vs2rho(vs_crust); % use same expression as for sed (assume not ultramafic or other poorly-fit rocks)
 xi_crust = mpc.xi*ones(size(zc));
 
 
 %% MANTLE
-mminz = cmaxz;
-mmaxz = par.mod.maxz + model.selev; 
-zm = unique([mminz:par.mod.dz:mmaxz,mmaxz])';
-
 % try
-vs_mantle = sum(mpm.splines*diag(mpm.VS_sp),2);
+if options.use_splines; 
+    mminz = cmaxz;
+    mmaxz = par.mod.maxz + model.selev; 
+    zm = unique([mminz:par.mod.dz:mmaxz,mmaxz])';
+    vs_mantle = sum(mpm.splines*diag(mpm.VS_sp),2);
+else
+    vs_mantle = options.vs.mantle; 
+    zm = options.z.mantle; 
+end
 vp_mantle = mantle_vs2vp(vs_mantle,zm );
 rho_mantle = mantle_vs2rho(vs_mantle,zm );
 xi_mantle = mpm.xi*ones(size(zm));
