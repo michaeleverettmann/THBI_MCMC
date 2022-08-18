@@ -83,7 +83,7 @@ if par.inv.synthTest;
     vsMoh = TRUEmodel.vs(isMoh); 
 %     vscTemp = TRUEmodel.crustmparm.VS_sp(end); 
 %     vsmTemp = TRUEmodel.mantmparm.VS_sp(1); 
-    fracChange = (vsMoh(1) - vsMoh(2)) / vsMoh(1) * 100; 
+    fracChange = (vsMoh(2) - vsMoh(1)) / vsMoh(1) * 100; 
     yplt = get(gca, 'ylim'); 
     plot([fracChange, fracChange], [yplt(1), yplt(2)], 'b', 'LineWidth', 2); 
 end
