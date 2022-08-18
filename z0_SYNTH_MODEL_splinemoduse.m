@@ -92,6 +92,7 @@ end
 
 
 if use_splines; 
+       
     %% DERIVATIVE PARMS
     % DEPTHS
     cminz = h_sed;
@@ -137,22 +138,38 @@ end
 
 
 if ~use_splines; 
-    % For now, ver has to be one of the options in SEMum2_avg. 
+    % Use station name to determine which velocity values go in. 
+    % First word in station name is which base velocity model to use from SEM
+    % Remaining words go in at any order. Examples: sed0 means 0 depth sediment.
+    % See below for which key words will do what to your models. 
     
+    % Test: ver = 'cont_EProt-sed4-mld1-mld2-zmoh25'
     
+    versplit = split(ver, '-'); 
+    v_mod = versplit{1}; 
+    
+    % Base crust velocities. 
     % % % is_crust = find(TRUEmodel.z==45); 
     % % % is_crust = is_crust(1); 
     % % % vs_c = TRUEmodel.VS(1:is_crust); 
     % % % z_c = TRUEmodel.z(1:is_crust); 
     vs_c = [3.3000    3.3067    3.3162    3.3284    3.3435    3.3612    3.3818    3.4051    3.4312 3.4600    3.4916    3.5260    3.5617    3.5955    3.6272    3.6567    3.6840    3.7093 3.7324    3.7534    3.7722    3.7889    3.8035    3.8100]'; 
     z_c = [0     2     4     6     8    10    12    14    16    18    20    22    24    26    28    30    32    34 36    38    40    42    44    45]'; 
-
-    vs_c = vs_c + 0.5; 
     
     % Load mantle model. 
     SEMum2_avg = SEMum2_avgprofiles(); 
     z0  = SEMum2_avg.Z; 
-    vs0 = SEMum2_avg.(ver);
+    vs0 = SEMum2_avg.(v_mod);
+    
+    if contains(ver, 'zmoh25'); 
+        zmoh = 25; 
+        killc = z_c >= zmoh; 
+        vs_base = interp1(z_c, vs_c, zmoh); 
+        vs_c = [vs_c(~killc); vs_base]; 
+        z_c  = [z_c(~killc) ; zmoh   ];
+    end
+        
+        
 
     % "continuous" model. 
     z_m = [0:par.mod.dz:300]'; 
@@ -162,18 +179,53 @@ if ~use_splines;
 
     % % % Quick plot to make sure interpolation and extrapolation aren't messing anything up too much. 
     % figure(1); clf; hold on; set(gca, 'ydir', 'reverse'); plot(vs, z); plot(vs0, z0); 
-
+    
+    if contains(ver, 'mld1'); 
+        ftr_amp   = -0.2; 
+        ftr_pos   = 80; 
+        ftr_width = 10; 
+        ftr = ftr_amp * exp( -(z_m-ftr_pos).^2 / (2*ftr_width^2) ); % Feature to add
+        vs_m = vs_m + ftr; 
+    end
+    
+    if contains(ver, 'mld2')
+        ftr_amp   = -0.2; 
+        ftr_pos   = 150; 
+        ftr_width = 10; 
+        ftr = ftr_amp * exp( -(z_m-ftr_pos).^2 / (2*ftr_width^2) ); % Feature to add
+        vs_m = vs_m + ftr;     
+    end
+    
+    
+    if contains(ver, 'sed0'); 
+        sed = struct('h',0,'VS',[3.3 3.3]);
+    elseif contains(ver, 'sed1'); 
+        sed = struct('h',1,'VS',[2.0, 2.5]);
+    elseif contains(ver, 'sed4'); 
+        sed = struct('h',4,'VS',[2.0, 2.5]);
+    end
+    % Don't worry about making this a discontinuity. 
+    % It's useful anyway to test a parameterisation different than what we use for forward modelling. 
+    killc = z_c < sed.h; 
+    vs_c  = vs_c(~killc); 
+    z_c   = z_c (~killc); 
+    
     %% MAKE ALL PARAMETER STRUCTURES
-    sed = struct('h',0,'VS',[3.3 3.3]);
-    crust = struct('h',max(z_c),'vpvs',1.75,'xi',1.05);
+    crust = struct('h',max(z_c)-sed.h,'vpvs',1.75,'xi',1.05);
     mantle = struct('xi',1);
     model = struct('sedmparm',sed,'crustmparm',crust,'mantmparm',mantle,...
                    'M', nan, 'datahparm', nan, 'selev',0);
 
+               
     %% TURN PARMS INTO REAL TARGET MODEL
     TRUEmodel = make_mod_from_parms(model,par,'use_splines',false,...
         'vs', struct('crust', vs_c, 'mantle', vs_m),...
         'z' , struct('crust', z_c, 'mantle', z_m));
+    
+    figure(1); clf; hold on; box on; grid on; set(gcf, 'color', 'white'); 
+    xlabel('Vs (km/s'); ylabel('Depth (km)'); title('Synthetic model'); 
+    plot(TRUEmodel.VS, TRUEmodel.z);
+    set(gca, 'ydir', 'reverse');           
     
     h_crust = model.sedmparm.h + model.crustmparm.h; 
 end
