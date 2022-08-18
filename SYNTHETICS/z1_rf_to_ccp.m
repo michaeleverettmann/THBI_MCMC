@@ -58,4 +58,11 @@ if ifplot;
     ylabel('Time (s)'); 
 end
 
+dtps = string(par.inv.datatypes); 
+fns = string(fieldnames(data)); 
+
+if ~any(dtps=='RF_Sp') && any(fns=='RF_Sp'); % If we had 'RF_Sp' in our data but we only wanted it for making ccp stacks, remove this from the data. 
+    data = rmfield(data, 'RF_Sp'); 
+end
+
 end

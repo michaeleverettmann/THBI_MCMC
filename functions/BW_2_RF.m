@@ -23,7 +23,8 @@ for idt = 1:length(trudtypes)
     end
  
     pdt = parse_dtype( trudtypes{idt} );
-    if strcmp(pdt{1},'BW') && any(ismember(par.inv.datatypes,RFdtype))
+    if strcmp(pdt{1},'BW') && any(string(par.inv.datatypes).contains(RFdtype))
+
         % Identify parent channel (assume that P means parent is 1, S means
         % parent is 2!)
         ip = find(strcmp(pdt{2}(1),{'P','S'})); 

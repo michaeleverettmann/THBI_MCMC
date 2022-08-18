@@ -134,7 +134,7 @@ data = struct();
 if any(string(par.inv.datatypes)=='BW_Ps') || any(string(par.inv.datatypes)=='RF_Ps') || any(string(par.inv.datatypes)=='HKstack_P')
     data.BW_Ps = PsRF; 
 end
-if any(string(par.inv.datatypes)=='BW_Sp') || any(string(par.inv.datatypes)=='RF_Sp')
+if any(string(par.inv.datatypes)=='BW_Sp') || any(string(par.inv.datatypes).contains('RF_Sp'))
     data.BW_Sp = SpRF; 
 end
 
