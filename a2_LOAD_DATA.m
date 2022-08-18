@@ -53,6 +53,8 @@ elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
     % Use receiver functions to make h-kappa stacks. 
     [ trudata ] = z1_SYNTH_DATA_h_kappa(par,trudata,model,0);
     
+    [ trudata ] = z1_rf_to_ccp(par,trudata,model,0); 
+    
 %% -----------------------------------------------------------------
 %% LAB TESTING
 elseif strcmp(par.proj.name,'LAB_tests')
