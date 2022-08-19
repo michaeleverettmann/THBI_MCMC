@@ -78,7 +78,7 @@ for idt = 1:length(trudtypes)
                             
         end
                             
-%         figure(21); clf; subplot(211);plot(tt_RFp,RFp);subplot(212);plot(tt_RFd,RFd)
+%         figure(21); clf; sgtitle('After deconvolution'); subplot(211);plot(tt_RFp,RFp);title('Parent');;subplot(212);plot(tt_RFd,RFd);title('Daughter'); 
         
         %% insert back into trudata - interpolating times onto original time
         trudata_rf.(trudtypes{idt}).PSV(:,ip) = interp1(tt_RFp,RFp,trudata.(trudtypes{idt}).tt).*maxab(maxab(trudata.(trudtypes{idt}).PSV));
@@ -95,7 +95,6 @@ for idt = 1:length(trudtypes)
 %         plot(trudata.(trudtypes{idt}).tt,[trudata.(trudtypes{idt}).PSV(:,ip),trudata.(trudtypes{idt}).RF_PSV(:,ip)])
 %         subplot(212);
 %         plot(trudata.(trudtypes{idt}).tt,[trudata.(trudtypes{idt}).PSV(:,id),trudata.(trudtypes{idt}).RF_PSV(:,id)])
-        
         
     end
 end

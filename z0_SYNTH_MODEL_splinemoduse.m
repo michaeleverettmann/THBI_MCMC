@@ -8,16 +8,16 @@ end
 global TRUEmodel TLM
 
 % ver = 'orig'; % Index for model parameters to choose from. 
-ver = [par.stadeets.sta]'; % Treat the station as determining what model to load. 
+versta = [par.stadeets.sta]'; % Treat the station as determining what model to load. 
 
-if strcmp(ver, 'teststa'); ver = 'orig'; end; % Backward compatibility. 
+if strcmp(versta, 'teststa'); versta = 'orig'; end; % Backward compatibility. 
 
 use_splines = false; 
 
 %% CHOOSE CUSTOM KEY PARAMETERS
 % For important parameters I modified, I'll try to do a %<
 % Or maybe put the parameters I want to modify from base at the top
-if strcmp(ver, 'orig'); % Original(ish) version. 
+if strcmp(versta, 'orig'); % Original(ish) version. 
     selev = 0;
     h_sed = 0;
     h_crust = 45;
@@ -40,7 +40,7 @@ if strcmp(ver, 'orig'); % Original(ish) version.
     xi_mantle = 1.0; 
     
     use_splines = true; 
-elseif strcmp(ver, 'sed_deep'); % Original(ish) version. 
+elseif strcmp(versta, 'sed_deep'); % Original(ish) version. 
     selev = 0; 
     h_sed = 4.1; %<
     h_crust = 45;
@@ -63,7 +63,7 @@ elseif strcmp(ver, 'sed_deep'); % Original(ish) version.
     xi_mantle = 1.0; 
     
     use_splines = true; 
-elseif strcmp(ver, 'crat_2mld'); % Original(ish) version. 
+elseif strcmp(versta, 'crat_2mld'); % Original(ish) version. 
     selev = 0; 
     h_sed = 1; 
     h_crust = 45;
@@ -145,8 +145,21 @@ if ~use_splines;
     
     % Test: ver = 'cont_EProt-sed4-mld1-mld2-zmoh25'
     
-    versplit = split(ver, '-'); 
+    % v_mod: tells which SEM model to use. 
+    % v_alt: alterations we will manually do. v_alt explanation: 
+    % s: sediment. 
+    % m: mid-lithospheric velocity discontinuity. 
+    % h: Moho depth. 
+    versplit = split(versta, '-'); 
     v_mod = versplit{1}; 
+    if length(versplit) == 2;
+        v_alt = versplit{2}; 
+    elseif length(versplit) == 1; 
+        v_alt = ''; 
+    else
+        error('You put in a strange format for synthetic station name'); 
+    end; 
+
     
     % Base crust velocities. 
     % % % is_crust = find(TRUEmodel.z==45); 
@@ -161,7 +174,7 @@ if ~use_splines;
     z0  = SEMum2_avg.Z; 
     vs0 = SEMum2_avg.(v_mod);
     
-    if contains(ver, 'zmoh25'); 
+    if contains(v_alt, 'z25'); 
         zmoh = 25; 
         killc = z_c >= zmoh; 
         vs_base = interp1(z_c, vs_c, zmoh); 
@@ -180,7 +193,7 @@ if ~use_splines;
     % % % Quick plot to make sure interpolation and extrapolation aren't messing anything up too much. 
     % figure(1); clf; hold on; set(gca, 'ydir', 'reverse'); plot(vs, z); plot(vs0, z0); 
     
-    if contains(ver, 'mld1'); 
+    if contains(v_alt, 'm1'); 
         ftr_amp   = -0.2; 
         ftr_pos   = 80; 
         ftr_width = 10; 
@@ -188,7 +201,7 @@ if ~use_splines;
         vs_m = vs_m + ftr; 
     end
     
-    if contains(ver, 'mld2')
+    if contains(v_alt, 'm2')
         ftr_amp   = -0.2; 
         ftr_pos   = 150; 
         ftr_width = 10; 
@@ -197,12 +210,15 @@ if ~use_splines;
     end
     
     
-    if contains(ver, 'sed0'); 
-        sed = struct('h',0,'VS',[3.3 3.3]);
-    elseif contains(ver, 'sed1'); 
+
+    if contains(v_alt, 's1'); 
         sed = struct('h',1,'VS',[2.0, 2.5]);
-    elseif contains(ver, 'sed4'); 
+    elseif contains(v_alt, 's4'); 
         sed = struct('h',4,'VS',[2.0, 2.5]);
+    elseif contains(v_alt, 's0'); 
+        sed = struct('h',0,'VS',[3.3 3.3]);
+    else
+        sed = struct('h',0,'VS',[3.3 3.3]);
     end
     % Don't worry about making this a discontinuity. 
     % It's useful anyway to test a parameterisation different than what we use for forward modelling. 
