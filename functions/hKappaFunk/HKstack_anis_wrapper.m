@@ -24,14 +24,25 @@ phase_wts = options.phase_wts;
 % Get average crust velocity. There are again a few choices. 
 % Get vsv, vpv. If there is anisotropy, this influences HK calculation.
 isCrust = model.z < model.zmoh; 
-rho = mean(model.rho(isCrust)); % Medium density of crust. Not sure how best to average this yet.
+dz = zeros(size(model.z)); % For weighted mean, integral style. 
+dz(1:end-1,1) = dz(1:end-1,1) + 0.5 .* diff(model.z);
+dz(2:end  ,1) = dz(2:end  ,1) + 0.5 .* diff(model.z); 
+dzC = dz(isCrust); 
+
+% Function to calculate mean accounting for variable dz spacing. Simple integral mean. 
+meanInt = @(m,dz)sum(dz.*m)/sum(dz); 
+vrAv = @(m,dz)( (1./meanInt(1./m,dz) + meanInt(m,dz) ) / 2 ); % Voigt Reuss Hill average (or whatever it's called). 
+
+% rho = mean(model.rho(isCrust)); % Medium density of crust. Not sure how best to average this yet.
+rho = meanInt(model.rho(isCrust), dzC); 
 eta = 1; % IMPORTANT if eta is ever not 1, we need to modify the code. 
-vsAv = (1./mean(1./model.VS(isCrust)) + mean(model.VS(isCrust)) ) / 2; % mean VS. Decide which type of mean to take later. 
+vsAv = vrAv(model.VS(isCrust), dzC); 
+
 if isempty(options.posterior); % Have to calculate averages from 1-D profile. 
     xi = model.Sanis(isCrust)/100+1; % Radial S anisotropy. add one because for some reason here anisotropy is + or -
-    xi = (1/mean(1./xi) + mean(xi)) / 2; % Voigt-Reuss-Hill average
+    xi = vrAv(xi, dzC); 
     phi = model.Panis(isCrust)/100+1; % Radial P anisotropy
-    phi = (1/mean(1./phi) + mean(phi)) / 2; 
+    phi = vrAv(phi, dzC); 
 else % If we have the posterior, get average values from there. 
     posterior = options.posterior; 
     xi = median(posterior.xicrust); 
@@ -65,11 +76,11 @@ HK_A = HK_A';
 HK_H = HK_H'; 
 HK_K = HK_K'; 
 
-
+options.ifplot = true; if options.ifplot; warning('Setting options.ifplot = true'); end; 
 if options.ifplot; 
     figure(198); clf; hold on; set(gcf,'color','white');
     subplot(1,1,1); hold on; 
-    xlabel('kappa'); ylabel('H'); title('Synthetic H-kappa stack'); 
+    xlabel('kappa'); ylabel('H'); title('Synthetic H-kappa stack (black dot ignores sediment kappa)'); 
     set(gca, 'ydir', 'reverse');         
     sf = pcolor(HK_K, HK_H, HK_A'); %Can't use surf. It's 3d. It always covers other plotting objects. 
     sf.EdgeAlpha = 0; 
@@ -100,7 +111,11 @@ if options.ifplot;
         HK_H(ymax),HK_K(xmax)), 'verticalalignment', 'bottom' )
 
     % Plot true position of max energy. TODO add to legend. 
-    scatter(model.crustmparm.vpvs, model.zmoh, 50, 'k'); 
+    try
+        scatter(model.vpvs, model.zmoh, 50, 'k'); 
+    catch
+        scatter(model.crustmparm.vpvs, model.zmoh, 50, 'k'); 
+    end
 
     % Plot the receiver function and the predicted times of different phases. This is a function in HKstack.m 
     HKstack(RF, tt, ...
