@@ -12,7 +12,7 @@ str_temp = split(stamp, '/');
 % burnin_only  = 4000 ; 
 % cooloff_only = 3000 ; 
 % nchains_only = 12   ; 
-niter_only   = 10000; 
+niter_only   = 16000; 
 burnin_only  = 4000 ; 
 cooloff_only = 3000 ; 
 nchains_only = 12   ; 
@@ -562,6 +562,15 @@ elseif strcmp(stamp, 'all_simple_parent_no_sed');
     par.mod.sed.hmax                  = 0; 
     par.mod.force_no_new_prior        = false; 
 
+    
+    
+elseif strcmp(stamp, 'low_noise_sp'); 
+    par.synth.noise_sigma_BW_Sp = 0; 
+    par.synth.noise_sigma_RF_Sp = 0; 
+    
+   
+
+    
     
 end
 

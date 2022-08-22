@@ -174,7 +174,7 @@ if ~use_splines;
     z0  = SEMum2_avg.Z; 
     vs0 = SEMum2_avg.(v_mod);
     
-    if contains(v_alt, 'z25'); 
+    if contains(v_alt, 'h25'); 
         zmoh = 25; 
         killc = z_c >= zmoh; 
         vs_base = interp1(z_c, vs_c, zmoh); 
@@ -215,6 +215,8 @@ if ~use_splines;
         sed = struct('h',1,'VS',[2.0, 2.5]);
     elseif contains(v_alt, 's4'); 
         sed = struct('h',4,'VS',[2.0, 2.5]);
+    elseif contains(v_alt, 's2'); 
+        sed = struct('h',2,'VS',[2.0, 2.5]);
     elseif contains(v_alt, 's0'); 
         sed = struct('h',0,'VS',[3.3 3.3]);
     else

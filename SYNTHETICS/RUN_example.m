@@ -20,7 +20,7 @@ cd(proj.dir);
 generation = 0; % generation of solution and data processing
 gc = '';
 BWclust = '';
-STAMP = 'examplerun';
+STAMP = 'high_sp_dof';
 % STAMP = 'adding_sediment_pt1'; 
 
 onesta = '';
@@ -38,7 +38,7 @@ run_params.STAMP = STAMP; % NEED - some identifier for this inversion run
 run_params.overwrite = 1; % do you want to overwrite previous results?
 if ~ (exist('network_manual', 'var') && exist('station_manual', 'var')) ; 
     network_manual = 'testnwk'; 
-    station_manual = 'cont_EProt-s4m1m2h25'; %
+    station_manual = 'cont_EProt-s4m1m2'; %
     fprintf('\nReseting to %s.%s\n',network_manual,station_manual)
 end
 run_params.sta = station_manual; % name of station

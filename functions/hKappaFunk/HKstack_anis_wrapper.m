@@ -76,7 +76,7 @@ HK_A = HK_A';
 HK_H = HK_H'; 
 HK_K = HK_K'; 
 
-options.ifplot = true; if options.ifplot; warning('Setting options.ifplot = true'); end; 
+% options.ifplot = true; if options.ifplot; warning('Setting options.ifplot = true'); end; 
 if options.ifplot; 
     figure(198); clf; hold on; set(gcf,'color','white');
     subplot(1,1,1); hold on; 

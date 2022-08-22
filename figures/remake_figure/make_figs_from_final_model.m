@@ -10,7 +10,7 @@ run('../../a0_STARTUP_BAYES.m');
 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/R54A_TA_dat1/add_sediment_try2'; 
-resdir_data = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv/cont_Phan_testnwk_dat0/examplerun'; 
+resdir_data = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv/cont_EProt-m1m2h25_testnwk_dat0/high_dof_with_noise'; 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/S57A_TA_dat1/sage_gage'; 
 resdir_fig = '/Users/brennanbrunsvik/Documents/temp'; 
 prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat' ; 

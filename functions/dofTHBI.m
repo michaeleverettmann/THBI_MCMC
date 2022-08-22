@@ -15,7 +15,10 @@ for id = 1:length(dtypes)
         if strcmp(pdt{1},'SW') 
             trudata.(dtype)(itr).dof = length(trudata.(dtype)(itr).periods);
         elseif strcmp(pdt{1},'HKstack') 
-            trudata.(dtype)(itr).dof = trudata.(dtype)(itr).Nobs;
+%             trudata.(dtype)(itr).dof = trudata.(dtype)(itr).Nobs;
+            trudata.HKstack_P.Nobs = par.mod.data.deg_of_freedom.h_kappa; 
+            trudata.HKstack_P.dof  = par.mod.data.deg_of_freedom.h_kappa; 
+            warning('Manually assigning HK stack degree of freedom'); 
         elseif any(strcmp({'BW','RF'},pdt{1}))
             if strcmp(pdt{3},'ccp')
 %                 trudata.(dtype)(itr).dof = length(trudata.(dtype)(itr).zz)*trudata.(dtype)(itr).dof_per_z;
@@ -29,13 +32,9 @@ for id = 1:length(dtypes)
         end
     end
     
+    fprintf('Degrees of freedom = %7.3f for datatype %s\n',...
+        trudata.(dtype)(itr).dof, dtype)
     
-end
-
-if isfield(trudata, 'HKstack_P')
-    trudata.HKstack_P.Nobs = par.mod.data.deg_of_freedom.h_kappa; 
-    trudata.HKstack_P.dof  = par.mod.data.deg_of_freedom.h_kappa; 
-    warning('bb2021.12.22 setting hk structure: Nobs, dof to a constant from par file.')
 end
 
 end
