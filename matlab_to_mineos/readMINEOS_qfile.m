@@ -26,9 +26,34 @@ mode_details = struct('n',n,'l',l,...
 % desired frequencies
 freq_want = 1./swperiods;
 
-% interpolate to get velocities
-phV = interp1(freq_all,phV_all,freq_want);
-grV = interp1(freq_all,grV_all,freq_want);
+try
+    % interpolate to get velocities
+    phV = interp1(freq_all,phV_all,freq_want);
+    grV = interp1(freq_all,grV_all,freq_want);
+catch 
+    if length(freq_all) ~= length(unique(freq_all)); 
+        to_kill = logical( zeros(size(freq_all)) ); 
+        for ifreq = 1:length(freq_all); 
+            dup_freq = freq_all(ifreq) == freq_all; 
+            if sum(dup_freq) > 1; 
+                warning('\nMineos duplicated some frequency. If you see this often, look into it!!!\n'); 
+                grV_all(ifreq) = mean(grV_all(dup_freq)); 
+                phV_all(ifreq) = mean(phV_all(dup_freq)); 
+            end
+            dup_freq(ifreq) = false;
+            freq_all(dup_freq) = nan; % Prevent from killing prevously identified duplicates
+            to_kill(dup_freq) = true; 
+        end
+        freq_all = freq_all(~to_kill); 
+        grV_all = grV_all(~to_kill); 
+        phV_all = phV_all(~to_kill); 
+    end
+    
+    % Now go back to what we were trying to do. 
+    % interpolate to get velocities
+    phV = interp1(freq_all,phV_all,freq_want);
+    grV = interp1(freq_all,grV_all,freq_want);
+end            
 
 
 end
