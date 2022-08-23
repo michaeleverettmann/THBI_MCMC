@@ -13,13 +13,13 @@ for id = 1:length(dtypes)
     
     for itr = 1:length(trudata.(dtype))
         if strcmp(pdt{1},'SW') 
-            trudata.(dtype)(itr).dof = length(trudata.(dtype)(itr).periods);
-% % %             if max(trudata.(dtype)(itr).periods) > 100; 
-% % %                 trudata.(dtype)(itr).dof = 6; 
-% % %             else; 
-% % %                 trudata.(dtype)(itr).dof = 5; 
-% % %             end
-% % %             warning('Testing low DOF surface waves!'); 
+%             trudata.(dtype)(itr).dof = length(trudata.(dtype)(itr).periods);
+            if max(trudata.(dtype)(itr).periods) > 100; 
+                trudata.(dtype)(itr).dof = 6; 
+            else; 
+                trudata.(dtype)(itr).dof = 5; 
+            end
+            warning('Testing low DOF surface waves!'); 
         elseif strcmp(pdt{1},'HKstack') 
 %             trudata.(dtype)(itr).dof = trudata.(dtype)(itr).Nobs;
             trudata.HKstack_P.Nobs = par.mod.data.deg_of_freedom.h_kappa; 
@@ -64,3 +64,59 @@ for id = 1:length(dtypes)
 end
 
 end
+
+% % % dtype = 'SW_HV'; % dal. DOF = 5; Eks: DOF = 5, but statistically valid at only 3. Same Lov. 
+% % % 
+% % % x = trudata.(dtype).periods; 
+% % % y = trudata.(dtype).HVr; 
+%
+
+%%% Scratch cde to remoce. 
+% pnew = linspace(6, 167, 10)'; 
+% vnew = interp1(trudata.('SW_Ray_phV')(1).periods, trudata.('SW_Ray_phV')(1).phV, pnew);      
+% scdofcalc(vnew)
+% pnew, vnew
+% p = [    6.0000
+%     7.0298
+%     8.2362
+%     9.6498
+%    11.3059
+%    13.2463
+%    15.5197
+%    18.1833
+%    21.3040
+%    24.9603
+%    29.2442
+%    34.2632
+%    40.1437
+%    47.0333
+%    55.1055
+%    64.5630
+%    75.6436
+%    88.6260
+%   103.8365
+%   121.6575
+%   142.5370
+%   167.0000]; 
+% v = [2.6956
+% 2.7483
+% 2.8123
+% 2.8953
+% 2.9229
+% 2.9920
+% 3.0446
+% 3.1129
+% 3.2402
+% 3.3833
+% 3.5604
+% 3.7055
+% 3.8511
+% 3.8948
+% 3.9973
+% 4.0343
+% 4.0993
+% 4.1259
+% 4.1924
+% 4.2146
+% 4.2869
+% 4.3986];
