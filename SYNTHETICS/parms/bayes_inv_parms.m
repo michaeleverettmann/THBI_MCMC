@@ -135,7 +135,7 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
                            'phV',0.05            ,... %    phase velocities
                            'grV',0.06)           ,... %    group velocities
                     	'HV',struct(             ... %   Rayleigh wave ellipticity
-                           'HVr',0.06)           ,... %    HV ratio
+                           'HVr',0.03)           ,... %    HV ratio
                     	'Lov',struct(             ... %   Love waves
                            'phV',0.05            ,... %    phase velocities
                            'grV',0.06)))         ,... %    group velocities

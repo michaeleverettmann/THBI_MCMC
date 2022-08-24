@@ -1,18 +1,18 @@
-function axs = plot_TRUvsPRE_WAVEFORMS( trudata,predata,ifsave,ofile,ifnorm)
+function axs = plot_TRUvsPRE_WAVEFORMS( trudata,predata,par,ifsave,ofile,ifnorm)
 %plot_TRUvsPRE_WAVEFORMS( trudata,predata,ifsave,ofile )
 %   
 % function to plot predicted and true seismograms (Vertical and Radial)
 % Assumes date in 3-column ZRT matrices with equal sample rate 
 
-if nargin < 3 || isempty(ifsave)
+if nargin < 4 || isempty(ifsave)
     ifsave=false;
 end
 
-if nargin < 4 || isempty(ofile)
+if nargin < 5 || isempty(ofile)
     ofile='true_vs_predicted_data';
 end
 
-if nargin < 5 || isempty(ifnorm)
+if nargin < 6 || isempty(ifnorm)
     ifnorm=true;
 end
 
@@ -79,7 +79,9 @@ switch pdtyp{1}
             case 'HV',  
                 ax = ax11;
                 ylabstr = 'H/V ratio'; 
-                errorbar(ax,trudata.(dtype).periods,trudata.(dtype).HVr,2*trudata.(dtype).sigma.*ones(size(trudata.(dtype).periods)),'k')
+                if ~ par.inv.synthTest; 
+                    errorbar(ax,trudata.(dtype).periods,trudata.(dtype).HVr,2*trudata.(dtype).sigma.*ones(size(trudata.(dtype).periods)),'k')
+                end
                 set(ax, 'xscale', 'log'); 
                 xticks(ax, [16, 20, 30, 40, 50, 70, 90]); 
         end

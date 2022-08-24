@@ -10,7 +10,7 @@ run('../../a0_STARTUP_BAYES.m');
 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/R54A_TA_dat1/add_sediment_try2'; 
-resdir_data = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv/cont_EProt-m1m2h25_testnwk_dat0/high_dof_with_noise'; 
+resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/cont_EProt-s4m1m2_testnwk_dat0/high_sp_dof'; 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/S57A_TA_dat1/sage_gage'; 
 resdir_fig = '/Users/brennanbrunsvik/Documents/temp'; 
 prior_path = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat' ; 
@@ -112,7 +112,7 @@ end
 [ final_log_likelihood,final_misfit ] = b5_CALC_LIKELIHOOD( final_misfit,trudata,final_model.hyperparms,par );
 plot_TRUvsPRE( trudata,final_predata,1,[resdir_fig,'/final_true_vs_pred_data.pdf'], allmodels_collated);
 % plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,1,[resdir_fig,'/final_true_vs_pred_data_wavs.png']);
-plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,1,[resdir_fig,'/final_true_vs_pred_data_wavs.png']);
+plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,par,1,[resdir_fig,'/final_true_vs_pred_data_wavs.png']);
 
 % plot_TRUvsPRE_WAVEFORMS_indiv_figs(trudata,final_predata,1,[resdir,'/final_true_vs_pred_data_wavs.pdf']);
 % save([resdir_fig,'/final_misfit'],'final_misfit');

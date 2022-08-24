@@ -1,4 +1,4 @@
-function axs = plot_TRUvsPRE_WAVEFORMS( trudata,predata,ifsave,ofile,ifnorm)
+function axs = plot_TRUvsPRE_WAVEFORMS( trudata,predata,par,ifsave,ofile,ifnorm)
 %plot_TRUvsPRE_WAVEFORMS( trudata,predata,ifsave,ofile )
 %   
 % function to plot predicted and true seismograms (Vertical and Radial)
