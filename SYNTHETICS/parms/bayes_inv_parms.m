@@ -179,7 +179,7 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
 forc = struct(      'mindV',0.075                 ,... % delta Vs for layerising. Smaller is finer. Also scales vertical spacing of layers when there are no velocity changes. See layerise. 
                     'nsamps',2^11                ,... % number of samples (more means longer run time) - brb2022.06.08 I don't think this actually gets passed to propmat. 
                     'PSVorZR','PSV'             ,... % whether to rotate data into PSV or keep in ZR
-         
+                    'synthperiod',2.5              );  % period for propmat response
 % forc.synthperiod = 5; warning('Changing synth period');                 
                 
 %% Data processing parms
