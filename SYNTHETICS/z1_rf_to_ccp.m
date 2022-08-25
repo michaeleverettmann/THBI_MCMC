@@ -43,15 +43,25 @@ RF_Pw = flat_hanning_win(data.RF_Sp_ccp.zz,RF_P,Zwin(1)-taperz/2,Zwin(2)+taperz/
 
 data.RF_Sp_ccp.PSV = [RF_Pw,RF_SV]; 
 
-% ifplot=1; if ifplot; warning('If plot force = true'); end; 
 if ifplot; 
+    
     figure(1); clf; hold on; set(gcf, 'color', 'white'); 
-    tiledlayout(1,2,'TileSpacing', 'compact'); 
+    tiledlayout(1,3,'TileSpacing', 'compact'); 
+    
     nexttile(); hold on; grid on; box on; 
-    set(gca,'ydir', 'reverse'); 
+    set(gca,'ydir', 'reverse');
+    ylim(zaxlim); 
+    plot(model.VS, model.Z); 
+    xlabel('VS'); 
+    ylabel('Depth (km)'); 
+    
+    nexttile(); hold on; grid on; box on; 
+    set(gca,'ydir', 'reverse');
+    ylim(zaxlim); 
     plot(data.RF_Sp_ccp.PSV,data.RF_Sp_ccp.zz); ; 
     xlabel('Sp ccp'); 
     ylabel('Depth (km)'); 
+    
     nexttile(); hold on; grid on; box on; 
     plot(data.RF_Sp.PSV, data.RF_Sp.tt); 
     xlabel('Sp'); 

@@ -170,9 +170,17 @@ if ~use_splines;
     z_c = [0     2     4     6     8    10    12    14    16    18    20    22    24    26    28    30    32    34 36    38    40    42    44    45]'; 
     
     % Load mantle model. 
-    SEMum2_avg = SEMum2_avgprofiles(); 
-    z0  = SEMum2_avg.Z; 
-    vs0 = SEMum2_avg.(v_mod);
+    if strcmp(v_mod, 'layermantle') 
+        z0 = [0:2:300]; 
+        vs0 = ones(size(z0)); 
+        vs0(z0<80) = 3.9; 
+        vs0(z0>=80) = 4.2; 
+        vs0(z0>=150) = 4.5; 
+    else 
+        SEMum2_avg = SEMum2_avgprofiles(); 
+        z0  = SEMum2_avg.Z'; 
+        vs0 = SEMum2_avg.(v_mod);
+    end
     
     if contains(v_alt, 'h25'); 
         zmoh = 25; 
@@ -229,7 +237,6 @@ if ~use_splines;
     z_c   = z_c (~killc); 
     
     %% MAKE ALL PARAMETER STRUCTURES
-    crust = struct('h',max(z_c)-sed.h,'vpvs',1.75,'xi',1.05);
     mantle = struct('xi',1);
     model = struct('sedmparm',sed,'crustmparm',crust,'mantmparm',mantle,...
                    'M', nan, 'datahparm', nan, 'selev',0);
