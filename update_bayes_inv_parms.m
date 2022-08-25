@@ -568,9 +568,24 @@ elseif strcmp(stamp, 'low_noise_sp');
     par.synth.noise_sigma_BW_Sp = 0; 
     par.synth.noise_sigma_RF_Sp = 0; 
     
-   
-
-    
+elseif strcmp(stamp, 'no_noise'); 
+    par.synth.noise_sigma_SW_Ray = 0.000;         
+    par.synth.noise_sigma_SW_Lov = 0.000;         
+    par.synth.noise_sigma_SW_HV  = 0.000;         
+    par.synth.noise_sigma_BW_Sp  = 0.000;         
+    par.synth.noise_sigma_BW_Ps  = 0.000;         
+    par.synth.noise_sigma_RF_Sp  = 0.000;         
+    par.synth.noise_sigma_RF_Ps  = 0.000; 
+elseif strcmp(stamp, 'no_noise_no_hv'); 
+    par.synth.noise_sigma_SW_Ray = 0.000;         
+    par.synth.noise_sigma_SW_Lov = 0.000;         
+    par.synth.noise_sigma_SW_HV  = 0.000;         
+    par.synth.noise_sigma_BW_Sp  = 0.000;         
+    par.synth.noise_sigma_BW_Ps  = 0.000;         
+    par.synth.noise_sigma_RF_Sp  = 0.000;         
+    par.synth.noise_sigma_RF_Ps  = 0.000; 
+    dtp = string(par.inv.datatypes); 
+    par.inv.datatypes = cellstr(dtp(dtp ~= 'SW_HV')); 
     
 end
 

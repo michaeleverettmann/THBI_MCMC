@@ -237,6 +237,7 @@ if ~use_splines;
     z_c   = z_c (~killc); 
     
     %% MAKE ALL PARAMETER STRUCTURES
+    crust = struct('h',max(z_c)-sed.h,'vpvs',1.75,'xi',1.05); % warning('Trying to crustal anisotropy'); 
     mantle = struct('xi',1);
     model = struct('sedmparm',sed,'crustmparm',crust,'mantmparm',mantle,...
                    'M', nan, 'datahparm', nan, 'selev',0);

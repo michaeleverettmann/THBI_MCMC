@@ -50,14 +50,14 @@ if ifplot;
     
     nexttile(); hold on; grid on; box on; 
     set(gca,'ydir', 'reverse');
-    ylim(zaxlim); 
+%     ylim(zaxlim); 
     plot(model.VS, model.Z); 
     xlabel('VS'); 
     ylabel('Depth (km)'); 
     
     nexttile(); hold on; grid on; box on; 
     set(gca,'ydir', 'reverse');
-    ylim(zaxlim); 
+%     ylim(zaxlim); 
     plot(data.RF_Sp_ccp.PSV,data.RF_Sp_ccp.zz); ; 
     xlabel('Sp ccp'); 
     ylabel('Depth (km)'); 

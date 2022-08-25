@@ -20,7 +20,7 @@ cd(proj.dir);
 generation = 0; % generation of solution and data processing
 gc = '';
 BWclust = '';
-STAMP = 'high_sp_dof';
+STAMP = 'no_noise_no_hv';
 % STAMP = 'adding_sediment_pt1'; 
 
 onesta = '';

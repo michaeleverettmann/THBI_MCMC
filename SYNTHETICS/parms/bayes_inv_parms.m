@@ -250,6 +250,7 @@ RFparms = struct([]);
 % 'IDRF' for iterative time domain method, or 'ETMTM' for Extended time multitaper method
 RFparms(1).method = 'IDRF';
 %input: time domain deconvolution
+RFparms.gauss_t = 0.5;
 RFparms.accept_mis=1e-10; %accepted misfit
 RFparms.itmax=50; %number of iterations
 %input: freq domain deconvolution
