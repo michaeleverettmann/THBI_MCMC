@@ -126,7 +126,7 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
                            'cms',0.3)            ,... %    crust multiples
                     	'Sp',struct(              ... %   S-p data
                            'def',0.2             ,... %    default
-                           'ccp',0.1             ,... %    ccp stack
+                           'ccp',0.2             ,... %    ccp stack
                            'lo',0.1))            ,... %    low-f
                   	 'HKstack',struct(            ... %  H-K stack
                     	   'P',.3)              ,... %    P combination

@@ -116,20 +116,50 @@ for id = 1:length(par.inv.datatypes)
                 end %^ end plot
             end          
             
-            misfit2(itr)    =  xconv_misfit(trudata.(dtype)(itr).PSV(:,1), ...
+% % %             %%% Option 1. Doesn't take z into account explicitly. 
+% % %             % Normalization also doesn't account for different convolved versus original time series 
+% % %             misfit2(itr)    =  xconv_misfit(trudata.(dtype)(itr).PSV(:,1), ...
+% % %                                             trudata.(dtype)(itr).PSV(:,2), ...
+% % %                                             predata.(dtype)(itr).PSV(:,1), ...
+% % %                                             predata.(dtype)(itr).PSV(:,2));
+% % % 
+% % %             stfpow_tru(itr) = norm(trudata.(dtype)(itr).PSV(:,1)) +...
+% % %                                  norm(trudata.(dtype)(itr).PSV(:,2));
+% % %             stfpow_pre(itr) = norm(predata.(dtype)(itr).PSV(:,1)) +...
+% % %                                  norm(predata.(dtype)(itr).PSV(:,2));
+% % %             norm_denominator = stfpow_tru * stfpow_pre; 
+% % %             %%%
+
+                             
+         	%%% Option 2. Basically an average error over depth. Error is normalized
+            [~, err, VobsHpre, HobsVpre ]   =  xconv_misfit(trudata.(dtype)(itr).PSV(:,1), ...
                                             trudata.(dtype)(itr).PSV(:,2), ...
                                             predata.(dtype)(itr).PSV(:,1), ...
                                             predata.(dtype)(itr).PSV(:,2));
-                                           
-            stfpow_tru(itr) = norm(trudata.(dtype)(itr).PSV(:,1)) +...
-                                 norm(trudata.(dtype)(itr).PSV(:,2));
-            stfpow_pre(itr) = norm(predata.(dtype)(itr).PSV(:,1)) +...
-                                 norm(predata.(dtype)(itr).PSV(:,2));
-                             
-                            
+                                        
+            % Calculate integral average of error.  Note that this keeps error in data units. 
+            zz = predata.(dtype)(itr).zz; 
+            DZ = max(zz) - min(zz); 
+            dz = predata.(dtype)(itr).dz; 
+            zz_conv = [min(zz)-DZ/2 : dz :  max(zz)+DZ/2 + dz*5]'; % Add a few extra terms at end, remove them later. To prevent us from having to few indecies due to rounding. Note that an absolute shift in z doesn't matter, it's really only dz that matters. 
+            zz_conv = zz_conv(1:length(err)); % Cut off any extra values. 
+            
+            integ_norm = @(zz_conv, valint)sqrt( trapz(zz_conv, valint.^2) ./ ...
+                (max(zz_conv) - min(zz_conv)) ); % Just using trapz cause it's convenient and I don't have to worry about array sizes. Doesn't take much computation, only 1.34e-5 s per call. Note that max(zz_conv) - min(zz_conv) is NOT the same as DZ. NOTE, a test. As is (2022.08.26) if you plug in ones for the valint, then the function will return 1. 
+            
+            misfit2(itr) = integ_norm(zz_conv, err     );
+            vhconv       = integ_norm(zz_conv, VobsHpre); 
+            hvconv       = integ_norm(zz_conv, HobsVpre); 
+            norm_denominator = sqrt(vhconv * hvconv); % brb2022.08.26 I forget the standard way of normalizing, like doing normalized cross correlation... Something like this. 
+            %%%
+            
+            %%%
+%             norm(trudata.(dtype)(itr).PSV(:,1) - predata.(dtype)(itr).PSV(:,1)) ./ (norm(trudata.(dtype)(itr).PSV(:,1)) )
+            %%%
+            
         end
               
-        misfit.E2.(dtype) = misfit2./stfpow_tru./stfpow_pre;      % SUM OF SQUARED MISFITS, NORMALISED
+        misfit.E2.(dtype) = misfit2./norm_denominator;      % SUM OF SQUARED MISFITS, NORMALISED
         
         %%% brb2022.02.18 Simple rms estimate for comparison. As of now,
         %%% not in use for inverison. 
