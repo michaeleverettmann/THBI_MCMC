@@ -587,6 +587,22 @@ elseif strcmp(stamp, 'no_noise_no_hv');
     dtp = string(par.inv.datatypes); 
     par.inv.datatypes = cellstr(dtp(dtp ~= 'SW_HV')); 
     
+    
+elseif strcmp(stamp, 'synth_no_sed'); 
+    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
+    par.mod.sed.hmax                  = 0; 
+    par.mod.sed.vsmin                 = 3.3;
+    par.sed.vsmax                     = 3.3; 
+    par.mod.force_no_new_prior        = true; 
+    
+    
+    
+    
+    
 end
 
 inv = par.inv; 
