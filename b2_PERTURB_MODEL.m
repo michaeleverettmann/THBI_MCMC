@@ -434,7 +434,7 @@ switch ptbopts{optflag} % decide what to modify
                         if std==0, continue; end % don't perturb if no perturbation
                         ptb = 'Moho_h';
 
-                        h0 = model.crustmparm.h;
+                        h0 = model.crustmparm.h; % moho to sed depth, not absolute moho depth. 
                         hma = par.mod.crust.hmax; 
                         hmi = par.mod.crust.hmin;
                         h1 = h0 + random('norm',0,std,1); % calc. random perturbation
@@ -457,13 +457,16 @@ switch ptbopts{optflag} % decide what to modify
 %                         if any(diff(model.mantmparm.knots)<par.mod.dz), continue, end % can't be too close to existing knot
 %                         if any(diff(model.crustmparm.knots)<par.mod.dz), continue, end % can't be too close to existing knot
 
-                        if h1 < hmi, P_bd = 0; return, end
-                        if h1 > hma, P_bd = 0; return, end
+                        % Verify that h1 is within bounds. 
+                        % h1 is not absolute, it is depth between sediment and moho. So to get to absolute moho depth, add sediment depth. 
+                        if h1 + model.sedmparm.h < hmi, P_bd = 0; return, end % brb2022.08.09 Added sediment depth here, because h1 is relative to sediment depth. 
+                        if h1 + model.sedmparm.h > hma, P_bd = 0; return, end
+%                         fprintf('dh: %2.4f\n',dh); 
 
                         % -------- modify splines in crust -------- 
                         cminz = model.crustmparm.knots(1);
                         cmaxz = model.crustmparm.knots(end);
-                        model.crustmparm.h = cmaxz - cminz;
+                        model.crustmparm.h = cmaxz - cminz; % crustmparm.h is moho to sediment, not absolute. 
 
                         iczt = find(model.z==model.zsed,1,'last'); % here using the old zsed
                         iczb = find(model.z==model.zmoh,1,'first');% here using the old moho
@@ -519,16 +522,17 @@ switch ptbopts{optflag} % decide what to modify
 
                         if par.inv.verbose, fprintf('    Changed moho depth from %.2f to %.2f\n',model.sedmparm.h + h0,cmaxz); end
                         
-                        %%% Maybe perturb vpvs also. Since trade off between vpvs and h are so covariant. 
+                        %%% Some chance to also perturb vpvs. Because trade off between vpvs and h are known to be covariant. 
                         if try_h_and_k; 
                             std = temp .* par.mod.crust.vpvsstd .* sig_scale; % get std of perturbation
                             ptb = [ptb '_crust_vpvs'];
 
                             V0 = model.crustmparm.vpvs;
                             vpvs_ptb = random('norm',0,std,1); % Calculate the random perturbation. 
-                            if dh / vpvs_ptb > 0; % Important! For this specific vpvs perturbation, we assume a negative correlation between h and vpvs. We know Ps timing depends on h and vpvs with negative covariance. 
-                                vpvs_ptb = - vpvs_ptb; % Force correlation between dh and dk is negative. 
-                            end
+% % % % This commented code can force all vpvs, zmoh perturbations to have negative covariance, since we know those parameters should negatively covary. However, the emperical prior shows that this biases results towards deep moho with low(or high? i forget) vpvs.                              
+% % % %                             if dh / vpvs_ptb > 0; % Important! For this specific vpvs perturbation, we assume a negative correlation between h and vpvs. We know Ps timing depends on h and vpvs with negative covariance. 
+% % % %                                 vpvs_ptb = - vpvs_ptb; % Force correlation between dh and dk is negative. 
+% % % %                             end
                             V1 = V0 + vpvs_ptb; % calc. random perturbation
 
                             model.crustmparm.vpvs = V1; % insert perturbed val
