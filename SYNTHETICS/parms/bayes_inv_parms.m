@@ -78,7 +78,7 @@ modl.crust = struct(...
                 ... gaussian prior probability for crust thickness - mean=30, std=10
                      'h_pprior',@(h) 1,...exp(-(h-30).^2/4.^2),... % prior probability 
     ... shear velocity in the crust
-                     'vsmax',4.4                 ,...4.5 % max crust spline velocity, km/s bb2021.10.26 changes from 4.3 to 4.4... Shen and Ritzwoller Fig 12 shows lower crustal velocity going above 4.2 
+                     'vsmax',4.5                 ,...4.5 % max crust spline velocity, km/s bb2021.10.26 changes from 4.3 to 4.4... Shen and Ritzwoller Fig 12 shows lower crustal velocity going above 4.2 
                      'vsmin',2.5                 ,...3.3 % min crust spline velocity, km/s bb2021.10.26 ?? Not sure about this one. There must be a theoretical limit. Shen2016 shows SUPER low velocities in Gulf of Mexico, which is clearly a consequence of sediment. North/East of that, values are higher than 2.8. 
                      'vsstd',0.08                ,... % std of crust spline velocity for perturbation, km/s
     ... Vp/Vs in the crust

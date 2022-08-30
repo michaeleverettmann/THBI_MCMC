@@ -169,6 +169,10 @@ if ~use_splines;
     vs_c = [3.3000    3.3067    3.3162    3.3284    3.3435    3.3612    3.3818    3.4051    3.4312 3.4600    3.4916    3.5260    3.5617    3.5955    3.6272    3.6567    3.6840    3.7093 3.7324    3.7534    3.7722    3.7889    3.8035    3.8100]'; 
     z_c = [0     2     4     6     8    10    12    14    16    18    20    22    24    26    28    30    32    34 36    38    40    42    44    45]'; 
     
+    % Increase velocity at depth a little
+    vs_c = vs_c + 0.1 * z_c./max(z_c); 
+    fprintf('Synth model: Increasing lower sed velocity a little (0.1 km/s)\n'); 
+    
     % Load mantle model. 
     if strcmp(v_mod, 'layermantle') 
         z0 = [0:2:300]; 
@@ -176,10 +180,12 @@ if ~use_splines;
         vs0(z0<80) = 3.9; 
         vs0(z0>=80) = 4.2; 
         vs0(z0>=150) = 4.5; 
+        fprintf('Synth model: Making simple layered mantle.\n'); 
     else 
         SEMum2_avg = SEMum2_avgprofiles(); 
         z0  = SEMum2_avg.Z'; 
         vs0 = SEMum2_avg.(v_mod);
+        fprintf('Synth model: Getting basic mantle model from SEMum2.\n'); 
     end
     
     if contains(v_alt, 'h25'); 
@@ -188,6 +194,7 @@ if ~use_splines;
         vs_base = interp1(z_c, vs_c, zmoh); 
         vs_c = [vs_c(~killc); vs_base]; 
         z_c  = [z_c(~killc) ; zmoh   ];
+        fprintf('Synth model: Making shallow moho at %1.0f km.\n', zmoh); 
     end
         
         
@@ -197,11 +204,26 @@ if ~use_splines;
     z_m = unique(sort([z_m; z_c(end)])); % Make sure Moho depth is in mantle model. 
     z_m = z_m(z_m>=z_c(end)); % Just keep mantle depths and vals from SEM model. 
     vs_m = interp1(z0, vs0, z_m, 'spline', 'extrap');
+    
+    
+    dvs_moh = vs_m(1) - vs_c(end); 
+    dvs_moh_max = 0.5; 
+    if dvs_moh > dvs_moh_max;
+        fprintf('Synth model: Lowering uppermost mantle velocity to prevent large zmoh vs jump. New v jump of %1.3f, fractional perturbation of %1.3f\n',dvs_moh_max, dvs_moh_max./vs_c(end));  
+        dvs_shift = dvs_moh - dvs_moh_max; % How much we need to decrease vs_m at zmoh
+        vs_m_mod = interp1([min(z_m), 100, 105, max(z_m)], ... % Make the vs change stop by 100 km depth more or less. 
+            [dvs_shift,0, 0, 0],...
+            z_m, 'makima'); % Basically a linear interpolation, but makima makes this a little smoth
+        vs_m = vs_m - vs_m_mod; 
+%         figure(1); clf; hold on; plot(vs_m_mod, z_m); set(gca, 'ydir', 'reverse')
+    end
+        
 
     % % % Quick plot to make sure interpolation and extrapolation aren't messing anything up too much. 
     % figure(1); clf; hold on; set(gca, 'ydir', 'reverse'); plot(vs, z); plot(vs0, z0); 
     
     if contains(v_alt, 'm1'); 
+        fprintf('Synth model: Adding low velocity at 80 km.\n'); 
         ftr_amp   = -0.2; 
         ftr_pos   = 80; 
         ftr_width = 10; 
@@ -210,6 +232,7 @@ if ~use_splines;
     end
     
     if contains(v_alt, 'm2')
+        fprintf('Synth model: Adding low velocity at 150 km.\n'); 
         ftr_amp   = -0.2; 
         ftr_pos   = 150; 
         ftr_width = 10; 
@@ -220,11 +243,11 @@ if ~use_splines;
     
 
     if contains(v_alt, 's1'); 
-        sed = struct('h',1,'VS',[2.0, 2.5]);
+        sed = struct('h',1,'VS',[2.0, 3.0]);
     elseif contains(v_alt, 's4'); 
-        sed = struct('h',4,'VS',[2.0, 2.5]);
+        sed = struct('h',4,'VS',[2.0, 3.0]);
     elseif contains(v_alt, 's2'); 
-        sed = struct('h',2,'VS',[2.0, 2.5]);
+        sed = struct('h',2,'VS',[2.0, 3.0]);
     elseif contains(v_alt, 's0'); 
         sed = struct('h',0,'VS',[3.3 3.3]);
     else
@@ -314,6 +337,7 @@ TRUEmodel.vsAvCrust = h_crust / interp1(z2, timeToDep, h_crust); % "Average" tra
 % brb2022.02.09: This assumes a station with zero elevation. It should be fine for most synthetic tests. TODO we do have an optional elevation value in the synthetic model. I should verify that z includes z<0 - if so, no code change is needed. 
 
 %% PLOT FINAL MODEL
+warning('if plot set true'); ifplot = 1; 
 if ifplot
 figure(95); clf; set(gcf,'pos',[120 151 920 947])
 subplot(131), hold on;
