@@ -216,10 +216,10 @@ synth = struct( 'gcarcs',[70]                 ,... % average gcarc
                 'SW_Ray_phV_periods',logspace(log10(6),log10(167),22)',...  % Rayleigh wave phV periods
                 'SW_Ray_grV_periods',logspace(log10(6),log10(40),10)',...  % Rayleigh wave phV periods
                 'SW_Lov_phV_periods',logspace(log10(6),log10(40),10)',...  % Love wave phV periods
-                'SW_HV_periods',logspace(log10(8),log10(90),11)',...  % Rayleigh wave HV periods
-                'synthperiod',2                  ,...  % period for propmat synth
+                'SW_HV_periods',[16 20 24 28 32 36 40 50 60 70 80 90]',...  % Rayleigh wave HV periods. From Shen and ritzwoller 2016. 
+                'synthperiod',forc.synthperiod   ,...  % period for propmat synth
                 'nsamps',[]                      );  % number of samples. 
-            
+
 %---RF parameters---%
 RFparms = struct([]);
 % 'IDRF' for iterative time domain method, or 'ETMTM' for Extended time multitaper method

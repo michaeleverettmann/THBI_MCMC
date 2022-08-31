@@ -233,15 +233,15 @@ synth = struct( 'gcarcs',[70]                 ,... % average gcarc
                 'noise_sigma_SW_Ray',0.015        ,... %0.03 std for random added noise for SWs
                 'noise_sigma_SW_Lov',0.015        ,... %0.03 std for random added noise for SWs
                 'noise_sigma_SW_HV',0.005        ,... %0.03 std for random added noise for SWs
-                'noise_sigma_BW_Sp',0.000        ,... %0.02 std for random added noise for SpRFs
+                'noise_sigma_BW_Sp',0.009        ,... %0.02 std for random added noise for SpRFs
                 'noise_sigma_BW_Ps',0.012        ,... %0.02 std for random added noise for PsRFs
-                'noise_sigma_RF_Sp',0.000        ,... %0.02 std for random added noise for SpRFs
+                'noise_sigma_RF_Sp',0.009        ,... %0.02 std for random added noise for SpRFs
                 'noise_sigma_RF_Ps',0.012        ,... %0.02 std for random added noise for PsRFs
                 'surf_Vp_Vs',[6.1 3.55]          ,... % [VP, VS] surface velocity values - if empty, uses True vals % bb2022.02.08 Not sure what these are. Different sets of values are used in z0_SYNTH_MODEL...
                 'SW_Ray_phV_periods',logspace(log10(6),log10(167),22)',...  % Rayleigh wave phV periods
                 'SW_Ray_grV_periods',logspace(log10(6),log10(40),10)',...  % Rayleigh wave phV periods
                 'SW_Lov_phV_periods',logspace(log10(6),log10(40),10)',...  % Love wave phV periods
-                'SW_HV_periods',logspace(log10(8),log10(90),11)',...  % Rayleigh wave HV periods
+                'SW_HV_periods',[16 20 24 28 32 36 40 50 60 70 80 90]',...  % Rayleigh wave HV periods. From Shen and ritzwoller 2016. 
                 'synthperiod',forc.synthperiod   ,...  % period for propmat synth
                 'nsamps',[]                      );  % number of samples. 
 

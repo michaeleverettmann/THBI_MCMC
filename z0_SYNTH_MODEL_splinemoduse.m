@@ -243,11 +243,14 @@ if ~use_splines;
     
 
     if contains(v_alt, 's1'); 
-        sed = struct('h',1,'VS',[2.0, 3.0]);
+        sed = struct('h',1,'VS',[2.0, .95*vs_c(1)]);
+%         sed = struct('h',1,'VS',[1.3, 2.3]);
     elseif contains(v_alt, 's4'); 
-        sed = struct('h',4,'VS',[2.0, 3.0]);
+        sed = struct('h',4,'VS',[2.0, .95*vs_c(1)]);
+    elseif contains(v_alt, 's4sharp'); % See what happens if the sediment/basement vs jump is sharp. I think this produces strong changes to HV, the inversion cannot accurately recover the sharpness of the feature, so HV isn't fit well, and everything goes to shit. Testing... brb2022.08.30
+        sed = struct('h',4,'VS',[2.0, 2.5]);
     elseif contains(v_alt, 's2'); 
-        sed = struct('h',2,'VS',[2.0, 3.0]);
+        sed = struct('h',2,'VS',[2.0, .95*vs_c(1)]);
     elseif contains(v_alt, 's0'); 
         sed = struct('h',0,'VS',[3.3 3.3]);
     else

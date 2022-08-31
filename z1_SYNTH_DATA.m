@@ -87,11 +87,11 @@ trudat_ps_PSV = flat_hanning_win(tt_ps,trudat_ps_PSV,Ps_widewind(1),Ps_widewind(
 trudat_sp_PSV = flat_hanning_win(tt_sp,trudat_sp_PSV,Sp_widewind(1),Sp_widewind(2),3); % 3s taper
 
 % normalise to small energy, flip to positive main pulse
-normf_ps = trudat_ps_PSV(:,1)'*trudat_ps_PSV(:,1) + trudat_ps_PSV(:,2)'*trudat_ps_PSV(:,2);
-trudat_ps_PSV = trudat_ps_PSV/sqrt(normf_ps/2)./sign(maxab(trudat_ps_PSV(:)));
+% normf_ps = trudat_ps_PSV(:,1)'*trudat_ps_PSV(:,1) + trudat_ps_PSV(:,2)'*trudat_ps_PSV(:,2);
+% trudat_ps_PSV = trudat_ps_PSV/sqrt(normf_ps/2)./sign(maxab(trudat_ps_PSV(:)));
 
-normf_sp = trudat_sp_PSV(:,1)'*trudat_sp_PSV(:,1) + trudat_sp_PSV(:,2)'*trudat_sp_PSV(:,2);
-trudat_sp_PSV = trudat_sp_PSV/sqrt(normf_sp/2)./sign(maxab(trudat_sp_PSV(:)));
+% normf_sp = trudat_sp_PSV(:,1)'*trudat_sp_PSV(:,1) + trudat_sp_PSV(:,2)'*trudat_sp_PSV(:,2);
+% trudat_sp_PSV = trudat_sp_PSV/sqrt(normf_sp/2)./sign(maxab(trudat_sp_PSV(:)));
 
 % add noise
 if strcmp(par.synth.noisetype,'gaussian') || strcmp(par.synth.noisetype,'gauss')

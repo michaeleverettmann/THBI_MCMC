@@ -87,6 +87,21 @@ hcby = ylabel(hcb,'log_{10}(Probability)','fontweight','bold','verticalalignment
 set(hcby,'rotation',270,'pos',[3.2 -2.5 0]);
 
 
+%% Plot true model if synthetic. 
+if par.inv.synthTest; 
+    global TRUEmodel
+    if ~isempty(TRUEmodel)
+        Z = TRUEmodel.Z;
+        vs = TRUEmodel.VS;
+        vp = TRUEmodel.VP;
+        plot(ax1,vs,Z,'-b','Linewidth',2);
+        plot(ax2,vp,Z,'-b','Linewidth',2);
+    else
+        warning('Why is TRUEmodel empty? Cant plot TRUEmodel'); 
+    end
+end
+
+
 %% SAVE
 if ifsave
     fprintf('   saving fig\n');
