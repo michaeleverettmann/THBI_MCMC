@@ -142,9 +142,16 @@ eval(sprintf('! cp parms/bayes_inv_parms.m %s',resdir))
 
 % allpdytp = parse_dtype_all(par);
 
+%% Get some directories ready. 
+% Switch to execution folder, to make synthetic data. 
+prev_dir = pwd(); 
+cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
+mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
+
 %% ========================  LOAD + PREP DATA  ========================
 [trudata,par] = a2_LOAD_DATA(par, 'nwk', nwk, 'sta', sta);
 plot_TRU_WAVEFORMS(trudata);
+cd(prev_dir); % Not sure if need to change back to whatever directory we were previously in, but I will for safety. 
 % check_data(trudata,par)
 
 %% ===========================  PRIOR  ===========================
