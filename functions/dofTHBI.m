@@ -27,6 +27,7 @@ for id = 1:length(dtypes)
             warning('Manually assigning HK stack degree of freedom'); 
         elseif any(strcmp({'BW','RF'},pdt{1}))           
             % Remove starting and ending parts of time series where they == 0. Those are artificial. 
+            
             if strcmp(pdt{2}, 'Sp'); 
                 daughter = trudata.(dtype)(itr).PSV(:,1); 
                 parent   = trudata.(dtype)(itr).PSV(:,2); 
@@ -34,7 +35,7 @@ for id = 1:length(dtypes)
                 daughter = trudata.(dtype)(itr).PSV(:,2); 
                 parent   = trudata.(dtype)(itr).PSV(:,1); 
             end
-                       
+
             if strcmp({'RF'},pdt{1}); 
                 neq0d = find(daughter ~= 0); % Daughter is not zero
                 start_ind = neq0d(1); 
@@ -46,7 +47,7 @@ for id = 1:length(dtypes)
                 dofd = scdofcalc(daughter); 
                 trudata.(dtype)(itr).dof = dofd;
             end
-            
+
             if strcmp({'BW'},pdt{1}); 
                 error('brb2022.08.23 Need to decide how to handle degrees of freedom for body waves if they arent receiver functions'); 
                 trudata.(dtype)(itr).dof = mean([scdofcalc(daughter),...
@@ -57,6 +58,25 @@ for id = 1:length(dtypes)
 % % %                 parent    = parent  (start_ind:end_ind,:); 
 % % %                 dofp = scdofcalc(parent); 
             end
+            
+            
+            
+            set_dof_manually = strcmp(pdt{2}, 'Sp') && ...
+                isfield(par.mod.data.deg_of_freedom, 'Sp') && ...
+                ~isnan(par.mod.data.deg_of_freedom.Sp); % Sort of temporary, for using Hopper ccp dataset. brb2022.08.30. 
+            
+            if set_dof_manually
+                dof_old = trudata.(dtype)(itr).dof; 
+                dofd = par.mod.data.deg_of_freedom.Sp; 
+                trudata.(dtype)(itr).dof = dofd; 
+                fprintf(['\nSetting Sp degree of freedom manually to %1.2f from bayes_inv_parms.m.\n',...
+                    'If you arent using the Hoper dataset, reconsider this number. \n',...
+                    'For this stations specific receiver function, the Silver and Chan method\n',...
+                    'Would have given you degree of freedom = %1.3f.\n',...
+                    'You can manually pick a number that seems representative of all your stations.\n'], dofd, dof_old); 
+            end % 
+                
+
         end
     end
     fprintf('Degrees of freedom = %7.3f for datatype %s\n',...
