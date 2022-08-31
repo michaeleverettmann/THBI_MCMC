@@ -23,7 +23,13 @@ phase_wts = options.phase_wts;
 
 % Get average crust velocity. There are again a few choices. 
 % Get vsv, vpv. If there is anisotropy, this influences HK calculation.
-isCrust = model.z < model.zmoh; 
+isCrust = model.z <= model.zmoh; 
+isCrustF = find(isCrust); 
+if model.z(isCrustF(end-1)) == model.z(isCrustF(end)); % Handle the duplicated moho depth for crust and mantle
+    isCrustF(end) = []; % Remove mantle value
+    isCrust(:) = false; 
+    isCrust(isCrustF) = true; 
+end
 dz = zeros(size(model.z)); % For weighted mean, integral style. 
 dz(1:end-1,1) = dz(1:end-1,1) + 0.5 .* diff(model.z);
 dz(2:end  ,1) = dz(2:end  ,1) + 0.5 .* diff(model.z); 
