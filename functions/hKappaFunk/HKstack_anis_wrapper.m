@@ -18,6 +18,22 @@ function [HK_A, HK_H, HK_K] = HKstack_anis_wrapper(par, model, ...
 % MCMC/THBI wrapper to get relevant model/data and use it for radially 
 % anisotropic HK stack. 
 
+% % % % % % Earth flattening transformation
+% a = 6371; 
+% zflt = @(z)-a .* log((a-z)./a); 
+% vflt = @(z,v)a./(a-z) .* v; 
+% % r = a - model.z; 
+% % zzf = -a .* log(r./a); 
+% % vsf = a./r .* vs; 
+% % vpf = a./r .* vp; 
+% % zz = zzf; 
+% % vs = vsf; 
+% % vp = vpf; 
+% model.z_orig = model.z; 
+% model.zmoh_orig = model.zmoh; 
+% model.z    = zflt(model.z   ); 
+% model.zmoh = zflt(model.zmoh); 
+
 % Choose weighting for different phases. There are a few valid choices.
 phase_wts = options.phase_wts; 
 
@@ -37,12 +53,19 @@ dzC = dz(isCrust);
 
 % Function to calculate mean accounting for variable dz spacing. Simple integral mean. 
 meanInt = @(m,dz)sum(dz.*m)/sum(dz); 
-vrAv = @(m,dz)( (1./meanInt(1./m,dz) + meanInt(m,dz) ) / 2 ); % Voigt Reuss Hill average (or whatever it's called). 
+% vrAv = @(m,dz)( (1./meanInt(1./m,dz) + meanInt(m,dz) ) / 2 ); % Voigt Reuss Hill average (or whatever it's called). 
+vrAv = @(m,dz)( (1./meanInt(1./m,dz) ) ); % This averaging approach is slightly more consistent with propmat than the voigt reuss. Makes sense... it's all about travel times. 
+
 
 % rho = mean(model.rho(isCrust)); % Medium density of crust. Not sure how best to average this yet.
 rho = meanInt(model.rho(isCrust), dzC); 
 eta = 1; % IMPORTANT if eta is ever not 1, we need to modify the code. 
 vsAv = vrAv(model.VS(isCrust), dzC); 
+vpAv = vrAv(model.VP(isCrust), dzC); 
+
+ % TODO need to incocporate sediment vpvs and xi into the averages properly. Tough to decide how to balance them being model parameters that we plot and look at, while HK sampling should be based on different parameters.  brb 2022.08.31, I cant really tell the difference between hk stacks or the positions of plotted points when changing between these two values. 
+vpvs_av_iso = vpAv / vsAv; % including in sediment. 
+% vpvs_av_iso = model.vpvs;
 
 if isempty(options.posterior); % Have to calculate averages from 1-D profile. 
     xi = model.Sanis(isCrust)/100+1; % Radial S anisotropy. add one because for some reason here anisotropy is + or -
@@ -57,11 +80,11 @@ end
     
 % Assume ray path change is insignificant when adding anisotropy
 incAngVs = rayp2inc(rayp/111.1949, vsAv             ); 
-incAngVp = rayp2inc(rayp/111.1949, vsAv * model.vpvs); % PN 20.6 was the incidence angle here. Seems reasonable. Same as for the real rays for US.CEH
+incAngVp = rayp2inc(rayp/111.1949, vsAv * vpvs_av_iso); % PN 20.6 was the incidence angle here. Seems reasonable. Same as for the real rays for US.CEH
 
-[velVs,~] = christof_radial_anis(vsAv, vsAv * model.vpvs,...
+[velVs,~] = christof_radial_anis(vsAv, vsAv * vpvs_av_iso,...
     xi, phi, eta, rho, incAngVs); % Velocities for ray with vs incidence angle
-[velVp,~] = christof_radial_anis(vsAv, vsAv * model.vpvs,...
+[velVp,~] = christof_radial_anis(vsAv, vsAv * vpvs_av_iso,...
     xi, phi, eta, rho, incAngVp); % Velocities for ray with vp incidence angle
 vsvAn = velVs(2); % Vsv for s ray 
 vpAn  = velVp(1); % Vp for p ray
@@ -72,10 +95,10 @@ vpvsEffective = vpAn/vsvAn;
 
 [HK_A, HK_H, HK_K] = HKstack(RF, tt, ...
     rayp/111.1949, phase_wts, ...
-    vsAv, ...
+    vsAv, ... % isotropic
     linspace(options.hBounds(1), options.hBounds(2), options.hNum)',...
     linspace(options.kBounds(1), options.kBounds(2), options.kNum), ...
-    'vpvsANIS_vpvs',vpvsEffective/model.vpvs,'Vsv_av',vsvAn); 
+    'vpvsANIS_vpvs',vpvsEffective/vpvs_av_iso,'Vsv_av',vsvAn); 
 
 % The rest of the script expects transposed hk stack. For IRIS ears data loaded from Zach's functions, K is first dimension, H is second bb2021.12.31
 HK_A = HK_A'; 
@@ -120,7 +143,7 @@ if options.ifplot;
     try
         scatter(model.vpvs, model.zmoh, 50, 'k'); 
     catch
-        scatter(model.crustmparm.vpvs, model.zmoh, 50, 'k'); 
+        warning('Could not plot model.vpvs and/or model.zmoh'); 
     end
 
     % Plot the receiver function and the predicted times of different phases. This is a function in HKstack.m 
@@ -129,6 +152,7 @@ if options.ifplot;
         linspace(10, 70, 2000)',linspace(1.5, 2.1, 2001), ...
             'plotPicks',true,'kChoice',kBest,'hChoice',hBest, ...
             'vpvsANIS_vpvs',vpvsEffective/model.vpvs,'Vsv_av',vsvAn); 
+
 end
 
 end

@@ -21,7 +21,7 @@ generation = 0; % generation of solution and data processing
 gc = '';
 BWclust = '';
 % STAMP = 'synth_no_sed';
-STAMP = 'low_noise_sp';
+STAMP = 'no_noise';
 % STAMP = 'adding_sediment_pt1'; 
 
 onesta = '';
