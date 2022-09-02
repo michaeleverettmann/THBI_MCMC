@@ -98,7 +98,8 @@ for istamp = [1:length(STAMP_all)];
 
     %%%%% Important! Must define network and station before runnig this! 
     % If we have not defined network and station, use default US.CEH
-    if ~ (exist('network_manual', 'var') && exist('station_manual', 'var')) ; 
+    running_in_hpc = (exist('network_manual', 'var') && exist('station_manual', 'var'))
+    if ~ running_in_hpc; 
         network_manual = 'TA'; 
         station_manual = 'S57A'; 
         fprintf('\nReseting to %s.%s\n',network_manual,station_manual)

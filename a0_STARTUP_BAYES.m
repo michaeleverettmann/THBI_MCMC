@@ -136,7 +136,25 @@ paths.STAinversions = [paths.THBIpath '/data/STASinv/'   ]; % bb2021.09.28 if th
 % [status, cmdout] = system('rm ./*pathsAutoGen.m')
 % % % delete('pathsAutoGen.m') % Delete and recreate pathsAutoGen.m for each computer. 
 warning('brb2022.04.05 : Not deleting pathsAutoGen.m. Cant do this if running many stations at once. Do things still work? If you see something about a file not existing, maybe this is the cause. ')
-matlab.io.saveVariablesToScript([paths.THBIpath '/pathsAutoGen.m'], 'paths');
+
+
+% Try saving paths. However, if we are running many stations, we risk
+% messing up the paths file due to parallel writing. So don't save paths if
+% there is no need. 
+try 
+    pause_time = rand(1)*2; 
+    fprintf('Pausing for %1.3f seconds before loading paths file\n',pause_time); 
+    pause(pause_time); % Wait a random amount of time to reduce risk of many stations simultaneously writing this file. Give chance for another station to write this variable. 
+    paths_old = getPaths(); 
+catch 
+    paths_old = struct(''); 
+end
+    
+if isequaln(paths_old, paths); 
+    fprintf('Old paths was same as new paths. Not resaving.\n'); 
+else; 
+    matlab.io.saveVariablesToScript([paths.THBIpath '/pathsAutoGen.m'], 'paths');
+end
 
 addpath(paths.models_seismic); % bb2021.11.02 Needed for some functions which access data. I thought this was already added somewhere but I don't see where. 
 end
