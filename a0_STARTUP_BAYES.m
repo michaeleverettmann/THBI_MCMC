@@ -141,19 +141,31 @@ warning('brb2022.04.05 : Not deleting pathsAutoGen.m. Cant do this if running ma
 % Try saving paths. However, if we are running many stations, we risk
 % messing up the paths file due to parallel writing. So don't save paths if
 % there is no need. 
-try 
-    pause_time = rand(1)*2; 
-    fprintf('Pausing for %1.3f seconds before loading paths file\n',pause_time); 
-    pause(pause_time); % Wait a random amount of time to reduce risk of many stations simultaneously writing this file. Give chance for another station to write this variable. 
-    paths_old = getPaths(); 
-catch 
-    paths_old = struct(''); 
-end
-    
-if isequaln(paths_old, paths); 
-    fprintf('Old paths was same as new paths. Not resaving.\n'); 
-else; 
-    matlab.io.saveVariablesToScript([paths.THBIpath '/pathsAutoGen.m'], 'paths');
+itries = 0; 
+while itries < 10; 
+    try 
+        pause_time = rand(1)*2; 
+        fprintf('Pausing for %1.3f seconds before loading paths file\n',pause_time); 
+        pause(pause_time); % Wait a random amount of time to reduce risk of many stations simultaneously writing this file. Give chance for another station to write this variable. 
+    %     paths_old = getPaths(); 
+    % catch 
+    %     paths_old = struct(''); 
+    % end
+
+    % if isequaln(paths_old, paths); 
+    %     fprintf('Old paths was same as new paths. Not resaving.\n'); 
+    % else; 
+        matlab.io.saveVariablesToScript([paths.THBIpath '/pathsAutoGen.m'], 'paths');
+        paths = getPaths(); 
+        itries = inf; 
+    % end
+    catch e
+        fprintf('Oh no couldt read paths. Error was: \n%s\n',getReport(e)); 
+        itries = itries + 1; 
+        if itries > 10; 
+            error('No luck with paths'); 
+        end
+    end
 end
 
 addpath(paths.models_seismic); % bb2021.11.02 Needed for some functions which access data. I thought this was already added somewhere but I don't see where. 

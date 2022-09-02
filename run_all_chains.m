@@ -216,6 +216,9 @@ end
 cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
 mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
 
+fprintf('Some info on split:\n'); 
+help split
+fprintf('END Some info on split:\n'); 
 
 
 %% % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
