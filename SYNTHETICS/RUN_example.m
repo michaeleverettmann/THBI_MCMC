@@ -1,5 +1,5 @@
-close all
-clear all
+% close all 
+% clear all % Cannot clear all, because then we allways reset network_manual and station_manual below. 
 %% Setup
 run('../a0_STARTUP_BAYES.m')
 
@@ -20,9 +20,7 @@ cd(proj.dir);
 generation = 0; % generation of solution and data processing
 gc = '';
 BWclust = '';
-% STAMP = 'synth_no_sed';
-STAMP = 'no_noise';
-% STAMP = 'adding_sediment_pt1'; 
+STAMP = 'standard';
 
 onesta = '';
 

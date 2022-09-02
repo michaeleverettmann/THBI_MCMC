@@ -1,2 +1,2 @@
-testnwk cont_EProt-s1
+testnwk cont_EProt-s1m1m2
 # For some reason have to have a final line that isn't used. Note: format is NET STA
