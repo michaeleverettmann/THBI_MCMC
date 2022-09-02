@@ -1,18 +1,18 @@
-function axs = plot_TRUvsPRE_WAVEFORMS( trudata,predata,ifsave,ofile,ifnorm)
+function axs = plot_TRUvsPRE_WAVEFORMS( trudata,predata,posterior,par,ifsave,ofile,ifnorm)
 %plot_TRUvsPRE_WAVEFORMS( trudata,predata,ifsave,ofile )
 %   
 % function to plot predicted and true seismograms (Vertical and Radial)
 % Assumes date in 3-column ZRT matrices with equal sample rate 
 
-if nargin < 3 || isempty(ifsave)
+if nargin < 5 || isempty(ifsave)
     ifsave=false;
 end
 
-if nargin < 4 || isempty(ofile)
+if nargin < 6 || isempty(ofile)
     ofile='true_vs_predicted_data';
 end
 
-if nargin < 5 || isempty(ifnorm)
+if nargin < 7 || isempty(ifnorm)
     ifnorm=true;
 end
 

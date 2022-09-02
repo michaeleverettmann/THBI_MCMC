@@ -12,7 +12,7 @@ str_temp = split(stamp, '/');
 % burnin_only  = 4000 ; 
 % cooloff_only = 3000 ; 
 % nchains_only = 12   ; 
-niter_only   = 10000; 
+niter_only   = 16000; 
 burnin_only  = 4000 ; 
 cooloff_only = 3000 ; 
 nchains_only = 12   ; 
@@ -562,6 +562,46 @@ elseif strcmp(stamp, 'all_simple_parent_no_sed');
     par.mod.sed.hmax                  = 0; 
     par.mod.force_no_new_prior        = false; 
 
+    
+    
+elseif strcmp(stamp, 'low_noise_sp'); 
+    par.synth.noise_sigma_BW_Sp = 0; 
+    par.synth.noise_sigma_RF_Sp = 0; 
+    
+elseif strcmp(stamp, 'no_noise'); 
+    par.synth.noise_sigma_SW_Ray = 0.000;         
+    par.synth.noise_sigma_SW_Lov = 0.000;         
+    par.synth.noise_sigma_SW_HV  = 0.000;         
+    par.synth.noise_sigma_BW_Sp  = 0.000;         
+    par.synth.noise_sigma_BW_Ps  = 0.000;         
+    par.synth.noise_sigma_RF_Sp  = 0.000;         
+    par.synth.noise_sigma_RF_Ps  = 0.000; 
+elseif strcmp(stamp, 'no_noise_no_hv'); 
+    par.synth.noise_sigma_SW_Ray = 0.000;         
+    par.synth.noise_sigma_SW_Lov = 0.000;         
+    par.synth.noise_sigma_SW_HV  = 0.000;         
+    par.synth.noise_sigma_BW_Sp  = 0.000;         
+    par.synth.noise_sigma_BW_Ps  = 0.000;         
+    par.synth.noise_sigma_RF_Sp  = 0.000;         
+    par.synth.noise_sigma_RF_Ps  = 0.000; 
+    dtp = string(par.inv.datatypes); 
+    par.inv.datatypes = cellstr(dtp(dtp ~= 'SW_HV')); 
+    
+    
+elseif strcmp(stamp, 'synth_no_sed'); 
+    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
+    par.mod.sed.hmax                  = 0; 
+    par.mod.sed.vsmin                 = 3.3;
+    par.sed.vsmax                     = 3.3; 
+    par.mod.force_no_new_prior        = true; 
+    
+    
+    
+    
     
 end
 

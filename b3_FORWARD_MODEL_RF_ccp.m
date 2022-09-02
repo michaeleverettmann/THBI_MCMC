@@ -194,7 +194,7 @@ predata.RF_Sp_ccp.PSV = [RF_Pw,RF_SV];
 
 
 %% ifplot....
-ifplot = false; if ifplot; warning('Setting ifplot = true'); end; 
+% ifplot = true; if ifplot; warning('Setting ifplot = true'); end; 
 if ifplot
     zz  = predata.RF_Sp_ccp.zz;
     RFz = predata.RF_Sp_ccp.PSV;

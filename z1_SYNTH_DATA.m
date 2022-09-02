@@ -35,7 +35,7 @@ P_inc = rayp2inc(raypp,TLM.Vp(end),6371-TLM.zlayb(end));
 S_inc = rayp2inc(rayps,TLM.Vs(end),6371-TLM.zlayb(end));
 
 [trudat_ps,tt_ps]  = run_propmat(TLM,'TegPs','Ps',samprate, P_inc, par.synth.synthperiod); % in R,T,Z
-[trudat_sp,tt_sp] = run_propmat(TLM,'TegSp','Sp',samprate, S_inc, par.synth.synthperiod*2); % in R,T,Z
+[trudat_sp,tt_sp] = run_propmat(TLM,'TegSp','Sp',samprate, S_inc, par.synth.synthperiod); % in R,T,Z
 % channel order
 trudat_ps_ZRT = trudat_ps(:,[3,1,2]); % in Z,R,T
 trudat_sp_ZRT = trudat_sp(:,[3,1,2]); % in Z,R,T
@@ -87,11 +87,11 @@ trudat_ps_PSV = flat_hanning_win(tt_ps,trudat_ps_PSV,Ps_widewind(1),Ps_widewind(
 trudat_sp_PSV = flat_hanning_win(tt_sp,trudat_sp_PSV,Sp_widewind(1),Sp_widewind(2),3); % 3s taper
 
 % normalise to small energy, flip to positive main pulse
-normf_ps = trudat_ps_PSV(:,1)'*trudat_ps_PSV(:,1) + trudat_ps_PSV(:,2)'*trudat_ps_PSV(:,2);
-trudat_ps_PSV = trudat_ps_PSV/sqrt(normf_ps/2)./sign(maxab(trudat_ps_PSV(:)));
+% normf_ps = trudat_ps_PSV(:,1)'*trudat_ps_PSV(:,1) + trudat_ps_PSV(:,2)'*trudat_ps_PSV(:,2);
+% trudat_ps_PSV = trudat_ps_PSV/sqrt(normf_ps/2)./sign(maxab(trudat_ps_PSV(:)));
 
-normf_sp = trudat_sp_PSV(:,1)'*trudat_sp_PSV(:,1) + trudat_sp_PSV(:,2)'*trudat_sp_PSV(:,2);
-trudat_sp_PSV = trudat_sp_PSV/sqrt(normf_sp/2)./sign(maxab(trudat_sp_PSV(:)));
+% normf_sp = trudat_sp_PSV(:,1)'*trudat_sp_PSV(:,1) + trudat_sp_PSV(:,2)'*trudat_sp_PSV(:,2);
+% trudat_sp_PSV = trudat_sp_PSV/sqrt(normf_sp/2)./sign(maxab(trudat_sp_PSV(:)));
 
 % add noise
 if strcmp(par.synth.noisetype,'gaussian') || strcmp(par.synth.noisetype,'gauss')
@@ -134,7 +134,7 @@ data = struct();
 if any(string(par.inv.datatypes)=='BW_Ps') || any(string(par.inv.datatypes)=='RF_Ps') || any(string(par.inv.datatypes)=='HKstack_P')
     data.BW_Ps = PsRF; 
 end
-if any(string(par.inv.datatypes)=='BW_Sp') || any(string(par.inv.datatypes)=='RF_Sp')
+if any(string(par.inv.datatypes)=='BW_Sp') || any(string(par.inv.datatypes).contains('RF_Sp'))
     data.BW_Sp = SpRF; 
 end
 
@@ -174,6 +174,22 @@ end
 % end
 
 end % doing body waves
+
+% % % %% Get Sp CCP stacks
+% % % dz = 0.5; 
+% % % zz = [-15:dz:300]';
+% % % gcarcs = par.synth.gcarcs(1); 
+% % % if length(par.synth.gcarcs)>1; error('Only have Sp CCP ready for 1 gcarc. You need to build a loop over more, or just use one gcarc.'); end
+% % % tpS = tauptime('deg',gcarc,'phases','S'); 
+% % % rayps = tpS.rayparameter;
+% % % dof_per_z=1/par.datprocess.CCP.parent_zw; 
+% % % data.RF_Sp_ccp = struct('zz',zz,'rayp',rayps,'dz',dz,'nsamp',length(zz),'dof_per_z',dof_per_z); 
+% % % warning('Fake degree of freedom'); 
+% % % 
+% % % % par.inv.datatypes{6} = 'RF_Sp_ccp'
+% % % [data] = b3_FORWARD_MODEL_RF_ccp(TRUEmodel, TLM, par, data, 'temporary', 1)
+% % % %!%! Probably add noise here. 
+% % % %%
 
 
 %% ===================  CALCULATE PHASE VELOCITIES  ===================

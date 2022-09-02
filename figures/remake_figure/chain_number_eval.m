@@ -79,7 +79,7 @@ end
 [ final_misfit ] = b4_CALC_MISFIT( trudata,final_predata,par,0, 'plotRFError',true );
 [ final_log_likelihood,final_misfit ] = b5_CALC_LIKELIHOOD( final_misfit,trudata,final_model.hyperparms,par );
 % plot_TRUvsPRE( trudata,final_predata,1,[resdir_fig,'/final_true_vs_pred_data.pdf'], allmodels_collated);
-plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,1,[resdir_fig,'/final_true_vs_pred_data_wavs.png']);
+plot_TRUvsPRE_WAVEFORMS( trudata,final_predata,posterior,par,1,[resdir_fig,'/final_true_vs_pred_data_wavs.png']);
 % plot_TRUvsPRE_WAVEFORMS_indiv_figs(trudata,final_predata,1,[resdir,'/final_true_vs_pred_data_wavs.pdf']);
 % save([resdir_fig,'/final_misfit'],'final_misfit');
 plot_FIG2_FIT_MODEL( final_model,posterior,prior,par,1,[resdir_fig,'/fig2_FIT_MODEL.pdf'])

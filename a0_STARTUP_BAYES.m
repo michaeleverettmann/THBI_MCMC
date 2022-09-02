@@ -126,6 +126,8 @@ paths = struct(    'CADMINEOS',      [hd '/Documents/repositories/Peoples_codes/
                    'models_seismic', [hd '/Documents/repositories/data/models_seismic'], ...
                    'ramDrive',        ramDrive); % TODO This will have to be set to automatically change depending on the computer.  /dev/shm/brunsvikRam /Volumes/brunsvikRAM
 
+addpath(sprintf('%s/SEMum2_avg_VS',paths.models_seismic)); % brb2022.08.16 Average global models for synthetic tests.                 
+               
 paths.rawdatadir =    [paths.THBIpath '/data/STAsrawdat/']; % bb2021.09.28 if this takes too much local storage, put it on external drives. 
 paths.STAinversions = [paths.THBIpath '/data/STASinv/'   ]; % bb2021.09.28 if this takes too much local storage, put it on external drives. 
 % 'rawdatadir', ['/Volumes/data/',proj.name,'/THBI/STAsrawdat/'],... % bb2021.09.28 Could use these locations to keep data on NAS. Not so important though if you aren't downloading a bunch of waveform data I think. 
@@ -134,7 +136,25 @@ paths.STAinversions = [paths.THBIpath '/data/STASinv/'   ]; % bb2021.09.28 if th
 % [status, cmdout] = system('rm ./*pathsAutoGen.m')
 % % % delete('pathsAutoGen.m') % Delete and recreate pathsAutoGen.m for each computer. 
 warning('brb2022.04.05 : Not deleting pathsAutoGen.m. Cant do this if running many stations at once. Do things still work? If you see something about a file not existing, maybe this is the cause. ')
-matlab.io.saveVariablesToScript([paths.THBIpath '/pathsAutoGen.m'], 'paths');
+
+
+% Try saving paths. However, if we are running many stations, we risk
+% messing up the paths file due to parallel writing. So don't save paths if
+% there is no need. 
+try 
+    pause_time = rand(1)*2; 
+    fprintf('Pausing for %1.3f seconds before loading paths file\n',pause_time); 
+    pause(pause_time); % Wait a random amount of time to reduce risk of many stations simultaneously writing this file. Give chance for another station to write this variable. 
+    paths_old = getPaths(); 
+catch 
+    paths_old = struct(''); 
+end
+    
+if isequaln(paths_old, paths); 
+    fprintf('Old paths was same as new paths. Not resaving.\n'); 
+else; 
+    matlab.io.saveVariablesToScript([paths.THBIpath '/pathsAutoGen.m'], 'paths');
+end
 
 addpath(paths.models_seismic); % bb2021.11.02 Needed for some functions which access data. I thought this was already added somewhere but I don't see where. 
 end

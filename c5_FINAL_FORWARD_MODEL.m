@@ -335,6 +335,7 @@ if any(strcmp(pdtyps(:,1),'HKstack'))
     fm.rho = fm.rhoav; 
     fm.zmoh = fm.zmohav; % median(posterior.zmoh); 
     fm.VS = final_model.VSav; 
+    fm.VP = final_model.VPav; 
     fm.z = fm.Z; % this is why we should always use cammel case or something else consistent! 
     fm.vpvs = fm.vpvsav;
 %     fm.vpvs = fm.vpvsav_v2; 

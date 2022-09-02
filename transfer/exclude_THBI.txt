@@ -14,7 +14,6 @@
 **.svg
 **.tif
 **.html
-# **.mat # Might need some .mat files. 
 **.fig
 **.asv
 # Inversion .mat files that take a lot of space. 

@@ -1,18 +1,18 @@
-function axs = plot_TRUvsPRE_WAVEFORMS( trudata,predata,ifsave,ofile,ifnorm)
+function axs = plot_TRUvsPRE_WAVEFORMS( trudata,predata,posterior,par,ifsave,ofile,ifnorm)
 %plot_TRUvsPRE_WAVEFORMS( trudata,predata,ifsave,ofile )
 %   
 % function to plot predicted and true seismograms (Vertical and Radial)
 % Assumes date in 3-column ZRT matrices with equal sample rate 
 
-if nargin < 3 || isempty(ifsave)
+if nargin < 5 || isempty(ifsave)
     ifsave=false;
 end
 
-if nargin < 4 || isempty(ofile)
+if nargin < 6 || isempty(ofile)
     ofile='true_vs_predicted_data';
 end
 
-if nargin < 5 || isempty(ifnorm)
+if nargin < 7 || isempty(ifnorm)
     ifnorm=true;
 end
 
@@ -79,7 +79,9 @@ switch pdtyp{1}
             case 'HV',  
                 ax = ax11;
                 ylabstr = 'H/V ratio'; 
-                errorbar(ax,trudata.(dtype).periods,trudata.(dtype).HVr,2*trudata.(dtype).sigma.*ones(size(trudata.(dtype).periods)),'k')
+                if ~ par.inv.synthTest; 
+                    errorbar(ax,trudata.(dtype).periods,trudata.(dtype).HVr,2*trudata.(dtype).sigma.*ones(size(trudata.(dtype).periods)),'k')
+                end
                 set(ax, 'xscale', 'log'); 
                 xticks(ax, [16, 20, 30, 40, 50, 70, 90]); 
         end
@@ -182,6 +184,25 @@ switch pdtyp{1}
         xlabel(ax12, 'Vp/Vs ratio','fontsize',16)
         ylabel(ax12, 'Moho depth','fontsize',16)
         set(ax12,'ydir','reverse', 'linewidth', 4)
+        
+        
+% % % %         figure(1); clf; hold on; 
+% % %         axPdf = copyobj(ax12, gcf); 
+% % %         axes(axPdf); 
+% % %         cla; 
+% % %         ax12.Visible = 'on'; 
+% % %         axPdf.Visible = 'off'; 
+% % %         kgrd = predata.HKstack_P.Kgrid; 
+% % %         hgrd = predata.HKstack_P.Hgrid; 
+% % %         kgrd = linspace(min(kgrd), max(kgrd), 101); 
+% % %         hgrd = linspace(min(hgrd), max(hgrd), 100); 
+% % %         [hist_counts] = hist3(...
+% % %             [posterior.vpvs, posterior.zmoh],'ctrs',{kgrd,hgrd}); 
+% % %         hist_counts = imgaussfilt(hist_counts, 'FilterSize', 5); 
+% % %         hist_counts = log(hist_counts); 
+% % %         [pdf_hand] = contourf(axPdf, kgrd, hgrd', hist_counts', 5, 'w'); 
+% % %         linkaxes([ax12,axPdf]); 
+% % %         sprintf(''); 
     
     
 end
@@ -194,6 +215,82 @@ if ifsave
 %     save2pdf(58,ofile,'/');
     exportgraphics(gcf, ofile, 'resolution', 300); 
 end
+
+
+
+if any(string(par.inv.datatypes) == 'HKstack_P'); 
+%     predata = final_predata; 
+%     model = final_model; 
+    dtype = 'HKstack_P'; 
+%     titleSize = 12; 
+    xlim_arr = [1.6, 2.1];
+    ylim_arr = [15 , 70 ];
+    fsetlims = @()set(gca(),'xlim', xlim_arr, 'ylim', ylim_arr, ...
+        'ydir', 'reverse'); 
+
+
+    figure(1058); clf; hold on; 
+    set(gcf, 'pos', [405 698 320 383]); 
+    axPdf = gca(); cla; box on; 
+    fsetlims(); 
+    ax12 = copyobj(axPdf, gcf); 
+    set(ax12, 'Color', 'none'); 
+    fsetlims(); 
+
+
+    %%% Top 
+    axes(ax12); 
+    Esum = predata.(dtype).Esum'; 
+    contour(ax12,predata.(dtype).Kgrid,predata.(dtype).Hgrid,...
+        predata.(dtype).Esum', linspace(min(min(Esum)), max(max(Esum)),5), 'k'); % Use final_predata to get the HK stack estimated with our velocity model. 
+
+    plot(predata.HKstack_P.K,predata.HKstack_P.H,'ok','linewidth',2,...
+        'markerfacecolor','r','markersize',7)
+    %%%
+
+
+
+
+
+    ax12.Visible = 'on'; 
+    axPdf.Visible = 'off'; 
+
+
+    %%% Bottom
+    axes(axPdf); 
+    kgrd = predata.HKstack_P.Kgrid; 
+    hgrd = predata.HKstack_P.Hgrid; 
+    kgrd = linspace(min(kgrd), max(kgrd), 101); 
+    hgrd = linspace(min(hgrd), max(hgrd), 100); 
+    [hist_counts] = hist3(...
+        [posterior.vpvs, posterior.zmoh],'ctrs',{kgrd,hgrd}); 
+    hist_counts = imgaussfilt(hist_counts, 'FilterSize', 3); 
+    hist_counts = log(hist_counts); 
+    [pdf_hand] = contourf(axPdf, kgrd, hgrd', hist_counts', 15,...
+        'linestyle', 'none'); 
+%     cbar = colorbar(axPdf,'South'); 
+    cbar = colorbar(); 
+    cbar.Label.String = 'ln(times sampled)'; cbar.Label.FontSize = 12; 
+    %%%
+
+    % linkaxes([ax12,axPdf]); 
+    linkaxes([axPdf,ax12 ]); 
+    set(ax12, 'Position', axPdf.Position); 
+    axes(axPdf); axes(ax12); 
+    title(ax12, 'zmoh/vpvs sampling density','fontsize',titleSize, ...
+        'fontweight', 'normal'); 
+    xlabel(ax12, 'Vp/Vs ratio','fontsize',14, 'fontweight', 'normal'); 
+    ylabel(ax12, 'Moho depth','fontsize',14, 'fontweight', 'normal'); 
+    set(ax12,'linewidth', 2); 
+    
+    if ifsave
+        exportgraphics(gcf, sprintf(...
+            '%s/final_true_vs_pred_data_wavs_HK.png',par.res.resdir), ...
+            'resolution', 300); 
+    end
+    
+end
+
 
 % %% Ps
 % if isfield(predata,'PsRF') && ~isempty(predata.PsRF(1).PSV)

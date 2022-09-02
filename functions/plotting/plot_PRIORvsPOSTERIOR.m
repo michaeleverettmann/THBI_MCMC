@@ -59,7 +59,10 @@ title('Vs crust bot (km/s)','fontsize',16)
 
 
 if par.inv.synthTest; 
-    vsBot = TRUEmodel.crustmparm.VS_sp(end); % brb2022.02.18 Not 100% sure this is the right value
+    isMoh = find(TRUEmodel.zmoh==TRUEmodel.z); 
+    isMoh = isMoh(1); 
+    vsBot = TRUEmodel.vs(isMoh); 
+%     vsBot = TRUEmodel.crustmparm.VS_sp(end); % brb2022.02.18 Not 100% sure this is the right value
     yplt = get(gca, 'ylim'); 
     plot([vsBot, vsBot], [yplt(1), yplt(2)], 'b', 'LineWidth', 2); 
 end
@@ -76,9 +79,11 @@ set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
 title('fractional dVs at Moho (%)','fontsize',16)
 
 if par.inv.synthTest; 
-    vscTemp = TRUEmodel.crustmparm.VS_sp(end); 
-    vsmTemp = TRUEmodel.mantmparm.VS_sp(1); 
-    fracChange = (vsmTemp - vscTemp) / vscTemp * 100; 
+    isMoh = find(TRUEmodel.zmoh==TRUEmodel.z); 
+    vsMoh = TRUEmodel.vs(isMoh); 
+%     vscTemp = TRUEmodel.crustmparm.VS_sp(end); 
+%     vsmTemp = TRUEmodel.mantmparm.VS_sp(1); 
+    fracChange = (vsMoh(2) - vsMoh(1)) / vsMoh(1) * 100; 
     yplt = get(gca, 'ylim'); 
     plot([fracChange, fracChange], [yplt(1), yplt(2)], 'b', 'LineWidth', 2); 
 end

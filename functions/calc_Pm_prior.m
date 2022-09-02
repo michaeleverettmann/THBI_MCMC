@@ -14,7 +14,7 @@ Pm_prior = 1;
 
 %% Crustal thickness
 try
-    Pm_prior = Pm_prior*par.mod.crust.h_pprior(model.zmoh-model.zsed);
+    Pm_prior = Pm_prior*par.mod.crust.h_pprior(model.zmoh); % brb2022.08.08 Switching from model.zmoh-model.zsed. Shouldn't matter, prior is just 1 anyway. 
 catch e 
     fprintf('\n%s\n',getReport(e)); 
     if par.inv.verbose

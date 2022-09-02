@@ -32,12 +32,9 @@ elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
     save([par.res.resdir,'/trumodel'],'TRUEmodel');
 
     % make synth data
-%     [ junkdata ] = z1_SYNTH_DATA(par,0);
-%     [predata,laymodel1] = b3__INIT_PREDATA(TRUEmodel,par,junkdata,0 );
-%     predata = b3_FORWARD_MODEL_BW(TRUEmodel,laymodel1,par,predata,'test_bb2021_12_07',0 ); 
-%     predata = b3_FORWARD_MODEL_RF_ccp(   TRUEmodel,laymodel1,par,predata,'test_bb2021_12_07',0 );
     [ trudata ] = z1_SYNTH_DATA(par,0); % in ZRT format
-    
+%     figure(1101); clf; hold on; plot(trudata.BW_Sp.tt, trudata.BW_Sp.PSV); title('Before deconvolution'); 
+
     if strcmp(par.synth.noisetype,'real')
         [ trudata,par ] = z2_NOISIFY_SYNTH( trudata, par,par.synth.noise_sta_deets );
     end
@@ -45,14 +42,20 @@ elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
     % distribute data for different processing (e.g. _lo, _cms)
     trudata = duplicate_data_distribute(trudata,par);
    
-    % conv to receiver functions
+    % convert to receiver functions from body waves
     if any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
         trudata = BW_2_RF(trudata,par);
+%         figure(1102); clf; hold on; plot(trudata.RF_Sp.tt, trudata.RF_Sp.PSV); title('After deconvolution'); 
+
     end
     
     % Use receiver functions to make h-kappa stacks. 
     [ trudata ] = z1_SYNTH_DATA_h_kappa(par,trudata,model,0);
     
+    if any(string(par.inv.datatypes).contains('RF_Sp_ccp')); 
+        [ trudata ] = z1_rf_to_ccp(par,trudata,model,0); 
+    end
+       
 %% -----------------------------------------------------------------
 %% LAB TESTING
 elseif strcmp(par.proj.name,'LAB_tests')

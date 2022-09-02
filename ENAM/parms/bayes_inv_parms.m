@@ -14,14 +14,17 @@ inv = struct(    'synthTest',false                ,...
                  'Nsavestate',100                ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x             
-                 'datatypes',{{'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}}); 
+                 'datatypes',{{'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+                        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+                        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}}); 
 % % %              %                  'datatypes',{{'SW_HV'}}) 
 % % %                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
 % % %                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
 % % %                                 %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
 
+% Everything below can be copy pasted between real data runs and synthetic runs (as of 2022.08.11). brb
 
-profileRun = false; % Whether to do an mpi profile to learn what parts of code take much time
+profileRun = false; if profileRun; fprintf('\n\nDoing an mpi profile run.\n\n'), end% Whether to do an mpi profile to learn what parts of code take much time
                                 
 %% Model parms
 modl = struct([]);
@@ -53,7 +56,7 @@ modl.crust = struct(...
                 ... gaussian prior probability for crust thickness - mean=30, std=10
                      'h_pprior',@(h) 1,...exp(-(h-30).^2/4.^2),... % prior probability 
     ... shear velocity in the crust
-                     'vsmax',4.4                 ,...4.5 % max crust spline velocity, km/s bb2021.10.26 changes from 4.3 to 4.4... Shen and Ritzwoller Fig 12 shows lower crustal velocity going above 4.2 
+                     'vsmax',4.5                 ,...4.5 % max crust spline velocity, km/s bb2021.10.26 changes from 4.3 to 4.4... Shen and Ritzwoller Fig 12 shows lower crustal velocity going above 4.2 
                      'vsmin',2.5                 ,...3.3 % min crust spline velocity, km/s bb2021.10.26 ?? Not sure about this one. There must be a theoretical limit. Shen2016 shows SUPER low velocities in Gulf of Mexico, which is clearly a consequence of sediment. North/East of that, values are higher than 2.8. 
                      'vsstd',0.08                ,... % std of crust spline velocity for perturbation, km/s
     ... Vp/Vs in the crust
@@ -101,7 +104,7 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
                            'cms',0.3)            ,... %    crust multiples
                     	'Sp',struct(              ... %   S-p data
                            'def',0.2             ,... %    default
-                           'ccp',0.1             ,... %    ccp stack
+                           'ccp',0.2             ,... %    ccp stack
                            'lo',0.1))            ,... %    low-f
                   	 'HKstack',struct(            ... %  H-K stack
                     	   'P',.3)              ,... %    P combination
@@ -147,7 +150,8 @@ modl.data = struct('prior_sigma',struct(                 ... % PRIOR
                                                   ...  
                   'logstd_sigma',0.05,            ...
                   'deg_of_freedom',struct(       ...
-                      'h_kappa', 15)) ;   % LOGSTD
+                      'h_kappa', 15,...
+                      'Sp',43)) ;   % LOGSTD
 
                  
 %% Forward calc. parms
@@ -211,14 +215,14 @@ synth = struct( 'gcarcs',[70]                 ,... % average gcarc
                 'noise_sigma_BW_Ps',0.012        ,... %0.02 std for random added noise for PsRFs
                 'noise_sigma_RF_Sp',0.009        ,... %0.02 std for random added noise for SpRFs
                 'noise_sigma_RF_Ps',0.012        ,... %0.02 std for random added noise for PsRFs
-                'surf_Vp_Vs',[6.1 3.55]          ,... % [VP, VS] surface velocity values - if empty, uses True vals
+                'surf_Vp_Vs',[6.1 3.55]          ,... % [VP, VS] surface velocity values - if empty, uses True vals % bb2022.02.08 Not sure what these are. Different sets of values are used in z0_SYNTH_MODEL...
                 'SW_Ray_phV_periods',logspace(log10(6),log10(167),22)',...  % Rayleigh wave phV periods
                 'SW_Ray_grV_periods',logspace(log10(6),log10(40),10)',...  % Rayleigh wave phV periods
                 'SW_Lov_phV_periods',logspace(log10(6),log10(40),10)',...  % Love wave phV periods
-                'SW_HV_periods',logspace(log10(8),log10(90),11)',...  % Rayleigh wave HV periods
-                'synthperiod',2                  ,...  % period for propmat synth
+                'SW_HV_periods',[16 20 24 28 32 36 40 50 60 70 80 90]',...  % Rayleigh wave HV periods. From Shen and ritzwoller 2016. 
+                'synthperiod',forc.synthperiod   ,...  % period for propmat synth
                 'nsamps',[]                      );  % number of samples. 
-            
+
 %---RF parameters---%
 RFparms = struct([]);
 % 'IDRF' for iterative time domain method, or 'ETMTM' for Extended time multitaper method

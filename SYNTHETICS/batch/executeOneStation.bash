@@ -20,7 +20,14 @@ module load MatLab/R2021b || echo "Did not load Matlab. Are we not using Knot?"
 # First argument is station.network. 
 # Script executes RUN_one_station.m on that station. 
 
+network=$1
+station=$2
+echo Running: $network $station 
 
-# #nohup 
-matlab -nodisplay -nosplash -nodesktop -r "RUN_example" # &> batch/run_info/nohup$network.$station.out 
-# }
+now="$(date)"
+echo $now 
+pwd
+echo "network_manual='$network'; station_manual='$station'; RUN_example"
+echo ''
+
+matlab -nodisplay -nosplash -nodesktop -r "network_manual='$network'; station_manual='$station'; RUN_example" # &> batch/run_info/nohup$network.$station.out 

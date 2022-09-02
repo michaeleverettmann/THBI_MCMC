@@ -1,4 +1,4 @@
-function [ misfit2,e ] = xconv_misfit( Vobs,Hobs,Vpre,Hpre )
+function [ misfit2,e, VobsHpre, HobsVpre ] = xconv_misfit( Vobs,Hobs,Vpre,Hpre )
 %[ misfit2,e ] = xconv_misfit( Vobs,Hobs,Vpre,Hpre )
 % 
 %  Function to calculate the cross-convolution misfit between observed
