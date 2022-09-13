@@ -355,6 +355,8 @@ if any(strcmp(allpdytp(:,1),'HKstack'))
         rfWaves = load(sprintf('%s/IRIS_EARS//Ears/gauss_2.5/%s.%s/rfArr.mat',EARSdir,nwk,sta)); 
         rfWaves.tt = rfWaves.tt'; 
         
+        fprintf('Number of receiver functions loaded: %1.0f\n',size(rfWaves.rf,2)); 
+        
         %%% Make my own HK stacks. Seems like phase weighting in IRIS EARS make inversion unstable... brb2022.04.04
         
         fprintf('\nbrb2022.02.04: TODO synthetic starting HK stack: making first hk stack using 0.5, 0.3, 0.2 weights. Also using 3.5 as average s crustal velocity, similar to Zhu and Kanamori 2000. These should be parameters. \n')
