@@ -1,0 +1,1 @@
+Matlab stores parallel job metadata in some folder. If running many parpools in parallel, they might overwrite each others metadata, giving a corrupt file error message. Give each parallel pool its own folder. While parpool is not running, we should be able to clear this folder. 

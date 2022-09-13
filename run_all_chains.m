@@ -182,11 +182,19 @@ end
 delete(gcp('nocreate'));
 myCluster = parcluster('local');
 maxWorkers = myCluster.NumWorkers; 
+
+% Matlab stores parallel job metadata in some folder. If running many parpools in parallel, they might overwrite each others metadata, giving a corrupt file error message. Give each parallel pool its own folder. 
+JobStorageLocation = sprintf('%s/job_info_scratch/%s_%s_%s',...
+    paths.THBIpath, nwk, sta, STAMP); 
+mkdir(JobStorageLocation); 
+myCluster.JobStorageLocation = JobStorageLocation; 
+
+
 % % Use the following two lines if you want more parallel chains than you have cores. 
 % myCluster.NumWorkers = max(maxWorkers, par.inv.nchains); 
 % maxWorkers = myCluster.NumWorkers; 
 
-parpool(min([par.inv.nchains,maxWorkers])); % TODOcomp May need to change based on computer. I set so that we only use as many workers as the local parallel profile will allow.  
+myCluster.parpool(min([par.inv.nchains,maxWorkers])); % TODOcomp May need to change based on computer. I set so that we only use as many workers as the local parallel profile will allow.  
 TD = parallel.pool.Constant(trudata); PR = parallel.pool.Constant(par);
 % (((( If not parallel: ))))
 % TD(1). Value = trudata; par.inv.verbose = 0;

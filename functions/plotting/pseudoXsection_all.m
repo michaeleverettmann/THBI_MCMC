@@ -24,7 +24,7 @@ addpath('/Users/brennanbrunsvik/Documents/repositories/general_data'); % For top
 
 % specify details of this run
 generation = 1; % generation of solution and data processing
-STAMP = 'all_sp_weight';
+STAMP = 'standard';
 
 % Quality thresholds for including stations - important!
 overallQ_thresh = 1; % 2 is good, 1 is ok, 0 is bad
