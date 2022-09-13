@@ -189,7 +189,6 @@ JobStorageLocation = sprintf('%s/job_info_scratch/%s_%s_%s',...
 mkdir(JobStorageLocation); 
 myCluster.JobStorageLocation = JobStorageLocation; 
 
-
 % % Use the following two lines if you want more parallel chains than you have cores. 
 % myCluster.NumWorkers = max(maxWorkers, par.inv.nchains); 
 % maxWorkers = myCluster.NumWorkers; 

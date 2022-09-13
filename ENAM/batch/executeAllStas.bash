@@ -25,10 +25,24 @@ echo '************** New Run **************' !>> $pid
 echo $(date) !>> $pid # Put the date in process_ID file so we know what's what. Also, don't want to remove old PIDs, in case one keeps running and we have to shut it down. 
 while read -r lineSta; # Loop over each station. 
 do
-    # Run "task" on network, station, and echo the process_ID to $pid file. 
+    # # Run "task" on network, station, and echo the process_ID to $pid file. 
+    # ftest="~/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv/${lineSta//[ ]/_}_dat1/standard/allmodels_perchain_orig.mat"
+    # # echo "Check if file there. $ftest"
+    # if test -f "$ftest"; then 
+    #     echo "$ftest exists."
+    # else
+    #     echo "sbatch batch/executeOneStation.bash '$lineSta'"
+    #     # sbatch batch/executeOneStation.bash $lineSta
+    #     # sleep 1.0
+    # fi
+
+
+
     echo "sbatch batch/executeOneStation.bash '$lineSta'"
     sbatch batch/executeOneStation.bash $lineSta
-    # sleep 1.0
+
+
+
 done < $staList
 
 wait 
