@@ -1,0 +1,5 @@
+This file is just notes on a few stations I am manually avoiding running. 
+
+TA 350A Has only one receiver function with EARS. 
+TA S61A Has only two receiver functions with EARS. 
+TA X50A only one receiver function
