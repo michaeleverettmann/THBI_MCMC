@@ -8,14 +8,14 @@ str_temp = split(stamp, '/');
 
 
 % % % % { Different data types alone
-% niter_only   = 16000; 
-% burnin_only  = 4000 ; 
-% cooloff_only = 3000 ; 
-% nchains_only = 12   ; 
 niter_only   = 16000; 
 burnin_only  = 4000 ; 
 cooloff_only = 3000 ; 
 nchains_only = 12   ; 
+% niter_only   = 1000; 
+% burnin_only  = 200 ; 
+% cooloff_only = 100 ; 
+% nchains_only = 12   ; 
 % % % 
 % niter_only   = 300  ; 
 % burnin_only  = 50   ;  
@@ -600,8 +600,11 @@ elseif strcmp(stamp, 'synth_no_sed');
     par.mod.force_no_new_prior        = true; 
     
     
-    
-    
+elseif strcmp(stamp, 'standard_temp'); 
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;  
     
 end
 
