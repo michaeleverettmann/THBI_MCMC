@@ -180,6 +180,7 @@ end
 
 % ===== Prepare for parallel pool =====
 delete(gcp('nocreate'));
+% distcomp.feature( 'LocalUseMpiexec', false ); % Trying this to make sure I can open many parpool on cluster. See: https://www.mathworks.com/matlabcentral/answers/196549-failed-to-start-a-parallel-pool-in-matlab2015a  This didn't help, and it slowed down opening parallel pools. 
 myCluster = parcluster('local');
 maxWorkers = myCluster.NumWorkers; 
 
