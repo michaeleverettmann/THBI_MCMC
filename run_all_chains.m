@@ -191,10 +191,13 @@ fprintf('\nChecking storage availability on /tmp/ folder\n\n');
 fprintf('\nTemporarily using user storage for JobStorageLocation\n'); 
 JobStorageLocation = sprintf('%s/job_info_scratch/%s_%s_%s',...
     paths.THBIpath, nwk, sta, STAMP); 
+JobStorageLocation_old = [JobStorageLocation '_old']; 
 % % % JobStorageLocation = sprintf('/tmp/mcmcthbi_%s_%s_%s/',... % Use tmp for local disk. % https://researchcomputing.princeton.edu/support/knowledge-base/matlab
 % % %     nwk, sta, STAMP); % tmp would be a good place, but the node might have full tmp storage. 
 % % % %  Another option is to use Matlab process ID. pid = feature('getpid')
 mkdir(JobStorageLocation);
+mkdir(JobStorageLocation_old); 
+system(sprintf('mv %s/* %s',JobStorageLocation, JobStorageLocation_old)); 
 pause_time = 3; 
 fprintf('Pausing for %1.3f seconds to allow job storage folder to be created\n',pause_time); 
 pause(pause_time);
@@ -213,8 +216,8 @@ catch error_parpool
         '\n >>>>>>>>>>>>>>>> \n %s \n <<<<<<<<<<<<<<< \n',...
         'Trying to start parpool one more time!'],...
         getReport(error_parpool) ); 
-    system(sprintf('rm %s*.mat',JobStorageLocation)); % Remove possibly corrupted .mat files. 
     delete(gcp('nocreate')); 
+    system(sprintf('mv %s/* %s',JobStorageLocation, JobStorageLocation_old)); % Remove possibly corrupted .mat files. 
     pause_time = rand(1)*3; 
     fprintf('Pausing for %1.3f seconds before starting pool\n',pause_time); 
     pause(pause_time);
