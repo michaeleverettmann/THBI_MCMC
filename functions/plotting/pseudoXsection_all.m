@@ -9,7 +9,7 @@ paths = getPaths();
 % proj.dir = [paths.THBIpath '/' proj.name];
 proj = load('~/Documents/UCSB/ENAM/THBI_ENAM/ENAM/INFO/proj.mat'); 
 proj = proj.proj; 
-paths.STAinversions = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/'; % Place where your results are. 
+paths.STAinversions = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_collate/'; % Place where your results are. 
 proj.STAinversions = paths.STAinversions; 
 
 % figPath = '~/Documents/UCSB/ENAM/THBI_ENAM/figures/xsect/'; 
@@ -52,7 +52,7 @@ ofile2 = [figPath 'Xsect1_wCCP_',STAMP];
 Q1 = [lalim(2), lolim(1)];
 Q2 = [lalim(1), lolim(2)]; 
 % lonBounds = sort([Q1(2) Q2(2)]); latBounds = sort([Q1(1) Q2(1)]); 
-offsecmax = 5; %5%  distance off section allowed, in degrees
+offsecmax = 3; %5%  distance off section allowed, in degrees
 % NNW to SSE across Yellowstone
 % ofile1 = ['figs/Xsect2_',STAMP];
 % ofile2 = ['figs/Xsect2_wCCP_',STAMP];

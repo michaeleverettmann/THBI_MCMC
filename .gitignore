@@ -2,6 +2,7 @@ EXAMPLE/inversion_results/**
 
 ENAM/optimization_tests/**
 
+job_info_scratch/**
 
 SYNTHETICS/inversion_results/**
 SYNTHETICS/**.mat

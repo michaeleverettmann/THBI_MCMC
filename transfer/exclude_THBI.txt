@@ -29,3 +29,4 @@
 *junk/*
 **pathsAutoGen**
 **data/STASinv/**
+job_info_scratch/**

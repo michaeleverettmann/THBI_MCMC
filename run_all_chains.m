@@ -176,24 +176,57 @@ end
 
 % error('Done with redoing prior. Exiting'); 
 
-%% ---------------------------- INITIATE ----------------------------
+%% ---------------------------- INITIATE PARALLEL -------------------------
 
 % ===== Prepare for parallel pool =====
 delete(gcp('nocreate'));
+% distcomp.feature( 'LocalUseMpiexec', false ); % Trying this to make sure I can open many parpool on cluster. See: https://www.mathworks.com/matlabcentral/answers/196549-failed-to-start-a-parallel-pool-in-matlab2015a  This didn't help, and it slowed down opening parallel pools. 
 myCluster = parcluster('local');
 maxWorkers = myCluster.NumWorkers; 
 
 % Matlab stores parallel job metadata in some folder. If running many parpools in parallel, they might overwrite each others metadata, giving a corrupt file error message. Give each parallel pool its own folder. 
+fprintf('\nChecking storage availability on /tmp/ folder\n\n'); 
+!du -h /tmp/
+!df -h /tmp/
+fprintf('\nTemporarily using user storage for JobStorageLocation\n'); 
 JobStorageLocation = sprintf('%s/job_info_scratch/%s_%s_%s',...
     paths.THBIpath, nwk, sta, STAMP); 
-mkdir(JobStorageLocation); 
+JobStorageLocation_old = [JobStorageLocation '_old']; 
+% % % JobStorageLocation = sprintf('/tmp/mcmcthbi_%s_%s_%s/',... % Use tmp for local disk. % https://researchcomputing.princeton.edu/support/knowledge-base/matlab
+% % %     nwk, sta, STAMP); % tmp would be a good place, but the node might have full tmp storage. 
+% % % %  Another option is to use Matlab process ID. pid = feature('getpid')
+mkdir(JobStorageLocation);
+mkdir(JobStorageLocation_old); 
+system(sprintf('mv %s/* %s',JobStorageLocation, JobStorageLocation_old)); 
+pause_time = 3; 
+fprintf('Pausing for %1.3f seconds to allow job storage folder to be created\n',pause_time); 
+pause(pause_time);
 myCluster.JobStorageLocation = JobStorageLocation; 
 
 % % Use the following two lines if you want more parallel chains than you have cores. 
 % myCluster.NumWorkers = max(maxWorkers, par.inv.nchains); 
 % maxWorkers = myCluster.NumWorkers; 
 
-myCluster.parpool(min([par.inv.nchains,maxWorkers])); % TODOcomp May need to change based on computer. I set so that we only use as many workers as the local parallel profile will allow.  
+fprintf('Starting parpool with JobStorageLocation %s\n',JobStorageLocation); 
+tstartppool = tic; 
+try 
+    myCluster.parpool(min([par.inv.nchains,maxWorkers])); % TODOcomp May need to change based on computer. I set so that we only use as many workers as the local parallel profile will allow.  
+catch error_parpool
+    fprintf(['Problem opening parpool! Error displayed below. ',...
+        '\n >>>>>>>>>>>>>>>> \n %s \n <<<<<<<<<<<<<<< \n',...
+        'Trying to start parpool one more time!'],...
+        getReport(error_parpool) ); 
+    delete(gcp('nocreate')); 
+    system(sprintf('mv %s/* %s',JobStorageLocation, JobStorageLocation_old)); % Remove possibly corrupted .mat files. 
+    pause_time = rand(1)*3; 
+    fprintf('Pausing for %1.3f seconds before starting pool\n',pause_time); 
+    pause(pause_time);
+    myCluster.parpool(min([par.inv.nchains,maxWorkers])); % TODOcomp May need to change based on computer. I set so that we only use as many workers as the local parallel profile will allow.  
+end
+fprintf('Time to start parpool: \n'); 
+toc(tstartppool)
+
+    
 TD = parallel.pool.Constant(trudata); PR = parallel.pool.Constant(par);
 % (((( If not parallel: ))))
 % TD(1). Value = trudata; par.inv.verbose = 0;
