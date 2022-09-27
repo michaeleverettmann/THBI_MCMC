@@ -26,10 +26,14 @@ for is = 1:stainfo.nstas
     
     resdir = sprintf('%s%s_%s_dat%.0f/%s',proj.STAinversions,sta,nwk,generation,STAMP);
     fdir = [resdir, '/final_model.mat']; 
+    fallmod = [resdir, '/allmodels_perchain_orig.mat']; 
+    fgoodchains = [resdir,'/goodchains.mat']; 
     misfitdir = sprintf('%s/final_misfit.mat',resdir); 
     gdstas(is) = logical(exist(fdir, 'file'          ) ...
         * logical(exist(misfitdir, 'file')           ) ...
-        * logical(exist([resdir,'/par.mat'], 'file') )     );  
+        * logical(exist([resdir,'/par.mat'], 'file') ) ...
+        * logical(exist(fallmod, 'file')             ) ...
+        * logical(exist(fgoodchains, 'file')         )     );  
     if ~gdstas(is); continue; end; % can't load par if it doesn't exist. Just do continue. 
     par=load([resdir,'/par.mat']); par=par.par; 
     gdstas(is) = gdstas(is) * ((par.inv.niter==desired_iter) && (par.inv.nchains==desired_chains)); % Don't plot results if we didn't run the inversion with enough chains or iterations. Might have been test runs..
@@ -48,6 +52,12 @@ for is = 1:stainfo.nstas
     mdls.model{igdsta,1} = model; 
     mdls.misfit{igdsta,1} = final_misfit; 
     mdls.dir{igdsta,1} = resdir; 
+    %%%
+
+
+    %%% Trying to make PDF of velocity at each depth. 
+    allmod = load(fallmod).allmodels_perchain; 
+    goodchains = load(fgoodchains).goodchains; 
     %%%
 
 end
