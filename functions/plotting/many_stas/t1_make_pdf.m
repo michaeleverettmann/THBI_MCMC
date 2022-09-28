@@ -107,7 +107,7 @@ pv_recover = dp_p ./ dv_p;
 v_samp_recover = ( v_samps(1:end-1) + v_samps(2:end) ) ./ 2; % Because we loose one value doing derivative. 
 
 %% Kernel density estimation, from Matlab. 
-nptsksd = int16((max(v_samps) - min(v_samps) ) ./ .01); % Number of points to use in estimating k density. I'm spacing it for now to have a point each 0.01 km/s
+100; % nptsksd = int16((max(v_samps) - min(v_samps) ) ./ .01); % Number of points to use in estimating k density. I'm spacing it for now to have a point each 0.01 km/s
 [pv_k, v_k] = ksdensity(v_samps, 'width', .04, 'NumPoints', nptsksd);%, 'Bandwidth',0.03); 
 pv_k = pv_k / trapz(v_k, pv_k); 
 
