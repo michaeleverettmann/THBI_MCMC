@@ -76,6 +76,7 @@ DY = max(stay) - min(stay);
 xline = linspace(min(stax) - edge_space * DX, max(stax) + edge_space * DX, nx)'; 
 yline = linspace(min(stay) - edge_space * DY, max(stay) + edge_space * DY, ny)'; 
 [xgrid, ygrid] = ndgrid(xline, yline);  
+[longrid, latgrid] = m_xy2ll(xgrid, ygrid); 
 
 vs_interp = griddata(stax, stay, vs(:,ivel), xgrid, ygrid, 'cubic'); 
 % vs_interp(isnan(vs_interp)) = nanmean(vs_interp, 'all'); 
@@ -83,7 +84,8 @@ vs_interp = griddata(stax, stay, vs(:,ivel), xgrid, ygrid, 'cubic');
 % Plot surface. 
 a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', vs(:,ivel),...
     'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', vs_interp, ...
-    'fignum', 2, 'title', 'Simple v interpolation')
+    'fignum', 2, 'title', 'Simple v interpolation');  
+exportgraphics(gcf, 'surface_simple_interpolation.pdf'); 
 
 
 
@@ -107,7 +109,7 @@ vgrid = vgrid + randn(size(vgrid))-0.5; % Give some error
 % Plot the starting model. 
 a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', vs(:,ivel),...
     'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', vgrid, ...
-    'fignum', 3, 'title', 'V starting model')
+    'fignum', 3, 'title', 'V starting model'); 
 
 %% Set up grid roughness calculations. Use 2nd derivative smoothing. 
 dx2 = ((xgrid(1:end-2,:) - xgrid(3:end,:))/2).^2; % Squared, so sign doesn't matter. 
@@ -177,6 +179,11 @@ vgrid_out(isnan(vs_interp)) = nan;
 %% Plot inversion output. 
 a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', vs(:,ivel),...
     'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', vgrid_out, ...
-    'fignum', 6, 'title', 'V output'); colorbar(); 
+    'fignum', 6, 'title', 'V output'); 
+exportgraphics(gcf, './surface_inversion_rough.pdf'); 
+
+% Temporary. Mostly for testing. 
+save('surface_out_example.mat', 'longrid', 'latgrid',...
+    'xgrid', 'ygrid', 'vgrid_out', 'llminmax'); 
 
 

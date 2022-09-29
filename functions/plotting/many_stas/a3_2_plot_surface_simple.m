@@ -70,9 +70,17 @@ end
 
 %% Plot stations. 
 if ~isempty(stax);     
-    scatter(stax, stay, 60, options.stav, 'filled', 'MarkerEdgeColor','k'); 
+    scatter(stax, stay, 30, options.stav, 'filled', 'MarkerEdgeColor','k'); 
 end
 
-
+colorbar(); 
+cmap = turbo(); 
+cmap = cmap(end:-1:1,:); 
+colormap(cmap); 
+try
+    caxis([min(options.stav), max(options.stav)]);
+catch error_rep
+    fprintf('%s', getReport(error_rep)); 
+end
 
 end
