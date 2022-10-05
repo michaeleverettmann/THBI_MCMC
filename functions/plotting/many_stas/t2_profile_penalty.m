@@ -159,7 +159,7 @@ fhand2=@()fhand(vgrid);
 % % %     fhand2(); 
 % % % end
 
-%% Efficient interpolation from station to pdf
+%% Interpolate each pdf to common mm grid. 
 
 %%% Go from different mm at each sta to common mm at each sta through interpolation. 
 nmm = 300; 
@@ -180,33 +180,14 @@ for ista = 1:nsta;
     pdf_terp(:, ista) = pdf_terp_i; 
 end
 
-% Hypothetical vsta for sesting
-% vsta_mod = rand(nsta,1) .* .5 + mean(mm_terp); 
-% vsta_mod(1) = min(mm_terp);  vsta_mod(2) = mean(mm_terp);  vsta_mod(3) = max(mm_terp); % For easy testing. % Check best_ind_flce([1,3]). If it's 1, half length, then the whole length, then index selection is probably good. 
+%% Function for interpolating pdfs at all stations given vsta at each station
 vsta_mod = linspace(min(mm_terp), max(mm_terp), nsta)'; % Easy values, for testing. 
 
-%% Function for interpolating pdfs at all stations given vsta at each station
-% Find two nearest indecies corresponding to a mm value. Use dmm_di, which should be much faster than using distance and sorting. 
-best_ind = 1 + (vsta_mod - min(mm_terp))/dmm_di; % Start at one. Find (non integer) best index of array based on dindex/dmm
-best_ind_flce = [floor(best_ind), ceil(best_ind)]; % Ind before (floor) and after (ceil) the idealized non-integer index. 
-best_ind_flce(best_ind_flce<1)=1; % If lower than our bounds, just use our lowest part of pdf. That should be 0 anyway!
-best_ind_flce(best_ind_flce>nmm) = nmm; % If greater than our bounds, just use our last part of pdf. That should be 0 anyway!
+pdf_mod = mm_to_pdf_dmdi(vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); 
+% % % fhandtest = @()mm_to_pdf_dmdi(vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); 
+% % % timeit(fhandtest)
 
-% Convert nmmxnsta coordinates to linear coordinates, to do vectorized operations more easily. 
-sta_hack = [[1:nsta];[1:nsta]]'; % Which station each model parameter corresponds, in best_ind_flce
-best_ind_linear = sub2ind([nmm, nsta], best_ind_flce, sta_hack); % Linear (single dimension) coordinates to points of interest in pdf_terp
-
-% Convert distance to a weight for interpolation. 
-ind_weight = 1./([best_ind - best_ind_flce].^2); 
-ind_weight(or(isnan(ind_weight),ind_weight>99999)) = 99999; % In case of 1./0. 
-ind_weight = ind_weight ./ sum(ind_weight,2); % Normalize, so multiply this to values at ind and this gives an average. 
-
-% Do the interpolation
-pdf_mod = sum(pdf_terp(best_ind_linear).*ind_weight,2); % Interpolated pdf between two mm values
-
-%%% End making the function. TODO move it out of this script. TIMEIT
-
-%% Plot to check that we interpolated to a common mm correctly. 
+% Plot to check that we interpolated to a common mm correctly. 
 figure(12); clf; hold on; 
 tiledlayout(2,1,'TileSpacing','compact'); 
 nexttile(); hold on; title('Interpolated') 
@@ -221,88 +202,81 @@ for ista = 1:nsta;
 end
 % scatter([1:length(pdf_mod)]' + pdf_mod, vsta_mod); 
 
-
-%% Efficient interpolation from grid to stations. 
-% Goal: Make a matrix which can multiply by (flattened array of) station
-% valuaes, and immediately give back the interpolated station values. All
-% distance calculations and such are done only once on the front end. 
-
-% Determine which nodes are closest to each station and find their weights.
-% gridi = zeros(size(xgrid)); 
-ngrid = (size(xgrid,1)*size(xgrid,2)); 
-gridi_r = [1:ngrid]'; 
-vgrid_r = vgrid(gridi_r); 
-gridi = reshape(gridi_r, size(xgrid,1), size(xgrid,2)); % Map between 2d grid and 1d. 
-ngrid = length(gridi_r); 
-
-nearesti = zeros(nsta, 4); % Don't think I need this? 
-
-grid_terp = zeros(ngrid, nsta); % Maybe make sparse if needed
-
-for ista = 1:nsta; 
-    staxi = stax(ista); 
-    stayi = stay(ista); 
-
-    to_east  = xgrid >= staxi; 
-    to_west  = xgrid <  staxi; 
-    to_north = ygrid >= stayi; 
-    to_south = ygrid <  stayi;
-
-    xdist = xgrid - staxi;  
-    ydist = ygrid - stayi; 
-    tdist = sqrt(xdist.^2 + ydist.^2); 
-
-    [easti,  ~] = find(to_east ); 
-    [westi,  ~] = find(to_west ); 
-    [~, northi] = find(to_north); 
-    [~, southi] = find(to_south); 
-    easti = min(easti); 
-    westi = max(westi); 
-    northi = min(northi); 
-    southi = max(southi); 
-
-    nei = gridi(easti, northi);
-    nwi = gridi(westi, northi); 
-    sei = gridi(easti, southi); 
-    swi = gridi(westi, southi); 
-
-    box_map = [nei, nwi, sei, swi]; 
-
-    nearesti(ista, :) = box_map; 
-
-    dist_to_crnr = tdist(box_map); 
-    weight_to_crnr = 1./dist_to_crnr; % TODO think about if this is the best interpolation method for this. 
-    weight_to_crnr = weight_to_crnr ./ sum(weight_to_crnr); 
-    
-    if any(weight_to_crnr) == inf; 
-        error('Should handle station being right on a node'); 
-    end
-
-%     grid_terp(box_map,ista) = 1 ;
-    grid_terp(box_map,ista) = weight_to_crnr; 
-
-% % %     ne = to_north .* to_east; 
-% % %     nw = to_north .* to_west; 
-% % %     se = to_south .* to_east; 
-% % %     sw = to_south .* to_west; 
-
-%     xgrid(ne)
-end
-if any(isnan(grid_terp)); 
-    error('There are nans in grid_terp. Figure out a solution')
-end
-
-% Now can matrix multiply vgrid_r' * weight_to_crnr to interpolate velocity at
-% each station. Do not need to worry about distances again. 
-% I thnk also gridi_r needs to be passed to flatten vgrid
-vsta_terp_mat = (vgrid_r' * grid_terp)'; 
-% fhand_matmult = @()(vgrid_r' * grid_terp)';
-% fhand_matmult = @()(vgrid(gridi_r)' * grid_terp)';
-
-%%% Now I just pass vgrid_r as argument and grid_terp as always present
-%%% argument
-
-
+% % % %% Efficient interpolation from grid to stations. 
+% % % 
+% % % % Determine which nodes are closest to each station and find their weights.
+% % % ngrid = (size(xgrid,1)*size(xgrid,2)); 
+% % % vgrid_r = vgrid(:); % vgrid "reshaped" to 1d
+% % % 
+% % % nearesti = zeros(nsta, 4); % Four corners linear indices. 
+% % % weighti  = zeros(nsta, 4); % Weights to the four corners for interpolation. 
+% % % grid_terp = zeros(ngrid, nsta); % Matrix math version of interpolation. 
+% % % 
+% % % for ista = 1:nsta; 
+% % %     staxi = stax(ista); 
+% % %     stayi = stay(ista); 
+% % % 
+% % %     to_east  = xgrid >= staxi; 
+% % %     to_west  = xgrid <  staxi; 
+% % %     to_north = ygrid >= stayi; 
+% % %     to_south = ygrid <  stayi;
+% % % 
+% % %     xdist = xgrid - staxi;  
+% % %     ydist = ygrid - stayi; 
+% % %     tdist = sqrt(xdist.^2 + ydist.^2); 
+% % % 
+% % %     [easti,  ~] = find(to_east ); 
+% % %     [westi,  ~] = find(to_west ); 
+% % %     [~, northi] = find(to_north); 
+% % %     [~, southi] = find(to_south); 
+% % %     easti = min(easti); 
+% % %     westi = max(westi); 
+% % %     northi = min(northi); 
+% % %     southi = max(southi); 
+% % % 
+% % %     nei = sub2ind([size(vgrid,1), size(vgrid,2)], easti, northi); 
+% % %     nwi = sub2ind([size(vgrid,1), size(vgrid,2)], westi, northi); 
+% % %     sei = sub2ind([size(vgrid,1), size(vgrid,2)], easti, southi); 
+% % %     swi = sub2ind([size(vgrid,1), size(vgrid,2)], westi, southi); 
+% % % 
+% % %     box_map = [nei, nwi, sei, swi]; 
+% % % 
+% % %     nearesti(ista, :) = box_map; 
+% % % 
+% % %     dist_to_crnr = tdist(box_map); 
+% % %     weight_to_crnr = 1./dist_to_crnr; % TODO think about if this is the best interpolation method for this. 
+% % %     weight_to_crnr = weight_to_crnr ./ sum(weight_to_crnr); 
+% % %     
+% % %     if any(weight_to_crnr) == inf; 
+% % %         error('Should handle station being right on a node'); 
+% % %     end
+% % % 
+% % %     weighti(ista,:) = weight_to_crnr; 
+% % %     grid_terp(box_map,ista) = weight_to_crnr; 
+% % % 
+% % % end
+% % % if any(isnan(grid_terp)); 
+% % %     error('There are nans in grid_terp. Figure out a solution')
+% % % end
+% % % 
+% % % % Now can matrix multiply vgrid_r' * weight_to_crnr to interpolate velocity at
+% % % % each station. Do not need to worry about distances again. 
+% % % % I thnk also gridi_r needs to be passed to flatten vgrid
+% % % vsta_terp_mat = (vgrid_r' * grid_terp)'; % Matrix multiplication of getting velocities. 
+% % % vsta_terp_vec = sum(vgrid(nearesti) .* weighti,2); % Vectorized way of getting velocities. Less arithmatic. 
+% % % % fhand_matmult = @()(vgrid_r' * grid_terp)';
+% % % % fhand_matmult = @()(vgrid(gridi_r)' * grid_terp)';
+% % % 
+% % % %%% Now I just pass vgrid_r as argument and grid_terp as always present
+% % % %%% argument
+% % % 
+% % % fhand_mat = @()(vgrid_r' * grid_terp)'; 
+% % % fhand_vec = @()sum(vgrid(nearesti) .* weighti,2);
+% % % timeit(fhand_mat) % fhand_mat might be a little faster, but if grid becomes extremely large or stations become very large, the number of operations grows by n or m squared
+% % % timeit(fhand_vec) % Tiny bit slower with few stations or grid points. Maybe will be more efficient with more data. 
+% [vsta_terp_vec, vsta_terp_mat, vgrid_r...
+%     ] = p_prep_grid_to_sta_interp(xgrid, ygrid, vgrid, stax, stay)
+[fhand_vec] = p_prep_grid_to_sta_interp(xgrid, ygrid, vgrid, stax, stay)
 
 %%
 fhand=@(vgrid)a3_1_penalty_efficient(vgrid,...
