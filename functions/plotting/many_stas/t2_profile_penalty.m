@@ -161,29 +161,36 @@ fhand2=@()fhand(vgrid);
 
 %% Interpolate each pdf to common mm grid. 
 
-%%% Go from different mm at each sta to common mm at each sta through interpolation. 
-nmm = 300; 
+% % % %%% Go from different mm at each sta to common mm at each sta through interpolation. 
+% % % nmm = 300; 
+% % % nsta = length(pdfs); 
+% % % 
+% % % pdf_terp = zeros(nmm, nsta); 
+% % % 
+% % % all_mm = [pdfs(:).mm]; 
+% % % min_mm = min(min(all_mm)); 
+% % % max_mm = max(max(all_mm)); 
+% % % mm_terp = linspace(min_mm, max_mm, nmm)'; % Corresponds to pdf_terp dimension 1. 
+% % % 
+% % % dmm_di = mm_terp(2) - mm_terp(1); % How much does mm change per index. 
+% % % 
+% % % for ista = 1:nsta; 
+% % %     pdf_terp_i = interp1(pdfs(ista).mm, pdfs(ista).pm, mm_terp,...
+% % %         'cubic', 0 ); 
+% % %     pdf_terp(:, ista) = pdf_terp_i; 
+% % % end
+
+[pdf_terp, mm_terp] = p_prep_mm_to_pdf(pdfs, nmm); 
 nsta = length(pdfs); 
 
-pdf_terp = zeros(nmm, nsta); 
-
-all_mm = [pdfs(:).mm]; 
-min_mm = min(min(all_mm)); 
-max_mm = max(max(all_mm)); 
-mm_terp = linspace(min_mm, max_mm, nmm)'; % Corresponds to pdf_terp dimension 1. 
-
-dmm_di = mm_terp(2) - mm_terp(1); % How much does mm change per index. 
-
-for ista = 1:nsta; 
-    pdf_terp_i = interp1(pdfs(ista).mm, pdfs(ista).pm, mm_terp,...
-        'cubic', 0 ); 
-    pdf_terp(:, ista) = pdf_terp_i; 
-end
 
 %% Function for interpolating pdfs at all stations given vsta at each station
 vsta_mod = linspace(min(mm_terp), max(mm_terp), nsta)'; % Easy values, for testing. 
 
-pdf_mod = mm_to_pdf_dmdi(vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); 
+pdf_mod = p_mm_to_pdf_dmdi(vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); 
+fhand_mm_to_pdf=@(vsta_mod)p_mm_to_pdf_dmdi(vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); % super simple way to call this function... 
+% fhand_mm_to_pdf(vsta_mod)
+
 % % % fhandtest = @()mm_to_pdf_dmdi(vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); 
 % % % timeit(fhandtest)
 
@@ -202,84 +209,17 @@ for ista = 1:nsta;
 end
 % scatter([1:length(pdf_mod)]' + pdf_mod, vsta_mod); 
 
-% % % %% Efficient interpolation from grid to stations. 
-% % % 
-% % % % Determine which nodes are closest to each station and find their weights.
-% % % ngrid = (size(xgrid,1)*size(xgrid,2)); 
-% % % vgrid_r = vgrid(:); % vgrid "reshaped" to 1d
-% % % 
-% % % nearesti = zeros(nsta, 4); % Four corners linear indices. 
-% % % weighti  = zeros(nsta, 4); % Weights to the four corners for interpolation. 
-% % % grid_terp = zeros(ngrid, nsta); % Matrix math version of interpolation. 
-% % % 
-% % % for ista = 1:nsta; 
-% % %     staxi = stax(ista); 
-% % %     stayi = stay(ista); 
-% % % 
-% % %     to_east  = xgrid >= staxi; 
-% % %     to_west  = xgrid <  staxi; 
-% % %     to_north = ygrid >= stayi; 
-% % %     to_south = ygrid <  stayi;
-% % % 
-% % %     xdist = xgrid - staxi;  
-% % %     ydist = ygrid - stayi; 
-% % %     tdist = sqrt(xdist.^2 + ydist.^2); 
-% % % 
-% % %     [easti,  ~] = find(to_east ); 
-% % %     [westi,  ~] = find(to_west ); 
-% % %     [~, northi] = find(to_north); 
-% % %     [~, southi] = find(to_south); 
-% % %     easti = min(easti); 
-% % %     westi = max(westi); 
-% % %     northi = min(northi); 
-% % %     southi = max(southi); 
-% % % 
-% % %     nei = sub2ind([size(vgrid,1), size(vgrid,2)], easti, northi); 
-% % %     nwi = sub2ind([size(vgrid,1), size(vgrid,2)], westi, northi); 
-% % %     sei = sub2ind([size(vgrid,1), size(vgrid,2)], easti, southi); 
-% % %     swi = sub2ind([size(vgrid,1), size(vgrid,2)], westi, southi); 
-% % % 
-% % %     box_map = [nei, nwi, sei, swi]; 
-% % % 
-% % %     nearesti(ista, :) = box_map; 
-% % % 
-% % %     dist_to_crnr = tdist(box_map); 
-% % %     weight_to_crnr = 1./dist_to_crnr; % TODO think about if this is the best interpolation method for this. 
-% % %     weight_to_crnr = weight_to_crnr ./ sum(weight_to_crnr); 
-% % %     
-% % %     if any(weight_to_crnr) == inf; 
-% % %         error('Should handle station being right on a node'); 
-% % %     end
-% % % 
-% % %     weighti(ista,:) = weight_to_crnr; 
-% % %     grid_terp(box_map,ista) = weight_to_crnr; 
-% % % 
-% % % end
-% % % if any(isnan(grid_terp)); 
-% % %     error('There are nans in grid_terp. Figure out a solution')
-% % % end
-% % % 
-% % % % Now can matrix multiply vgrid_r' * weight_to_crnr to interpolate velocity at
-% % % % each station. Do not need to worry about distances again. 
-% % % % I thnk also gridi_r needs to be passed to flatten vgrid
-% % % vsta_terp_mat = (vgrid_r' * grid_terp)'; % Matrix multiplication of getting velocities. 
-% % % vsta_terp_vec = sum(vgrid(nearesti) .* weighti,2); % Vectorized way of getting velocities. Less arithmatic. 
-% % % % fhand_matmult = @()(vgrid_r' * grid_terp)';
-% % % % fhand_matmult = @()(vgrid(gridi_r)' * grid_terp)';
-% % % 
-% % % %%% Now I just pass vgrid_r as argument and grid_terp as always present
-% % % %%% argument
-% % % 
-% % % fhand_mat = @()(vgrid_r' * grid_terp)'; 
-% % % fhand_vec = @()sum(vgrid(nearesti) .* weighti,2);
-% % % timeit(fhand_mat) % fhand_mat might be a little faster, but if grid becomes extremely large or stations become very large, the number of operations grows by n or m squared
-% % % timeit(fhand_vec) % Tiny bit slower with few stations or grid points. Maybe will be more efficient with more data. 
-% [vsta_terp_vec, vsta_terp_mat, vgrid_r...
-%     ] = p_prep_grid_to_sta_interp(xgrid, ygrid, vgrid, stax, stay)
-[fhand_vec] = p_prep_grid_to_sta_interp(xgrid, ygrid, vgrid, stax, stay)
+%% Efficient interpolation from grid to stations. 
+[fhand_vec, fhand_mat, grid_terp, nearesti, weighti...
+    ] = p_prep_grid_to_sta_interp(...
+    xgrid, ygrid, vgrid, stax, stay); 
 
+% Try actually doing the penalty. 
+a3_1_penalty_efficient(vgrid,...
+    pdf_terp, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay, ...
+    nearesti, weighti, min(mm_terp), dmm_di, nmm, nsta); 
 %%
-fhand=@(vgrid)a3_1_penalty_efficient(vgrid,...
+fhand=@(vgrid)a3_1_penalty(vgrid,...
     pdfs, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay); % Supply constants to the function handle. 
 fhand(vgrid); 
 % vgrid_start = vgrid; 
