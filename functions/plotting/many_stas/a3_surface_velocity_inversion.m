@@ -2,10 +2,9 @@ clc; clear;
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 fpdfs    = sprintf('%scompiled_pdfs_%s.mat',out_dir,STAMP); % File with pdfs. a2_1...m
 
-
 mdls = load(fresults).mdls; 
 
-%% % Reorganize structure. Could be more - or less - useful one way or other. 
+%% Reorganize structure. Could be more - or less - useful one way or other. 
 %%% BORROWED FROM A2
 models = struct(); 
 zmoh          = zeros(length(mdls.nwk),1); 
@@ -65,8 +64,8 @@ a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, ...
     'fignum', 1, 'title', 'station positions')
 
 %% Setting up surface. 
-nx = 15; 
-ny = 17;  
+nx = 35; 
+ny = 45;  
 ivel = 4; % Temporary. Expand to a loop. 
 edge_space = 0.2; % How far to go beyond max and min stax and y, in fraction. 
 
@@ -97,14 +96,12 @@ exportgraphics(gcf, 'surface_simple_interpolation.pdf');
 pdf_file = load(fpdfs); 
 pdfs = pdf_file.pdfs; 
 
-% rough_scale = 5e-11; % How much to penalize roughness. 
-rough_scale = 5e-8; % How much to penalize roughness. 
-
+rough_scale = 5e-9; % How much to penalize roughness. 
 
 % Make a starting model. 
 vgrid = vs_interp; % Probably a fine starting model. 
 vgrid(isnan(vgrid)) = nanmean(nanmean(vgrid)); 
-vgrid = vgrid + randn(size(vgrid))-0.5; % Give some error
+vgrid = vgrid + randn(size(vgrid))*0.5; % Give some error
 
 % Plot the starting model. 
 a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', vs(:,ivel),...
@@ -135,22 +132,60 @@ a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay,...
     'xgrid', x_dy2, 'ygrid', y_dy2, 'vgrid', dvdy2, ...
     'fignum', 5, 'title', 'Y roughness'); colorbar(); 
 
-% How to get "modelled" velocity throughout inversion. 
-vsta = interpn(xgrid, ygrid, vgrid, stax, stay, 'linear'); % MODELLED velocity at each station. 
+% % % % % How to get "modelled" velocity throughout inversion. 
+% % % % vsta = interpn(xgrid, ygrid, vgrid, stax, stay, 'linear'); % MODELLED velocity at each station. 
+% % % % 
+% % % % % Probability associated with a velocity. 
+% % % % pv_mod = zeros(size(stax)); 
+% % % % for ista=1:length(pv_mod); 
+% % % %     pv_mod(ista) = interp1(pdfs(ista).mm, pdfs(ista).pm, vsta(ista), 'linear', 0 ); % Probability of a velocity at a specific station, from our velocity model surface. 
+% % % % end
+% % % % 
+% % % % penalty = - sum(pv_mod); % Lower penalty is higher probability. 
+% % % % penalty = penalty + roughness; 
+% % % % 
+% % % % fhand=@(vgrid)a3_1_penalty(vgrid,...
+% % % %     pdfs, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay); % Supply constants to the function handle. 
+% % % % fhand(vgrid); 
 
-% Probability associated with a velocity. 
-pv_mod = zeros(size(stax)); 
-for ista=1:length(pv_mod); 
-    pv_mod(ista) = interp1(pdfs(ista).mm, pdfs(ista).pm, vsta(ista), 'linear', 0 ); % Probability of a velocity at a specific station, from our velocity model surface. 
-end
-
-penalty = - sum(pv_mod); % Lower penalty is higher probability. 
-penalty = penalty + roughness; 
-
-fhand=@(vgrid)a3_1_penalty(vgrid,...
-    pdfs, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay); % Supply constants to the function handle. 
-fhand(vgrid); 
 vgrid_start = vgrid; 
+
+%% Prep for efficient inverison. Some constant variables. 
+
+% Interpolate each pdf to common mm grid. 
+% Important for computational efficient when calculating penalty. 
+nsta = length(pdfs); 
+nmm = 300; 
+[pdf_terp, mm_terp, dmm_di] = p_prep_mm_to_pdf(pdfs, nmm); 
+
+% Interpolate mm from the grid to stations.  
+[fhand_vec, fhand_mat, grid_terp, nearesti, weighti...
+    ] = p_prep_grid_to_sta_interp(...
+    xgrid, ygrid, vgrid, stax, stay); 
+
+% The thing we want to minimize. Make a function handle. 
+fhand_penalty=@(vgrid)a3_1_penalty_efficient(vgrid,...
+    pdf_terp, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay, ...
+    nearesti, weighti, min(mm_terp), dmm_di, nmm, nsta); 
+
+%% Test the above efficient inversion interpolation stuff. 
+vsta_mod = linspace(min(mm_terp), max(mm_terp), nsta)'; % FOR TESTING Easy values, for testing. 
+pdf_mod = p_mm_to_pdf_dmdi(...
+    vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); 
+
+% Plot to check that we interpolated to a common mm correctly. 
+figure(12); clf; hold on; 
+tiledlayout(2,1,'TileSpacing','compact'); 
+nexttile(); hold on; title('Interpolated') 
+for ista = 1:nsta
+    plot(ista  + pdf_terp(:,ista), mm_terp ); 
+end
+scatter([1:nsta]' + pdf_mod, vsta_mod); 
+
+nexttile(); hold on; title('Original'); 
+for ista = 1:nsta; 
+    plot(ista + pdfs(ista).pm, pdfs(ista).mm)
+end
 
 %% Example of running the inversion. 
 options = optimoptions("fminunc",Display="iter",...
@@ -163,7 +198,7 @@ opts.SpecifyObjectiveGradient = false;
 % overallTime = tic;
 
 [vgrid_out,fval_out,flag_out,output_out] =...
-    fminunc(fhand, vgrid_start, opts);
+    fminunc(fhand_penalty, vgrid_start, opts);
 
 vgrid_out(isnan(vs_interp)) = nan; 
 

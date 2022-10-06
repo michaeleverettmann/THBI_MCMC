@@ -97,7 +97,9 @@ exportgraphics(gcf, 'surface_simple_interpolation.pdf');
 pdf_file = load(fpdfs); 
 pdfs = pdf_file.pdfs; 
 
+% rough_scale = 5e-11; % How much to penalize roughness. 
 rough_scale = 5e-8; % How much to penalize roughness. 
+
 
 % Make a starting model. 
 vgrid = vs_interp; % Probably a fine starting model. 
@@ -148,82 +150,40 @@ penalty = penalty + roughness;
 fhand=@(vgrid)a3_1_penalty(vgrid,...
     pdfs, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay); % Supply constants to the function handle. 
 fhand(vgrid); 
-% vgrid_start = vgrid; 
+vgrid_start = vgrid; 
 
-fhand2=@()fhand(vgrid); 
+%% Example of running the inversion. 
+options = optimoptions("fminunc",Display="iter",...
+    MaxFunctionEvaluations=inf,MaxIterations=100,...
+    Algorithm='quasi-newton');
 
-% % % %%
-% % % for iii=1:100; 
-% % %     fhand2(); 
-% % % end
+opts = options;
+% opts.HessianApproximation = 'lbfgs';
+opts.SpecifyObjectiveGradient = false;
+% overallTime = tic;
 
-%%%%%%%%%% 
+[vgrid_out,fval_out,flag_out,output_out] =...
+    fminunc(fhand, vgrid_start, opts);
 
-%% Interpolate each pdf to common mm grid. 
-% Important for computational efficient when calculating penalty. 
+vgrid_out(isnan(vs_interp)) = nan; 
 
-nsta = length(pdfs); 
-nmm = 300; 
-[pdf_terp, mm_terp, dmm_di] = p_prep_mm_to_pdf(pdfs, nmm); 
+% [vgrid_out,timetable.Fval("LBFGS_NoGrad"),timetable.Eflag("LBFGS_NoGrad"),output] =...
+%     fminunc(fhand, vgrid_start, opts);
+% 
+% 
+% timetable.Time("LBFGS_NoGrad") = toc(overallTime);
+% timetable.Iters("LBFGS_NoGrad") = output.iterations;
+% timetable.TimePerIter("LBFGS_NoGrad") =...
+%     timetable.Time("LBFGS_NoGrad")/timetable.Iters("LBFGS_NoGrad");
 
-%% Function for interpolating pdfs at all stations given vsta at each station
-vsta_mod = linspace(min(mm_terp), max(mm_terp), nsta)'; % FOR TESTING Easy values, for testing. 
+%% Plot inversion output. 
+a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', vs(:,ivel),...
+    'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', vgrid_out, ...
+    'fignum', 6, 'title', 'V output'); 
+exportgraphics(gcf, './surface_inversion_rough.pdf'); 
 
-pdf_mod = p_mm_to_pdf_dmdi(...
-    vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); 
-% fhand_mm_to_pdf=@(vsta_mod)p_mm_to_pdf_dmdi(vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); % super simple way to call this function... 
-% fhand_mm_to_pdf(vsta_mod)
+% Temporary. Mostly for testing. 
+save('surface_out_example.mat', 'longrid', 'latgrid',...
+    'xgrid', 'ygrid', 'vgrid_out', 'llminmax'); 
 
-% % % fhandtest = @()mm_to_pdf_dmdi(vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); 
-% % % timeit(fhandtest)
 
-% Plot to check that we interpolated to a common mm correctly. 
-% % % % figure(12); clf; hold on; 
-% % % % tiledlayout(2,1,'TileSpacing','compact'); 
-% % % % nexttile(); hold on; title('Interpolated') 
-% % % % for ista = 1:nsta
-% % % %     plot(ista  + pdf_terp(:,ista), mm_terp ); 
-% % % % end
-% % % % scatter([1:nsta]' + pdf_mod, vsta_mod); 
-% % % % 
-% % % % nexttile(); hold on; title('Original'); 
-% % % % for ista = 1:nsta; 
-% % % %     plot(ista + pdfs(ista).pm, pdfs(ista).mm)
-% % % % end
-
-%% Interpolate mm from the grid to stations.  
-[fhand_vec, fhand_mat, grid_terp, nearesti, weighti...
-    ] = p_prep_grid_to_sta_interp(...
-    xgrid, ygrid, vgrid, stax, stay); 
-
-vsta_interp_test = sum(vgrid(nearesti) .* weighti,2); 
-
-a3_2_plot_surface_simple(llminmax, ...
-    'stax', stax, 'stay', stay, 'stav', vsta_interp_test, ... 
-    'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', vgrid, ...
-    'fignum', 15, 'title', 'Fast interpolation test'); colorbar(); 
-
-%% Calculate the penalty. 
-a3_1_penalty_efficient(vgrid,...
-    pdf_terp, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay, ...
-    nearesti, weighti, min(mm_terp), dmm_di, nmm, nsta); 
-
-fhand2=@()a3_1_penalty_efficient(vgrid,...
-    pdf_terp, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay, ...
-    nearesti, weighti, min(mm_terp), dmm_di, nmm, nsta); 
-for iii=1:10000; 
-    fhand2(); 
-end
-
-% % % %%
-% % % fhand=@(vgrid)a3_1_penalty(vgrid,...
-% % %     pdfs, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay); % Supply constants to the function handle. 
-% % % fhand(vgrid); 
-% % % % vgrid_start = vgrid; 
-% % % 
-% % % fhand2=@()fhand(vgrid); 
-% % % 
-% % % % % % %%
-% % % % % % for iii=1:100; 
-% % % % % %     fhand2(); 
-% % % % % % end
