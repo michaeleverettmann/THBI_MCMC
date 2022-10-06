@@ -1,13 +1,18 @@
-function [fhand_vec, fhand_mat...
+function [fhand_vec, fhand_mat, grid_terp, nearesti, weighti...
     ] = p_prep_grid_to_sta_interp(xgrid, ygrid, vgrid, stax, stay)
 %% Efficient interpolation from grid to stations. 
-% Returns two station handles. 
+% Returns two function handles. Should make things easier than keeping
+% track of a bunch of different weights and stuff. 
+% 
 % fhand_vec is vectorized operation. Provide it vgrid. It gives
 % interpolated velocities. 
+%
 % fhand_mat is matrix-math operation. Give it (flattened) vgrid_r. Also
 % given interpolated velocities. 
+% 
 % I suspect the matrix version is faster for smaller data/problems, and
 % vector version faster for larger memory problems. 
+% brb2022.10.05
 nsta = length(stax); 
 
 % Determine which nodes are closest to each station and find their weights.
