@@ -1,24 +1,13 @@
 clc; clear; 
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
-fpdfs = sprintf('%scompiled_pdfs_%s.mat',out_dir,STAMP); % File with pdfs. a2_1...m
+fpdfs    = sprintf('%scompiled_pdfs_%s.mat',out_dir,STAMP); % File with pdfs. a2_1...m
 
 mdls = load(fresults).mdls; 
 
 %% parameters. 
 rough_scale = 5e-9; % How much to penalize roughness.
-max_inv_iterations = 100; % How many iterations to allow in inversion. 
-v_at_depth = true; % Use velocity from a depth, or one of the other parameters like moho depth. 
+max_inv_iterations = 300; % How many iterations to allow in inversion. 
 
-% z_vs loaded in a0....m
-% for idep = 1:length(z_vs);
-for idep = [1, 15, 30, 50]; 
-
-
-depth = z_vs(idep); 
-this_inversion = sprintf('vs%1.0f',depth); % String name affiliated with figures and files. 
-mkdir(this_inversion); 
-
-fprintf('Running inversion %s\n', this_inversion)
 
 %% Reorganize structure. Could be more - or less - useful one way or other. 
 %%% BORROWED FROM A2
@@ -33,6 +22,7 @@ vpvs          = zeros(length(mdls.nwk),1);
 % vpvssig       = zeros(length(mdls.nwk),1);
 
 
+z_vs          = [0.5, 15, 50, 100, 150, 200]; 
 vs            = zeros(length(mdls.nwk),length(z_vs)); 
 
 for imd = 1:length(mdls.nwk); 
@@ -79,16 +69,12 @@ a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, ...
     'fignum', 1, 'title', 'station positions')
 
 %% Setting up surface. 
-
-
-if v_at_depth; 
-    ivel = find(z_vs == depth); 
-    iz = ivel; 
-end
-
+% nx = 35; 
+% ny = 45;  
 nodes_per_degree = 4; 
 nx = ceil((lonmax - lonmin) * nodes_per_degree); 
 ny = ceil((latmax - latmin) * nodes_per_degree);  
+ivel = 4; % Temporary. Expand to a loop. 
 edge_space = 0.2; % How far to go beyond max and min stax and y, in fraction. 
 
 
@@ -106,13 +92,21 @@ vs_interp = griddata(stax, stay, vs(:,ivel), xgrid, ygrid, 'cubic');
 a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', vs(:,ivel),...
     'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', vs_interp, ...
     'fignum', 2, 'title', 'Simple v interpolation');  
-% scatter(xgrid, ygrid, 5, 'k', 'filled')
-exportgraphics(gcf, [this_inversion '/surface_simple_interpolation.pdf']); 
+scatter(xgrid, ygrid, 5, 'k', 'filled')
+exportgraphics(gcf, 'surface_simple_interpolation.pdf'); 
 
 
 
+%% Get PDF for stations. 
+% Use an example pdf while developing surface inversion stuff. 
+% fpdf = '~/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/many_stas/pdf_example.mat'; 
+% pdf = load(fpdf).pdf_example; 
+% Probably something like pdf(ista) = load(pdf_sta). 
+pdf_file = load(fpdfs); 
+pdfs = pdf_file.pdfs; 
 
-%% Make a starting model. 
+
+% Make a starting model. 
 vgrid = vs_interp; % Probably a fine starting model. 
 vgrid(isnan(vgrid)) = nanmean(nanmean(vgrid)); 
 % vgrid = vgrid + randn(size(vgrid))*0.5; % Give some error
@@ -163,34 +157,6 @@ a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay,...
 % % % % fhand(vgrid); 
 
 vgrid_start = vgrid; 
-
-%% Get PDF for stations. 
-% Use an example pdf while developing surface inversion stuff. 
-% fpdf = '~/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/many_stas/pdf_example.mat'; 
-% pdf = load(fpdf).pdf_example; 
-% Probably something like pdf(ista) = load(pdf_sta). 
-pdf_file = load(fpdfs); 
-pdfs = pdf_file.pdfs_allparm; 
-
-
-% If using different depths: 
-% iz = 12; % Temporary. 
-% depth = pdf_file.pdfs_allparm(1).zatdep(iz); 
-% fprintf('Temporarily using %1.0f depth for inversion. \n', depth)
-
-% pdfs = pdfs(:).vs{iz}; 
-
-%%% Put this in function later. 
-pdfs_vs = pdfs(1).vs{1}; % Make a new structure (obnoxious). And have to start with the correct field names. Reason for new structure is that, I used a cell array for each different depth. Matlab doesn't actually access the nth stations ith cell array all in one call. 
-nsta = length(pdfs); 
-for ista = 1:nsta
-    pdfs_vs(ista) = pdfs(ista).vs{iz}; 
-end
-pdfs = pdfs_vs; 
-%%% Put this in function later. 
-
-% this_inversion = sprintf('%s%s', 'vs', num2str(depth) ); 
-
 
 %% Prep for efficient inverison. Some constant variables. 
 
@@ -292,12 +258,10 @@ vgrid_out(isnan(vs_interp)) = nan;
 a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', vs(:,ivel),...
     'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', vgrid_out, ...
     'fignum', 6, 'title', 'V output'); 
-exportgraphics(gcf, sprintf('%s/surface_inversion_rough.pdf',this_inversion)); 
+exportgraphics(gcf, './surface_inversion_rough.pdf'); 
 
 % Temporary. Mostly for testing. 
 save('surface_out_example.mat', 'longrid', 'latgrid',...
-    'xgrid', 'ygrid', 'llminmax'); % Longrid and stuff isn't going to change. 
-save(sprintf('%s/surface_values', this_inversion), 'vgrid_out')
+    'xgrid', 'ygrid', 'vgrid_out', 'llminmax'); 
 
 
-end

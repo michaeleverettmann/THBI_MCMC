@@ -37,6 +37,9 @@ proj.STAinversions = paths.STAinversions;
 
 fresults = sprintf('%s/compiled_results_%s.mat',out_dir,STAMP); 
 
+z_vs = [5:5:300]; warning('Make sure z vs is supposed to be 5:5:300 always in pdfs or something. remove this from parameter setup. ')% Temporary. Different depths looking for station median values. Needs to match whats in the pdfs. 
+
+
 
 % % % % 
 % % % % 
