@@ -6,7 +6,7 @@ fpdfs = sprintf('%scompiled_pdfs_%s.mat',out_dir,STAMP); % File with pdfs. a2_1.
 v_at_depth = true; % Use velocity from a depth, or one of the other parameters like moho depth. 
 % z_vs loaded in a0....m
 % for idep = 1:length(z_vs);
-for idep = [1, 15, 30, 50]; 
+for idep = [2, 13, 30, 50]; 
 
 
 depth = z_vs(idep); 

@@ -31,6 +31,17 @@ m_coast('patch',[1 1 1]); % m_coast('patch',[1 .85 .7]);
 
 %% Plot surface
 if ~isempty(options.xgrid); 
+
+    if ~isempty(options.stax); 
+        pt_dist_nan = 0.02; 
+        pt_dist = zeros(size(options.xgrid)); 
+        for ipt = 1:(size(options.xgrid, 1) * size(options.xgrid,2)); 
+            pt_dist(ipt) = min(sqrt((options.xgrid(ipt) - options.stax).^2 + ...
+                 (options.ygrid(ipt) - options.stay).^2)); 
+        end
+        options.vgrid(pt_dist > pt_dist_nan) = nan; 
+    end
+
     contourf(options.xgrid, options.ygrid, options.vgrid, 15,...
         'LineStyle','none'); 
 %     m_contourf(options.xgrid, options.ygrid, options.vgrid, 15); 
@@ -42,7 +53,11 @@ for iplace = 1:length(lonbord);
     m_line(lonbord{iplace}, latbord{iplace}, 'LineWidth',1,'color',0*[1 1 1])
 end
 
-m_grid('box','fancy','linestyle','-','gridcolor','w','backcolor',[.3 .75 1]);
+% m_grid('box','fancy','linestyle','-','gridcolor','w','backcolor',[.3 .75 1]);
+m_grid('box','fancy','linestyle','-','gridcolor',.5 .*[1,1,1],'backcolor',[.3 .75 1]);
+%%% TODO find a way to nan all the data that leaks out of the projection
+%%% box. 
+
 
 if ~isempty(options.title); 
     title(options.title, 'fontweight', 'normal')

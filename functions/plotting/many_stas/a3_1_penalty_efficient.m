@@ -1,4 +1,4 @@
-function [penalty] = a3_1_penalty_efficient(vgrid,...
+function [penalty, penalty_no_prior, roughness] = a3_1_penalty_efficient(vgrid,...
     pdf_terp, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay,...
     nearesti, weighti, min_mm_terp, dmm_di, nmm, nsta); 
 
@@ -16,7 +16,8 @@ vsta = sum(vgrid(nearesti) .* weighti,2);
 % Interpolate v at each station to a pdf. 
 pv_mod = p_mm_to_pdf_dmdi(vsta, pdf_terp, min_mm_terp, dmm_di, nmm, nsta); 
 
-penalty = - sum(pv_mod); % Lower penalty is higher probability. 
-penalty = penalty + roughness; 
+penalty_no_prior = - sum(pv_mod); % Lower penalty is higher probability. 
+
+penalty = penalty_no_prior + roughness; 
 
 end
