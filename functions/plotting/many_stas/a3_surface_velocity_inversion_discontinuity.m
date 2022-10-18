@@ -6,21 +6,16 @@ mdls = load(fresults).mdls;
 
 %% parameters. 
 rough_scale = 10e-9; % How much to penalize roughness.
-max_inv_iterations = 3; % How many iterations to allow in inversion. 
+max_inv_iterations = 10; % How many iterations to allow in inversion. 
+v_at_depth = true; % Use velocity from a depth, or one of the other parameters like moho depth. 
 
 % z_vs loaded in a0....m
-% for iinv = 1:length(z_vs);
-for iinv = [30]; %!%! Add strings to the list to handle other parameters. Make sure they are always first in list. 
+% for idep = 1:length(z_vs);
+for idep = [30]; 
 
-%^%^ Handle whether doing depth or other model parameter inversion
-v_at_depth = ~ strcmp(class(iinv), class("A string") ); % Use velocity from a depth, or one of the other parameters like moho depth. If a string is provided, we assume we are not using velocity at depth but another model parameter. %!%! Utilize v_at_depth
-if v_at_depth 
-    param = z_vs(iinv); %!%! Only do if v_at_depth. %!%! change variable depth. 
-else
-    param = iinv
-end
 
-this_inversion = sprintf('vs%1.0f',param); % String name affiliated with figures and files. %!%! change variable depth. 
+depth = z_vs(idep); 
+this_inversion = sprintf('vs%1.0f',depth); % String name affiliated with figures and files. 
 mkdir(this_inversion); 
 
 fprintf('Running inversion %s\n', this_inversion)
@@ -37,12 +32,10 @@ xicr          = zeros(length(mdls.nwk),1);
 vpvs          = zeros(length(mdls.nwk),1); 
 % vpvssig       = zeros(length(mdls.nwk),1);
 
-% vs            = zeros(length(mdls.nwk),length(z_vs)); 
-m_simple      = zeros(length(mdls.nwk), 1); 
 
-nsta = length(mdls.nwk); 
+vs            = zeros(length(mdls.nwk),length(z_vs)); 
 
-for imd = 1:nsta; 
+for imd = 1:length(mdls.nwk); 
 
     % Make alternative format models variable. 
     models(imd).nwk   = mdls.nwk  {imd}; 
@@ -63,17 +56,9 @@ for imd = 1:nsta;
     vpvs              (imd) = mdl.vpvsav; 
 
     % Pseudo-tomography
-    if v_at_depth
-% % %         dist_from_z = (abs(z_vs - mdl.Z)); %!%! These lines only revelvant if v_at_depth
-% % %         [C,I ] = min(dist_from_z); %!%! These lines only revelvant if v_at_depth
-% % %         vs(imd,:) = mdl.VSav(I'); % Velocity at depths. %!%! These lines only revelvant if v_at_depth
-% % %         %!%! vs is derived from models. Just make it m_simple. 
-        [~,iclosest_z] = min( abs(z_vs(iinv) - mdl.Z) ); 
-        m_simple(imd) = mdl.VSav(iclosest_z);
-    else
-        m_simple = nan(nsta, 1); %!%! Figure out size. 
-    end
-    
+    dist_from_z = (abs(z_vs - mdl.Z)); 
+    [C,I ] = min(dist_from_z); 
+    vs(imd,:) = mdl.VSav(I'); % Velocity at depths. 
 end
 
 
@@ -96,11 +81,9 @@ a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, ...
 %% Setting up surface. 
 
 
-if v_at_depth; %!%! nice
-    ivel = find(z_vs == param); 
+if v_at_depth; 
+    ivel = find(z_vs == depth); 
     iz = ivel; 
-else
-    iz = 'no different depths!'; 
 end
 
 nodes_per_degree = 4; 
@@ -116,12 +99,12 @@ yline = linspace(min(stay) - edge_space * DY, max(stay) + edge_space * DY, ny)';
 [xgrid, ygrid] = ndgrid(xline, yline);  
 [longrid, latgrid] = m_xy2ll(xgrid, ygrid); 
 
-m_interp = griddata(stax, stay, m_simple, xgrid, ygrid, 'cubic'); %!%! change variable vs_interp. Replace all m_simple. 
-% m_interp(isnan(m_interp)) = nanmean(m_interp, 'all'); 
+vs_interp = griddata(stax, stay, vs(:,ivel), xgrid, ygrid, 'cubic'); 
+% vs_interp(isnan(vs_interp)) = nanmean(vs_interp, 'all'); 
 
 % % % %%% Handle points outside station bounds. 
 % % % dist_handle = 0.03 * min([DX, DY]); 
-% % % v_dft = mean(m_simple); 
+% % % v_dft = mean(vs(:,ivel)); 
 % % % for ipt = 1:(nx*ny)
 % % %     distpt = sqrt( (stax - xgrid(ipt)).^2 + (stay - ygrid(ipt)).^2 ); % distance of this point to each station
 % % %     if min(distpt) > dist_handle;
@@ -131,15 +114,15 @@ m_interp = griddata(stax, stay, m_simple, xgrid, ygrid, 'cubic'); %!%! change va
 % % % %         sta_to_dft_wt = 1./((min(distpt)-dist_handle)/dist_handle); % Station weighting relative to default weighting. Station weighting is 1 at dist_handle from closest station. Station weighting should decrease moving away from stations. 
 % % %         dft_to_sta_wt = ((dist_nearest-dist_handle) / dist_handle); % Station weighting relative to default weighting. Station weighting is 1 at dist_handle from closest station. Station weighting should decrease moving away from stations. 
 % % %         disp([sta_to_dft_wt, v_new])
-% % %         v_new = (sta_to_dft_wt * sum(sta_wt .* m_simple)) + ...
+% % %         v_new = (sta_to_dft_wt * sum(sta_wt .* vs(:,ivel))) + ...
 % % %             ((1-sta_to_dft_wt) * v_dft); 
-% % %         m_interp(ipt) = v_new; 
+% % %         vs_interp(ipt) = v_new; 
 % % %     end
 % % % end
 
 %%% Plot surface. 
-a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', m_simple,... %!%! Replace vs(:,ivel)
-    'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', m_interp, ...
+a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', vs(:,ivel),...
+    'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', vs_interp, ...
     'fignum', 2, 'title', 'Simple v interpolation');  
 % scatter(xgrid, ygrid, 5, 'k', 'filled')
 exportgraphics(gcf, [this_inversion '/surface_simple_interpolation.pdf']); 
@@ -148,9 +131,9 @@ exportgraphics(gcf, [this_inversion '/surface_simple_interpolation.pdf']);
 
 
 %% Make a starting model. 
-mgrid = m_interp; % Probably a fine starting model.  %!%! Replace vgrid. Replace vs_interp. 
-mgrid(isnan(mgrid)) = nanmean(nanmean(mgrid)); %!%! replace vgrid
-% mgrid = mgrid + randn(size(mgrid))*0.5; % Give some error
+vgrid = vs_interp; % Probably a fine starting model. 
+vgrid(isnan(vgrid)) = nanmean(nanmean(vgrid)); 
+% vgrid = vgrid + randn(size(vgrid))*0.5; % Give some error
 % 
 % 
 %%% Handle points outside station bounds. 
@@ -161,19 +144,19 @@ for ipt = 1:(nx*ny)
 %     diff()
 %     exponent = cumprod(distpt(3)) * 8; 
     exponent = 4; 
-    max_ind = size(m_simple, 1); 
+    max_ind = size(vs, 1); 
 %     max_ind = 30; 
     distpts = distpts(1:max_ind);
-    vspt = m_simple( distpti(1:max_ind) ); %!%! Replace vs. Replace vspt. 
+    vspt = vs( distpti(1:max_ind), ivel ); 
     sta_wt = (1./distpts).^exponent; 
     sta_wt = sta_wt / sum(sta_wt); 
-    v_new = sum(sta_wt .* vspt); %!%! replace v_new. Replace vspt. 
-    mgrid(ipt) = v_new; %!%! replace vgrid. Replace v_new. 
+    v_new = sum(sta_wt .* vspt); 
+    vgrid(ipt) = v_new; 
 end
 
 % Plot the starting model. 
-a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', m_simple,... %!%! Replace vs(:,ivel)
-    'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', mgrid, ...
+a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', vs(:,ivel),...
+    'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', vgrid, ...
     'fignum', 3, 'title', 'V starting model'); 
 exportgraphics(gcf, [this_inversion '/surface_starting_model.pdf']); 
 
@@ -188,21 +171,37 @@ y_dy2 = ygrid(:,2:end-1); x_dy2 = xgrid(:,2:end-1); % y and x positions where we
 % Example roughness to make sure the calculations are good. 
 % This is the calculation to get roughness throughout the inversion
 % (Basically). 
-dvdx2 = (mgrid(1:end-2,:) - 2*mgrid(2:end-1,:) + mgrid(3:end,:))./dx2; %!%! replace vgrid
-dvdy2 = (mgrid(:,1:end-2) - 2*mgrid(1,2:end-1) + mgrid(:,3:end))./dy2; %!%! replace vgrid
+dvdx2 = (vgrid(1:end-2,:) - 2*vgrid(2:end-1,:) + vgrid(3:end,:))./dx2; 
+dvdy2 = (vgrid(:,1:end-2) - 2*vgrid(1,2:end-1) + vgrid(:,3:end))./dy2; 
 dvdx2 = dvdx2.^2; % Square, mostly to prevent negative values...
 dvdy2 = dvdy2.^2; 
-roughness = sum(dvdx2, 'all') + sum(dvdy2, 'all'); % replace dvdx2 and dvdy2
+roughness = sum(dvdx2, 'all') + sum(dvdy2, 'all'); 
 roughness = roughness * rough_scale; % How to get roughness penalty value. 
 
 a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay,...
-    'xgrid', x_dx2, 'ygrid', y_dx2, 'vgrid', dvdx2, ...%Replace dvdx2 and dvdy2
+    'xgrid', x_dx2, 'ygrid', y_dx2, 'vgrid', dvdx2, ...
     'fignum', 4, 'title', 'X roughness'); colorbar(); 
 a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay,...
-    'xgrid', x_dy2, 'ygrid', y_dy2, 'vgrid', dvdy2, ...%Replace dvdx2 and dvdy2
+    'xgrid', x_dy2, 'ygrid', y_dy2, 'vgrid', dvdy2, ...
     'fignum', 5, 'title', 'Y roughness'); colorbar(); 
 
-mgrid_start = mgrid; %!%! Replace vgrid_start and vgrid
+% % % % How to get "modelled" velocity throughout inversion. 
+% % % vsta = interpn(xgrid, ygrid, vgrid, stax, stay, 'linear'); % MODELLED velocity at each station. 
+% % % 
+% % % % Probability associated with a velocity. 
+% % % pv_mod = zeros(size(stax)); 
+% % % for ista=1:length(pv_mod); 
+% % %     pv_mod(ista) = interp1(pdfs(ista).mm, pdfs(ista).pm, vsta(ista), 'linear', 0 ); % Probability of a velocity at a specific station, from our velocity model surface. 
+% % % end
+% % % 
+% % % penalty = - sum(pv_mod); % Lower penalty is higher probability. 
+% % % penalty = penalty + roughness; 
+% % % 
+% % % fhand=@(vgrid)a3_1_penalty(vgrid,...
+% % %     pdfs, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay); % Supply constants to the function handle. 
+% % % fhand(vgrid); 
+
+vgrid_start = vgrid; 
 
 %% Get PDF for stations. 
 % Use an example pdf while developing surface inversion stuff. 
@@ -215,27 +214,21 @@ pdfs = pdf_file.pdfs_allparm;
 
 % If using different depths: 
 % iz = 12; % Temporary. 
-% param = pdf_file.pdfs_allparm(1).zatdep(iz); 
-% fprintf('Temporarily using %1.0f depth for inversion. \n', param)
+% depth = pdf_file.pdfs_allparm(1).zatdep(iz); 
+% fprintf('Temporarily using %1.0f depth for inversion. \n', depth)
 
 % pdfs = pdfs(:).vs{iz}; 
 
 %%% Put this in function later. 
-%!%! replace pdfs_vs. 
-%!%! If not vs, access different part of pdfs. 
-if v_at_depth
-    pdfs_vs = pdfs(1).vs{1}; % Make a new structure (obnoxious). And have to start with the correct field names. Reason for new structure is that, I used a cell array for each different depth. Matlab doesn't actually access the nth stations ith cell array all in one call. 
-    nsta = length(pdfs); 
-    for ista = 1:nsta
-        pdfs_vs(ista) = pdfs(ista).vs{iz}; %!%! Not access pdfs.vs
-    end
-    pdfs = pdfs_vs; %!%! replace pdfs_vs. 
-else
-    pdfs = pdfs(:).(iinv); 
+pdfs_vs = pdfs(1).vs{1}; % Make a new structure (obnoxious). And have to start with the correct field names. Reason for new structure is that, I used a cell array for each different depth. Matlab doesn't actually access the nth stations ith cell array all in one call. 
+nsta = length(pdfs); 
+for ista = 1:nsta
+    pdfs_vs(ista) = pdfs(ista).vs{iz}; 
 end
+pdfs = pdfs_vs; 
 %%% Put this in function later. 
 
-% this_inversion = sprintf('%s%s', 'vs', num2str(param) ); 
+% this_inversion = sprintf('%s%s', 'vs', num2str(depth) ); 
 
 
 %% Prep for efficient inverison. Some constant variables. 
@@ -249,10 +242,10 @@ nmm = 300;
 % Interpolate mm from the grid to stations.  
 [fhand_vec, fhand_mat, grid_terp, nearesti, weighti...
     ] = p_prep_grid_to_sta_interp(...
-    xgrid, ygrid, mgrid, stax, stay); %!%! replace vgrid
+    xgrid, ygrid, vgrid, stax, stay); 
 
 % The thing we want to minimize. Make a function handle. 
-fhand_penalty=@(mgrid)a3_1_penalty_efficient(mgrid,...%!%! replace vgrid
+fhand_penalty=@(vgrid)a3_1_penalty_efficient(vgrid,...
     pdf_terp, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay, ...
     nearesti, weighti, min(mm_terp), dmm_di, nmm, nsta); 
 
@@ -260,9 +253,9 @@ fhand_penalty=@(mgrid)a3_1_penalty_efficient(mgrid,...%!%! replace vgrid
 pdf_total_max = sum(max(pdf_terp,[],1)); 
 
 %% Test the above efficient inversion interpolation stuff. 
-msta_mod = linspace(min(mm_terp), max(mm_terp), nsta)'; % FOR TESTING Easy values, for testing. %!%! replace vsta_mod
+vsta_mod = linspace(min(mm_terp), max(mm_terp), nsta)'; % FOR TESTING Easy values, for testing. 
 pdf_mod = p_mm_to_pdf_dmdi(...
-    msta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); %!%! replace vsta_mod
+    vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); 
 
 % Plot to check that we interpolated to a common mm correctly. 
 figure(12); clf; hold on; 
@@ -273,7 +266,7 @@ title('Interpolated')
 for ista = 1:nsta
     plot(ista  + pdf_terp(:,ista), mm_terp ); 
 end
-scatter([1:nsta]' + pdf_mod, msta_mod); %!%! replace vsta_mod
+scatter([1:nsta]' + pdf_mod, vsta_mod); 
 
 nexttile(); hold on; box on; set(gca, 'LineWidth', 1.5); 
 title('Original'); 
@@ -296,17 +289,17 @@ fprintf('Sum of max of pdf of each station: %1.1f.\nExcluding roughness, this is
 
 % % % tic; 
 % % % [vgrid_out,fval_out,flag_out,output_out] =...
-% % %     fminunc(fhand_penalty, mgrid_start, opts);
+% % %     fminunc(fhand_penalty, vgrid_start, opts);
 % % % toc 
 
 
 %% Iterate and see how model changes
 tic; 
 ii = 0; 
-mgrid_temp = mgrid_start; %!%! Replace mgrid_temp and vgrid_start
+vgrid_temp = vgrid_start; 
 opts_temp = opts; 
 ii_vec = [0]; 
-[pentot_ii,penpdf_ii,penprior_ii] = fhand_penalty(mgrid_temp); %!%! replace vgrid_temp
+[pentot_ii,penpdf_ii,penprior_ii] = fhand_penalty(vgrid_temp); 
 opts_temp.MaxIterations = 0; 
 while ii < max_inv_iterations; 
 %     opts_temp.MaxIterations = ceil((opts_temp.MaxIterations + 1)^(1.3)) ; 
@@ -328,14 +321,14 @@ while ii < max_inv_iterations;
         opts_temp.MaxIterations = min([1, max_inv_iterations - opts_temp.MaxIterations])
     end
 
-    [mgrid_temp,fval_out,flag_out,output_out] =...%!%! replace vgrid_temp
-        fminunc(fhand_penalty, mgrid_temp, opts_temp);%!%! replace vgrid_temp
+    [vgrid_temp,fval_out,flag_out,output_out] =...
+        fminunc(fhand_penalty, vgrid_temp, opts_temp);
     ii = ii + output_out.iterations; 
     ii_vec(end+1) = ii; 
-    [pentot_ii(end+1),penpdf_ii(end+1),penprior_ii(end+1)] = fhand_penalty(mgrid_temp); %!%! replace vgrid_temp
+    [pentot_ii(end+1),penpdf_ii(end+1),penprior_ii(end+1)] = fhand_penalty(vgrid_temp); 
 
 end
-mgrid_out = mgrid_temp; %!%! replace vgrid_temp, vgrid_out
+vgrid_out = vgrid_temp; 
 toc
 
 %% Plot how inversion progressed
@@ -381,10 +374,10 @@ fhand_prog = @(invval)(diff(invval) ./ diff(ii_vec))' ./ max(invval) * 100;
 
 
 
-% mgrid_out(isnan(m_interp)) = nan; 
+% vgrid_out(isnan(vs_interp)) = nan; 
 
-% [mgrid_out,timetable.Fval("LBFGS_NoGrad"),timetable.Eflag("LBFGS_NoGrad"),output] =...
-%     fminunc(fhand, mgrid_start, opts);
+% [vgrid_out,timetable.Fval("LBFGS_NoGrad"),timetable.Eflag("LBFGS_NoGrad"),output] =...
+%     fminunc(fhand, vgrid_start, opts);
 % 
 % 
 % timetable.Time("LBFGS_NoGrad") = toc(overallTime);
@@ -400,16 +393,16 @@ fhand_prog = @(invval)(diff(invval) ./ diff(ii_vec))' ./ max(invval) * 100;
 % % % fprintf('Sum of max of pdf of each station: %1.1f.\nExcluding roughness, this is best possible penalty.\n', sum(max(pdf_terp)) )
 % % % 
 % % % tic; 
-% % % [mgrid_out,fval_out,flag_out,output_out] =...
-% % %     fminsearch(fhand_penalty, mgrid_start, options);
+% % % [vgrid_out,fval_out,flag_out,output_out] =...
+% % %     fminsearch(fhand_penalty, vgrid_start, options);
 % % % toc 
 % % % 
 % % % 
 % % % 
-% % % mgrid_out(isnan(m_interp)) = nan; 
+% % % vgrid_out(isnan(vs_interp)) = nan; 
 % % % 
-% % % % [mgrid_out,timetable.Fval("LBFGS_NoGrad"),timetable.Eflag("LBFGS_NoGrad"),output] =...
-% % % %     fminunc(fhand, mgrid_start, opts);
+% % % % [vgrid_out,timetable.Fval("LBFGS_NoGrad"),timetable.Eflag("LBFGS_NoGrad"),output] =...
+% % % %     fminunc(fhand, vgrid_start, opts);
 % % % % 
 % % % % 
 % % % % timetable.Time("LBFGS_NoGrad") = toc(overallTime);
@@ -418,15 +411,15 @@ fhand_prog = @(invval)(diff(invval) ./ diff(ii_vec))' ./ max(invval) * 100;
 % % % %     timetable.Time("LBFGS_NoGrad")/timetable.Iters("LBFGS_NoGrad");
 
 %% Plot inversion output. 
-a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', m_simple,... %!%! replace vs(:,ivel)
-    'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', mgrid_out, ... %!%! replace vgrid_out
+a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', vs(:,ivel),...
+    'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', vgrid_out, ...
     'fignum', 6, 'title', 'V output'); 
 exportgraphics(gcf, sprintf('%s/surface_inversion_rough.pdf',this_inversion)); 
 
 % Temporary. Mostly for testing. 
 save('surface_out_example.mat', 'longrid', 'latgrid',...
     'xgrid', 'ygrid', 'llminmax'); % Longrid and stuff isn't going to change. 
-save(sprintf('%s/surface_values', this_inversion), 'mgrid_out')
+save(sprintf('%s/surface_values', this_inversion), 'vgrid_out')
 
 
 end
