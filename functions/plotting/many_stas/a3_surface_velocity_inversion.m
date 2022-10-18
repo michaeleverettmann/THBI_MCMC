@@ -10,17 +10,18 @@ max_inv_iterations = 3; % How many iterations to allow in inversion.
 
 % z_vs loaded in a0....m
 % for iinv = 1:length(z_vs);
-for iinv = [30]; %!%! Add strings to the list to handle other parameters. Make sure they are always first in list. 
+for iinv = ["zsed"]; %!%! Add strings to the list to handle other parameters. Make sure they are always first in list. 
 
 %^%^ Handle whether doing depth or other model parameter inversion
 v_at_depth = ~ strcmp(class(iinv), class("A string") ); % Use velocity from a depth, or one of the other parameters like moho depth. If a string is provided, we assume we are not using velocity at depth but another model parameter. %!%! Utilize v_at_depth
 if v_at_depth 
     param = z_vs(iinv); %!%! Only do if v_at_depth. %!%! change variable depth. 
+    this_inversion = sprintf('vs%1.0f',param); % String name affiliated with figures and files. %!%! change variable depth. 
 else
-    param = iinv
+    param = iinv; 
+    this_inversion = sprintf('%s',param); 
 end
 
-this_inversion = sprintf('vs%1.0f',param); % String name affiliated with figures and files. %!%! change variable depth. 
 mkdir(this_inversion); 
 
 fprintf('Running inversion %s\n', this_inversion)
@@ -71,7 +72,7 @@ for imd = 1:nsta;
         [~,iclosest_z] = min( abs(z_vs(iinv) - mdl.Z) ); 
         m_simple(imd) = mdl.VSav(iclosest_z);
     else
-        m_simple = nan(nsta, 1); %!%! Figure out size. 
+        m_simple(imd) = mdl.(iinv+"av"); % This is better than doing the median later, since median didn't work for some model parameters. 
     end
     
 end
@@ -231,7 +232,7 @@ if v_at_depth
     end
     pdfs = pdfs_vs; %!%! replace pdfs_vs. 
 else
-    pdfs = pdfs(:).(iinv); 
+    pdfs = [pdfs.(iinv)]; 
 end
 %%% Put this in function later. 
 
