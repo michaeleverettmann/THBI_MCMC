@@ -2,6 +2,7 @@ clc; clear;
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 fpdfs = sprintf('%scompiled_pdfs_%s.mat',out_dir,STAMP); % File with pdfs. a2_1...m
 
+version_surf = 3; 
 
 v_at_depth = true; % Use velocity from a depth, or one of the other parameters like moho depth. 
 % z_vs loaded in a0....m
@@ -17,7 +18,7 @@ iz = find(z_vs == depth);
 mdls = load(fresults).mdls; 
 % pdfs = load(fpdfs).pdfs; 
 sfsmat = load('surface_out_example.mat'); xgrid = sfsmat.xgrid; ygrid = sfsmat.ygrid; llminmax = sfsmat.llminmax; latgrid = sfsmat.latgrid; longrid = sfsmat.longrid; 
-sfsmat2= load(sprintf('%s/surface_values', this_inversion)); vgrid_out = sfsmat2.vgrid_out; 
+sfsmat2= load(sprintf('%s/surface_values_V%1.0f', this_inversion, version_surf)); vgrid_out = sfsmat2.vgrid_out; 
 
 
 pdf_file = load(fpdfs); 

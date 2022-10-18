@@ -7,10 +7,17 @@ mdls = load(fresults).mdls;
 %% parameters. 
 rough_scale = 10e-9; % How much to penalize roughness.
 max_inv_iterations = 3; % How many iterations to allow in inversion. 
+version_surf = 3; 
 
-% z_vs loaded in a0....m
-% for iinv = 1:length(z_vs);
-for iinv = ["zsed"]; %!%! Add strings to the list to handle other parameters. Make sure they are always first in list. 
+to_invert = {"zsed", "zmoh"}; % Which model parameters to run. Those come first because they can influence later inversions.  
+for inum = int16([5, 15, 20, 25, 30, 35, 40, ...
+        45, 50, 55, 60, 70, 80, 100, 130, 160, 200]/5); % Which depths/incidices to run. 
+    to_invert{end+1} = inum; 
+end
+
+% Total hack to not worry as much about having depth slices of vs, but other things not being a function of depth. 
+for iinv = to_invert; %!%! Add strings to the list to handle other parameters. Make sure they are always first in list. 
+iinv = iinv{1}; 
 
 %^%^ Handle whether doing depth or other model parameter inversion
 v_at_depth = ~ strcmp(class(iinv), class("A string") ); % Use velocity from a depth, or one of the other parameters like moho depth. If a string is provided, we assume we are not using velocity at depth but another model parameter. %!%! Utilize v_at_depth
@@ -427,7 +434,7 @@ exportgraphics(gcf, sprintf('%s/surface_inversion_rough.pdf',this_inversion));
 % Temporary. Mostly for testing. 
 save('surface_out_example.mat', 'longrid', 'latgrid',...
     'xgrid', 'ygrid', 'llminmax'); % Longrid and stuff isn't going to change. 
-save(sprintf('%s/surface_values', this_inversion), 'mgrid_out')
+save(sprintf('%s/surface_values_V%1.0f', this_inversion, version_surf), 'mgrid_out')
 
 
 end
