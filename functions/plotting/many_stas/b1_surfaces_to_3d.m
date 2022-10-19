@@ -2,11 +2,13 @@ clc; clear;
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 
 version_surf = 3; 
-lolim = [-87, -76; -86, -72; -88, -76]; 
-lalim = [ 43,  35;  30,  44;  36,  32]; 
+lolim = [-94.2132, -62.7473; -86, -72; -88, -76]; 
+lalim = [ 51.3480,  18.8802;  30,  44;  36,  32]; 
 % i_xsect = 1; 
+n_contour = 30; 
 
-depths = [5, 20, 60, 80, 100, 200]; % Try loading these depths. Probably need to type manually for now, but could save as a .mat file in future. 
+depths = [5, 15, 20, 25, 30, 35, 40, ...
+        45, 50, 55, 60, 70, 80, 100, 130, 160, 200, 250, 300]; % Try loading these depths. Probably need to type manually for now, but could save as a .mat file in future. 
 parms_other = ["zsed", "zmoh"]; 
 
 sfsmat = load('surface_out_example.mat'); xgrid = sfsmat.xgrid; ygrid = sfsmat.ygrid; llminmax = sfsmat.llminmax; latgrid = sfsmat.latgrid; longrid = sfsmat.longrid; 
@@ -41,7 +43,6 @@ zsed_surf = sfsmat2.mgrid_out;
 
 %%
 
-n_contour = 15; 
 figure(1); clf; hold on; 
 set(gcf, 'pos', [1053 564 767*2 329*ceil(.5*size(lolim,1))], 'color', 'white'); 
 tiledlayout(ceil(.5 * size(lolim, 1 )), 2,'TileSpacing', 'Compact')
@@ -84,7 +85,6 @@ zsedsect = griddata(longrid, latgrid, zsed_surf, lon_surf_line, lat_surf_line);
 
 
 %% Plot
-n_contour = 15; 
 % figure(1); clf; hold on; 
 nexttile(); hold on; 
 box on; 

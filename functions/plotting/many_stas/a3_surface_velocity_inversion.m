@@ -11,7 +11,7 @@ version_surf = 3;
 
 to_invert = {"zsed", "zmoh"}; % Which model parameters to run. Those come first because they can influence later inversions.  
 for inum = int16([5, 15, 20, 25, 30, 35, 40, ...
-        45, 50, 55, 60, 70, 80, 100, 130, 160, 200]/5); % Which depths/incidices to run. 
+        45, 50, 55, 60, 70, 80, 100, 130, 160, 200, 250, 300]/5); % Which depths/incidices to run. 
     to_invert{end+1} = inum; 
 end
 
