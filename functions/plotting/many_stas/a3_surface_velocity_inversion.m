@@ -6,12 +6,12 @@ mdls = load(fresults).mdls;
 
 %% parameters. 
 rough_scale = 10e-9; % How much to penalize roughness.
-max_inv_iterations = 3; % How many iterations to allow in inversion. 
+max_inv_iterations = 15; % How many iterations to allow in inversion. 
 version_surf = 3; 
 
 to_invert = {"zsed", "zmoh"}; % Which model parameters to run. Those come first because they can influence later inversions.  
 for inum = int16([5, 15, 20, 25, 30, 35, 40, ...
-        45, 50, 55, 60, 70, 80, 100, 130, 160, 200, 250, 300]/5); % Which depths/incidices to run. 
+        45, 50, 55, 60, 65, 70, 75, 80, 90, 100, 120, 140, 170, 210, 250, 300]/5); % Which depths/incidices to run. 
     to_invert{end+1} = inum; 
 end
 
@@ -150,6 +150,7 @@ a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', m_simple,
     'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', m_interp, ...
     'fignum', 2, 'title', 'Simple v interpolation');  
 % scatter(xgrid, ygrid, 5, 'k', 'filled')
+
 exportgraphics(gcf, [this_inversion '/surface_simple_interpolation.pdf']); 
 
 

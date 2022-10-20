@@ -3,11 +3,23 @@ run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Becaus
 fpdfs = sprintf('%scompiled_pdfs_%s.mat',out_dir,STAMP); % File with pdfs. a2_1...m
 
 version_surf = 3; 
+n_surf_pts = 100; 
+
+lolim = [-87, -76; -86, -68; -88, -78; -87, -80.5]; 
+lalim = [ 43,  35;  30,  47;  36,  33;  38,  25  ]; 
+fnum = 101; 
+scale_pdf = .035; 
+% offsecmax = 0.65; %5%  distance off section allowed, in degrees
+offsecmax = 1.5; %5%  distance off section allowed, in degrees
+mlim_manual = [4.1, 5]; 
+
 
 v_at_depth = true; % Use velocity from a depth, or one of the other parameters like moho depth. 
 % z_vs loaded in a0....m
 % for idep = 1:length(z_vs);
-for idep = [2, 13, 30, 50]; 
+
+
+for idep = int16([120]/5); 
 
 
 depth = z_vs(idep); 
@@ -18,7 +30,7 @@ iz = find(z_vs == depth);
 mdls = load(fresults).mdls; 
 % pdfs = load(fpdfs).pdfs; 
 sfsmat = load('surface_out_example.mat'); xgrid = sfsmat.xgrid; ygrid = sfsmat.ygrid; llminmax = sfsmat.llminmax; latgrid = sfsmat.latgrid; longrid = sfsmat.longrid; 
-sfsmat2= load(sprintf('%s/surface_values_V%1.0f', this_inversion, version_surf)); vgrid_out = sfsmat2.vgrid_out; 
+sfsmat2= load(sprintf('%s/surface_values_V%1.0f', this_inversion, version_surf)); vgrid_out = sfsmat2.mgrid_out; 
 
 
 pdf_file = load(fpdfs); 
@@ -33,39 +45,32 @@ pdfs = pdfs_vs;
 %%% Put this in function later. 
 
 
-%%
-lolim = [-87, -76; -86, -72; -88, -76]; 
-lalim = [ 43,  35;  30,  44;  36,  32]; 
-fnum = 101; 
-scale_pdf = .035; 
-% offsecmax = 0.65; %5%  distance off section allowed, in degrees
-offsecmax = 1.5; %5%  distance off section allowed, in degrees
-mlim_manual = [4.1, 5]; 
-
 %% Prep pdf-section style figure
 figure(fnum); clf; hold on; 
 set(gcf, 'pos', [1053 564 767*2 329*ceil(.5*size(lolim,1))], 'color', 'white'); 
 tiledlayout(ceil(.5 * size(lolim, 1 )), 2,'TileSpacing', 'Compact')
 
-%% Prep map view figure
-figure(1); clf; hold on; 
-lonmin = llminmax(1); lonmax = llminmax(2); latmin = llminmax(3); latmax = llminmax(4); 
-set(gcf, 'color', 'white'); 
-m_proj('lambert', 'long',[lonmin, lonmax],'lat',[latmin, latmax]);
-m_coast('patch',[1 1 1]); % m_coast('patch',[1 .85 .7]);
-m_grid('box','fancy','linestyle','-','gridcolor','w','backcolor',[.3 .75 1]);
-title('Cross-sections', 'fontweight', 'normal')
-contourf(xgrid, ygrid, vgrid_out, 15,...
-    'LineStyle','none'); 
-[latbord, lonbord] = borders('states'); % add states map
-for iplace = 1:length(lonbord); 
-    m_line(lonbord{iplace}, latbord{iplace}, 'LineWidth',1,'color',0*[1 1 1])
-end
-colorbar(); turbo_map = turbo(); turbo_map = turbo_map(end:-1:1,:); colormap(turbo_map); 
-% caxis(mlim_manual); 
-% caxis([4.35, 4.7]); 
+% % % % %% Prep map view figure
+% % % % figure(1); clf; hold on; 
+% % % % lonmin = llminmax(1); lonmax = llminmax(2); latmin = llminmax(3); latmax = llminmax(4); 
+% % % % set(gcf, 'color', 'white'); 
+% % % % m_proj('lambert', 'long',[lonmin, lonmax],'lat',[latmin, latmax]);
+% % % % m_coast('patch',[1 1 1]); % m_coast('patch',[1 .85 .7]);
+% % % % m_grid('box','fancy','linestyle','-','gridcolor','w','backcolor',[.3 .75 1]);
+% % % % title('Cross-sections', 'fontweight', 'normal')
+% % % % contourf(xgrid, ygrid, vgrid_out, 15,...
+% % % %     'LineStyle','none'); 
+% % % % [latbord, lonbord] = borders('states'); % add states map
+% % % % for iplace = 1:length(lonbord); 
+% % % %     m_line(lonbord{iplace}, latbord{iplace}, 'LineWidth',1,'color',0*[1 1 1])
+% % % % end
+% % % % colorbar(); turbo_map = turbo(); turbo_map = turbo_map(end:-1:1,:); colormap(turbo_map); 
+% % % % % caxis(mlim_manual); 
+% % % % % caxis([4.35, 4.7]); 
 
 %% Get station data and plot it. Loop over different x sections. 
+lat_surf_line_all = zeros(n_surf_pts, size(lolim,1) ); 
+lon_surf_line_all = lat_surf_line_all; 
 for i_xsect = 1:size(lolim, 1); 
 
 Q1 = [lalim(i_xsect, 1), lolim(i_xsect, 1)];
@@ -135,10 +140,11 @@ for ista = plot_these_stas(end:-1:1)';
 end
 
 %% Interpolate model surface to our line section and plot. 
-n_surf_pts = 100; 
 gcarc = linspace(min(d_par(by_line)), max(d_par(by_line)), n_surf_pts)'; 
 azline = profaz; 
 [lat_surf_line, lon_surf_line] = reckon(Q1(1), Q1(2), gcarc, azline); 
+lat_surf_line_all(:,i_xsect) = lat_surf_line; 
+lon_surf_line_all(:,i_xsect) = lon_surf_line; 
 [vs_surf_line] = griddata(longrid, latgrid, vgrid_out, lon_surf_line, lat_surf_line); 
 
 figure(fnum); % Reopen this figure. 
@@ -146,13 +152,13 @@ plot(gcarc, vs_surf_line, 'color', 'blue', 'LineWidth', 3);
 % ylim([4.1, 5.0]); 
 
 %% Plot position of line section on the map. 
-figure(1); 
-[stax, stay] = m_ll2xy(mdls.lon(by_line), mdls.lat(by_line));       
-scatter(stax, stay, 30, 'filled', 'MarkerEdgeColor','k'); 
-[x_surf_line, y_surf_line]=m_ll2xy(lon_surf_line, lat_surf_line); 
-plot(x_surf_line, y_surf_line, 'color', 'blue', 'LineWidth', 5); 
-t1=text(x_surf_line(1  ), y_surf_line(1  ), section_letter    , 'fontsize', 20, 'color', 'r');
-t2=text(x_surf_line(end), y_surf_line(end), section_letter+"'", 'fontsize', 20, 'color', 'r');
+% % % figure(1); 
+% % % [stax, stay] = m_ll2xy(mdls.lon(by_line), mdls.lat(by_line));       
+% % % scatter(stax, stay, 30, 'filled', 'MarkerEdgeColor','k'); 
+% % % [x_surf_line, y_surf_line]=m_ll2xy(lon_surf_line, lat_surf_line); 
+% % % plot(x_surf_line, y_surf_line, 'color', 'blue', 'LineWidth', 5); 
+% % % t1=text(x_surf_line(1  ), y_surf_line(1  ), section_letter    , 'fontsize', 20, 'color', 'r');
+% % % t2=text(x_surf_line(end), y_surf_line(end), section_letter+"'", 'fontsize', 20, 'color', 'r');
 
 
 
@@ -162,6 +168,11 @@ end % End loop on different sections.
 
 %% Save figures. 
 exportgraphics(figure(fnum), sprintf('%s/surface_versus_pdf.pdf', this_inversion)); 
+a3_2_plot_surface_simple(llminmax, 'stalon', mdls.lon, 'stalat', mdls.lat, ...
+    'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', vgrid_out,...
+    'sectlon', lon_surf_line_all, 'sectlat', lat_surf_line_all); 
 exportgraphics(figure(1   ), sprintf('%s/surface_versus_pdf_mapview.pdf', this_inversion)); 
+% exportgraphics(gcf, sprintf('xsections/xsections_map_V%1.0f.pdf', version_surf)); 
+
 
 end

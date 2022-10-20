@@ -2,16 +2,18 @@ clc; clear;
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 
 version_surf = 3; 
-lolim = [-94.2132, -62.7473; -86, -72; -88, -76]; 
-lalim = [ 51.3480,  18.8802;  30,  44;  36,  32]; 
+lolim = [-87, -76; -86, -68; -88, -78; -87, -80.5]; 
+lalim = [ 43,  35;  30,  47;  36,  33;  38,  25  ]; 
 % i_xsect = 1; 
 n_contour = 30; 
 
 depths = [5, 15, 20, 25, 30, 35, 40, ...
-        45, 50, 55, 60, 70, 80, 100, 130, 160, 200, 250, 300]; % Try loading these depths. Probably need to type manually for now, but could save as a .mat file in future. 
+        45, 50, 55, 60, 65, 70, 75, 80, 90, 100, 120, 140, 170, 210, 250, 300]; % Try loading these depths. Probably need to type manually for now, but could save as a .mat file in future. 
 parms_other = ["zsed", "zmoh"]; 
 
 sfsmat = load('surface_out_example.mat'); xgrid = sfsmat.xgrid; ygrid = sfsmat.ygrid; llminmax = sfsmat.llminmax; latgrid = sfsmat.latgrid; longrid = sfsmat.longrid; 
+mdls = load(fresults).mdls; % For sta lon and lat so we know where to and not to plot. 
+
 
 %% Make 3d lat and lon grids. 
 nz = length(depths); 
@@ -43,21 +45,29 @@ zsed_surf = sfsmat2.mgrid_out;
 
 %%
 
-figure(1); clf; hold on; 
+figure(16); clf; hold on; 
 set(gcf, 'pos', [1053 564 767*2 329*ceil(.5*size(lolim,1))], 'color', 'white'); 
 tiledlayout(ceil(.5 * size(lolim, 1 )), 2,'TileSpacing', 'Compact')
 
+nxy = 100; 
+lat_surf_line_all = zeros(nxy, size(lolim,1) ); 
+lon_surf_line_all = lat_surf_line_all; 
+
+% for i_xsect = 1; 
 for i_xsect = 1:size(lolim, 1); 
+
 
 
 Q1 = [lalim(i_xsect, 1), lolim(i_xsect, 1)];
 Q2 = [lalim(i_xsect, 2), lolim(i_xsect, 2)]; 
 [profd,profaz] = distance(Q1(1),Q1(2),Q2(1),Q2(2));
 
-nxy = 100; 
 gcarc = linspace(0, profd, nxy)'; 
 
 [lat_surf_line, lon_surf_line] = reckon(Q1(1), Q1(2), gcarc, profaz); 
+
+lat_surf_line_all(:,i_xsect) = lat_surf_line; 
+lon_surf_line_all(:,i_xsect) = lon_surf_line; 
 
 
 %% Prepare a 2-D section to interpolate into. 
@@ -94,12 +104,29 @@ ylabel('Depth (km)');
 title('Vs cross-section')
 colorbar(); 
 turbo_map = turbo(); turbo_map = turbo_map(end:-1:1,:); colormap(turbo_map); 
+clim([3.5, 4.8]); % TODO temporary 
 
 % Velocity
 [fk, hand] = contourf(lonmesh, zmesh, mterp, n_contour, 'EdgeAlpha', 0.5); 
 
 % Moho
-plot(lon_surf_line, zmohsect, 'LineWidth',4); 
-plot(lon_surf_line, zsedsect, 'LineWidth',4); 
+plot(lon_surf_line, zmohsect, 'k', 'LineWidth', 5); 
+plot(lon_surf_line, zsedsect, 'k', 'LineWidth', 5); 
+
+section_letter = char(64+i_xsect); % Text for cross-section name. ith letter of alphabet
+t1=text(0.01, 1.12, section_letter    , 'fontsize', 20, 'color', 'r', 'units', 'normalized', 'VerticalAlignment','top'); 
+t2=text(0.99, 1.12, section_letter+"'", 'fontsize', 20, 'color', 'r', 'units', 'normalized', 'VerticalAlignment','top', 'HorizontalAlignment','right'); 
+
+
 
 end
+
+mkdir('xsections'); 
+exportgraphics(gcf, sprintf('xsections/xsections_V%1.0f.pdf', version_surf), 'Resolution', 300); 
+
+
+%% Plot of cross-section positions
+a3_2_plot_surface_simple(llminmax, 'stalon', mdls.lon, 'stalat', mdls.lat, ...
+    'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', mgrid3d(:, :, end-7),...
+    'sectlon', lon_surf_line_all, 'sectlat', lat_surf_line_all); 
+exportgraphics(gcf, sprintf('xsections/xsections_map_V%1.0f.pdf', version_surf)); 

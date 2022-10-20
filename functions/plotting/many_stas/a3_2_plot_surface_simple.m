@@ -11,6 +11,8 @@ function [] = a3_2_plot_surface_simple(llminmax, options)
         options.vgrid = []
         options.fignum = 1; 
         options.title = []; 
+        options.sectlon = []; 
+        options.sectlat = []; 
     end
 
 % llminmax = [lonmin, lonmax, latmin, latmax]. Is used to define map
@@ -28,16 +30,30 @@ set(gcf, 'color', 'white');
 m_proj('lambert', 'long',[lonmin, lonmax],'lat',[latmin, latmax]);
 m_coast('patch',[1 1 1]); % m_coast('patch',[1 .85 .7]);
 
+%% Handle choices in terms of plotting stations from lon/lat, x/y, or not plotting stations. 
+if isempty(options.stax); 
+    if ~isempty(options.stalon); 
+        [stax, stay] = m_ll2xy(options.stalon, options.stalat);  
+    else;
+        stax = []; 
+        stay = []; 
+    end
+else
+    stax = options.stax; 
+    stay = options.stay; 
+end
+if isempty(options.stav); 
+    options.stav = ones(size(options.stax)); 
+end
 
 %% Plot surface
 if ~isempty(options.xgrid); 
-
-    if ~isempty(options.stax); 
+    if ~isempty(stax); % Have pulled stax out of options. 
         pt_dist_nan = 0.02; 
         pt_dist = zeros(size(options.xgrid)); 
         for ipt = 1:(size(options.xgrid, 1) * size(options.xgrid,2)); 
-            pt_dist(ipt) = min(sqrt((options.xgrid(ipt) - options.stax).^2 + ...
-                 (options.ygrid(ipt) - options.stay).^2)); 
+            pt_dist(ipt) = min(sqrt((options.xgrid(ipt) - stax).^2 + ...
+                 (options.ygrid(ipt) - stay).^2)); 
         end
         options.vgrid(pt_dist > pt_dist_nan) = nan; 
     end
@@ -63,29 +79,13 @@ if ~isempty(options.title);
     title(options.title, 'fontweight', 'normal')
 end
 
-
-
-
-
-%% Handle choices in terms of plotting stations from lon/lat, x/y, or not plotting stations. 
-if isempty(options.stax); 
-    if ~isempty(options.stalon); 
-        [stax, stay] = m_ll2xy(options.stalon, options.stalat);  
-    else;
-        stax = []; 
-        stay = []; 
-    end
-else
-    stax = options.stax; 
-    stay = options.stay; 
-end
-if isempty(options.stav); 
-    options.stav = ones(size(options.stax)); 
-end
-
 %% Plot stations. 
 if ~isempty(stax);     
-    scatter(stax, stay, 30, options.stav, 'filled', 'MarkerEdgeColor','k'); 
+    if ~ isempty(options.stav); 
+        scatter(stax, stay, 30, options.stav, 'filled', 'MarkerEdgeColor','k'); 
+    elseif isempty(options.stav); 
+        scatter(stax, stay, 5, 'filled', 'MarkerEdgeColor','k'); 
+    end
 end
 
 colorbar(); 
@@ -96,6 +96,17 @@ try
     caxis([min(options.stav), max(options.stav)]);
 catch error_rep
     fprintf('%s', getReport(error_rep)); 
+end
+
+%% Option for x sections. 
+if ~ isempty(options.sectlon); 
+    for isect = 1:size(options.sectlon,2); 
+        [sectx, secty] = m_ll2xy(options.sectlon(:,isect), options.sectlat(:,isect) );  
+        plot(sectx, secty, 'k', 'Linewidth', 3); 
+        section_letter = char(64+isect); 
+        t1=text(sectx(1  ), secty(1  ), section_letter    , 'fontsize', 20, 'color', 'r');
+        t2=text(sectx(end), secty(end), section_letter+"'", 'fontsize', 20, 'color', 'r');
+    end
 end
 
 end
