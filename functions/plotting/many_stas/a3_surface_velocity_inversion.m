@@ -7,11 +7,19 @@ mdls = load(fresults).mdls;
 %% parameters. 
 rough_scale = 10e-9; % How much to penalize roughness.
 max_inv_iterations = 15; % How many iterations to allow in inversion. 
-version_surf = 3; 
+version_surf = 4; 
 
-to_invert = {"zsed", "zmoh"}; % Which model parameters to run. Those come first because they can influence later inversions.  
-for inum = int16([5, 15, 20, 25, 30, 35, 40, ...
-        45, 50, 55, 60, 65, 70, 75, 80, 90, 100, 120, 140, 170, 210, 250, 300]/5); % Which depths/incidices to run. 
+% disconts = {"zsed", "zmoh"}; 
+disconts = {"zmoh"}; %brb TODO add in zsed again. 
+
+% % % to_invert = disconts; % Which model parameters to run. Those come first because they can influence later inversions.  
+% % % for inum = int16([5, 15, 20, 25, 30, 35, 40, ...
+% % %         45, 50, 55, 60, 65, 70, 75, 80, 90, 100, 120, 140, 170, 210, 250, 300]/5); % Which depths/incidices to run. 
+% % %     to_invert{end+1} = inum; 
+% % % end
+
+to_invert = {}; % disconts; % Which model parameters to run. Those come first because they can influence later inversions.  
+for inum = int16([40]/5); % Which depths/incidices to run. 
     to_invert{end+1} = inum; 
 end
 
@@ -194,7 +202,23 @@ x_dx2 = xgrid(2:end-1,:); y_dx2 = ygrid(2:end-1,:); % x and y positions where we
 y_dy2 = ygrid(:,2:end-1); x_dy2 = xgrid(:,2:end-1); % y and x positions where we have dy
 % Note for optimizing: Use a scalar (not matrix) for dx and dy. But as is, it's more versatile for map projections. 
 
-% Example roughness to make sure the calculations are good. 
+%% Modify roughness and such to ignore discontinuities. 
+if v_at_depth 
+    for this_surf = disconts;
+        this_surf = this_surf{1}; 
+        zdisc = load(sprintf('%s/surface_values_V%1.0f', this_surf, version_surf)).mgrid_out; 
+        gthan = zdisc > param; 
+        xcomp = (gthan(2:end-1,:) == gthan(3:end,:)) & (gthan(2:end-1,:) == gthan(1:end-2,:)); % This portion of smoothing should not cross the moho where false. 
+        ycomp = (gthan(:,2:end-1) == gthan(:,3:end)) & (gthan(:,2:end-1) == gthan(:,1:end-2)); % This portion of smoothing should not cross the moho where false. 
+        pct_rem = @(pcomp)100 * sum(pcomp == 0, 'all') / sum(pcomp == 1, 'all'); 
+        fprintf('Removing smoothing from %1.5f%% x and %1.5f%% y cells, %s\n', ...
+            pct_rem(xcomp), pct_rem(ycomp),  this_surf)
+        dx2(~xcomp) = inf; % Sort of a hack. Set dx and dy to inf where we don't care to smooth. Because the derivative at those spots will be change in value over inf = 0. 
+        dy2(~ycomp) = inf; 
+    end
+end
+
+%% Example roughness to make sure the calculations are good. 
 % This is the calculation to get roughness throughout the inversion
 % (Basically). 
 dvdx2 = (mgrid(1:end-2,:) - 2*mgrid(2:end-1,:) + mgrid(3:end,:))./dx2; %!%! replace vgrid
