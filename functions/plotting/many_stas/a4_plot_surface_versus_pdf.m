@@ -9,9 +9,8 @@ lolim = [-87, -76; -86, -68; -88, -78; -87, -80.5];
 lalim = [ 43,  35;  30,  47;  36,  33;  38,  25  ]; 
 fnum = 101; 
 scale_pdf = .035; 
-% offsecmax = 0.65; %5%  distance off section allowed, in degrees
 offsecmax = 1.5; %5%  distance off section allowed, in degrees
-mlim_manual = [4.1, 5]; 
+% mlim_manual = [4.1, 5]; 
 
 
 v_at_depth = true; % Use velocity from a depth, or one of the other parameters like moho depth. 
@@ -19,8 +18,7 @@ v_at_depth = true; % Use velocity from a depth, or one of the other parameters l
 % for idep = 1:length(z_vs);
 
 
-for idep = int16([120]/5); 
-
+for idep = int16([100]/5); 
 
 depth = z_vs(idep); 
 
@@ -50,24 +48,6 @@ figure(fnum); clf; hold on;
 set(gcf, 'pos', [1053 564 767*2 329*ceil(.5*size(lolim,1))], 'color', 'white'); 
 tiledlayout(ceil(.5 * size(lolim, 1 )), 2,'TileSpacing', 'Compact')
 
-% % % % %% Prep map view figure
-% % % % figure(1); clf; hold on; 
-% % % % lonmin = llminmax(1); lonmax = llminmax(2); latmin = llminmax(3); latmax = llminmax(4); 
-% % % % set(gcf, 'color', 'white'); 
-% % % % m_proj('lambert', 'long',[lonmin, lonmax],'lat',[latmin, latmax]);
-% % % % m_coast('patch',[1 1 1]); % m_coast('patch',[1 .85 .7]);
-% % % % m_grid('box','fancy','linestyle','-','gridcolor','w','backcolor',[.3 .75 1]);
-% % % % title('Cross-sections', 'fontweight', 'normal')
-% % % % contourf(xgrid, ygrid, vgrid_out, 15,...
-% % % %     'LineStyle','none'); 
-% % % % [latbord, lonbord] = borders('states'); % add states map
-% % % % for iplace = 1:length(lonbord); 
-% % % %     m_line(lonbord{iplace}, latbord{iplace}, 'LineWidth',1,'color',0*[1 1 1])
-% % % % end
-% % % % colorbar(); turbo_map = turbo(); turbo_map = turbo_map(end:-1:1,:); colormap(turbo_map); 
-% % % % % caxis(mlim_manual); 
-% % % % % caxis([4.35, 4.7]); 
-
 %% Get station data and plot it. Loop over different x sections. 
 lat_surf_line_all = zeros(n_surf_pts, size(lolim,1) ); 
 lon_surf_line_all = lat_surf_line_all; 
@@ -76,7 +56,6 @@ for i_xsect = 1:size(lolim, 1);
 Q1 = [lalim(i_xsect, 1), lolim(i_xsect, 1)];
 Q2 = [lalim(i_xsect, 2), lolim(i_xsect, 2)]; 
 [profd,profaz] = distance(Q1(1),Q1(2),Q2(1),Q2(2));
-
 
 by_line = logical(zeros(size(mdls.lon))); 
 d_perp  = zeros(        size(mdls.lon)) ; 
@@ -92,27 +71,22 @@ for ista = 1:length(mdls.lon);
     end
 end
 
+%%
 section_letter = char(64+i_xsect); % Text for cross-section name. ith letter of alphabet
 figure(fnum); 
 nexttile(); hold on; 
 set(gca, 'LineWidth', 1.5); 
 xlabel('Distance along section (degree)'); 
-ylabel('Vs (km/s'); 
-title('P(Vs) versus surface Vs', 'FontWeight','normal'); 
+ylabel('m'); 
+title('P(m) versus inverted m', 'FontWeight','normal'); 
 grid on; 
 box on; 
 t1=text(0.02, .98, section_letter    , 'fontsize', 20, 'color', 'r', 'units', 'normalized', 'VerticalAlignment','top'); 
 t2=text(0.98, .98, section_letter+"'", 'fontsize', 20, 'color', 'r', 'units', 'normalized', 'VerticalAlignment','top', 'HorizontalAlignment','right'); 
 
 %% Plot station pdfs. 
-% % % [junk, sta_plot_order] = sort(-d_perp); % Order stations from furthest to closest. 
-% % % % plot_these_stas = sta_plot_order(by_line); % Plot furthest stations first, then closest. 
-% % % plot_these_stas = plot_these_stas(d_perp(sta_plot_order) > offsecmax)
 [junk, sta_plot_order] = sort(d_perp); % Order stations from furthest to closest. 
 plot_these_stas = sta_plot_order(junk<offsecmax); % Plot furthest stations first, then closest. 
-% plot_these_stas = plot_these_stas(d_perp(sta_plot_order) > offsecmax)
-
-% by_line = sta_plot_order(d_perp(sta_plot_order)<offsecmax); 
 
 for ista = plot_these_stas(end:-1:1)'; 
 
