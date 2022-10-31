@@ -3,7 +3,8 @@ run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Becaus
 
 %% Parameters to set. 
 nkernel = 100; % Number of points in histogram kernels. 
-widthkernel = 0.02; % Found this looks ok in t1_make_pdf.m
+widthkernel_vel = 0.03; % Found this looks ok in t1_make_pdf.m
+widthkernel_parm = 0.06; 
 
 %% Loading
 fresults = sprintf('%s/compiled_results_%s.mat',out_dir,STAMP); 
@@ -50,22 +51,29 @@ for is = 1:length(mdls.lon);
     for iparam = 1:length(indiv_parameters); 
         fn = indiv_parameters(iparam); 
         samps = posterior.(fn); 
-
-        [pdfm, mm] = ksdensity(samps, 'width', widthkernel, 'NumPoints', nkernel); % pdf of model parameter. And ... model parameters. 
-%         figure(1); clf; hold on; 
-%         plot(mm, pdfm); 
+        dsamp_max = max(samps) - min(samps); 
+        dsamp_max = max([dsamp_max, 0.0001]); 
+        widthKernel_new = widthkernel_parm * dsamp_max; % Have to tune this a bit differently for model parameters if they have a large or small range. 
+        [pdfm, mm] = ksdensity(samps, 'width', widthKernel_new, 'NumPoints', nkernel); % pdf of model parameter. And ... model parameters. 
+        figure(iparam); clf; hold on; title(fn); 
+        plot(mm, pdfm); 
         pdfs_allparm(is).(fn)(1).mm = mm'; 
         pdfs_allparm(is).(fn)(1).pm = pdfm'; 
         pdfs_allparm(is).(fn)(1).nwk = mdls.nwk{is}; 
         pdfs_allparm(is).(fn)(1).sta = mdls.sta{is}; 
     end
 
+    % Find the max minus min for this parameter, between all stations. 
+    dv_max = max( posterior.VSmantle(:) ) - min( posterior.VSmantle(:) ); 
+    kernel_points = linspace(min( posterior.VSmantle(:) ), ...
+        max( posterior.VSmantle(:) ) , nkernel)'; 
+
     % Look over each depth. DIfferent structure organization than for other parameters. 
     pdfs_allparm(is).zatdep = zatdep; 
     for iz = 1:length(zatdep); 
         depth = posterior.zatdep(iz); 
         samps = posterior.VSmantle(:,iz); 
-        [pdfm, mm] = ksdensity(samps, 'width', widthkernel, 'NumPoints', nkernel); % pdf of model parameter. And ... model parameters. 
+        [pdfm, mm] = ksdensity(samps, kernel_points, 'width', widthkernel_vel); % pdf of model parameter. And ... model parameters. 
 %         figure(1); clf; hold on; 
 %         plot(mm, pdfm); 
         pdfs_allparm(is).vs{iz}(1).mm = mm'; 
