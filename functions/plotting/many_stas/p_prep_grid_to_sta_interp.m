@@ -66,6 +66,7 @@ for ista = 1:nsta;
     grid_terp(box_map,ista) = weight_to_crnr; 
 
 end
+
 if any(isnan(grid_terp)); 
     error('There are nans in grid_terp. Figure out a solution')
 end

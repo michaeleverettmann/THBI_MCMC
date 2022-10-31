@@ -7,10 +7,11 @@ mdls = load(fresults).mdls;
 %% parameters. 
 rough_scale = 10e-9; % How much to penalize roughness.
 max_inv_iterations = 15; % How many iterations to allow in inversion. 
-version_surf = 4; 
 
-% disconts = {"zsed", "zmoh"}; 
-disconts = {"zmoh"}; %brb TODO add in zsed again. 
+for version_surf = [5]; % Temporary loop
+
+disconts = {"zsed", "zmoh"}; 
+% disconts = {"zmoh"}; %brb TODO add in zsed again. 
 
 % % % to_invert = disconts; % Which model parameters to run. Those come first because they can influence later inversions.  
 % % % for inum = int16([5, 15, 20, 25, 30, 35, 40, ...
@@ -109,9 +110,9 @@ m_proj('lambert', 'long',[lonmin, lonmax],'lat',[latmin, latmax]);
 a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, ...
     'fignum', 1, 'title', 'station positions')
 
-%% Setting up surface. 
 
 
+%% Velocity or discontinuity? 
 if v_at_depth; %!%! nice
     ivel = find(z_vs == param); 
     iz = ivel; 
@@ -119,6 +120,7 @@ else
     iz = 'no different depths!'; 
 end
 
+%% Setting up surface. 
 nodes_per_degree = 4; 
 nx = ceil((lonmax - lonmin) * nodes_per_degree); 
 ny = ceil((latmax - latmin) * nodes_per_degree);  
@@ -159,7 +161,7 @@ a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', m_simple,
     'fignum', 2, 'title', 'Simple v interpolation');  
 % scatter(xgrid, ygrid, 5, 'k', 'filled')
 
-exportgraphics(gcf, [this_inversion '/surface_simple_interpolation.pdf']); 
+exportgraphics(gcf, [this_inversion '/surface_simple_interpolation_V' num2str(version_surf) '.pdf']); 
 
 
 
@@ -192,7 +194,7 @@ end
 a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', m_simple,... %!%! Replace vs(:,ivel)
     'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', mgrid, ...
     'fignum', 3, 'title', 'V starting model'); 
-exportgraphics(gcf, [this_inversion '/surface_starting_model.pdf']); 
+exportgraphics(gcf, [this_inversion '/surface_starting_model_V' num2str(version_surf) '.pdf']); 
 
 
 %% Set up grid roughness calculations. Use 2nd derivative smoothing. 
@@ -202,21 +204,24 @@ x_dx2 = xgrid(2:end-1,:); y_dx2 = ygrid(2:end-1,:); % x and y positions where we
 y_dy2 = ygrid(:,2:end-1); x_dy2 = xgrid(:,2:end-1); % y and x positions where we have dy
 % Note for optimizing: Use a scalar (not matrix) for dx and dy. But as is, it's more versatile for map projections. 
 
-%% Modify roughness and such to ignore discontinuities. 
-if v_at_depth 
-    for this_surf = disconts;
-        this_surf = this_surf{1}; 
-        zdisc = load(sprintf('%s/surface_values_V%1.0f', this_surf, version_surf)).mgrid_out; 
-        gthan = zdisc > param; 
-        xcomp = (gthan(2:end-1,:) == gthan(3:end,:)) & (gthan(2:end-1,:) == gthan(1:end-2,:)); % This portion of smoothing should not cross the moho where false. 
-        ycomp = (gthan(:,2:end-1) == gthan(:,3:end)) & (gthan(:,2:end-1) == gthan(:,1:end-2)); % This portion of smoothing should not cross the moho where false. 
-        pct_rem = @(pcomp)100 * sum(pcomp == 0, 'all') / sum(pcomp == 1, 'all'); 
-        fprintf('Removing smoothing from %1.5f%% x and %1.5f%% y cells, %s\n', ...
-            pct_rem(xcomp), pct_rem(ycomp),  this_surf)
-        dx2(~xcomp) = inf; % Sort of a hack. Set dx and dy to inf where we don't care to smooth. Because the derivative at those spots will be change in value over inf = 0. 
-        dy2(~ycomp) = inf; 
-    end
-end
+% % % %% Modify roughness and such to ignore discontinuities. 
+% % % if v_at_depth 
+% % %     for this_surf = disconts;
+% % %         this_surf = this_surf{1}; 
+% % %         zdisc = load(sprintf('%s/surface_values_V%1.0f', this_surf, version_surf)).mgrid_out; 
+% % %         gthan = zdisc > param; 
+% % %         xcomp = (gthan(2:end-1,:) == gthan(3:end,:)) & (gthan(2:end-1,:) == gthan(1:end-2,:)); % This portion of smoothing should not cross the moho where false. 
+% % %         ycomp = (gthan(:,2:end-1) == gthan(:,3:end)) & (gthan(:,2:end-1) == gthan(:,1:end-2)); % This portion of smoothing should not cross the moho where false. 
+% % %         pct_rem = @(pcomp)100 * sum(pcomp == 0, 'all') / sum(pcomp == 1, 'all'); 
+% % %         fprintf('Removing smoothing from %1.5f%% x and %1.5f%% y cells, %s\n', ...
+% % %             pct_rem(xcomp), pct_rem(ycomp),  this_surf)
+% % %         dx2(~xcomp) = inf; % Sort of a hack. Set dx and dy to inf where we don't care to smooth. Because the derivative at those spots will be change in value over inf = 0. 
+% % %         dy2(~ycomp) = inf; 
+% % % 
+% % % % % %         % Which stations to exclude from sampling. Don't really want to count them if we don't know if they are in mantle or crust. 
+% % % % % %         sta
+% % %     end
+% % % end
 
 %% Example roughness to make sure the calculations are good. 
 % This is the calculation to get roughness throughout the inversion
@@ -280,16 +285,51 @@ nmm = 300;
 [pdf_terp, mm_terp, dmm_di] = p_prep_mm_to_pdf(pdfs, nmm); 
 
 % Interpolate mm from the grid to stations.  
-[fhand_vec, fhand_mat, grid_terp, nearesti, weighti...
+[fhand_vec_nouse, fhand_mat_nouse, grid_terp, nearesti, weighti...
     ] = p_prep_grid_to_sta_interp(...
     xgrid, ygrid, mgrid, stax, stay); %!%! replace vgrid
+% Shouldn't use the fhand from this function because it doesn't account for
+% discontinuities. 
 
-% The thing we want to minimize. Make a function handle. 
+%% Modify roughness and grid interpolation. Don't smooth accross discontinuities. Don't interpolate at a station if it's on a discontinuity. 
+if (v_at_depth) & (version_surf ~= 3); 
+    for this_surf = disconts;
+        this_surf = this_surf{1}; 
+        zdisc = load(sprintf('%s/surface_values_V%1.0f', this_surf, version_surf)).mgrid_out; 
+        gthan = zdisc > param; % Depth greater than this discontinuity. Where we switch from 1 to 0, there is a discontinuity. 
+
+        % Handle smoothing. X and Y comparison. Where xcomp and ycomp are true, there is no smoothing across discontinuities.  
+        xcomp = (gthan(2:end-1,:) == gthan(3:end,:)) &...
+            (gthan(2:end-1,:) == gthan(1:end-2,:)); 
+        ycomp = (gthan(:,2:end-1) == gthan(:,3:end)) &...
+            (gthan(:,2:end-1) == gthan(:,1:end-2)); 
+        pct_rem = @(pcomp)100 * sum(pcomp == 0, 'all') / numel(pcomp); 
+        fprintf('Removing smoothing from %1.5f%% x and %1.5f%% y cells, %s\n', ...
+            pct_rem(xcomp), pct_rem(ycomp),  this_surf)
+        
+        dx2(~xcomp) = inf; % Sort of a hack. Set dx and dy to inf where we don't care to smooth. Because the derivative at those spots will be change in value over inf, which is 0.  
+        dy2(~ycomp) = inf; 
+        
+        % Handle station interpolation
+        stas_removed = []; 
+        for ista = 1:nsta; 
+            if length(unique(gthan(nearesti(ista,:)))) > 1; % This station is in a discontinuity
+                weighti(ista,:) = 0; % Set 0 weight for interpolation of this station. PDF is always 0. Can't affect inversion. 
+                grid_terp(:,ista) = 0; % Same as above. 
+                stas_removed = [stas_removed; ista]; 
+            end
+        end
+        fprintf('Removing %1.0f stations from interpolation due to %s intersection.\n', ...
+            length(stas_removed), this_surf); 
+    end
+end
+
+%% Penalty. Make a function handle with one argument for what we want to minimze. 
 fhand_penalty=@(mgrid)a3_1_penalty_efficient(mgrid,...%!%! replace vgrid
     pdf_terp, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay, ...
     nearesti, weighti, min(mm_terp), dmm_di, nmm, nsta); 
 
-% Find the absolute max pdf sum that could be achieved
+% For comparison, what is the max pdf sum that could ever be achieved? 
 pdf_total_max = sum(max(pdf_terp,[],1)); 
 
 %% Test the above efficient inversion interpolation stuff. 
@@ -339,7 +379,7 @@ ii = 0;
 mgrid_temp = mgrid_start; %!%! Replace mgrid_temp and vgrid_start
 opts_temp = opts; 
 ii_vec = [0]; 
-[pentot_ii,penpdf_ii,penprior_ii] = fhand_penalty(mgrid_temp); %!%! replace vgrid_temp
+[pentot_ii,penpdf_ii,penprior_ii, pennorm_ii] = fhand_penalty(mgrid_temp); %!%! replace vgrid_temp
 opts_temp.MaxIterations = 0; 
 while ii < max_inv_iterations; 
 %     opts_temp.MaxIterations = ceil((opts_temp.MaxIterations + 1)^(1.3)) ; 
@@ -365,7 +405,8 @@ while ii < max_inv_iterations;
         fminunc(fhand_penalty, mgrid_temp, opts_temp);%!%! replace vgrid_temp
     ii = ii + output_out.iterations; 
     ii_vec(end+1) = ii; 
-    [pentot_ii(end+1),penpdf_ii(end+1),penprior_ii(end+1)] = fhand_penalty(mgrid_temp); %!%! replace vgrid_temp
+    [pentot_ii(end+1),penpdf_ii(end+1),penprior_ii(end+1), pennorm_ii(end+1)...
+        ] = fhand_penalty(mgrid_temp); %!%! replace vgrid_temp
 
 end
 mgrid_out = mgrid_temp; %!%! replace vgrid_temp, vgrid_out
@@ -400,7 +441,8 @@ xlabel('Iteration');
 grid on; 
 
 
-exportgraphics(gcf, sprintf('%s/surface_inversion_progress_%s.pdf',this_inversion, yscale_type)); 
+exportgraphics(gcf, sprintf('%s/surface_inversion_progress_%s_%1.0f.pdf',...
+    this_inversion, yscale_type, version_surf)); 
 
 end
 
@@ -454,7 +496,8 @@ fhand_prog = @(invval)(diff(invval) ./ diff(ii_vec))' ./ max(invval) * 100;
 a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', m_simple,... %!%! replace vs(:,ivel)
     'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', mgrid_out, ... %!%! replace vgrid_out
     'fignum', 6, 'title', 'V output'); 
-exportgraphics(gcf, sprintf('%s/surface_inversion_rough.pdf',this_inversion)); 
+exportgraphics(gcf, sprintf('%s/surface_inversion_rough_V%1.0f.pdf',...
+    this_inversion, version_surf)); 
 
 % Temporary. Mostly for testing. 
 save('surface_out_example.mat', 'longrid', 'latgrid',...
@@ -463,3 +506,5 @@ save(sprintf('%s/surface_values_V%1.0f', this_inversion, version_surf), 'mgrid_o
 
 
 end
+
+end % Temporary loop

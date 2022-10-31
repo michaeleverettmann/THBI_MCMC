@@ -141,11 +141,13 @@ plot(gcarc, vs_surf_line, 'color', 'blue', 'LineWidth', 3);
 end % End loop on different sections. 
 
 %% Save figures. 
-exportgraphics(figure(fnum), sprintf('%s/surface_versus_pdf.pdf', this_inversion)); 
+exportgraphics(figure(fnum), sprintf('%s/surface_versus_pdf_V%1.0f.pdf', ...
+    this_inversion, version_surf)); 
 a3_2_plot_surface_simple(llminmax, 'stalon', mdls.lon, 'stalat', mdls.lat, ...
     'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', vgrid_out,...
     'sectlon', lon_surf_line_all, 'sectlat', lat_surf_line_all); 
-exportgraphics(figure(1   ), sprintf('%s/surface_versus_pdf_mapview.pdf', this_inversion)); 
+exportgraphics(figure(1   ), sprintf('%s/surface_versus_pdf_mapview_V%1.0f.pdf',...
+    this_inversion, version_surf)); 
 % exportgraphics(gcf, sprintf('xsections/xsections_map_V%1.0f.pdf', version_surf)); 
 
 

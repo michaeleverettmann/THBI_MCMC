@@ -1,4 +1,4 @@
-function [penalty, penalty_no_prior, roughness] = a3_1_penalty_efficient(vgrid,...
+function [penalty, penalty_no_prior, roughness, pen_norm] = a3_1_penalty_efficient(vgrid,...
     pdf_terp, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay,...
     nearesti, weighti, min_mm_terp, dmm_di, nmm, nsta); 
 
@@ -18,6 +18,11 @@ pv_mod = p_mm_to_pdf_dmdi(vsta, pdf_terp, min_mm_terp, dmm_di, nmm, nsta);
 
 penalty_no_prior = - sum(pv_mod); % Lower penalty is higher probability. 
 
-penalty = penalty_no_prior + roughness; 
+% penalty_norm 
+dvgrid = vgrid - mean(vgrid, 'all'); 
+dnorm = sqrt(dvgrid(:)'*dvgrid(:)); 
+pen_norm = 1e-1 * dnorm; % This value is super small! It should only have any meaningful impact where there are no stations, where we don't plot results. It's just for stability... prevent rediculous values 1000 km from any stations. 
+
+penalty = penalty_no_prior + roughness + pen_norm; 
 
 end
