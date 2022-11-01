@@ -6,13 +6,14 @@ mdls = load(fresults).mdls;
 
 %% parameters. 
 rough_scale_base = 1e-9; % How much to penalize roughness.
+re_run = false; 
 
-rough_scale_params = struct('zmoh', .1*rough_scale_base,...
-    'zsed', .5*rough_scale_base ); % Based on the max and min values in any parameter, determine how to change the roughness penalty. 
+rough_scale_params = struct('zmoh', .0015*rough_scale_base,...
+    'zsed', .1*rough_scale_base ); % Based on the max and min values in any parameter, determine how to change the roughness penalty. 
 
 max_inv_iterations = 30; % How many iterations to allow in inversion. 
 
-for version_surf = [6]; % Temporary loop
+for version_surf = [7]; % Temporary loop
 
 disconts = {"zsed", "zmoh"}; 
 % disconts = {"zmoh"}; %brb TODO add in zsed again. 
@@ -27,7 +28,8 @@ to_invert = disconts; % Which model parameters to run. Those come first because 
 % to_invert = {}; 
 % Merge to_invert with other model parameters, when ready. 
 if isempty(to_invert); warning('to_invert should start as == disconts'); end 
-for inum = int16([20, 65]/5); % Which depths/incidices to run. 
+for inum = int16([5, 15, 20, 25, 30, 35, 40, ...
+        45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 145, 170, 210, 250, 300]/5); % Which depths/incidices to run. 
     to_invert{end+1} = inum; 
 end
 
@@ -41,15 +43,24 @@ if v_at_depth
     param = z_vs(iinv); %!%! Only do if v_at_depth. %!%! change variable depth. 
     this_inversion = sprintf('vs%1.0f',param); % String name affiliated with figures and files. %!%! change variable depth. 
     rough_scale = rough_scale_base; % So we can modify rough_scale throughout. 
+    fprintf('On inversion depth %1.0f\n', iinv)
 else
     param = iinv; 
     this_inversion = sprintf('%s',param); 
     rough_scale = rough_scale_params.(char(param)); 
+    fprintf('On inversion %s\n', iinv)
 end
 
 mkdir(this_inversion); 
 
 fprintf('Running inversion %s\n', this_inversion)
+
+%% See if we already have results. 
+fname_surf_vals = sprintf('%s/surface_values_V%1.0f.mat', this_inversion, version_surf); 
+if exist(fname_surf_vals,'file') & (~re_run); 
+    fprintf('Aleady have results for %s. Skipping. \n',this_inversion)
+    continue; 
+end
 
 %% Reorganize structure. Could be more - or less - useful one way or other. 
 %%% BORROWED FROM A2
@@ -221,7 +232,10 @@ for ista = 1:length(pdfs);
     cpm = cumtrapz(mm, pm); 
     get_rid = (cpm > 0.99) | (cpm < 0.01); 
     mm = mm(~get_rid); 
-    cpm = cpm(~get_rid); 
+    cpm = cpm(~get_rid);
+    [C,IA,IC] = unique(cpm);  
+    cpm = cpm(IA); % Sometimes there are duplicates for some probability. Then we can't interpolate this. Just remove them, this value doesn't have to be so precise. 
+    mm  = mm (IA); 
     bounds_stas(ista,:) = interp1(cpm, mm, bounds_ratio, 'spline'); 
 end
 stas_mod_width = bounds_stas(:,2) - bounds_stas(:,1); 
@@ -547,7 +561,7 @@ exportgraphics(gcf, sprintf('%s/surface_inversion_rough_V%1.0f.pdf',...
 % Temporary. Mostly for testing. 
 save('surface_out_example.mat', 'longrid', 'latgrid',...
     'xgrid', 'ygrid', 'llminmax'); % Longrid and stuff isn't going to change. 
-save(sprintf('%s/surface_values_V%1.0f', this_inversion, version_surf), 'mgrid_out')
+save(fname_surf_vals, 'mgrid_out')
 
 
 end

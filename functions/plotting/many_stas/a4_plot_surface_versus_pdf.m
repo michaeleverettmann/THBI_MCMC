@@ -2,28 +2,48 @@ clc; clear;
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 fpdfs = sprintf('%scompiled_pdfs_%s.mat',out_dir,STAMP); % File with pdfs. a2_1...m
 
-version_surf = 6; 
+version_surf = 7; 
 n_surf_pts = 100; 
 
 lolim = [-87, -76; -86, -68; -88, -78; -87, -80.5]; 
 lalim = [ 43,  35;  30,  47;  36,  33;  38,  25  ]; 
 fnum = 101; 
-scale_pdf = .035; 
+scale_pdf = 0.1; 
 offsecmax = 1.5; %5%  distance off section allowed, in degrees
 % mlim_manual = [4.1, 5]; 
 
 
-v_at_depth = true; % Use velocity from a depth, or one of the other parameters like moho depth. 
+% v_at_depth = true; % Use velocity from a depth, or one of the other parameters like moho depth. 
 % z_vs loaded in a0....m
 % for idep = 1:length(z_vs);
 
 
-for idep = int16([20, 65]/5); 
 
-depth = z_vs(idep); 
+% disconts = {"zsed", "zmoh"}; 
+disconts = {"zmoh"}; 
 
-this_inversion = sprintf('vs%1.0f',depth); % String name affiliated with figures and files. 
-iz = find(z_vs == depth); 
+to_invert = disconts; % Which model parameters to run. Those come first because they can influence later inversions.  
+if isempty(to_invert); warning('to_invert should start as == disconts'); end 
+for inum = int16([]/5); % Which depths/incidices to run. 
+    to_invert{end+1} = inum; 
+end
+
+
+% for idep = int16([20, 65]/5); 
+for iinv = to_invert; %!%! Add strings to the list to handle other parameters. Make sure they are always first in list. 
+iinv = iinv{1}; 
+
+%^%^ Handle whether doing depth or other model parameter inversion
+v_at_depth = ~ strcmp(class(iinv), class("A string") ); % Use velocity from a depth, or one of the other parameters like moho depth. If a string is provided, we assume we are not using velocity at depth but another model parameter. %!%! Utilize v_at_depth
+if v_at_depth 
+    param = z_vs(iinv); %!%! Only do if v_at_depth. %!%! change variable depth. 
+    depth = param; 
+    iz = find(z_vs == depth); 
+    this_inversion = sprintf('vs%1.0f',param); % String name affiliated with figures and files. %!%! change variable depth. 
+else
+    param = iinv; 
+    this_inversion = sprintf('%s',param); 
+end
 
 mdls = load(fresults).mdls; 
 % pdfs = load(fpdfs).pdfs; 
@@ -33,14 +53,16 @@ sfsmat2= load(sprintf('%s/surface_values_V%1.0f', this_inversion, version_surf))
 
 pdf_file = load(fpdfs); 
 pdfs = pdf_file.pdfs_allparm; 
-%%% Put this in function later. 
-pdfs_vs = pdfs(1).vs{1}; % Make a new structure (obnoxious). And have to start with the correct field names. Reason for new structure is that, I used a cell array for each different depth. Matlab doesn't actually access the nth stations ith cell array all in one call. 
-nsta = length(pdfs); 
-for ista = 1:nsta
-    pdfs_vs(ista) = pdfs(ista).vs{iz}; 
+if v_at_depth
+    pdfs_vs = pdfs(1).vs{1}; % Make a new structure (obnoxious). And have to start with the correct field names. Reason for new structure is that, I used a cell array for each different depth. Matlab doesn't actually access the nth stations ith cell array all in one call. 
+    nsta = length(pdfs); 
+    for ista = 1:nsta
+        pdfs_vs(ista) = pdfs(ista).vs{iz}; %!%! Not access pdfs.vs
+    end
+    pdfs = pdfs_vs; %!%! replace pdfs_vs. 
+else
+    pdfs = [pdfs.(iinv)]; 
 end
-pdfs = pdfs_vs; 
-%%% Put this in function later. 
 
 
 %% Prep pdf-section style figure
@@ -94,11 +116,24 @@ t2=text(0.98, .98, section_letter+"'", 'fontsize', 20, 'color', 'r', 'units', 'n
 [junk, sta_plot_order] = sort(d_perp); % Order stations from furthest to closest. 
 plot_these_stas = sta_plot_order(junk<offsecmax); % Plot furthest stations first, then closest. 
 
+% Figure out how much to stretch pdfs in plot. 
+pdf_means = nan(length(pdfs),1); 
+for ista = 1:length(pdfs); 
+    pm = pdfs(ista).pm; 
+    mm = pdfs(ista).mm; 
+    cpm = cumtrapz(mm, pm); 
+    pdf_means(ista) = mean( pm((cpm>0.1)&(cpm<0.9)) ); 
+end
+pdf_stretch = 1./mean(pdf_means); 
 
+% Plot pdfs. 
 for ista = plot_these_stas(end:-1:1)'; 
 
     mm = pdfs(ista).mm; 
     pm = pdfs(ista).pm; 
+
+    mm = reshape(mm, [1, length(mm)]); 
+    pm = reshape(pm, [1, length(pm)]); 
 
     cpm = cumtrapz(mm, pm); 
     median_mm = linterp(cpm, mm, 0.5); 
@@ -116,7 +151,7 @@ for ista = plot_these_stas(end:-1:1)';
     all_cpms = [all_cpms, cpm]; 
 
     xbase = d_par(ista) .* ones(size(pm));
-    pm = pm * scale_pdf ; 
+    pm = pm * scale_pdf * pdf_stretch; 
 
     disti = d_perp(ista); 
     dist_rat = disti / offsecmax; 
