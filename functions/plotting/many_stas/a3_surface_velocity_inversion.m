@@ -5,10 +5,14 @@ fpdfs = sprintf('%scompiled_pdfs_%s.mat',out_dir,STAMP); % File with pdfs. a2_1.
 mdls = load(fresults).mdls; 
 
 %% parameters. 
-rough_scale = 10e-9; % How much to penalize roughness.
-max_inv_iterations = 15; % How many iterations to allow in inversion. 
+rough_scale_base = 1e-9; % How much to penalize roughness.
 
-for version_surf = [5]; % Temporary loop
+rough_scale_params = struct('zmoh', .1*rough_scale_base,...
+    'zsed', .5*rough_scale_base ); % Based on the max and min values in any parameter, determine how to change the roughness penalty. 
+
+max_inv_iterations = 30; % How many iterations to allow in inversion. 
+
+for version_surf = [6]; % Temporary loop
 
 disconts = {"zsed", "zmoh"}; 
 % disconts = {"zmoh"}; %brb TODO add in zsed again. 
@@ -19,8 +23,11 @@ disconts = {"zsed", "zmoh"};
 % % %     to_invert{end+1} = inum; 
 % % % end
 
-to_invert = {}; % disconts; % Which model parameters to run. Those come first because they can influence later inversions.  
-for inum = int16([40]/5); % Which depths/incidices to run. 
+to_invert = disconts; % Which model parameters to run. Those come first because they can influence later inversions.  
+% to_invert = {}; 
+% Merge to_invert with other model parameters, when ready. 
+if isempty(to_invert); warning('to_invert should start as == disconts'); end 
+for inum = int16([20, 65]/5); % Which depths/incidices to run. 
     to_invert{end+1} = inum; 
 end
 
@@ -33,9 +40,11 @@ v_at_depth = ~ strcmp(class(iinv), class("A string") ); % Use velocity from a de
 if v_at_depth 
     param = z_vs(iinv); %!%! Only do if v_at_depth. %!%! change variable depth. 
     this_inversion = sprintf('vs%1.0f',param); % String name affiliated with figures and files. %!%! change variable depth. 
+    rough_scale = rough_scale_base; % So we can modify rough_scale throughout. 
 else
     param = iinv; 
     this_inversion = sprintf('%s',param); 
+    rough_scale = rough_scale_params.(char(param)); 
 end
 
 mkdir(this_inversion); 
@@ -163,6 +172,62 @@ a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', m_simple,
 
 exportgraphics(gcf, [this_inversion '/surface_simple_interpolation_V' num2str(version_surf) '.pdf']); 
 
+%% Get PDF for stations. 
+% Use an example pdf while developing surface inversion stuff. 
+% fpdf = '~/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/many_stas/pdf_example.mat'; 
+% pdf = load(fpdf).pdf_example; 
+% Probably something like pdf(ista) = load(pdf_sta). 
+pdf_file = load(fpdfs); 
+pdfs = pdf_file.pdfs_allparm; 
+
+
+% If using different depths: 
+% iz = 12; % Temporary. 
+% param = pdf_file.pdfs_allparm(1).zatdep(iz); 
+% fprintf('Temporarily using %1.0f depth for inversion. \n', param)
+
+% pdfs = pdfs(:).vs{iz}; 
+
+%%% Put this in function later. 
+%!%! replace pdfs_vs. 
+%!%! If not vs, access different part of pdfs. 
+if v_at_depth
+    pdfs_vs = pdfs(1).vs{1}; % Make a new structure (obnoxious). And have to start with the correct field names. Reason for new structure is that, I used a cell array for each different depth. Matlab doesn't actually access the nth stations ith cell array all in one call. 
+    nsta = length(pdfs); 
+    for ista = 1:nsta
+        pdfs_vs(ista) = pdfs(ista).vs{iz}; %!%! Not access pdfs.vs
+    end
+    pdfs = pdfs_vs; %!%! replace pdfs_vs. 
+else
+    pdfs = [pdfs.(iinv)]; 
+end
+%%% Put this in function later. 
+
+%% Figure out how much to scale roughness based on heights of pdfs. 
+% This is just a way of addressing the
+% fact that all pdfs are normalized to 1, changing the balance of penalty
+% for pdf and penalty for roughness. 
+% Multiply penalty roughness by scale_sta_roughness. This is because a pdf
+% with wider model bounds will have smaller peaks and smaller max pdf. So
+% the biger the distribution, the smaller the max summed probability, and
+% the smaller our penalty should be. 
+bounds_ratio = [0.25, 0.75]; % Only worry about pdf within these cumulative pdf bounds. We have to pick some bounds where we think the model values are no longer relevant. 
+bounds_stas = zeros(nsta, length(bounds_ratio)); 
+for ista = 1:length(pdfs); 
+    low_bound_scale = 0.25; 
+    high_bound_scale = 0.75; 
+    mm=pdfs(ista).mm; 
+    pm=pdfs(ista).pm; 
+    cpm = cumtrapz(mm, pm); 
+    get_rid = (cpm > 0.99) | (cpm < 0.01); 
+    mm = mm(~get_rid); 
+    cpm = cpm(~get_rid); 
+    bounds_stas(ista,:) = interp1(cpm, mm, bounds_ratio, 'spline'); 
+end
+stas_mod_width = bounds_stas(:,2) - bounds_stas(:,1); 
+scale_sta_roughness = 1./stas_mod_width; 
+
+mult_roughness__all_sta = mean(scale_sta_roughness); % Don't use this value, since there might be some stations we will toss out. Re-calculate this later. 
 
 
 
@@ -223,6 +288,8 @@ y_dy2 = ygrid(:,2:end-1); x_dy2 = xgrid(:,2:end-1); % y and x positions where we
 % % %     end
 % % % end
 
+
+
 %% Example roughness to make sure the calculations are good. 
 % This is the calculation to get roughness throughout the inversion
 % (Basically). 
@@ -242,38 +309,6 @@ a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay,...
 
 mgrid_start = mgrid; %!%! Replace vgrid_start and vgrid
 
-%% Get PDF for stations. 
-% Use an example pdf while developing surface inversion stuff. 
-% fpdf = '~/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/many_stas/pdf_example.mat'; 
-% pdf = load(fpdf).pdf_example; 
-% Probably something like pdf(ista) = load(pdf_sta). 
-pdf_file = load(fpdfs); 
-pdfs = pdf_file.pdfs_allparm; 
-
-
-% If using different depths: 
-% iz = 12; % Temporary. 
-% param = pdf_file.pdfs_allparm(1).zatdep(iz); 
-% fprintf('Temporarily using %1.0f depth for inversion. \n', param)
-
-% pdfs = pdfs(:).vs{iz}; 
-
-%%% Put this in function later. 
-%!%! replace pdfs_vs. 
-%!%! If not vs, access different part of pdfs. 
-if v_at_depth
-    pdfs_vs = pdfs(1).vs{1}; % Make a new structure (obnoxious). And have to start with the correct field names. Reason for new structure is that, I used a cell array for each different depth. Matlab doesn't actually access the nth stations ith cell array all in one call. 
-    nsta = length(pdfs); 
-    for ista = 1:nsta
-        pdfs_vs(ista) = pdfs(ista).vs{iz}; %!%! Not access pdfs.vs
-    end
-    pdfs = pdfs_vs; %!%! replace pdfs_vs. 
-else
-    pdfs = [pdfs.(iinv)]; 
-end
-%%% Put this in function later. 
-
-% this_inversion = sprintf('%s%s', 'vs', num2str(param) ); 
 
 
 %% Prep for efficient inverison. Some constant variables. 
@@ -322,7 +357,17 @@ if (v_at_depth) & (version_surf ~= 3);
         fprintf('Removing %1.0f stations from interpolation due to %s intersection.\n', ...
             length(stas_removed), this_surf); 
     end
+else
+    stas_removed = []; % Keeping all stas. 
 end
+
+stas_kept = true(nsta,1); stas_kept(stas_removed) = false; 
+
+% Re-calculate how much we should multiply roughness penalty to handle
+% wider/narrower pdf bounds... now that we know which stations to use. 
+mult_roughness = mean(scale_sta_roughness(stas_kept)); % Excluding these stations probably doesn't make much of a difference. 
+rough_scale = rough_scale * mult_roughness; 
+
 
 %% Penalty. Make a function handle with one argument for what we want to minimze. 
 fhand_penalty=@(mgrid)a3_1_penalty_efficient(mgrid,...%!%! replace vgrid
