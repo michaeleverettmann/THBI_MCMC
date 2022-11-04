@@ -9,9 +9,9 @@ ifsave = true;
 
 paths = getPaths(); 
 paths.STAinversions = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_collate/'; % Place where your results are. 
-figPath = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/many_stas/';
-infodir = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/INFO/'; 
-out_dir = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/results_compiled/'; 
+figPath = '~/Documents/UCSB/ENAM/THBI_ENAM/figures/many_stas/';
+infodir = '~/Documents/UCSB/ENAM/THBI_ENAM/ENAM/INFO/'; 
+out_dir = '~/Documents/UCSB/ENAM/THBI_ENAM/data/results_compiled/'; 
 
 desired_chains = 12; 
 desired_iter   = 16000; 
@@ -21,7 +21,7 @@ addpath('~/MATLAB/m_map');
 addpath('~/Documents/UCSB/ENAM/THBI_ENAM/functions'); 
 addpath('~/MATLAB/seizmo/cmap'); warning('adding cmap in seismo. Is this breaking split?'); 
 addpath('~/MATLAB/borders'); 
-addpath('/Users/brennanbrunsvik/Documents/repositories/general_data'); % For topography loading. get_z_etopo1.m
+addpath('~/Documents/repositories/general_data'); % For topography loading. get_z_etopo1.m
 
 % specify details of this run
 generation = 1; % generation of solution and data processing
@@ -36,6 +36,9 @@ proj = load('~/Documents/UCSB/ENAM/THBI_ENAM/ENAM/INFO/proj.mat').proj;
 proj.STAinversions = paths.STAinversions; 
 
 fresults = sprintf('%s/compiled_results_%s.mat',out_dir,STAMP); 
+
+z_vs = [5:5:300]; warning('Make sure z vs is supposed to be 5:5:300 always in pdfs or something. remove this from parameter setup. ')% Temporary. Different depths looking for station median values. Needs to match whats in the pdfs. 
+
 
 
 % % % % 

@@ -1,10 +1,19 @@
-function [] = fun_mapbackground(lon, lat, dat, this_title, lolim, lalim); 
+function [] = fun_mapbackground(lon, lat, dat, this_title, lolim, lalim, options); 
+    arguments
+        lon
+        lat
+        dat
+        this_title
+        lolim = []
+        lalim = []
+        options.stanames = []
+    end
 
-lolim = [-87, -74]; 
-lalim = [30 ,  43]; 
+lolim = [-87, -71]; 
+lalim = [27 ,  46]; 
 
 nexttile; cla; hold on;
-m_proj('lambert', 'long',lolim + [-2 2],'lat',lalim + [-2 2]);
+m_proj('miller', 'long',lolim + [-2 2],'lat',lalim + [-2 2]);
 m_coast('patch',[1 1 1]); % m_coast('patch',[1 .85 .7]);
 
 [latbord, lonbord] = borders('states'); % add states map
@@ -22,5 +31,11 @@ colorbar();
 
 turbo_arr = turbo(); 
 colormap(turbo_arr(end:-1:1,:)); 
+
+if ~isempty(options.stanames); 
+    for ista = 1:length(lon); 
+        text(stax, stay, options.stanames); 
+    end
+end
 
 end

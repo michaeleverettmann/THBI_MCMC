@@ -43,6 +43,8 @@ for imd = 1:length(mdls.nwk);
     vs(imd,:) = mdl.VSav(I'); % Velocity at depths. 
 end
 
+sta_names = string(mdls.nwk) + "." + string(mdls.sta); 
+
 
 %%
 
@@ -50,13 +52,13 @@ end
 mapFigNum = 1; 
 figure(mapFigNum); clf; hold on; set(gcf, 'color', 'white', 'pos', [-1152 297 1024 735]); 
 tiledlayout(2,3,'TileSpacing','compact'); 
-fun_mapbackground(mdls.lon, mdls.lat, zmoh, 'Moho depth (km)'); 
+fun_mapbackground(mdls.lon, mdls.lat, zmoh, 'Moho depth (km)');%, 'stanames', sta_names); 
 fun_mapbackground(mdls.lon, mdls.lat, zsed, 'Sed depth (km)'); 
 fun_mapbackground(mdls.lon, mdls.lat, xicr, '\xi'); 
 fun_mapbackground(mdls.lon, mdls.lat, zmohsig, 'Moho error (km)'); 
 fun_mapbackground(mdls.lon, mdls.lat, zsedsig, 'Sed error (km)'); 
-fun_mapbackground(mdls.lon, mdls.lat, vpvs, 'Vp/Vs'); 
-exportgraphics(gcf, sprintf('%smap_view_mod.pdf', figPath))
+fun_mapbackground(mdls.lon, mdls.lat, vpvs, 'Vp/Vs');%, 'stanames', sta_names);  
+exportgraphics(gcf, sprintf('%smap_view_mod.pdf', figPath), 'Resolution',250)
 
 %%% Pseudo-tomography
 mapFigNum = 2; 
@@ -65,4 +67,4 @@ tiledlayout(2,3,'TileSpacing','compact');
 for ivs=1:length(z_vs); 
     fun_mapbackground(mdls.lon, mdls.lat, vs(:,ivs), sprintf('%1.1f km',z_vs(ivs))); 
 end
-exportgraphics(gcf, sprintf('%spseudo_tomography.pdf', figPath))
+exportgraphics(gcf, sprintf('%spseudo_tomography.pdf', figPath), 'Resolution',250)
