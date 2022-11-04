@@ -10,9 +10,12 @@ vdx = 1;
 vdy = 0.8;
 % vshift = [vdx, vdy]; 
 dshifts = flip([-7, -5, -3, -1, 0, 1, 5, 7]'); 
-lolim = lobase + vdx * dshifts; 
-lalim = labase + vdy * dshifts; 
-
+% lolim = lobase + vdx * dshifts; 
+% lalim = labase + vdy * dshifts; 
+% lolim = [lolim; -87, -80.5]; 
+% lalim = [lalim;  38,  25  ]; 
+lolim = [-87, -80.5]; 
+lalim = [ 38,  25  ]; 
 
 % i_xsect = 1; 
 n_contour = 30; 
@@ -53,7 +56,11 @@ zmoh_surf = sfsmat2.mgrid_out;
 sfsmat2 = load(sprintf('zsed/surface_values_V%1.0f', version_surf)); 
 zsed_surf = sfsmat2.mgrid_out; 
 
-%%
+% Load topo
+[lon_top, lat_top, z_top...
+    ] = get_z_etopo1(min(longrid(:))-1, max(longrid(:))+1, ...
+             min(latgrid(:))-1, max(latgrid(:))+1, 'plot', false,...
+             'ndmesh', true); 
 
 figure(16); clf; hold on; 
 % set(gcf, 'pos', [1053 564 767*2 329*ceil(.5*size(lolim,1))], 'color', 'white'); 
@@ -102,7 +109,7 @@ mterp = griddata(lon3d, lat3d, z3d, mgrid3d, lonmesh, latmesh, zmesh);
 %% Interpolate sediment, zmoh
 zmohsect = griddata(longrid, latgrid, zmoh_surf, lon_surf_line, lat_surf_line); 
 zsedsect = griddata(longrid, latgrid, zsed_surf, lon_surf_line, lat_surf_line); 
-
+ztopsect = interpn (lon_top, lat_top, z_top    , lon_surf_line, lat_surf_line, 'cubic'); % can use interpn here for speed because topo is on a grid. But the surface I inverted isn't on a lon/lat grid (it's a linearly spaced grid in x and y), so we have to use griddata above. 
 
 %%
 
@@ -124,8 +131,13 @@ clim([3.5, 4.8]); % TODO temporary
 [fk, hand] = contourf(gcmesh*d2km, zmesh, mterp, n_contour, 'EdgeAlpha', 0.5); 
 
 % Moho
-plot(gcarc*d2km, zmohsect, 'k', 'LineWidth', 5); 
-plot(gcarc*d2km, zsedsect, 'k', 'LineWidth', 5); 
+plot(gcarc*d2km, zmohsect, 'color', [250, 2, 192]/250, 'LineWidth', 4); 
+
+plot(gcarc*d2km, zsedsect*1000/50 - 10, 'color', 'k', 'LineWidth', 2); % [2, 217, 250]/255
+plot(gcarc*d2km,-(ztopsect/50)-10, 'k', 'LineWidth', 2); 
+% yyaxis right; % Maybe this can be a useful way to put sediment and stuff
+% with different veritcal scaling. 
+% yyaxis left; 
 
 section_letter = char(64+i_xsect); % Text for cross-section name. ith letter of alphabet
 t1=text(0.01, 1.12, section_letter    , 'fontsize', 20, 'color', 'r', 'units', 'normalized', 'VerticalAlignment','top'); 
