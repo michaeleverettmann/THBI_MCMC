@@ -1,9 +1,13 @@
-function [model,laymodel,par] = z0_SYNTH_MODEL_splinemoduse(par,ifplot)
+function [model,laymodel,par] = z0_SYNTH_MODEL_splinemoduse(par,ifplot,options)
+    arguments
+        par
+        ifplot = false 
+        options.xi_crust = 1.05; 
+    end
+
+xi_crust = options.xi_crust; 
 
 
-if nargin < 2 || isempty(ifplot)
-    ifplot=false;
-end
 
 global TRUEmodel TLM
 
@@ -36,7 +40,7 @@ if strcmp(versta, 'orig'); % Original(ish) version.
 
     vpvs_crust = 1.8;
 
-    xi_crust = 1.05;
+%     xi_crust = 1.05;
     xi_mantle = 1.0; 
     
     use_splines = true; 
@@ -59,7 +63,7 @@ elseif strcmp(versta, 'sed_deep'); % Original(ish) version.
 
     vpvs_crust = 1.8;
 
-    xi_crust = 1.05;
+%     xi_crust = 1.05;
     xi_mantle = 1.0; 
     
     use_splines = true; 
@@ -84,11 +88,13 @@ elseif strcmp(versta, 'crat_2mld'); % Original(ish) version.
 
     vpvs_crust = 1.8;
 
-    xi_crust = 1.05;
+
+%     xi_crust = 1.05;
     xi_mantle = 1.0; 
     
     use_splines = true; 
 end
+
 
 
 if use_splines; 
@@ -261,9 +267,10 @@ if ~use_splines;
     killc = z_c < sed.h; 
     vs_c  = vs_c(~killc); 
     z_c   = z_c (~killc); 
+
     
     %% MAKE ALL PARAMETER STRUCTURES
-    crust = struct('h',max(z_c)-sed.h,'vpvs',1.75,'xi',1.05); % warning('Trying to crustal anisotropy'); 
+    crust = struct('h',max(z_c)-sed.h,'vpvs',1.75,'xi',xi_crust); % warning('Trying to crustal anisotropy'); 
     mantle = struct('xi',1);
     model = struct('sedmparm',sed,'crustmparm',crust,'mantmparm',mantle,...
                    'M', nan, 'datahparm', nan, 'selev',0);
@@ -274,11 +281,13 @@ if ~use_splines;
         'vs', struct('crust', vs_c, 'mantle', vs_m),...
         'z' , struct('crust', z_c, 'mantle', z_m));
     
-    figure(1); clf; hold on; box on; grid on; set(gcf, 'color', 'white'); 
-    xlabel('Vs (km/s'); ylabel('Depth (km)'); title('Synthetic model'); 
-    plot(TRUEmodel.VS, TRUEmodel.z);
-    set(gca, 'ydir', 'reverse');           
-    
+    if ifplot 
+        figure(1); clf; hold on; box on; grid on; set(gcf, 'color', 'white'); 
+        xlabel('Vs (km/s'); ylabel('Depth (km)'); title('Synthetic model'); 
+        plot(TRUEmodel.VS, TRUEmodel.z);
+        set(gca, 'ydir', 'reverse');           
+    end
+
     h_crust = model.sedmparm.h + model.crustmparm.h; 
 end
 
@@ -340,7 +349,7 @@ TRUEmodel.vsAvCrust = h_crust / interp1(z2, timeToDep, h_crust); % "Average" tra
 % brb2022.02.09: This assumes a station with zero elevation. It should be fine for most synthetic tests. TODO we do have an optional elevation value in the synthetic model. I should verify that z includes z<0 - if so, no code change is needed. 
 
 %% PLOT FINAL MODEL
-warning('if plot set true'); ifplot = 1; 
+% warning('if plot set true'); ifplot = 1; 
 if ifplot
 figure(95); clf; set(gcf,'pos',[120 151 920 947])
 subplot(131), hold on;

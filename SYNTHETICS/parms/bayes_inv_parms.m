@@ -14,7 +14,7 @@ inv = struct(    'synthTest',true                ,...
                  'Nsavestate',100                ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x  
-                 'datatypes',{{'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}}); % Don't use ccp for synthetic. We can't really make a ccp stack ourselves...
+                 'datatypes',{{'HKstack_P'}}); % Don't use ccp for synthetic. We can't really make a ccp stack ourselves...
 %                  'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}})  
                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
                                 %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
@@ -212,9 +212,9 @@ synth = struct( 'gcarcs',[70]                 ,... % average gcarc
                 'noise_sigma_SW_Lov',0.015        ,... %0.03 std for random added noise for SWs
                 'noise_sigma_SW_HV',0.005        ,... %0.03 std for random added noise for SWs
                 'noise_sigma_BW_Sp',0.009        ,... %0.02 std for random added noise for SpRFs
-                'noise_sigma_BW_Ps',0.012        ,... %0.02 std for random added noise for PsRFs
+                'noise_sigma_BW_Ps',0        ,... %0.02 std for random added noise for PsRFs
                 'noise_sigma_RF_Sp',0.009        ,... %0.02 std for random added noise for SpRFs
-                'noise_sigma_RF_Ps',0.012        ,... %0.02 std for random added noise for PsRFs
+                'noise_sigma_RF_Ps',0        ,... %0.02 std for random added noise for PsRFs
                 'surf_Vp_Vs',[6.1 3.55]          ,... % [VP, VS] surface velocity values - if empty, uses True vals % bb2022.02.08 Not sure what these are. Different sets of values are used in z0_SYNTH_MODEL...
                 'SW_Ray_phV_periods',logspace(log10(6),log10(167),22)',...  % Rayleigh wave phV periods
                 'SW_Ray_grV_periods',logspace(log10(6),log10(40),10)',...  % Rayleigh wave phV periods

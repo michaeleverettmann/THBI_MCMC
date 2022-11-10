@@ -99,7 +99,7 @@ if strcmp(par.synth.noisetype,'gaussian') || strcmp(par.synth.noisetype,'gauss')
     trudat_sp_PSV = trudat_sp_PSV + random('norm',0,par.synth.noise_sigma_BW_Sp,size(trudat_sp_PSV)); 
 end
 
-if true
+if ifplot
 	figure(58),clf,set(gcf,'pos',[2 275 1047 830])
     %Ps
     subplot(411),plot(tt_ps,trudat_ps_PSV(:,1),'k','linewidth',2), xlim(par.datprocess.Ps.Twin.def), ylabel('Z tru','fontsize',18), title('Ps TRUE','fontsize',22)
