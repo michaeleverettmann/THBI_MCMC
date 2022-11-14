@@ -3,6 +3,8 @@ function [model,laymodel,par] = z0_SYNTH_MODEL_splinemoduse(par,ifplot,options)
         par
         ifplot = false 
         options.xi_crust = 1.05; 
+        options.h_crust = 45; 
+        options.vpvs_crust = 1.75; 
     end
 
 xi_crust = options.xi_crust; 
@@ -38,8 +40,8 @@ if strcmp(versta, 'orig'); % Original(ish) version.
     fmknots = (mknots-h_sed-h_crust)/(par.mod.maxz-h_sed-h_crust);
     k_mantle = length(mknots);
 
-    vpvs_crust = 1.8;
-
+%     vpvs_crust = 1.8;
+    vpvs_crust = options.vpvs_crust; 
 %     xi_crust = 1.05;
     xi_mantle = 1.0; 
     
@@ -61,7 +63,8 @@ elseif strcmp(versta, 'sed_deep'); % Original(ish) version.
     fmknots = (mknots-h_sed-h_crust)/(par.mod.maxz-h_sed-h_crust);
     k_mantle = length(mknots);
 
-    vpvs_crust = 1.8;
+%     vpvs_crust = 1.8;
+    vpvs_crust = options.vpvs_crust; 
 
 %     xi_crust = 1.05;
     xi_mantle = 1.0; 
@@ -86,7 +89,8 @@ elseif strcmp(versta, 'crat_2mld'); % Original(ish) version.
     fmknots = (mknots-h_sed-h_crust)/(par.mod.maxz-h_sed-h_crust);
     k_mantle = length(mknots);
 
-    vpvs_crust = 1.8;
+%     vpvs_crust = 1.8;
+    vpvs_crust = options.vpvs_crust; 
 
 
 %     xi_crust = 1.05;
@@ -268,9 +272,10 @@ if ~use_splines;
     vs_c  = vs_c(~killc); 
     z_c   = z_c (~killc); 
 
+    vpvs_crust = options.vpvs_crust; 
     
     %% MAKE ALL PARAMETER STRUCTURES
-    crust = struct('h',max(z_c)-sed.h,'vpvs',1.75,'xi',xi_crust); % warning('Trying to crustal anisotropy'); 
+    crust = struct('h',max(z_c)-sed.h,'vpvs',vpvs_crust,'xi',xi_crust); % warning('Trying to crustal anisotropy'); 
     mantle = struct('xi',1);
     model = struct('sedmparm',sed,'crustmparm',crust,'mantmparm',mantle,...
                    'M', nan, 'datahparm', nan, 'selev',0);

@@ -99,8 +99,8 @@ cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup.
 mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
 
 %% HK tests, analysis, starts here. 
-xi_a = [0.85, 0.95, 1, 1.05, 1.15]'; 
-xi_true = 1.1; 
+xi_a = [0.85, 0.9, 0.95, 1, 1.05, 1.1, 1.15]'; 
+xi_true = 0.85; 
 xi_a = sort(unique([xi_a; xi_true])); 
 nxi = length(xi_a); 
 i_xi_true = find(xi_a == xi_true); 
@@ -109,6 +109,8 @@ Exi_all = cell([length(xi_a), 1]);
 % t_predxi_all = cell([length(xi_a), 1]); 
 % t_pred00_all = cell([length(xi_a), 1]); 
 t_pred_xi_best_all = zeros(length(xi_a), 3); 
+hmax_all_noan = zeros(nxi,1); 
+kmax_all_noan = zeros(nxi,1); 
 
 rf_all = cell(length(xi_a),1); 
 
@@ -117,10 +119,10 @@ for ixi = 1:length(xi_a);
 
     ztrue = 45; 
     ktrue = 1.8; 
-    xitrue = xi_a(ixi); 
+    xitruei = xi_a(ixi); 
 
     [trudata,par] = a2_LOAD_DATA_hk_test(par, 'nwk', nwk, 'sta', sta, ...
-        'xi_crust', xitrue );
+        'xi_crust', xitruei );
     % plot_TRU_WAVEFORMS(trudata);
 
     
@@ -132,6 +134,11 @@ for ixi = 1:length(xi_a);
     waves = trudata.HKstack_P.waves; 
     t_predxi = trudata.HKstack_P.t_pred; 
     t_pred00 = trudata.HKstack_P_noan.t_pred; 
+
+%     [Exi_max, iemax] = max(Exi, [], 'all'); %linear index. 
+    [ikmax, ihmax] = find(E00 == max(E00 ,[], 'all')); 
+    kmax = K(ikmax); 
+    hmax = H(ihmax); 
     
     t_pred_xi_best = zeros(1, 3); 
     for it = 1:length(t_pred_xi_best); 
@@ -141,22 +148,54 @@ for ixi = 1:length(xi_a);
     end
     t_pred_xi_best_all(ixi, :) = t_pred_xi_best; 
     rf_all{ixi} = waves.rf; %  + ixi; 
+    Exi_all{ixi} = Exi; 
+    hmax_all_noan(ixi) = hmax; 
+    kmax_all_noan(ixi) = kmax; 
+
+    %%% How much error in the non-anisotropic HK stack? 
+    interp2(H, K, E00, hmax, kmax)
+    %%%
 end
  
-
+%%
 figure(201); clf; hold on; 
 subplot(1,2,1); hold on; 
 set(gca,'ydir', 'reverse'); 
-contourf(K, H, Exi'); 
+contourf(K, H, Exi_all{i_xi_true}', 30, 'EdgeAlpha', 0.1); 
+ylim([25, 55]); 
+xlim([1.6, 1.9]); 
+
+%%% Percentage contours
+max_hk = max(Exi_all{i_xi_true},[], 'all'); 
+contour(K, H, Exi_all{i_xi_true}', [0.68, 0.95].* max_hk, 'k', 'LineWidth',1); 
+%%%
+
+size_scat = 40; 
+scatter(kmax_all_noan, hmax_all_noan, size_scat, 'red', 'filled'); 
+scatter(kmax_all_noan(i_xi_true), hmax_all_noan(i_xi_true), size_scat*2, 'red', 'diamond', 'filled'); 
+plot(kmax_all_noan, hmax_all_noan, 'red', 'LineWidth', 1.); 
+% text(kmax_all_noan([1,nxi])+0.005, hmax_all_noan([1,nxi]) - 0.75, string(xi_a([1,nxi])) )
+text(kmax_all_noan+0.005, hmax_all_noan - 0.75, string(xi_a) )
 
 
 
-subplot(1,2,2); hold on; 
+figure(202); clf; hold on; 
+set(gcf, 'pos', [2358 471 516 271]); 
+% subplot(1,2,2); hold on; 
+xlim([-3, 30])
 
 for ixi = 1:nxi
     rf = rf_all{ixi}; 
-    plot(waves.tt, rf); 
     t_pred_xi_best = t_pred_xi_best_all(ixi,:)'; 
-    scatter(t_pred_xi_best', interp1(waves.tt, rf, t_pred_xi_best, 'cubic')) % Not sure why not aligned well
+%     if xi_a(ixi)~=1; 
+        scatter(t_pred_xi_best', interp1(waves.tt, rf, t_pred_xi_best, 'cubic'),...
+            'filled') % Not sure why not aligned well
+        plot(waves.tt, rf, 'linewidth', 1.5); 
+%     else
+%         scatter(t_pred_xi_best', interp1(waves.tt, rf, t_pred_xi_best, 'cubic'),...
+%             'k', 'filled'); % Not sure why not aligned well
+%         plot(waves.tt, rf, 'k', 'LineWidth', 2); 
+%     end
+
 end
 
