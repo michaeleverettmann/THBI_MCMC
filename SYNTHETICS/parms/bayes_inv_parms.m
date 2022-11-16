@@ -37,6 +37,10 @@ modl.starting.HKappa.startAtHK = true; % Starting model at maximum of hkappa sta
 
 modl.force_no_new_prior = false; % For debugging. Force not making a new emperical prior, even if we change acceptable model parameters. 
 
+modl.misc = struct(...
+    'psi_to_xi', -1 ); % Ratio of psi to xi through whole model. Only valid if xi and psi are expressed as percent (e.g. 5%, not 1.05).  
+%brb_panis
+
 modl.sed = struct(...
     ... thickness of the sediments
                      'hmax',5.0                  ,... %5 max sed layer thickness, km
@@ -206,7 +210,7 @@ cond = struct(  'pos_moho',         true         ,... % No negative moho jumps
             
 %% Synthetic data parms 
 synth = struct( 'gcarcs',[70]                 ,... % average gcarc
-                'samprate',10                    ,... % sample rate.
+                'samprate',10                    ,... % sample rate.20                    ,... % sample rate.
                 'noisetype','gaussian'           ,... % noisetype - 'gaussian' or 'real' (in which case drawn from station speficied
                 'noise_sigma_SW_Ray',0.015        ,... %0.03 std for random added noise for SWs
                 'noise_sigma_SW_Lov',0.015        ,... %0.03 std for random added noise for SWs

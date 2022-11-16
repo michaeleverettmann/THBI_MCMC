@@ -88,8 +88,8 @@ model.mxi  = mpm.xi;
 model.fdVSsed = 100*diff(vs(zz==zsed))./mean(vs(zz==zsed)); if zsed==0, model.fdVSsed = nan; end
 model.fdVSmoh = 100*diff(vs(zz==zmoh))./mean(vs(zz==zmoh));
 model.Sanis = 100*(xi-1); % in percentage 
-model.Panis = zeros(Nz,1);
-% model.Panis = 100*(phi-1); warning('Trying P anis')
+% model.Panis = zeros(Nz,1); %brb_panis
+model.Panis = model.Sanis * par.mod.misc.psi_to_xi; %brb_panis
 
 % re-order fields of model structure 
 forder ={'z','z0','VS','VP','rho','Nz','zsed','zmoh','vpvs','cxi','mxi','selev',...

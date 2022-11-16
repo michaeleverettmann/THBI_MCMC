@@ -38,6 +38,10 @@ modl.starting.HKappa.startAtHK = true; % Starting model at maximum of hkappa sta
 
 modl.force_no_new_prior = false; % For debugging. Force not making a new emperical prior, even if we change acceptable model parameters. 
 
+modl.misc = struct(...
+    'psi_to_xi', -1 ); % Ratio of psi to xi through whole model. Only valid if xi and psi are expressed as percent (e.g. 5%, not 1.05).  
+%brb_panis
+
 modl.sed = struct(...
     ... thickness of the sediments
                      'hmax',5.0                  ,... %5 max sed layer thickness, km

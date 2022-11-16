@@ -97,6 +97,27 @@ elseif strcmp(versta, 'crat_2mld'); % Original(ish) version.
     xi_mantle = 1.0; 
     
     use_splines = true; 
+elseif strcmp(versta, 'simple_layers_1'); 
+    selev = 0;
+    h_sed = 0;
+    h_crust = 45;
+
+    vs_sed = [3.5, 3.5];
+
+    kvs_crust = 3.5 * ones(4,1);
+    cknots = linspace(h_sed, h_sed+h_crust,3)';
+    fcknots = (cknots-h_sed)/h_crust;
+    k_crust = length(cknots);
+
+    kvs_mantle = 4.2 * ones(6,1);
+    mknots = [h_sed+h_crust, 60, 110, 140, par.mod.maxz]';
+    fmknots = (mknots-h_sed-h_crust)/(par.mod.maxz-h_sed-h_crust);
+    k_mantle = length(mknots);
+
+    vpvs_crust = options.vpvs_crust; 
+    xi_mantle = 1.0; 
+    
+    use_splines = true; 
 end
 
 
@@ -328,13 +349,12 @@ rholay = [sed_vs2rho(Vslay([xs,xc]));...
 xilay = [ones(length(xs),1);...
          TRUEmodel.cxi*ones(length(xc),1);...
          TRUEmodel.mxi*ones(length(xm),1)]; % S radial anisotropy
-philay = ones(nlay,1); % P radial anisotropy
+
+% philay = ones(nlay,1); % P radial anisotropy %brb_panis
 % warning('Changing philay')
-% philay2 = 1./xilay; 
-% philay = (philay + philay2) ./2; 
-% disp(philay);
-% philay = philay2; 
-warning('NO p wave anisotropy!!!')
+% philay = 1+(1-xilay); 
+% warning('NO p wave anisotropy!!!')
+philay = (par.mod.misc.psi_to_xi * (xilay-1)*100)./100 + 1; 
 etalay = ones(nlay,1); % eta anisotropy
 
 TLM = struct('zlayt',zlayt,'zlayb',zlayb,'Vs',Vslay,'Vp',Vplay,'rho',rholay,'nlay',nlay,'xi',xilay,'phi',philay,'eta',etalay);

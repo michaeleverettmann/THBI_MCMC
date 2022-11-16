@@ -3,10 +3,6 @@
 %% Setup
 run('../a0_STARTUP_BAYES.m')
 
-fig_path = sprintf('%s/../figures/hk_paper', pwd()) ; 
-fhand_figname = @(zmoh, k, thisfig, frmt)sprintf(...
-    '%s/z%3.0f_k%3.0f_%s.%s',fig_path, zmoh*10, k*100, thisfig, frmt); % Convenient function to make figure names. Get rid of decimals. 
-
 proj = struct('name', 'SYNTHETICS'); % bb2021.08.04 changed from EXAMPLE because I don't have the example data files. %,'EXAMPLE');
 paths = getPaths(); 
 proj.STAinversions = paths.STAinversions; 
@@ -110,12 +106,9 @@ nxi = length(xi_a);
 i_xi_true = find(xi_a == xi_true); 
 
 Exi_all = cell([length(xi_a), 1]); 
-E00_all = cell([length(xi_a), 1]); 
 % t_predxi_all = cell([length(xi_a), 1]); 
 % t_pred00_all = cell([length(xi_a), 1]); 
 t_pred_xi_best_all = zeros(length(xi_a), 3); 
-t_pred_xi_noan_all = zeros(length(xi_a), 3); 
-
 hmax_all_noan = zeros(nxi,1); 
 kmax_all_noan = zeros(nxi,1); 
 
@@ -167,23 +160,20 @@ for ixi = 1:length(xi_a);
 %     herr(ixi) = hmax_noan - ztrue; 
 %     kerr(ixi) = kmax_noan - ktrue; 
     
-    t_pred_xi_best  = zeros(1, 3); % Get the times from anisotropic stack at true parameters
-    t_pred_xi_noan  = zeros(1, 3); % Get the times from ISOTROPIC stack at true parameters. 
-%     t_pred_xi_noan = zeros(1, 3);
+    t_pred_xi_true = zeros(1, 3); 
+    t_pred_xi_best = zeros(1, 3); 
+    t_pred_xi_noan = zeros(1, 3);
     for it = 1:length(t_pred_xi_best); 
-        t_pred_xi_best(1, it) = interpn(H, K, ...
+        t_pred_xi_true(1, it) = interpn(H, K, ...
             reshape(t_predxi(it,:,:), size(t_predxi,2), size(t_predxi,3)) , ...
             ztrue, ktrue, 'cubic'); 
-        t_pred_xi_noan(1, it) = interpn(H, K, ...
-            reshape(t_pred00(it,:,:), size(t_predxi,2), size(t_predxi,3)) , ...
-            ztrue, ktrue, 'cubic'); 
+        t_pred_xi_best(1, it) = interpn(H, K, ...
+            reshape(t_predxi(it,:,:), size(t_predxi,2), size(t_predxi,3)) , ...
+            hmax_best, kmax_best, 'cubic'); 
     end
     t_pred_xi_best_all(ixi, :) = t_pred_xi_best; 
-    t_pred_xi_noan_all(ixi, :) = t_pred_xi_noan; 
-    
     rf_all{ixi} = waves.rf; %  + ixi; 
     Exi_all{ixi} = Exi; 
-    E00_all{ixi} = E00; 
     hmax_all_noan(ixi) = hmax_noan; 
     kmax_all_noan(ixi) = kmax_noan; 
 
@@ -221,84 +211,30 @@ plot(kmax_all_best, hmax_all_best, 'blue', 'LineWidth', 1.);
 % text(kmax_all_noan([1,nxi])+0.005, hmax_all_noan([1,nxi]) - 0.75, string(xi_a([1,nxi])) )
 text(kmax_all_noan+0.005, hmax_all_noan - 0.75, string(xi_a) )
 
-%% 
-fhand_norm = @(inval)inval ./ max(max(inval)); % Return normalized inval 
-
-figure(301); clf; hold on; set(gcf, 'pos', [-1089 329 364 218]); 
-subplot(1,1,1); hold on; 
-set(gca,'ydir', 'reverse', 'LineWidth', 1.5);
-grid on; 
-box on; 
-xlabel('\kappa'); 
-ylabel('H (km)'); 
-title('H-\kappa stack ignoring \xi', 'fontweight', 'normal'); 
-% contourf(K, H, Exi_all{i_xi_true}', 30, 'EdgeAlpha', 0.1); 
-ylim([40, 50]); 
-xlim([1.6, 1.9]); 
-
-lvl_cnt = [0.6, 0.75, 0.95, 0.99]; 
-LW = 1; 
-[~,hnd_xistart] = contour(K, H, fhand_norm(E00_all{1      }'),...
-    lvl_cnt, 'r', 'LineWidth', LW, 'DisplayName', sprintf('\\xi = %1.2f', xi_a(1      ) ) ); 
-[~,hnd_xiend  ] = contour(K, H, fhand_norm(E00_all{xi_a==1}'),...
-    lvl_cnt, 'k', 'LineWidth', LW, 'DisplayName', sprintf('\\xi = %1.2f', xi_a(xi_a==1) ) ); 
-[~,hnd_xi1    ] = contour(K, H, fhand_norm(E00_all{end    }'),...
-    lvl_cnt, 'b', 'LineWidth', LW, 'DisplayName', sprintf('\\xi = %1.2f', xi_a(end    ) ) ); 
-
-
-legend([hnd_xistart, hnd_xiend, hnd_xi1], 'Location', 'best'); 
-
-exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'multiple_contour', 'pdf'), 'ContentType', 'vector'); 
-
 
 %%
 figure(202); clf; hold on; 
-set(gcf, 'pos', [1060 564 445 235]); 
+set(gcf, 'pos', [1358 471 516 271]); 
 set(gca, 'LineWidth', 1.5, 'XGrid', 'on', 'XMinorTick', 'on'); box on; %grid on; 
-xlabel('Time (s)'); 
-title('Phase timing', 'FontWeight','normal'); 
-set(gca, 'YTick', []); 
+% subplot(1,2,2); hold on; 
 xlim([-3, 30])
-yshift_const = 0.075; 
 
 for ixi = 1:nxi
-    yshift = ixi * yshift_const; 
+    yshift = ixi * 0.075; 
     rf = rf_all{ixi}; 
-
     t_pred_xi_best = t_pred_xi_best_all(ixi,:)'; 
-    t_pred_xi_noan = t_pred_xi_noan_all(ixi,:)'; 
-
-    hnd_t_xi = scatter(...
-        t_pred_xi_best', yshift + interp1(waves.tt, rf, t_pred_xi_best, 'cubic'),...
-        40, 'blue', 'filled') % If using true parameters and anisotropic stack
-    hnd_t_00 = scatter(...
-        t_pred_xi_noan', yshift + interp1(waves.tt, rf, t_pred_xi_noan, 'cubic'),...
-        40, 'red', 'filled') % If using true parameters and isotropic stack
-%     hnd_t_xi = scatter(...
-%         t_pred_xi_best', yshift + interp1(waves.tt, rf, t_pred_xi_best, 'cubic'),...
-%         100, '+blue') % If using true parameters and anisotropic stack
-%     hnd_t_00 = scatter(...
-%         t_pred_xi_noan', yshift + interp1(waves.tt, rf, t_pred_xi_noan, 'cubic'),...
-%         100, '+red') % If using true parameters and isotropic stack
-    hnd_rf = plot(waves.tt, yshift+rf, 'k', 'linewidth', 1.5);
-
-    if ixi == nxi; 
-        xilabel = '\xi = '; 
-    else; 
-        xilabel = "      "; 
-    end
-
-    text(1, yshift + yshift_const * .5, sprintf('%s%1.2f', xilabel, xi_a(ixi) ) )
+%     if xi_a(ixi)~=1; 
+        scatter(t_pred_xi_best', yshift+interp1(waves.tt, rf, t_pred_xi_best, 'cubic'),...
+            'filled') % Not sure why not aligned well
+        plot(waves.tt, yshift+rf, 'linewidth', 1.5); 
+%     else
+%         scatter(t_pred_xi_best', interp1(waves.tt, rf, t_pred_xi_best, 'cubic'),...
+%             'k', 'filled'); % Not sure why not aligned well
+%         plot(waves.tt, rf, 'k', 'LineWidth', 2); 
+%     end
 
 end
 
-% scatter(0, -2*yshift_const, 0.00001); 
-ylim([-2*yshift_const, yshift_const * (nxi+2.5)])
-lgd = legend([hnd_rf, hnd_t_00, hnd_t_xi], ...
-    'Receiver function', 't ignore \xi', 't with \xi'); 
-set(lgd, 'Orientation', 'horizontal', 'Location', 'south'); 
-
-exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rftiming', 'pdf'), 'ContentType', 'vector'); 
 
 %%
 figure(203); clf; hold on; 
