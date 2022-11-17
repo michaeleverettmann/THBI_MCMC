@@ -58,8 +58,6 @@ meanInt = @(m,dz)sum(dz.*m)/sum(dz);
 % vrAv = @(m,dz)( (1./meanInt(1./m,dz) + meanInt(m,dz) ) / 2 ); % Voigt Reuss Hill average (or whatever it's called). 
 vrAv = @(m,dz)( (1./meanInt(1./m,dz) ) ); % This averaging approach is slightly more consistent with propmat than the voigt reuss. Makes sense... it's all about travel times. 
 
-
-% rho = mean(model.rho(isCrust)); % Medium density of crust. Not sure how best to average this yet.
 rho = meanInt(model.rho(isCrust), dzC); 
 eta = 1; % IMPORTANT if eta is ever not 1, we need to modify the code. 
 vsAv = vrAv(model.VS(isCrust), dzC); 
@@ -67,7 +65,6 @@ vpAv = vrAv(model.VP(isCrust), dzC);
 
  % TODO need to incocporate sediment vpvs and xi into the averages properly. Tough to decide how to balance them being model parameters that we plot and look at, while HK sampling should be based on different parameters.  brb 2022.08.31, I cant really tell the difference between hk stacks or the positions of plotted points when changing between these two values. 
 vpvs_av_iso = vpAv / vsAv; % including in sediment. 
-% vpvs_av_iso = model.vpvs;
 
 if isempty(options.posterior); % Have to calculate averages from 1-D profile. 
     xi = model.Sanis(isCrust)/100+1; % Radial S anisotropy. add one because for some reason here anisotropy is + or -
@@ -80,27 +77,32 @@ else % If we have the posterior, get average values from there.
     phi = median(posterior.phicrust); 
 end
     
-% Assume ray path change is insignificant when adding anisotropy
-incAngVs = rayp2inc(rayp/111.1949, vsAv             ); 
-incAngVp = rayp2inc(rayp/111.1949, vsAv * vpvs_av_iso); % PN 20.6 was the incidence angle here. Seems reasonable. Same as for the real rays for US.CEH
 
-[velVs,~] = christof_radial_anis(vsAv, vsAv * vpvs_av_iso,...
-    xi, phi, eta, rho, incAngVs); % Velocities for ray with vs incidence angle
-[velVp,~] = christof_radial_anis(vsAv, vsAv * vpvs_av_iso,...
-    xi, phi, eta, rho, incAngVp); % Velocities for ray with vp incidence angle
-vsvAn = velVs(2); % Vsv for s ray 
-vpAn  = velVp(1); % Vp for p ray
-
-% fprintf('\nvsvAn = %1.5f : vpAn = %1.5f\n', vsvAn, vpAn)
-
-vpvsEffective = vpAn/vsvAn; 
-
-[HK_A, HK_H, HK_K, t_pred] = HKstack(RF, tt, ...
-    rayp/111.1949, phase_wts, ...
-    vsAv, ... % isotropic
-    linspace(options.hBounds(1), options.hBounds(2), options.hNum)',...
-    linspace(options.kBounds(1), options.kBounds(2), options.kNum), ...
-    'vpvsANIS_vpvs',vpvsEffective/vpvs_av_iso,'Vsv_av',vsvAn); 
+% % % % % % %%% Here apply HK stacking. Old version. 2022.11.16
+% % % % Assume ray path change is insignificant when adding anisotropy
+% % % incAngVs = rayp2inc(rayp/111.1949, vsAv              ); 
+% % % incAngVp = rayp2inc(rayp/111.1949, vsAv * vpvs_av_iso);
+% % % 
+% % % [velVs,~] = christof_radial_anis(vsAv, vsAv * vpvs_av_iso,...
+% % %     xi, phi, eta, rho, incAngVs); % Velocities for ray with vs incidence angle
+% % % [velVp,~] = christof_radial_anis(vsAv, vsAv * vpvs_av_iso,...
+% % %     xi, phi, eta, rho, incAngVp); % Velocities for ray with vp incidence angle
+% % % vsvAn = velVs(2); % Vsv for s ray 
+% % % vpAn  = velVp(1); % Vp for p ray
+% % % 
+% % % % fprintf('\nvsvAn = %1.5f : vpAn = %1.5f\n', vsvAn, vpAn)
+% % % 
+% % % vpvsEffective = vpAn/vsvAn; 
+% % % 
+% % % [HK_A, HK_H, HK_K, t_pred] = HKstack(RF, tt, ...
+% % %     rayp/111.1949, phase_wts, ...
+% % %     vsAv, ... % isotropic
+% % %     linspace(options.hBounds(1), options.hBounds(2), options.hNum)',...
+% % %     linspace(options.kBounds(1), options.kBounds(2), options.kNum), ...
+% % %     'vpvsANIS_vpvs',vpvsEffective/vpvs_av_iso,'Vsv_av',vsvAn); 
+% % % % % % %%% Here stacking done for the receiver function
+[HK_A, HK_H, HK_K, t_pred] = hk_anis(...
+    RF, tt, rayp, vsAv, rho, xi, phi, eta); 
 
 % The rest of the script expects transposed hk stack. For IRIS ears data loaded from Zach's functions, K is first dimension, H is second bb2021.12.31
 HK_A = HK_A'; 

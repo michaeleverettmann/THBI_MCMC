@@ -3,6 +3,8 @@
 %% Setup
 run('../a0_STARTUP_BAYES.m')
 
+addpath('/Users/brennanbrunsvik/Documents/repositories/hk_anis'); %brb TODO need to move this. 
+
 fig_path = sprintf('%s/../figures/hk_paper', pwd()) ; 
 fhand_figname = @(zmoh, k, thisfig, frmt)sprintf(...
     '%s/z%3.0f_k%3.0f_%s.%s',fig_path, zmoh*10, k*100, thisfig, frmt); % Convenient function to make figure names. Get rid of decimals. 
@@ -191,7 +193,7 @@ for ixi = 1:length(xi_a);
     kmax_all_best(ixi) = kmax_best; 
 
     %%% How much error in the non-anisotropic HK stack? 
-    interp2(H, K, E00, hmax, kmax)
+%     interp2(H, K, E00, hmax, kmax)
     %%%
 end
  
