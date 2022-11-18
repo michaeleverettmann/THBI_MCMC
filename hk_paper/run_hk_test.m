@@ -235,8 +235,14 @@ xlabel('\kappa');
 ylabel('H (km)'); 
 title('H-\kappa stack ignoring \xi', 'fontweight', 'normal'); 
 % contourf(K, H, Exi_all{i_xi_true}', 30, 'EdgeAlpha', 0.1); 
-ylim([40, 50]); 
-xlim([1.6, 1.9]); 
+
+plt_ylim = [40, 50]; 
+plt_xlim = [1.6, 1.9]; 
+ylim(plt_ylim); 
+xlim(plt_xlim); 
+
+% plot([ktrue, ktrue], plt_ylim + [-1, 1])
+scatter(ktrue, ztrue, 200, 'k', 'pentagram', 'filled')
 
 lvl_cnt = [0.6, 0.75, 0.95, 0.99]; 
 LW = 1; 

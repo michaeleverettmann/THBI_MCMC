@@ -19,22 +19,22 @@ function [HK_A, HK_H, HK_K, t_pred] = HKstack_anis_wrapper(par, model, ...
 % anisotropic HK stack. 
 
 % % % % % % Earth flattening transformation
-% % a = 6371; 
-% % zflt = @(z)-a .* log((a-z)./a); 
-% % vflt = @(z,v)a./(a-z) .* v; 
-% % % r = a - model.z; 
-% % % zzf = -a .* log(r./a); 
-% % % vsf = a./r .* vs; 
-% % % vpf = a./r .* vp; 
-% % % zz = zzf; 
-% % % vs = vsf; 
-% % % vp = vpf; 
-% % model.z_orig = model.z; 
-% % model.zmoh_orig = model.zmoh; 
-% % model.z    = zflt(model.z   ); 
-% % model.zmoh = zflt(model.zmoh); 
-% % model.VS = vflt(model.z_orig, model.VS); 
-% % model.VP = vflt(model.z_orig, model.VP); 
+a = 6371; 
+zflt = @(z)-a .* log((a-z)./a); 
+vflt = @(z,v)a./(a-z) .* v; 
+% r = a - model.z; 
+% zzf = -a .* log(r./a); 
+% vsf = a./r .* vs; 
+% vpf = a./r .* vp; 
+% zz = zzf; 
+% vs = vsf; 
+% vp = vpf; 
+model.z_orig = model.z; 
+model.zmoh_orig = model.zmoh; 
+model.z    = zflt(model.z   ); 
+model.zmoh = zflt(model.zmoh); 
+model.VS = vflt(model.z_orig, model.VS); 
+model.VP = vflt(model.z_orig, model.VP); 
 
 % Choose weighting for different phases. There are a few valid choices.
 phase_wts = options.phase_wts; 
@@ -78,7 +78,7 @@ else % If we have the posterior, get average values from there.
 end
     
 
-% % % % % % %%% Here apply HK stacking. Old version. 2022.11.16
+% % %%brb2022.11.16 Old version of HK xi correction, where I only solved Christoffel equations for the vs and vp value in our model. Quicker. 
 % % % % Assume ray path change is insignificant when adding anisotropy
 % % % incAngVs = rayp2inc(rayp/111.1949, vsAv              ); 
 % % % incAngVp = rayp2inc(rayp/111.1949, vsAv * vpvs_av_iso);
@@ -100,9 +100,12 @@ end
 % % %     linspace(options.hBounds(1), options.hBounds(2), options.hNum)',...
 % % %     linspace(options.kBounds(1), options.kBounds(2), options.kNum), ...
 % % %     'vpvsANIS_vpvs',vpvsEffective/vpvs_av_iso,'Vsv_av',vsvAn); 
-% % % % % % %%% Here stacking done for the receiver function
+% % %%brb2022.11.16 END 
 [HK_A, HK_H, HK_K, t_pred] = hk_anis(...
+    RF, tt, rayp, vsAv, rho, xi, phi, eta); %brb2022.11.16 Solves Christoffel for each k, because each k values produces a different vp. Shouldn't matter for MCMC because we only sample HK stack at the h and k value in our model anyway! 
+fhand=@()hk_anis(...
     RF, tt, rayp, vsAv, rho, xi, phi, eta); 
+timeit(fhand)
 
 % The rest of the script expects transposed hk stack. For IRIS ears data loaded from Zach's functions, K is first dimension, H is second bb2021.12.31
 HK_A = HK_A'; 
