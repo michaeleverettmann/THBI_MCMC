@@ -1,4 +1,4 @@
-function [vel, pvecs]=christof(rvec, cc, den)
+function [vel, pvecs]=hk_christof(rvec, cc, den)
 % This function moved from /Users/brennanbrunsvik/Documents/UCSB/ENAM/VsAnisTomog/synth_split/christof.m
 
 % function [vel, pvecs]=christof(rvec, cc, den);

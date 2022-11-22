@@ -77,6 +77,15 @@ addpath([hd '/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for_seizmo']); % bb20
 addpath([hd '/Documents/repositories/Base_code/colormaps/colormaps_ander_biguri']);
 addpath([hd '/Documents/repositories/Base_code/colormaps/ScientificColourMaps7/vik']); 
 
+
+% Some of my repositories I might need
+addpath([hd, '/Documents/repositories/hk_anis/elastic']); % Two paths needed for doing anisotropic HK stacks. 
+addpath([hd, '/Documents/repositories/hk_anis/hk_calculation']);
+
+% addpath("elastic/"); 
+% addpath("hk_calculation/"); 
+% addpath("hk_calculation/"); 
+
 % addpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup'); % bb2021.08.04 Need taup. 
 % addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/misc/for_seizmo'); % bb2021.08.04 Just taking the absolutely necessary Seizmo tools. 
 % % javaaddpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup/lib/MatTauP-2.1.1.jar'); % Needed for taup I think.

@@ -197,7 +197,9 @@ datprocess=struct( 'normdata',true               ,... % normalise data in proces
                        'min_error', 0.002,           ... % Add this much "error" to h-kappa stacks (error of 0 can result in sigma inverting improperly)
                        'scale_error', 1,           ... % Multiply h-kappa error by this constant. Sigma needs to be scaled accordingly. If using 100, we can think of it like percent. 
                        'weightDistanceMax', 0,   ... % At start of burnin, gives 0 to 1 weight toward the (scaled) Euclidian distance from HKappa energy maximum. In otherwords, this tends toward disregarding the actual energy value, and pays attention to its position. 
-                       'weightDistanceMin', 0));     % At end of burnin, give this much weight 0 to 1 to distance from h,k where E is max.     	              
+                       'weightDistanceMin', 0,   ... % At end of burnin, give this much weight 0 to 1 to distance from h,k where E is max.    
+                       'kNum', 201,              ... % How many k values to try
+                       'hNum', 200                  ));  % How many h values to try Make sure it's ~= knum, to help catch errors.    	              
          
 %% Model Conditions
 cond = struct(  'pos_moho',         true         ,... % No negative moho jumps

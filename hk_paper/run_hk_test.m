@@ -111,6 +111,12 @@ xi_a = sort(unique([xi_a; xi_true]));
 nxi = length(xi_a); 
 i_xi_true = find(xi_a == xi_true); 
 
+% % % par.datprocess.kNum = 1001; 
+% % % par.datprocess.hNum = 1000; 
+par.datprocess.kNum = 101; 
+par.datprocess.hNum = 100; 
+warning('Less hk resolution right now')
+
 Exi_all = cell([length(xi_a), 1]); 
 E00_all = cell([length(xi_a), 1]); 
 % t_predxi_all = cell([length(xi_a), 1]); 
@@ -158,6 +164,7 @@ for ixi = 1:length(xi_a);
 
 %     [Exi_max, iemax] = max(Exi, [], 'all'); %linear index. 
     [ikmax, ihmax] = find(E00 == max(E00 ,[], 'all')); 
+    warning('I think I had k and h indicies backwards in the above line')
     kmax_noan = K(ikmax); 
     hmax_noan = H(ihmax); 
     herr(ixi) = hmax_noan - ztrue; 
@@ -242,21 +249,82 @@ ylim(plt_ylim);
 xlim(plt_xlim); 
 
 % plot([ktrue, ktrue], plt_ylim + [-1, 1])
-scatter(ktrue, ztrue, 200, 'k', 'pentagram', 'filled')
+hnd_true = scatter(ktrue, ztrue, 200, [252, 3, 252]./256, 'pentagram', 'filled', ...
+    'LineWidth', 1, 'MarkerEdgeColor', 'k',... 
+    'DisplayName', 'True'); 
 
-lvl_cnt = [0.6, 0.75, 0.95, 0.99]; 
+lvl_cnt = [0.7, 0.95]; 
 LW = 1; 
 [~,hnd_xistart] = contour(K, H, fhand_norm(E00_all{1      }'),...
-    lvl_cnt, 'r', 'LineWidth', LW, 'DisplayName', sprintf('\\xi = %1.2f', xi_a(1      ) ) ); 
-[~,hnd_xiend  ] = contour(K, H, fhand_norm(E00_all{xi_a==1}'),...
-    lvl_cnt, 'k', 'LineWidth', LW, 'DisplayName', sprintf('\\xi = %1.2f', xi_a(xi_a==1) ) ); 
+    lvl_cnt, 'r', 'LineWidth', LW, ...
+    'DisplayName', sprintf('\\xi = %1.2f', xi_a(1      ) ),...
+    'LineStyle','--'); 
 [~,hnd_xi1    ] = contour(K, H, fhand_norm(E00_all{end    }'),...
-    lvl_cnt, 'b', 'LineWidth', LW, 'DisplayName', sprintf('\\xi = %1.2f', xi_a(end    ) ) ); 
+    lvl_cnt, 'b', 'LineWidth', LW, ...
+    'DisplayName', sprintf('\\xi = %1.2f', xi_a(end    ) ),...
+    'LineStyle','--'); 
+[~,hnd_xiend  ] = contour(K, H, fhand_norm(E00_all{xi_a==1}'),...
+    lvl_cnt, 'k', 'LineWidth', LW*1.5, ...
+    'DisplayName', sprintf('\\xi = %1.2f', xi_a(xi_a==1) ) ); 
 
 
-legend([hnd_xistart, hnd_xiend, hnd_xi1], 'Location', 'best'); 
+% scatter(kmax_all_noan, hmax_all_noan, size_scat, 'red', 'filled'); 
+% scatter(kmax_all_noan(i_xi_true), hmax_all_noan(i_xi_true), size_scat*2, 'red', 'diamond', 'filled'); 
+% plot(kmax_all_noan, hmax_all_noan, 'red', 'LineWidth', 1.);
+% text(kmax_all_noan+0.005, hmax_all_noan - 0.75, string(xi_a) )
+
+
+legend([hnd_xistart, hnd_xiend, hnd_xi1, hnd_true], 'Location', 'best'); 
 
 exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'multiple_contour', 'pdf'), 'ContentType', 'vector'); 
+
+
+%%
+figure(302); clf; hold on; set(gcf, 'pos', [-1089 329 364 218]); 
+subplot(1,1,1); hold on; 
+set(gca,'ydir', 'reverse', 'LineWidth', 1.5);
+grid on; 
+box on; 
+xlabel('\kappa'); 
+ylabel('H (km)'); 
+title('H-\kappa stack \xi corrected', 'fontweight', 'normal'); 
+% contourf(K, H, Exi_all{i_xi_true}', 30, 'EdgeAlpha', 0.1); 
+
+plt_ylim = [40, 50]; 
+plt_xlim = [1.6, 1.9]; 
+ylim(plt_ylim); 
+xlim(plt_xlim); 
+
+% plot([ktrue, ktrue], plt_ylim + [-1, 1])
+hnd_true = scatter(ktrue, ztrue, 200, [252, 3, 252]./256, 'pentagram', 'filled', ...
+    'LineWidth', 1, 'MarkerEdgeColor', 'k',... 
+    'DisplayName', 'True'); 
+
+lvl_cnt = [0.7, 0.95]; 
+LW = 1; 
+[~,hnd_xistart] = contour(K, H, fhand_norm(Exi_all{1      }'),...
+    lvl_cnt, 'r', 'LineWidth', LW, ...
+    'DisplayName', sprintf('\\xi = %1.2f', xi_a(1      ) ),...
+    'LineStyle','--'); 
+[~,hnd_xi1    ] = contour(K, H, fhand_norm(Exi_all{end    }'),...
+    lvl_cnt, 'b', 'LineWidth', LW, ...
+    'DisplayName', sprintf('\\xi = %1.2f', xi_a(end    ) ),...
+    'LineStyle','--'); 
+[~,hnd_xiend  ] = contour(K, H, fhand_norm(Exi_all{xi_a==1}'),...
+    lvl_cnt, 'k', 'LineWidth', LW*1.5, ...
+    'DisplayName', sprintf('\\xi = %1.2f', xi_a(xi_a==1) ) ); 
+
+
+% scatter(kmax_all_noan, hmax_all_noan, size_scat, 'red', 'filled'); 
+% scatter(kmax_all_noan(i_xi_true), hmax_all_noan(i_xi_true), size_scat*2, 'red', 'diamond', 'filled'); 
+% plot(kmax_all_noan, hmax_all_noan, 'red', 'LineWidth', 1.);
+% text(kmax_all_noan+0.005, hmax_all_noan - 0.75, string(xi_a) )
+
+
+% legend([hnd_xistart, hnd_xiend, hnd_xi1, hnd_true], 'Location', 'best'); 
+
+exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'multiple_contour', 'pdf'), 'ContentType', 'vector'); 
+
 
 
 %%
@@ -310,8 +378,9 @@ exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rftiming', 'pdf'), 'ContentType
 
 %%
 figure(203); clf; hold on; 
-set(gcf, 'pos', [-826 509 362 233]); 
+set(gcf, 'pos', [-826 509 291 168]); 
 box on; 
+grid on; 
 set(gca,'LineWidth', 1.5); 
 xlabel('\xi true')
 
@@ -330,22 +399,33 @@ plot(xi_a, kerr, '-');
 %%
 zylim = [0, 60]; 
 model_cor = each_model{i_xi_true}; %model we did the correction to 
+LW = 1.5; 
 
 figure(204); clf; hold on; 
-set(gcf, 'pos', [1692 177 467 323]); 
+set(gcf, 'pos', [-800 377 317 240]); 
 tiledlayout(1,2,'TileSpacing','compact'); 
 % sgtitle('Model'); 
 
-nexttile(); hold on; set(gca, 'LineWidth', 1.5, 'YDir', 'reverse'); box on; ylim(zylim); 
+nexttile(); hold on; set(gca, 'LineWidth', LW, 'YDir', 'reverse'); box on; ylim(zylim); 
 xlabel('Velocity (km/s)'); 
-plot(model_cor.VS, model_cor.z, 'DisplayName', 'VS'); 
-plot(model_cor.VP, model_cor.z, 'DisplayName', 'Vp'); 
+grid on; 
+plot(model_cor.VS, model_cor.z, 'DisplayName', 'VS', 'LineWidth', LW); 
+plot(model_cor.VP, model_cor.z, 'DisplayName', 'Vp', 'LineWidth', LW); 
 legend(); 
+xlim([min(model_cor.VS-0.75), max(model_cor.VP+0.75)])
 
 ylabel('Depth (km)'); 
 
-nexttile(); hold on; set(gca, 'LineWidth', 1.5, 'YDir', 'reverse'); box on; ylim(zylim); 
+nexttile(); hold on; set(gca, 'LineWidth', LW, 'YDir', 'reverse'); box on; ylim(zylim); 
 xlabel('% Anisotropy'); 
-plot(   model_cor.Sanis, model_cor.z, 'DisplayName', '+ \xi'); 
-plot( - model_cor.Panis, model_cor.z, 'DisplayName', '- \psi'); 
+grid on; 
+set(gca, 'yticklabel', []); 
+plot(   model_cor.Sanis, model_cor.z, 'DisplayName', '+ \xi', ...
+    'LineWidth', LW, 'LineStyle','-'); 
+plot( - model_cor.Panis, model_cor.z, 'DisplayName', '- \phi', ...
+    'LineWidth', LW*1.5, 'LineStyle','--'); 
+% xticks = string(get(gca, 'XTicklabel')) ; 
+% xticks(xticks~="0") = ""; 
+% set(gca, 'xticklabels', xticks); 
+xlim([-18, 0 + 3]); 
 legend(); 
