@@ -2,7 +2,7 @@ function [ data ] = z1_SYNTH_DATA_h_kappa(par,trudata,trumodel,ifplot)
 %% brb2022.02.08 Function to calculate synthetic h-kappa stack from
 % synthetic receiver functions. 
 
-ifplot = false; warning('brb2022.02.08 remove ifplot')
+ifplot = false;  if ifplot; warning('brb2022.02.08 remove ifplot'); end; 
 
 samprate = par.synth.samprate;
 data = trudata; 
@@ -20,7 +20,6 @@ if any(string(pdtyps(:,1))=='HKstack'); % Use the Ps receiver function to get h-
                    'tt',   trudata.RF_Ps.tt, ...
                    'rayParmSecDeg', trudata.RF_Ps.rayp); % Parameters used in forward modelling HK stack on waveforms. 
     
-               
     trumodelIso = trumodel;
     trumodelIso.Panis = trumodel.Panis .* 0; 
     trumodelIso.Sanis = trumodel.Sanis .* 0; 

@@ -323,7 +323,7 @@ LW = 1;
 
 % legend([hnd_xistart, hnd_xiend, hnd_xi1, hnd_true], 'Location', 'best'); 
 
-exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'multiple_contour', 'pdf'), 'ContentType', 'vector'); 
+exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'multiple_contour_hkcor', 'pdf'), 'ContentType', 'vector'); 
 
 
 
@@ -394,6 +394,12 @@ ylabel('\kappa error')
 plot(xi_a, kerr, 'o'); 
 plot(xi_a, kerr, '-'); 
 
+exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rf_error', 'pdf'), 'ContentType', 'vector'); 
+
+%% Try to plot objective function, or something like that. 
+
+figure(401); clf; hold on; box on; grid on; set(gca,'LineWidth', 1.5); 
+
 
 
 %%
@@ -429,3 +435,5 @@ plot( - model_cor.Panis, model_cor.z, 'DisplayName', '- \phi', ...
 % set(gca, 'xticklabels', xticks); 
 xlim([-18, 0 + 3]); 
 legend(); 
+
+exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'synth_model', 'pdf'), 'ContentType', 'vector'); 
