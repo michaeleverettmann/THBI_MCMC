@@ -3,7 +3,9 @@ function [trudata,par] = a2_LOAD_DATA(par,options)
         par
         options.nwk = [] % Must provide if loading real data
         options.sta = [] % Must provide if loading real data
-        options.xi_crust = 1.05; 
+        options.xi_crust = 1.05;  
+        options.h_crust = 45; 
+        options.k_crust = 1.75; 
     end
 % function to load data (differs depending on which synth or real)
 
@@ -29,7 +31,8 @@ elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
     fprintf(' > Creating custom model and synthetic data\n')
     
     % make synth model
-    [model,laymodel,par] = z0_SYNTH_MODEL_splinemoduse(par,0, 'xi_crust', options.xi_crust);  %close(95)
+    [model,laymodel,par] = z0_SYNTH_MODEL_splinemoduse(par,0, 'xi_crust', options.xi_crust,...
+        'h_crust',options.h_crust, 'vpvs_crust', options.k_crust);  %close(95)
     save([par.res.resdir,'/trumodel'],'TRUEmodel');
 
     % make synth data

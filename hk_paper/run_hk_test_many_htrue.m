@@ -1,130 +1,30 @@
-% close all 
-% clear all % Cannot clear all, because then we allways reset network_manual and station_manual below. 
-%% Setup
-run('../a0_STARTUP_BAYES.m')
-
-addpath('/Users/brennanbrunsvik/Documents/repositories/hk_anis'); %brb TODO need to move this. 
-
-fig_path = sprintf('%s/../figures/hk_paper', pwd()) ; 
-fhand_figname = @(zmoh, k, thisfig, frmt)sprintf(...
-    '%s/z%3.0f_k%3.0f_%s.%s',fig_path, zmoh*10, k*100, thisfig, frmt); % Convenient function to make figure names. Get rid of decimals. 
-
-proj = struct('name', 'SYNTHETICS'); % bb2021.08.04 changed from EXAMPLE because I don't have the example data files. %,'EXAMPLE');
-paths = getPaths(); 
-proj.STAinversions = paths.STAinversions; 
-proj.dir = [fileparts(mfilename('fullpath')),'/'];
-proj.STAinversions = paths.STAinversions; ; % [proj.dir,'inversion_results/'];
-save([proj.dir,'project_details.mat'],'proj')
-
-wd = pwd; addpath(wd);
-cd(proj.dir);
-
-%% specify details of this run
-generation = 0; % generation of solution and data processing
-gc = '';
-BWclust = '';
-STAMP = 'hk_paper_1';
-onesta = '';
-
-%% put parameters in place 
-global run_params
-
-% you can obviously adapt these (likely in some loop over stations etc.) to be appropriate for your dataset
-run_params.projname = proj.name; % from above
-run_params.gc = gc; % great circle distance of body wave data, if relevant
-run_params.BWclust = BWclust; % cluster of BW data, if relevant
-run_params.datN = generation; % processing iteration, if relevant
-run_params.STAMP = STAMP; % NEED - some identifier for this inversion run
-run_params.overwrite = 1; % do you want to overwrite previous results?
-% % % if ~ (exist('network_manual', 'var') && exist('station_manual', 'var')) ; 
-network_manual = 'testnwk'; 
-station_manual = 'simple_layers_1'; %
-fprintf('\nReseting to %s.%s\n',network_manual,station_manual)
-% % % end
-run_params.sta = station_manual; % name of station
-run_params.nwk = network_manual; % name of network
-
-
-global run_params
-paths = getPaths(); 
-
-projname = run_params.projname;
-sta = run_params.sta;
-nwk = run_params.nwk;
-gc = run_params.gc;
-BWclust = run_params.BWclust;
-datN = run_params.datN;
-STAMP = run_params.STAMP;
-overwrite = run_params.overwrite;
-global projdir TRUEmodel
-projdir = [paths.THBIpath,'/',projname,'/'];
-cd(projdir);
-run([paths.THBIpath,'/a0_STARTUP_BAYES']);
-load('project_details'); %TODO_STATION_NETWORK bb2021.11.12
-addpath([proj.dir,'matguts/']);
-
-%% PARMS
-run parms/bayes_inv_parms
-[par, inv] = update_bayes_inv_parms(par, STAMP); % Modify this function to make different tests. 
-
-
-if strcmp(projname,'SYNTHETICS')
-    par.stadeets = struct('sta',sta','nwk',nwk'); 
-	noisesta = 'RSSD';
-	noisenwk = 'IU';
-	noisegcarcs = [73,38];
-	noiseshape = 'real'; % 'white' or 'real'
-	noiseup = 0.5; % factor to increase real noise
-end
-
-if strcmp(projname,'SYNTHETICS') || strcmp(projname,'LAB_tests')
-    par.synth.noise_sta_deets = struct('datadir',['/Volumes/data/THBI/US/STAsinv/',noisesta,'_dat20/'],...
-                         'sta',noisesta,'nwk',noisenwk,'gc',noisegcarcs,'noiseup',noiseup,'noiseshape',noiseshape);
-end
-
-par.inv.BWclust = BWclust;
-ifsavedat = false;
-
-%% get saving things ready
-par.proj = proj;
-avardir = sprintf('%s%s_%s_dat%.0f/',par.proj.STAinversions,sta,nwk,datN);
-resdir = [avardir,STAMP];
-if ~exist(resdir,'dir'), try mkdir(resdir); catch, error('Looks like no path to output directory - is it mounted?'); end, end
-
-par.data = struct('stadeets',struct('sta',sta,'nwk',nwk,'Latitude',[],'Longitude',[]),...
-                  'gc',gc,'datN',datN,'avardir',avardir);
-
-par.res.STAMP = STAMP;
-par.res.resdir= resdir;
-par.res = orderfields(par.res,{'STAMP','resdir','zatdep'});
-
-%% Get some directories ready. 
-% Switch to execution folder, to make synthetic data. 
-prev_dir = pwd(); 
-cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
-mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
+run_hk_test_setup_bs; % This does some obnoxious setup. % Run it then comment it out if you want to save some time. 
 
 %% HK tests, analysis, starts here. 
 xi_a = [0.85, 0.9, 0.95, 1, 1.05, 1.1, 1.15]'; 
 xi_true = 0.85; 
-xi_a = sort(unique([xi_a; xi_true])); 
-nxi = length(xi_a); 
+if ~ any(xi_a == xi_true); error('Pick xi true that is in xi_a'); end
 i_xi_true = find(xi_a == xi_true); 
+nxi = length(xi_a); 
 
-ztrue_a = [nan]; 
-ktrue_a = [nan]; 
+ztrue_a = [15, 25, 35, 45, 55 ]; 
+% ktrue_a = [1.75];
+
+nzi = length(ztrue_a); 
+nki = length(ktrue_a); 
 
 
-% % % par.datprocess.kNum = 1001; 
-% % % par.datprocess.hNum = 1000; 
-par.datprocess.kNum = 1001; 
-par.datprocess.hNum = 1000; 
+% par.datprocess.kNum = 101; 
+% par.datprocess.hNum = 100; 
+par.datprocess.kNum = 201; 
+par.datprocess.hNum = 200; 
 warning('Less hk resolution right now')
+
+% Exi_all = zeros(nzi, nki, nxi, ) % Nope, not worth it
 
 Exi_all = cell([length(xi_a), 1]); 
 E00_all = cell([length(xi_a), 1]); 
-% t_predxi_all = cell([length(xi_a), 1]); 
-% t_pred00_all = cell([length(xi_a), 1]); 
+
 t_pred_xi_best_all = zeros(length(xi_a), 3); 
 t_pred_xi_noan_all = zeros(length(xi_a), 3); 
 
@@ -136,9 +36,13 @@ rf_all = cell(length(xi_a),1);
 herr = zeros(nxi, 1); 
 kerr = zeros(nxi, 1); 
 
+dhedxi = zeros(length(ztrue_a),1); % Change in h error with respect to xi. 
+dkedxi = zeros(length(ztrue_a),1); 
+
 global TRUEmodel %Unfortunately this was already used as a global model
 each_model = {}; 
 
+for iztrue  = 1:length(ztrue_a); 
 for ixi = 1:length(xi_a);  
 %     for ixi = i_xi_true;  
 
@@ -146,10 +50,11 @@ for ixi = 1:length(xi_a);
 
 %     ztrue = 45; 
 %     ktrue = 1.75; 
-    xitruei = xi_a(ixi); 
+    xitruei = xi_a(ixi);
+    ztruei = ztrue_a(iztrue); 
 
     [trudata,par] = a2_LOAD_DATA_hk_test(par, 'nwk', nwk, 'sta', sta, ...
-        'xi_crust', xitruei );
+        'xi_crust', xitruei , 'h_crust',  ztruei);
 
     each_model{ixi, 1} = TRUEmodel; 
     ztrue = TRUEmodel.zmoh; 
@@ -207,6 +112,35 @@ for ixi = 1:length(xi_a);
 %     interp2(H, K, E00, hmax, kmax)
     %%%
 end
+
+
+xi_small = 0.9; 
+xi_large = 1.1; 
+is_xi_small = xi_a == xi_small; 
+is_xi_large = xi_a == xi_large; 
+dhedxi(iztrue) = (herr(is_xi_large) - herr(is_xi_small)) / (xi_a(is_xi_large) - xi_a(is_xi_small)) / 100; 
+dkedxi(iztrue) = (kerr(is_xi_large) - kerr(is_xi_small)) / (xi_a(is_xi_large) - xi_a(is_xi_small)) / 100; 
+end
+
+%%
+figure(501); clf; hold on; 
+set(gcf, 'pos', [-826 509 291 168]); 
+box on; 
+grid on; 
+set(gca,'LineWidth', 1.5); 
+xlabel('H true')
+
+yyaxis left; 
+ylabel('dH_{sol}/dxi_{true}'); 
+plot(ztrue_a, dhedxi, 'o')
+plot(ztrue_a, dhedxi, '-')
+
+yyaxis right; 
+ylabel('dK_{sol}/dxi_{true}'); 
+plot(ztrue_a, dkedxi, 'o'); 
+plot(ztrue_a, dkedxi, '-'); 
+
+exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rf_error_with_H', 'pdf'), 'ContentType', 'vector'); 
  
 %%
 figure(201); clf; hold on; 
@@ -402,9 +336,43 @@ exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rf_error', 'pdf'), 'ContentType
 
 %% Try to plot objective function, or something like that. 
 
+%ztrue, ktrue, xi_true
+
+% For this, need to make E that is nxi x nh x nk, (or something like that).
+Eob = zeros(nxi, par.datprocess.kNum, par.datprocess.hNum); 
+for ixi = 1:nxi; 
+    Eob(ixi,:,:) = Exi_all{ixi}; 
+end
+
+ind_closest = @(H, ztrue)find(abs(H - ztrue) == min(abs(H - ztrue))); % Index closest to H in ztrue. Obviously don't have to use H and ztrue. 
+
+ztruei = ind_closest(H, ztrue); 
+ktruei = ind_closest(K, ktrue); 
+xitruei= ind_closest(xi_a, xi_true); 
+
+Etmp = Eob(:, ktruei, :); 
+
+flatar = @(M)reshape(M,[],1); % flat array
+
+ylim_man = [-0.01, 0.11]; 
 figure(401); clf; hold on; box on; grid on; set(gca,'LineWidth', 1.5); 
+tiledlayout(3,1,'TileSpacing','compact'); 
 
+nexttile(), hold on, ylim(ylim_man), box on, grid on; 
+xlabel('Moho depth (km)'); xlim([25, 60]); 
+plot( H, flatar(Eob(xitruei, ktruei, :)) ,...
+    'k'); 
 
+nexttile(), hold on, ylim(ylim_man), box on, grid on; 
+xlabel('Vp/Vs'); % xlim([25, 60]); 
+ylabel('E')
+plot( K, Eob(xitruei, :, ztruei) ,...
+    'k'); 
+
+nexttile(), hold on, ylim(ylim_man), box on, grid on; 
+xlabel('\xi'); 
+plot( xi_a, Eob(:,ktruei, ztruei) ,...
+    'k'); 
 
 %%
 zylim = [0, 60]; 

@@ -26,7 +26,7 @@ use_splines = false;
 if strcmp(versta, 'orig'); % Original(ish) version. 
     selev = 0;
     h_sed = 0;
-    h_crust = 45;
+    h_crust = options.h_crust;
 
     vs_sed = [3.3 3.3];
 
@@ -49,7 +49,7 @@ if strcmp(versta, 'orig'); % Original(ish) version.
 elseif strcmp(versta, 'sed_deep'); % Original(ish) version. 
     selev = 0; 
     h_sed = 4.1; %<
-    h_crust = 45;
+    h_crust = options.h_crust;
 
     vs_sed = [1.5 2.5]; %<
 
@@ -73,7 +73,7 @@ elseif strcmp(versta, 'sed_deep'); % Original(ish) version.
 elseif strcmp(versta, 'crat_2mld'); % Original(ish) version. 
     selev = 0; 
     h_sed = 1; 
-    h_crust = 45;
+    h_crust = options.h_crust;
 
     vs_sed = [1.5 2.5]; 
 
@@ -100,7 +100,7 @@ elseif strcmp(versta, 'crat_2mld'); % Original(ish) version.
 elseif strcmp(versta, 'simple_layers_1'); 
     selev = 0;
     h_sed = 0;
-    h_crust = 45;
+    h_crust = options.h_crust;
 
     vs_sed = [3.5, 3.5];
 
