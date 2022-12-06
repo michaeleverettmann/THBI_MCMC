@@ -7,17 +7,18 @@ if ~ any(xi_a == xi_true); error('Pick xi true that is in xi_a'); end
 i_xi_true = find(xi_a == xi_true); 
 nxi = length(xi_a); 
 
-ztrue_a = [15, 25, 35, 45, 55 ]; 
+% ztrue_a = [15, 25, 35, 45, 55 ]; 
+ztrue_a = 25:5:55; 
 % ktrue_a = [1.75];
 
 nzi = length(ztrue_a); 
-nki = length(ktrue_a); 
+% nki = length(ktrue_a); 
 
 
 % par.datprocess.kNum = 101; 
 % par.datprocess.hNum = 100; 
-par.datprocess.kNum = 201; 
-par.datprocess.hNum = 200; 
+par.datprocess.kNum = 501; 
+par.datprocess.hNum = 500; 
 warning('Less hk resolution right now')
 
 % Exi_all = zeros(nzi, nki, nxi, ) % Nope, not worth it
@@ -53,6 +54,7 @@ for ixi = 1:length(xi_a);
     xitruei = xi_a(ixi);
     ztruei = ztrue_a(iztrue); 
 
+    par.mod.crust.hmin = 5; 
     [trudata,par] = a2_LOAD_DATA_hk_test(par, 'nwk', nwk, 'sta', sta, ...
         'xi_crust', xitruei , 'h_crust',  ztruei);
 
@@ -113,32 +115,107 @@ for ixi = 1:length(xi_a);
     %%%
 end
 
+% % % % Take simple slop between two points. 
+% % % xi_small = 0.9; 
+% % % xi_large = 1.1; 
+% % % is_xi_small = xi_a == xi_small; 
+% % % is_xi_large = xi_a == xi_large; 
+% % % dhedxi(iztrue) = (herr(is_xi_large) - herr(is_xi_small)) / (xi_a(is_xi_large) - xi_a(is_xi_small)) /100 ; 
+% % % dkedxi(iztrue) = (kerr(is_xi_large) - kerr(is_xi_small)) / (xi_a(is_xi_large) - xi_a(is_xi_small)) /100 ; 
+% % % 
+% % % figure(1); clf; hold on; 
+% % % subplot(2,1,1); hold on; ylabel('H err'); 
+% % % scatter(xi_a, herr)
+% % % subplot(2,1,2); hold on; ylabel('K err');
+% % % scatter(xi_a, kerr)
+% % % xlabel('\xi')
 
-xi_small = 0.9; 
-xi_large = 1.1; 
-is_xi_small = xi_a == xi_small; 
-is_xi_large = xi_a == xi_large; 
-dhedxi(iztrue) = (herr(is_xi_large) - herr(is_xi_small)) / (xi_a(is_xi_large) - xi_a(is_xi_small)) / 100; 
-dkedxi(iztrue) = (kerr(is_xi_large) - kerr(is_xi_small)) / (xi_a(is_xi_large) - xi_a(is_xi_small)) / 100; 
+% Alternate way of getting slope. Solve 2nd order polynomial, taking the
+% 1st derivative slope at xi = 0. 
+dxip = (xi_a - 1) * 100; 
+dhp  = herr ./ ztrue * 100 ;
+dkp  = kerr ./ ktrue * 100 ; 
+[hpol, hpfun] = polyfit( dxip , dhp , 2); 
+[kpol, kpfun] = polyfit( dxip , dkp , 2); 
+
+xlin_plot = linspace(min(dxip), max(dxip) ); 
+g0 = find(xlin_plot>=0); % where is xlin_plot greater than 0?
+g0 = g0(1); 
+l0 = g0-1; % where is xlin_plot just less than 0? Doesn't matter if these two are offset by an integer or two. 
+
+dhpre = polyval(hpol, xlin_plot'); 
+dkpre = polyval(kpol, xlin_plot'); 
+dh_slope = hpol(end-1); 
+dk_slope = kpol(end-1); 
+% dh_slope = (dhpre(g0) - dhpre(l0)) / (xlin_plot(g0) - xlin_plot(l0) ); 
+% dk_slope = (dkpre(g0) - dkpre(l0)) / (xlin_plot(g0) - xlin_plot(l0) ); 
+
+
+dhedxi(iztrue) = dh_slope; 
+dkedxi(iztrue) = dk_slope; 
+
+figure(2); clf; hold on; set(gcf,'pos',[2024 1360 318 206]); 
+grid on; box on; set(gca, 'LineWidth', 1.5); 
+ylabel('Percent change'); 
+title(sprintf('H = %1.2f km',ztrue), 'fontweight', 'normal'); 
+scatter(dxip, dhp)
+hnd_h = plot(xlin_plot, dhpre, 'DisplayName',sprintf(...
+    'dH/d\\xi, slope = %1.3f',dh_slope)); 
+% subplot(2,1,2); hold on; ylabel('K err');
+scatter(dxip, dkp)
+hnd_k = plot(xlin_plot, dkpre, 'DisplayName',...
+    sprintf('dK/d\\xi, slope = %1.3f',dk_slope) ); 
+xlabel('d\xi (%)')
+legend([hnd_h, hnd_k]); 
+
 end
 
+% dhedxi = dhedxi .^ (-1); 
+% dkedxi = dkedxi .^ (-1); 
+
+% % % dhedxi = dhedxi ./ ztrue_a' * 100; 
+% % % dkedxi = dkedxi ./ ktrue * 100; % Don't have vector of k true yet
+
+% % % %%
+% % % figure(501); clf; hold on; 
+% % % set(gcf, 'pos', [-826 509 291 168]); 
+% % % set(gcf, 'pos', [2051 776 291 168]); 
+% % % box on; 
+% % % grid on; 
+% % % set(gca,'LineWidth', 1.5); 
+% % % xlabel('H_{true}')
+% % % title('Sensitivity to \xi versus H', 'FontWeight','normal'); 
+% % % 
+% % % % yyaxis left; 
+% % % ylabel('%dH_{sol} / %\xi_{true}'); 
+% % % plot(ztrue_a, dhedxi, 'o')
+% % % plot(ztrue_a, dhedxi, '-')
+% % % 
+% % % % yyaxis right; 
+% % % ylabel('%dK_{sol} / %\xi_{true}'); 
+% % % plot(ztrue_a, dkedxi, 'o'); 
+% % % plot(ztrue_a, dkedxi, '-'); 
+% % % 
+% % % exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rf_error_with_H', 'pdf'), 'ContentType', 'vector'); 
 %%
 figure(501); clf; hold on; 
 set(gcf, 'pos', [-826 509 291 168]); 
+set(gcf, 'pos', [2051 776 291 168]); 
 box on; 
 grid on; 
 set(gca,'LineWidth', 1.5); 
-xlabel('H true')
+xlabel('H_{true}')
+title('Sensitivity to \xi versus H', 'FontWeight','normal'); 
 
-yyaxis left; 
-ylabel('dH_{sol}/dxi_{true}'); 
-plot(ztrue_a, dhedxi, 'o')
-plot(ztrue_a, dhedxi, '-')
+% ylabel('%dH_{sol} / %\xi_{true}'); 
+hnd_h = scatter(ztrue_a, dhedxi, 'filled', 'DisplayName', '%dH_{sol} / %d\xi_{true}')
+% plot(ztrue_a, dhedxi, '-')
 
-yyaxis right; 
-ylabel('dK_{sol}/dxi_{true}'); 
-plot(ztrue_a, dkedxi, 'o'); 
-plot(ztrue_a, dkedxi, '-'); 
+% ylabel('%dK_{sol} / %\xi_{true}'); 
+hnd_k = scatter(ztrue_a, dkedxi, 'filled', 'DisplayName', '%dK_{sol} / %d\xi_{true}'); 
+% plot(ztrue_a, dkedxi, '-'); 
+
+legend([hnd_h, hnd_k], 'Location', 'best'); 
 
 exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rf_error_with_H', 'pdf'), 'ContentType', 'vector'); 
  
@@ -147,7 +224,7 @@ figure(201); clf; hold on;
 subplot(1,2,1); hold on; 
 set(gca,'ydir', 'reverse'); 
 contourf(K, H, Exi_all{i_xi_true}', 30, 'EdgeAlpha', 0.1); 
-ylim([25, 55]); 
+ylim([5, 55]); 
 xlim([1.6, 1.9]); 
 
 %%% Percentage contours
