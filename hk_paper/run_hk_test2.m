@@ -310,35 +310,55 @@ for ixi = 1:nxi;
     Eob(ixi,:,:) = Exi_all{ixi}; 
 end
 
-ind_closest = @(H, ztrue)find(abs(H - ztrue) == min(abs(H - ztrue))); % Index closest to H in ztrue. Obviously don't have to use H and ztrue. 
+ind_closest = @(H, ztrue)find(abs(H - ztrue) == min(abs(H - ztrue))); % Index closest to H in ztrue. 
 
 ztruei = ind_closest(H, ztrue); 
 ktruei = ind_closest(K, ktrue); 
 xitruei= ind_closest(xi_a, xi_true); 
+
+Ebest = Eob(xitruei, ktruei, ztruei); 
 
 Etmp = Eob(:, ktruei, :); 
 
 flatar = @(M)reshape(M,[],1); % flat array
 
 ylim_man = [-0.01, 0.11]; 
-figure(401); clf; hold on; box on; grid on; set(gca,'LineWidth', 1.5); 
+figure(401); clf; hold on; box on; grid on; 
+set(gcf, 'pos', [2235 809 407 359]); 
 tiledlayout(3,1,'TileSpacing','compact'); 
+LW = 1.25; 
 
-nexttile(), hold on, ylim(ylim_man), box on, grid on; 
-xlabel('Moho depth (km)'); xlim([25, 60]); 
+nexttile(), hold on, ylim(ylim_man), box on, grid on; set(gca,'LineWidth', LW); 
+xlabel('H (km)'); xlim([25, 60]); 
 plot( H, flatar(Eob(xitruei, ktruei, :)) ,...
-    'k'); 
+    'k', 'LineWidth', LW); 
+sct = scatter(ztrue, Ebest, 150, 'yellow', 'filled', 'pentagram', 'MarkerEdgeColor', 'k'); 
+text(0.03, 0.1, sprintf('$\\kappa=%1.2f$ km, $\\xi = %1.2f$', ktrue, xi_true), ...
+    'Units', 'normalized', 'VerticalAlignment', 'bottom',...
+    'Interpreter','latex'); 
 
-nexttile(), hold on, ylim(ylim_man), box on, grid on; 
-xlabel('Vp/Vs'); % xlim([25, 60]); 
+nexttile(), hold on, ylim(ylim_man), box on, grid on; set(gca,'LineWidth', LW); 
+xlabel('\kappa'); % xlim([25, 60]); 
 ylabel('E')
 plot( K, Eob(xitruei, :, ztruei) ,...
-    'k'); 
+    'k', 'LineWidth', LW); 
+sct = scatter(ktrue, Ebest, 150, 'yellow', 'filled', 'pentagram', 'MarkerEdgeColor', 'k'); 
+text(0.03, 0.1, sprintf('$H=%1.1f$ km, $\\xi = %1.2f$', ztrue, xi_true), ...
+    'Units', 'normalized', 'VerticalAlignment', 'bottom',...
+    'Interpreter','latex'); 
 
-nexttile(), hold on, ylim(ylim_man), box on, grid on; 
+nexttile(), hold on, ylim(ylim_man), box on, grid on; set(gca,'LineWidth', LW); 
 xlabel('\xi'); 
 plot( xi_a, Eob(:,ktruei, ztruei) ,...
-    'k'); 
+    'k', 'LineWidth', LW); 
+sct = scatter(xi_true, Ebest, 150, 'yellow', 'filled', 'pentagram', 'MarkerEdgeColor', 'k'); 
+% xlim([0.8, 1.2]); 
+text(0.03, 0.1, sprintf('$H=%1.1f$ km, $\\kappa = %1.2f$', ztrue, ktrue), ...
+    'Units', 'normalized', 'VerticalAlignment', 'bottom',...
+    'Interpreter','latex'); 
+
+exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'HK_objective_function', 'pdf'), 'ContentType', 'vector'); 
+
 
 %%
 zylim = [0, 60]; 
