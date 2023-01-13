@@ -141,6 +141,14 @@ end
 % % % end
 
 %% Set figure layout
+c_xilow = [159, 16, 199]./255; 
+c_xihi  = [17, 130, 32]./255; 
+c_mod_true = 'y'; % Yellow
+c_t_with_xi = [3, 15, 252]./255; ;
+c_t_no_xi = [230, 2, 14]./255; 
+c_t_iso = 'green'; 
+
+
 figmain = figure(501); clf; 
 set(figmain, 'pos', [2284 706 735 561]); 
 nxt = 10; 
@@ -172,28 +180,28 @@ ylabel('Depth (km)'); % yticklabels([]);
 axes(ax3); 
 xlabel('Time (s)'); 
 yticklabels([]); 
-ttl3 = title('Phase Timing', 'FontWeight','normal'); 
+ttl3 = title('Synthetic Receiver Functions', 'FontWeight','normal'); 
 
 axes(ax4); 
 xlabel('\kappa'); 
 ylabel('H (km)'); 
-title('HK stack: ignoring \xi', 'fontweight', 'normal'); 
+title('H\kappa stack: ignoring \xi', 'fontweight', 'normal'); 
 
 axes(ax5); 
 xlabel('\kappa'); 
 ylabel('H (km)'); 
 % yticklabels([]); 
-title('HK stack: \xi corrected', 'fontweight', 'normal'); 
+title('H\kappa stack: \xi corrected', 'fontweight', 'normal'); 
 
 
-%%%%%%%% Synth model plots
+% %%%%%%%% Synth model plots
 zylim = [0, 60]; 
 model_cor = each_model{i_xi_true}; %model we did the correction to 
 LW = 1.5; 
 
 axes(ax1); hold on; set(gca, 'YDir', 'reverse'); 
 ylim(zylim); 
-plot(model_cor.VS, model_cor.z, 'DisplayName', 'VS', 'LineWidth', LW); 
+plot(model_cor.VS, model_cor.z, 'DisplayName', 'Vs', 'LineWidth', LW); 
 plot(model_cor.VP, model_cor.z, 'DisplayName', 'Vp', 'LineWidth', LW); 
 legend('Location','northeast'); 
 xlim([min(model_cor.VS-0.75), max(model_cor.VP+0.75)])
@@ -224,10 +232,10 @@ for ixi = 1:nxi
 
     hnd_t_xi = scatter(...
         t_pred_xi_best', yshift + interp1(waves.tt, rf, t_pred_xi_best, 'cubic'),...
-        40, 'blue', 'filled') % If using true parameters and anisotropic stack
+        40, 'filled', 'MarkerFaceColor', c_t_with_xi); % If using true parameters and anisotropic stack
     hnd_t_00 = scatter(...
         t_pred_xi_noan', yshift + interp1(waves.tt, rf, t_pred_xi_noan, 'cubic'),...
-        40, 'red', 'filled') % If using true parameters and isotropic stack
+        40, 'filled', 'MarkerFaceColor', c_t_no_xi) % If using true parameters and isotropic stack
     hnd_rf = plot(waves.tt, yshift+rf, 'k', 'linewidth', 1.5);
 
     if ixi == nxi; 
@@ -260,22 +268,22 @@ plt_xlim = [1.6, 1.9];
 ylim(plt_ylim); 
 xlim(plt_xlim); 
 
-hnd_true = scatter(ktrue, ztrue, 200, [252, 3, 252]./256, 'pentagram', 'filled', ...
+LW_scale = 1.75; 
+[~,hnd_xiend  ] = contour(K, H, fhand_norm(E00_all{xi_a==1}'),...
+    lvl_cnt, 'k', 'LineWidth', LW*LW_scale, ...
+    'DisplayName', sprintf('\\xi = %1.2f', xi_a(xi_a==1) ) ); 
+[~,hnd_xistart] = contour(K, H, fhand_norm(E00_all{1      }'),...
+    lvl_cnt, 'LineWidth', LW*LW_scale, 'color', c_xilow,...
+    'DisplayName', sprintf('\\xi = %1.2f', xi_a(1      ) ),...
+    'LineStyle','-'); 
+[~,hnd_xi1    ] = contour(K, H, fhand_norm(E00_all{end    }'),...
+    lvl_cnt, 'LineWidth', LW*LW_scale, 'color', c_xihi,...
+    'DisplayName', sprintf('\\xi = %1.2f', xi_a(end    ) ),...
+    'LineStyle','-'); 
+
+hnd_true = scatter(ktrue, ztrue, 200, 'yellow', 'pentagram', 'filled', ...
     'LineWidth', 1, 'MarkerEdgeColor', 'k',... 
     'DisplayName', 'True'); 
-
-
-[~,hnd_xistart] = contour(K, H, fhand_norm(E00_all{1      }'),...
-    lvl_cnt, 'r', 'LineWidth', LW, ...
-    'DisplayName', sprintf('\\xi = %1.2f', xi_a(1      ) ),...
-    'LineStyle','--'); 
-[~,hnd_xi1    ] = contour(K, H, fhand_norm(E00_all{end    }'),...
-    lvl_cnt, 'b', 'LineWidth', LW, ...
-    'DisplayName', sprintf('\\xi = %1.2f', xi_a(end    ) ),...
-    'LineStyle','--'); 
-[~,hnd_xiend  ] = contour(K, H, fhand_norm(E00_all{xi_a==1}'),...
-    lvl_cnt, 'k', 'LineWidth', LW*1.5, ...
-    'DisplayName', sprintf('\\xi = %1.2f', xi_a(xi_a==1) ) ); 
 
 %%%%%%%% HK stack with anis
 axes(ax5); 
@@ -284,21 +292,22 @@ set(gca,'ydir', 'reverse');%, 'LineWidth', 1.5);
 ylim(plt_ylim); 
 xlim(plt_xlim); 
 
-hnd_true = scatter(ktrue, ztrue, 200, [252, 3, 252]./256, 'pentagram', 'filled', ...
+[~,hnd_xiend  ] = contour(K, H, fhand_norm(Exi_all{xi_a==1}'),...
+    lvl_cnt, 'k', 'LineWidth', LW*LW_scale, ...
+    'DisplayName', sprintf('\\xi = %1.2f', xi_a(xi_a==1) ) ); 
+[~,hnd_xistart] = contour(K, H, fhand_norm(Exi_all{1      }'),...
+    lvl_cnt, 'LineWidth', LW*LW_scale, 'color', c_xilow,...
+    'DisplayName', sprintf('\\xi = %1.2f', xi_a(1      ) ),...
+    'LineStyle','-'); 
+[~,hnd_xi1    ] = contour(K, H, fhand_norm(Exi_all{end    }'),...
+    lvl_cnt, 'LineWidth', LW*LW_scale, 'color', c_xihi,...
+    'DisplayName', sprintf('\\xi = %1.2f', xi_a(end    ) ),...
+    'LineStyle','-'); 
+
+
+hnd_true = scatter(ktrue, ztrue, 200, 'yellow', 'pentagram', 'filled', ...
     'LineWidth', 1, 'MarkerEdgeColor', 'k',... 
     'DisplayName', 'True'); 
-
-[~,hnd_xistart] = contour(K, H, fhand_norm(Exi_all{1      }'),...
-    lvl_cnt, 'r', 'LineWidth', LW, ...
-    'DisplayName', sprintf('\\xi = %1.2f', xi_a(1      ) ),...
-    'LineStyle','--'); 
-[~,hnd_xi1    ] = contour(K, H, fhand_norm(Exi_all{end    }'),...
-    lvl_cnt, 'b', 'LineWidth', LW, ...
-    'DisplayName', sprintf('\\xi = %1.2f', xi_a(end    ) ),...
-    'LineStyle','--'); 
-[~,hnd_xiend  ] = contour(K, H, fhand_norm(Exi_all{xi_a==1}'),...
-    lvl_cnt, 'k', 'LineWidth', LW*1.5, ...
-    'DisplayName', sprintf('\\xi = %1.2f', xi_a(xi_a==1) ) ); 
 
 legend([hnd_xistart, hnd_xiend, hnd_xi1, hnd_true], 'Location', 'best'); 
 
@@ -308,6 +317,7 @@ exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rf_synth_paper', 'pdf'), 'Conte
 
 
 %% HK stack error figure
+LW = 1.5; 
 figure(203); clf; hold on; 
 set(gcf, 'pos', [-826 509 291 168]); 
 box on; 
@@ -316,14 +326,14 @@ set(gca,'LineWidth', 1.5);
 xlabel('\xi true')
 
 yyaxis left; 
-ylabel('H error (km)'); 
-plot(xi_a, herr, 'o')
-plot(xi_a, herr, '-')
+ylabel('H offset (km)'); 
+scatter(xi_a, herr, 50, 'filled'); 
+plot(xi_a, herr, '-', 'LineWidth', LW); 
 
 yyaxis right; 
-ylabel('\kappa error')
-plot(xi_a, kerr, 'o'); 
-plot(xi_a, kerr, '-'); 
+ylabel('\kappa offset')
+scatter(xi_a, kerr, 50, 'filled'); 
+plot(xi_a, kerr, '-', 'LineWidth', LW); 
 
 exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rf_error', 'pdf'), 'ContentType', 'vector'); 
 

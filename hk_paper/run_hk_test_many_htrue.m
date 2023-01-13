@@ -1,5 +1,7 @@
 run_hk_test_setup_bs; % This does some obnoxious setup. % Run it then comment it out if you want to save some time. 
 
+fig_dir = '~/Documents/UCSB/ENAM/THBI_ENAM/figures/hk_paper'; 
+
 %% HK tests, analysis, starts here. 
 xi_a = [0.85, 0.9, 0.95, 1, 1.05, 1.1, 1.15]'; 
 xi_true = 0.85; 
@@ -217,7 +219,7 @@ hnd_k = scatter(ztrue_a, dkedxi, 'filled', 'DisplayName', '%dK_{sol} / %d\xi_{tr
 
 legend([hnd_h, hnd_k], 'Location', 'best'); 
 
-exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rf_error_with_H', 'pdf'), 'ContentType', 'vector'); 
+exportgraphics(gcf, [fig_dir, '/rf_sensitivity_to_xi_vers_h.pdf'], 'ContentType', 'vector'); 
  
 %%
 figure(201); clf; hold on; 
