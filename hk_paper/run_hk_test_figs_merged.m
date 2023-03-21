@@ -141,12 +141,13 @@ end
 % % % end
 
 %% Set figure layout
-c_xilow = [159, 16, 199]./255; 
-c_xihi  = [17, 130, 32]./255; 
-c_mod_true = 'y'; % Yellow
-c_t_with_xi = [3, 15, 252]./255; ;
+c_xilow = [179, 54, 214]./255; % Low values of xi
+c_xihi = [201, 135, 2]./255; 
+c_mod_true = 'y'; % Yellow, star? 
+c_t_with_xi = [3, 15, 252]./255; ;% Anisotropic 
 c_t_no_xi = [230, 2, 14]./255; 
-c_t_iso = 'green'; 
+c_t_iso = [10, 247, 30]./255; 
+cnt_mod = 1/1.5; % Multiply colors by this when doing contours. Make them a bit darker. 
 
 
 figmain = figure(501); clf; 
@@ -201,8 +202,9 @@ LW = 1.5;
 
 axes(ax1); hold on; set(gca, 'YDir', 'reverse'); 
 ylim(zylim); 
-plot(model_cor.VS, model_cor.z, 'DisplayName', 'Vs', 'LineWidth', LW); 
-plot(model_cor.VP, model_cor.z, 'DisplayName', 'Vp', 'LineWidth', LW); 
+plot(model_cor.VS, model_cor.z, 'k', 'DisplayName', 'Vs', 'LineWidth', LW); 
+plot(model_cor.VP, model_cor.z, 'k', 'DisplayName', 'Vp', 'LineWidth', LW,...
+    'LineStyle','--'); 
 legend('Location','northeast'); 
 xlim([min(model_cor.VS-0.75), max(model_cor.VP+0.75)])
 
@@ -211,10 +213,10 @@ set(gca, 'YDir', 'reverse');
 ylim(zylim); 
 axes(ax2); ylim(zylim); 
 
-plot(   model_cor.Sanis/100+1, model_cor.z, 'DisplayName', '+ \xi', ...
+plot(   model_cor.Sanis/100+1, model_cor.z, 'k', 'DisplayName', '\xi', ...
     'LineWidth', LW, 'LineStyle','-'); 
-plot( - model_cor.Panis/100+1, model_cor.z, 'DisplayName', '- \phi', ...
-    'LineWidth', LW*1.5, 'LineStyle','--'); 
+plot( - model_cor.Panis/100+1, model_cor.z, 'DisplayName', '1/\phi', ...
+    'LineWidth', LW*1.5, 'LineStyle','--', 'Color', [4, 184, 139]./255); 
 xlim([0.8, 1.05]); 
 legend('Location','northeast'); 
 
@@ -244,7 +246,7 @@ for ixi = 1:nxi
         xilabel = "      "; 
     end
 
-    text(0.75, yshift + yshift_const * .5, sprintf('%s%1.2f', xilabel, xi_a(ixi) ) )
+    text(0.75, yshift + yshift_const * .5, sprintf('%s%1.2f', xilabel, xi_a(ixi) ) );
 
 end
 
@@ -270,7 +272,7 @@ xlim(plt_xlim);
 
 LW_scale = 1.75; 
 [~,hnd_xiend  ] = contour(K, H, fhand_norm(E00_all{xi_a==1}'),...
-    lvl_cnt, 'k', 'LineWidth', LW*LW_scale, ...
+    lvl_cnt, 'k', 'LineWidth', LW*LW_scale, ... 'color', c_t_with_xi.*cnt_mod, ...
     'DisplayName', sprintf('\\xi = %1.2f', xi_a(xi_a==1) ) ); 
 [~,hnd_xistart] = contour(K, H, fhand_norm(E00_all{1      }'),...
     lvl_cnt, 'LineWidth', LW*LW_scale, 'color', c_xilow,...
@@ -281,7 +283,7 @@ LW_scale = 1.75;
     'DisplayName', sprintf('\\xi = %1.2f', xi_a(end    ) ),...
     'LineStyle','-'); 
 
-hnd_true = scatter(ktrue, ztrue, 200, 'yellow', 'pentagram', 'filled', ...
+hnd_true = scatter(ktrue, ztrue, 200, c_mod_true, 'pentagram', 'filled', ...
     'LineWidth', 1, 'MarkerEdgeColor', 'k',... 
     'DisplayName', 'True'); 
 
@@ -293,7 +295,7 @@ ylim(plt_ylim);
 xlim(plt_xlim); 
 
 [~,hnd_xiend  ] = contour(K, H, fhand_norm(Exi_all{xi_a==1}'),...
-    lvl_cnt, 'k', 'LineWidth', LW*LW_scale, ...
+    lvl_cnt, 'k', 'LineWidth', LW*LW_scale, ...'color', c_t_with_xi.*cnt_mod, ...
     'DisplayName', sprintf('\\xi = %1.2f', xi_a(xi_a==1) ) ); 
 [~,hnd_xistart] = contour(K, H, fhand_norm(Exi_all{1      }'),...
     lvl_cnt, 'LineWidth', LW*LW_scale, 'color', c_xilow,...
@@ -305,7 +307,7 @@ xlim(plt_xlim);
     'LineStyle','-'); 
 
 
-hnd_true = scatter(ktrue, ztrue, 200, 'yellow', 'pentagram', 'filled', ...
+hnd_true = scatter(ktrue, ztrue, 200, c_mod_true, 'pentagram', 'filled', ...
     'LineWidth', 1, 'MarkerEdgeColor', 'k',... 
     'DisplayName', 'True'); 
 

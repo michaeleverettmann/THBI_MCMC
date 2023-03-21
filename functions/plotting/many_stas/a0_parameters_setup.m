@@ -22,6 +22,8 @@ addpath('~/Documents/UCSB/ENAM/THBI_ENAM/functions');
 addpath('~/MATLAB/seizmo/cmap'); warning('adding cmap in seismo. Is this breaking split?'); 
 addpath('~/MATLAB/borders'); 
 addpath('~/Documents/repositories/general_data'); % For topography loading. get_z_etopo1.m
+addpath('~/Documents/repositories/Base_code/colormaps/colormaps_ander_biguri'); 
+
 
 % specify details of this run
 generation = 1; % generation of solution and data processing

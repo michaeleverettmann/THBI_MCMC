@@ -88,7 +88,9 @@ if ~isempty(stax);
     end
 end
 
-colorbar(); 
+cbar = colorbar(); 
+cbar.Label.String = 'Vs'; 
+% cbar.Position = [0.9    0.1426    0.0452    0.7512]; 
 cmap = turbo(); 
 cmap = cmap(end:-1:1,:); 
 colormap(cmap); 
@@ -104,8 +106,8 @@ if ~ isempty(options.sectlon);
         [sectx, secty] = m_ll2xy(options.sectlon(:,isect), options.sectlat(:,isect) );  
         plot(sectx, secty, 'k', 'Linewidth', 3); 
         section_letter = char(64+isect); 
-        t1=text(sectx(1  ), secty(1  ), section_letter    , 'fontsize', 20, 'color', 'r');
-        t2=text(sectx(end), secty(end), section_letter+"'", 'fontsize', 20, 'color', 'r');
+        t1=text(sectx(1  ), secty(1  ), section_letter    , 'fontsize', 22, 'color', 'r');
+        t2=text(sectx(end), secty(end), section_letter+"'", 'fontsize', 22, 'color', 'r');
     end
 end
 
