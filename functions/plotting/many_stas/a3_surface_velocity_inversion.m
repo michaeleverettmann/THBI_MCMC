@@ -9,13 +9,13 @@ rough_scale_base = 1e-9; % How much to penalize roughness.
 re_run = false; 
 
 rough_scale_params = struct('zmoh', .0015*rough_scale_base,...
-    'zsed', .1*rough_scale_base ); % Based on the max and min values in any parameter, determine how to change the roughness penalty. 
+    'zsed', .1*rough_scale_base, 'xicr', .01*rough_scale_base); % Based on the max and min values in any parameter, determine how to change the roughness penalty. 
 
 max_inv_iterations = 30; % How many iterations to allow in inversion. 
 
 for version_surf = [7]; % Temporary loop
 
-disconts = {"zsed", "zmoh"}; 
+disconts = {"xicr", "zsed", "zmoh"}; 
 % disconts = {"zmoh"}; %brb TODO add in zsed again. 
 
 % % % to_invert = disconts; % Which model parameters to run. Those come first because they can influence later inversions.  
@@ -210,7 +210,11 @@ if v_at_depth
     end
     pdfs = pdfs_vs; %!%! replace pdfs_vs. 
 else
-    pdfs = [pdfs.(iinv)]; 
+    iinvmod = iinv; 
+    if strcmp(iinv, "xicr"); 
+        iinvmod = iinv+"ust"; 
+    end
+    pdfs = [pdfs.(iinvmod)]; 
 end
 %%% Put this in function later. 
 
