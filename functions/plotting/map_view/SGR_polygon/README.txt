@@ -1,0 +1,1 @@
+SGR_poly_ptX.txt and .mat files were generated using "digitize_polygons.m", which was a very rough and manually intense code to plot points using ginput. I drew the figure based on "Insights into the mode of the South Georgia rift extension in eastern Georgia, USA, Clendenin 2013". They cited Chowns, 2009, but I think they meant 1989 since I cannot find that figure.

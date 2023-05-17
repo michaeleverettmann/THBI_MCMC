@@ -1,0 +1,1 @@
+tl_2017_us_state.zip is state borders from government website. Retried on 2021.03.22: https://hifld-geoplatform.opendata.arcgis.com/datasets/us-state-boundaries

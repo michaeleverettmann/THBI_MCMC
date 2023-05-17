@@ -16,8 +16,8 @@ nki = length(ktrue_a);
 
 % par.datprocess.kNum = 101; 
 % par.datprocess.hNum = 100; 
-par.datprocess.kNum = 201; 
-par.datprocess.hNum = 200; 
+par.datprocess.kNum = 501; 
+par.datprocess.hNum = 500; 
 warning('Less hk resolution right now')
 
 % Exi_all = zeros(nzi, nki, nxi, ) % Nope, not worth it
@@ -103,6 +103,10 @@ for ixi = 1:length(xi_a);
     hmax_all_best(ixi) = hmax_best; 
     kmax_all_best(ixi) = kmax_best; 
 
+    fprintf('\nXi = %1.3f. \n    H = %1.2f, K = %1.3f.\n    dH = %1.3f. percent dH = %1.3f.\n    dK = %1.4f. Percent dK = %1.4f\n',...
+        xitruei, hmax_noan, kmax_noan, hmax_noan-ztrue, (hmax_noan-ztrue)/ztrue*100, ...
+        kmax_noan-ktrue, (kmax_noan-ktrue)/ktrue*100) % brb2023.03.31 Working on this. 
+
     %%% How much error in the non-anisotropic HK stack? 
 %     interp2(H, K, E00, hmax, kmax)
     %%%
@@ -148,6 +152,8 @@ c_t_with_xi = [3, 15, 252]./255; ;% Anisotropic
 c_t_no_xi = [230, 2, 14]./255; 
 c_t_iso = [10, 247, 30]./255; 
 cnt_mod = 1/1.5; % Multiply colors by this when doing contours. Make them a bit darker. 
+xlbl = 0; 
+ylbl = 1.05; 
 
 
 figmain = figure(501); clf; 
@@ -171,28 +177,36 @@ end
 axes(ax1); 
 xlabel('Velocity (km/s)'); 
 ylabel('Depth (km)'); 
-ttl12 = title('Synthetic Model Example', 'fontweight', 'normal'); 
-set(ttl12, 'Position', [1.30 1.0190 0.5000], 'Units', 'normalized') % Manually adjust title position to cover ax1 and ax2
+% ttl12 = title('Synthetic Model Example', 'fontweight', 'normal'); 
+% set(ttl12, 'Position', [1.30 1.0190 0.5000], 'Units', 'normalized') % Manually adjust title position to cover ax1 and ax2
+title('Velocity', 'fontweight', 'normal'); 
+text(xlbl, ylbl, '(a)', 'Units','normalized'); 
 
 axes(ax2); 
-xlabel('\xi'); 
+xlabel('Anisotropy'); 
 ylabel('Depth (km)'); % yticklabels([]); 
+title('Anisotropy', 'fontweight', 'normal');  
+text(xlbl, ylbl, '(b)', 'Units','normalized'); 
+
 
 axes(ax3); 
 xlabel('Time (s)'); 
 yticklabels([]); 
 ttl3 = title('Synthetic Receiver Functions', 'FontWeight','normal'); 
+text(xlbl, ylbl, '(c)', 'Units','normalized'); 
 
 axes(ax4); 
 xlabel('\kappa'); 
 ylabel('H (km)'); 
 title('H\kappa stack: ignoring \xi', 'fontweight', 'normal'); 
+text(xlbl, ylbl, '(d)', 'Units','normalized'); 
 
 axes(ax5); 
 xlabel('\kappa'); 
 ylabel('H (km)'); 
 % yticklabels([]); 
 title('H\kappa stack: \xi corrected', 'fontweight', 'normal'); 
+text(xlbl, ylbl, '(e)', 'Units','normalized'); 
 
 
 % %%%%%%%% Synth model plots
@@ -237,7 +251,7 @@ for ixi = 1:nxi
         40, 'filled', 'MarkerFaceColor', c_t_with_xi); % If using true parameters and anisotropic stack
     hnd_t_00 = scatter(...
         t_pred_xi_noan', yshift + interp1(waves.tt, rf, t_pred_xi_noan, 'cubic'),...
-        40, 'filled', 'MarkerFaceColor', c_t_no_xi) % If using true parameters and isotropic stack
+        40, 'filled', 'MarkerFaceColor', c_t_no_xi); % If using true parameters and isotropic stack
     hnd_rf = plot(waves.tt, yshift+rf, 'k', 'linewidth', 1.5);
 
     if ixi == nxi; 
@@ -317,6 +331,25 @@ legend([hnd_xistart, hnd_xiend, hnd_xi1, hnd_true], 'Location', 'best');
 exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rf_synth_paper', 'pdf'), 'ContentType', 'vector');  
 %%% End main figure! 
 
+%% Some calculations on change in HK stacks with anisotropy
+% Relies on external function, get_hk_best.m 
+% [~, ~, H_bst_low, K_bst_low] = get_hk_best(E00_all, 1, H, K); 
+% [~, ~, H_bst_hi , K_bst_hi ] = get_hk_best(E00_all, size(E00_all, 1), H, K); 
+% [~, ~, H_bst_00 , K_bst_00 ] = get_hk_best(E00_all, xi_a == 1, H, K); 
+% 
+% (H_bst_hi - H_bst_00)
+% [~, ~, H_bst_00 , K_bst_00 ] = get_hk_best(E00_all, xi_a == 1, H, K); 
+% fprintf('\n\n')
+% for ixi = 1:length(xi_a); 
+%     [~, ~, H_bst_xi , K_bst_xi ] = get_hk_best(E00_all,ixi, H, K); 
+%     dH = -(H_bst_xi - H_bst_00); 
+%     dH_prct = dH/H_bst_00*100; 
+%     dK = -(K_bst_xi - K_bst_00); 
+%     dK_prct = dK/K_bst_00*100; 
+%     fprintf('\nXi = %1.3f. \n    H = %1.2f, K = %1.3f.\n    dH = %1.3f. percent dH = %1.3f.\n    dK = %1.4f. Percent dK = %1.4f\n',...
+%         xi_a(ixi), H_bst_xi, K_bst_xi, dH, dH_prct, dK, dK_prct)
+% end
+
 
 %% HK stack error figure
 LW = 1.5; 
@@ -342,12 +375,15 @@ exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rf_error', 'pdf'), 'ContentType
 %% Try to plot objective function, or something like that. 
 
 %ztrue, ktrue, xi_true
+E_intersect = 0.9;  % Want to know which values intersect this high of E
 
 % For this, need to make E that is nxi x nh x nk, (or something like that).
 Eob = zeros(nxi, par.datprocess.kNum, par.datprocess.hNum); 
 for ixi = 1:nxi; 
     Eob(ixi,:,:) = Exi_all{ixi}; 
 end
+
+Eob = Eob ./ max(Eob, [], 'all'); % Normalize it. 
 
 ind_closest = @(H, ztrue)find(abs(H - ztrue) == min(abs(H - ztrue))); % Index closest to H in ztrue. 
 
@@ -361,7 +397,10 @@ Etmp = Eob(:, ktruei, :);
 
 flatar = @(M)reshape(M,[],1); % flat array
 
-ylim_man = [-0.01, 0.11]; 
+% ylim_man = [-0.01, 0.11]; 
+ylim_man = [-.1, 1.1]; 
+% ylim_man = [0.75, 0.76]; 
+
 figure(401); clf; hold on; box on; grid on; 
 set(gcf, 'pos', [2235 809 251 366]); 
 tiledlayout(3,1,'TileSpacing','compact'); 
@@ -369,32 +408,42 @@ LW = 1.25;
 
 nexttile(), hold on, ylim(ylim_man), box on, grid on; set(gca,'LineWidth', LW); 
 xlabel('H (km)'); xlim([25, 60]); 
-plot( H, flatar(Eob(xitruei, ktruei, :)) ,...
+toplt = flatar(Eob(xitruei, ktruei, :)); 
+plot( H, toplt ,...
     'k', 'LineWidth', LW); 
 sct = scatter(ztrue, Ebest, 150, 'yellow', 'filled', 'pentagram', 'MarkerEdgeColor', 'k'); 
 text(0.03, 0.1, sprintf('$\\kappa=%1.2f$ km, $\\xi = %1.2f$', ktrue, xi_true), ...
     'Units', 'normalized', 'VerticalAlignment', 'bottom',...
     'Interpreter','latex'); 
+intersecting_x = funct_find_intersection(H, toplt, E_intersect) ; 
+fprintf('H crosses %1.2f at [%s]\n\n', E_intersect, sprintf('%1.3f, ', intersecting_x))
+
 
 nexttile(), hold on, ylim(ylim_man), box on, grid on; set(gca,'LineWidth', LW); 
 xlabel('\kappa'); % xlim([25, 60]); 
-ylabel('E')
-plot( K, Eob(xitruei, :, ztruei) ,...
+ylabel('E'); 
+toplt = Eob(xitruei, :, ztruei); 
+plot( K, toplt ,...
     'k', 'LineWidth', LW); 
 sct = scatter(ktrue, Ebest, 150, 'yellow', 'filled', 'pentagram', 'MarkerEdgeColor', 'k'); 
 text(0.03, 0.1, sprintf('$H=%1.1f$ km, $\\xi = %1.2f$', ztrue, xi_true), ...
     'Units', 'normalized', 'VerticalAlignment', 'bottom',...
     'Interpreter','latex'); 
+intersecting_x = funct_find_intersection(K, toplt, E_intersect) ; 
+fprintf('K crosses %1.2f at [%s]\n\n', E_intersect, sprintf('%1.3f, ', intersecting_x))
 
 nexttile(), hold on, ylim(ylim_man), box on, grid on; set(gca,'LineWidth', LW); 
 xlabel('\xi'); 
-plot( xi_a, Eob(:,ktruei, ztruei) ,...
+toplt = Eob(:,ktruei, ztruei); 
+plot( xi_a, toplt ,...
     'k', 'LineWidth', LW); 
 sct = scatter(xi_true, Ebest, 150, 'yellow', 'filled', 'pentagram', 'MarkerEdgeColor', 'k'); 
 % xlim([0.8, 1.2]); 
 text(0.03, 0.1, sprintf('$H=%1.1f$ km, $\\kappa = %1.2f$', ztrue, ktrue), ...
     'Units', 'normalized', 'VerticalAlignment', 'bottom',...
     'Interpreter','latex'); 
+intersecting_x = funct_find_intersection(xi_a, toplt, E_intersect) ; 
+fprintf('xi crosses %1.2f at [%s]\n\n', E_intersect, sprintf('%1.3f, ', intersecting_x))
 
 exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'HK_objective_function', 'pdf'), 'ContentType', 'vector'); 
 

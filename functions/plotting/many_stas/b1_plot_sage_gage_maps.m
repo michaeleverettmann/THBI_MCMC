@@ -56,6 +56,8 @@ sfsmat2 = load(sprintf('zmoh/surface_values_V%1.0f', version_surf));
 zmoh_surf = sfsmat2.mgrid_out; 
 sfsmat2 = load(sprintf('zsed/surface_values_V%1.0f', version_surf)); 
 zsed_surf = sfsmat2.mgrid_out; 
+sfsmat3 = load(sprintf('xicr/surface_values_V%1.0f', version_surf)); 
+xi_surf = sfsmat3.mgrid_out; 
 
 % Load topo
 [lon_top, lat_top, z_top...
@@ -83,7 +85,7 @@ tiledlayout(2, 3, 'TileSpacing', 'tight');
 
 
 pt_dist_nan = 1; 
-pt_dist = zeros(size(grd_cont)); 
+pt_dist = zeros(size(xgrid)); 
 for ipt = 1:(size(xgrid, 1) * size(xgrid,2)); 
     pt_dist(ipt) = min(distance(latgrid(ipt), longrid(ipt), ...
         mdls.lat, mdls.lon));
@@ -99,35 +101,39 @@ m_proj('mercator', 'long',[ll_min_max_map(1), ll_min_max_map(2)],...
                    'lat',[ll_min_max_map(3), ll_min_max_map(4)]);
 m_coast('patch',[1 1 1]); 
 
-% Pick the right surface. 
+% Pick the right surface.
+cnt_num = 100; 
 if ifig >=4; 
     ind_depth = ifig-3; 
     grd_cont = mgrid3d(:,:,ind_depth); 
     label = string(sprintf('Z=%1.0f km', depths(ind_depth))) + newline + "Vs (km/s)"; 
-    cmap = turbo(); 
+    cmap = turbo(12); 
     cmap = flip(cmap); 
     colormap(gca, cmap); 
     if ind_depth == 1; 
-        caxis([3.6, 3.9]); 
+        clim([3.6, 3.9]); 
     elseif any(ind_depth == [2,3]); 
-        caxis([4.35, 4.75]); 
+        clim([4.35, 4.75]); 
     end
 elseif ifig == 1; 
     grd_cont = zmoh_surf; 
     label = 'Moho (km)'; 
-    colormap(gca, viridis); 
-%     caxis([])
+    colormap(gca, viridis(12)); 
+    clim([-25, 50]);    
+    clim_min = 5*floor(min(zmoh_surf, [], 'all')/5)  ; % Round in 5s
+    clim_max = 5*floor(max(zmoh_surf, [], 'all')/5)  ;
+    clim([clim_min, clim_max]); 
 elseif ifig == 2; 
     grd_cont = zsed_surf;
     label = "Sediment (km)"; 
-    colormap(gca, viridis); 
+    colormap(gca, viridis()); 
 %     set(gca,'ColorScale','log'); Later could make this log... 
-    caxis([0, 1]); 
+    clim([0, 1]); 
 elseif ifig == 3; 
-    grd_cont = zmoh_surf; % TEMPORARY 
-    label = '\xi=(Vsh/Vvh)^2'; 
-    colormap(gca, redblue()); 
-    caxis([0.9, 1.1]); 
+    grd_cont = xi_surf; % TEMPORARY 
+    label = '\xi=(Vsh/Vsv)^2'; 
+    colormap(gca, redblue(13)); 
+    clim(1+[-1, 1].*.1); 
 end
 grd_cont(pt_dist > pt_dist_nan) = nan; 
 % Colorbar and label
@@ -137,11 +143,14 @@ cbar = colorbar('Location', 'south');
 cbar.Position(3) = ax.Position(3) * .4; 
 % disp(cbar.Position)
 cbar.Position(1) = (ax.Position(1)+ax.Position(3)*.5) ; 
+if ifig == 1; 
+    cbar.Position(1) = cbar.Position(1) - 0.01; % For some reason first axis is off. 
+end
 
 options.vgrid(pt_dist > pt_dist_nan) = nan; 
 
 num_cnt = 100; 
-m_contourf(longrid, latgrid, grd_cont, num_cnt,...
+m_contourf(longrid, latgrid, grd_cont, cnt_num,...
     'LineStyle','none'); 
 
 % States
@@ -177,8 +186,10 @@ end
     m_plot(gre_bord(1,:), gre_bord(2,:), 'linewidth', 3, 'color', [102, 45, 1]./255); 
 % end
 if ifig == 1; 
-    m_text(-83, 41, 'GRNVL', 'color', [1,1,1]); 
-    m_text(-85, 35, 'APPLN', 'color', [1,1,1]); 
+    m_text(-82, 39, 'Grenville', 'color', [1,1,1].*0, 'fontsize', 10, ...
+        'rotation', 53, 'horizontalalignment', 'center', 'verticalalignment', 'middle', 'fontweight', 'bold'); 
+    m_text(-82, 36, 'Appalachian', 'color', [1,1,1].*0, 'fontsize', 10, ...
+        'rotation', 45, 'horizontalalignment', 'center', 'verticalalignment', 'middle', 'fontweight', 'bold'); 
 
 end
 

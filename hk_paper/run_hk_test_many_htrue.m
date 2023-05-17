@@ -210,11 +210,13 @@ xlabel('H_{true}')
 title('Sensitivity to \xi versus H', 'FontWeight','normal'); 
 
 % ylabel('%dH_{sol} / %\xi_{true}'); 
-hnd_h = scatter(ztrue_a, dhedxi, 'filled', 'DisplayName', '%dH_{sol} / %d\xi_{true}')
-% plot(ztrue_a, dhedxi, '-')
+hnd_h = scatter(ztrue_a, dhedxi, 'filled', 'DisplayName', ...
+    "%dH_{sol} / %d\xi_{true}, av=" + sprintf("%1.3f",...
+        mean(dhedxi) )); 
 
-% ylabel('%dK_{sol} / %\xi_{true}'); 
-hnd_k = scatter(ztrue_a, dkedxi, 'filled', 'DisplayName', '%dK_{sol} / %d\xi_{true}'); 
+hnd_k = scatter(ztrue_a, dkedxi, 'filled', 'DisplayName', ...
+    "%dK_{sol} / %d\xi_{true}, av=" + sprintf("%1.3f",...
+        mean(dkedxi) )); 
 % plot(ztrue_a, dkedxi, '-'); 
 
 legend([hnd_h, hnd_k], 'Location', 'best'); 
@@ -363,10 +365,10 @@ for ixi = 1:nxi
 
     hnd_t_xi = scatter(...
         t_pred_xi_best', yshift + interp1(waves.tt, rf, t_pred_xi_best, 'cubic'),...
-        40, 'blue', 'filled') % If using true parameters and anisotropic stack
+        40, 'blue', 'filled'); % If using true parameters and anisotropic stack
     hnd_t_00 = scatter(...
         t_pred_xi_noan', yshift + interp1(waves.tt, rf, t_pred_xi_noan, 'cubic'),...
-        40, 'red', 'filled') % If using true parameters and isotropic stack
+        40, 'red', 'filled'); % If using true parameters and isotropic stack
 %     hnd_t_xi = scatter(...
 %         t_pred_xi_best', yshift + interp1(waves.tt, rf, t_pred_xi_best, 'cubic'),...
 %         100, '+blue') % If using true parameters and anisotropic stack
@@ -403,13 +405,15 @@ xlabel('\xi true')
 
 yyaxis left; 
 ylabel('H error (km)'); 
-plot(xi_a, herr, 'o')
-plot(xi_a, herr, '-')
+scatter(xi_a, herr, 'o', 'filled'); 
+plot(xi_a, herr, '-', 'linewidth', 1.5); 
+ylim_cur = get(gca, 'ylim'); ylim_max = max(abs(ylim_cur));ylim([-ylim_max, ylim_max]); % Make 0 the center. 
 
 yyaxis right; 
-ylabel('\kappa error')
-plot(xi_a, kerr, 'o'); 
-plot(xi_a, kerr, '-'); 
+ylabel('\kappa error'); 
+scatter(xi_a, kerr, 'o', 'filled');  
+plot(xi_a, kerr, '-', 'linewidth', 1.5);  
+ylim_cur = get(gca, 'ylim'); ylim_max = max(abs(ylim_cur));ylim([-ylim_max, ylim_max]); % Make 0 the center. 
 
 exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rf_error', 'pdf'), 'ContentType', 'vector'); 
 
