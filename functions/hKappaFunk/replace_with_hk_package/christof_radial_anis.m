@@ -67,7 +67,7 @@ for iRay=[1:length(angAll)];
 
     zerVec = zeros(length(ang),1); 
     propDir = [ zerVec, sind(ang), -cosd(ang)]'; % ray propogation direct (sign doesn't matter). For some reason I drew propogation vector going down, positive is up. 
-    [vel,pvecs]=christof(propDir, cc, rho); % Phase velocity and particle motion vectors for three quasi waves. 
+    [vel,pvecs]=hk_christof(propDir, cc, rho); % Phase velocity and particle motion vectors for three quasi waves. 
     
     % Sort out which is p, sv, sh. 
     pInd = (abs(propDir' * pvecs)); % p is in same direction as propogation

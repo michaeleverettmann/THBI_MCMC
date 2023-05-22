@@ -394,15 +394,57 @@ end
 % Colorbars if vertical
 cbar_crust  = colorbar(ax_crust ,'Location', 'east'); 
 cbar_mantle = colorbar(ax_mantle,'Location', 'east'); 
-cbar_crust.Position      = [ax_dx(1) + 0.1  , ax_y(1), .02, ax_dy(1)]; 
-cbar_mantle.Position     = [ax_dx(1) + 0.2, ax_y(1), .02, ax_dy(1)]; 
+% cbar_crust.Position      = [ax_dx(1) + 0.1  , ax_y(1), .02, ax_dy(1)]; 
+% cbar_mantle.Position     = [ax_dx(1) + 0.2, ax_y(1), .02, ax_dy(1)]; 
+cbar_crust.Position      = [ax_dx(end) + 0.08  , ax_y(end), .0175, ax_dy(1)]; 
+cbar_mantle.Position     = [ax_dx(end) + 0.15 , ax_y(end), .0175, ax_dy(1)]; 
 cbar_crust.Label.String  = 'Crust Vs' ; 
 cbar_mantle.Label.String = 'Mantle Vs'; 
 
+%% Map view of cross-section locations. 
+% axmap = axes('Position', [ax_dx(end)+0.075, (ax_y(end)+ax_dy(end)/6), ax_dy(end)*.8, ax_dy(end)*.8]);
+axmap = axes('Position', [ax_dx(1)+0.1, (ax_y(1)), ax_dy(1)*.8, ax_dy(1)*.8]);
+cla; hold on; 
+m_proj('mercator', 'long',[ll_min_max_map(1)-1, ll_min_max_map(2)+1],...
+                   'lat',[ll_min_max_map(3)-2, ll_min_max_map(4)]); 
+% box on; 
+% set(gca,'Visible', 'off'); 
+[latbord, lonbord] = borders('states'); % add states map
+for iplace = 1:length(lonbord); 
+    m_line(lonbord{iplace}, latbord{iplace}, 'LineWidth',1,'color',.5*[1 1 1])
+end
+cst = m_coast('patch',.5*[1 1 1], 'FaceAlpha', 0); 
+xsect_letters = ["A", "B", "C", "D", "E", "F", "G", "H"]; 
+% xsect_letters = xsect_letters(size(lolim):-1:1); % Flip letters so we label going from top to bottom
+for ixsect = 1:size(lolim,1); 
+    Q1 = [lalim(ixsect, 1), lolim(ixsect, 1)];
+    Q2 = [lalim(ixsect, 2), lolim(ixsect, 2)]; 
+    [profd,profaz] = distance(Q1(1),Q1(2),Q2(1),Q2(2));
+    gcarc = linspace(0, profd, 100)'; 
+    d2km = 2 * pi * 6371 / 360; % Yes I know this is 111, but might as well be somewhat precise :) 
+    dist_arc = d2km * gcarc; % km 
+    [lat_surf_line, lon_surf_line] = reckon(Q1(1), Q1(2), gcarc, profaz); 
+    m_plot(lon_surf_line, lat_surf_line, 'k', 'linewidth', 2); 
+    m_text(lon_surf_line(1 )-.75, ...
+        lat_surf_line(1  )-0, ...
+        xsect_letters(ixsect), ...
+        'color', 'k', 'fontweight', 'normal', 'units', 'data', ...
+        'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', ...
+        'fontsize', 8); 
+    m_text(lon_surf_line(end) +1.75, ...
+        lat_surf_line(end),...
+        xsect_letters(ixsect)+"'", ...
+        'color', 'k', 'fontweight', 'normal', 'units', 'data', ...
+        'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', ...
+        'fontsize', 8);  
+end
+% m_grid('box','fancy','linestyle','none','gridcolor',.5 .*[1,1,1],...
+%     'backcolor','none', 'xtick', [-85:10:75], 'ytick', [35:10:45]); 
+m_grid('box','fancy','linestyle','none','gridcolor',.5 .*[1,1,1],...
+    'backcolor','none', 'xtick', [-85:10:75], 'ytick', [35:10:45], ...
+    'fontsize', 8, 'ylabeldir', 'middle', 'YaxisLocation', 'right'); 
 
-
-
-
+%%
 
 mkdir('xsections'); 
 exportgraphics(gcf, sprintf('sage_gage/xsections_V%1.0f.jpeg', version_surf), ...

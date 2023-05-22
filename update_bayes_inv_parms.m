@@ -8,30 +8,15 @@ str_temp = split(stamp, '/');
 
 
 % % % % { Different data types alone
-niter_only   = 16000; 
-burnin_only  = 4000 ; 
-cooloff_only = 3000 ; 
-nchains_only = 12   ; 
-% niter_only   = 1000; 
-% burnin_only  = 200 ; 
-% cooloff_only = 100 ; 
+% niter_only   = 16000; 
+% burnin_only  = 4000 ; 
+% cooloff_only = 3000 ; 
 % nchains_only = 12   ; 
-% % % 
-% niter_only   = 300  ; 
-% burnin_only  = 50   ;  
-% cooloff_only = 25   ; 
-% nchains_only = 1   ; 
-% par.mod.force_no_new_prior = true; warning('Not making new prior if needed'); 
 
-
-% niter_only   = 6000; 
-% burnin_only  = 300; 
-% cooloff_only = 200 ; 
-% nchains_only = 4  ; 
-% niter_only   = 300; 
-% burnin_only  = 30 ; 
-% cooloff_only = 20 ; 
-% nchains_only = 4  ; 
+niter_only   = 300; 
+burnin_only  = 30 ; 
+cooloff_only = 20 ; 
+nchains_only = 4  ; 
 
 if     strcmp(stamp, 'ENAM_trial'); 
     disp('Using default parameters') 
@@ -220,6 +205,16 @@ elseif strcmp(stamp, 'SW_HV_only');
     par.inv.burnin                    = burnin_only ; 
     par.inv.cooloff                   = cooloff_only; 
     par.inv.nchains                   = nchains_only;    
+elseif strcmp(stamp, 'all_no_hv'); 
+    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only ; 
+    par.inv.nchains                   = nchains_only   ; 
+
+
 
 % { --- ONE CHAIN Different data types alone
 elseif strcmp(stamp, 'SW_Ray_phV_only_one_chain'); 
@@ -464,14 +459,7 @@ elseif strcmp(stamp, 'all_003');
     par.inv.burnin                    = burnin_only ; 
     par.inv.cooloff                   = cooloff_only ; 
     par.inv.nchains                   = nchains_only   ; 
-elseif strcmp(stamp, 'all_no_hv'); 
-    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
-        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
-        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'};      
-    par.inv.niter                     = niter_only; 
-    par.inv.burnin                    = burnin_only ; 
-    par.inv.cooloff                   = cooloff_only ; 
-    par.inv.nchains                   = nchains_only   ; 
+
         
     
     

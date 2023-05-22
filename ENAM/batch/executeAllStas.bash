@@ -40,6 +40,8 @@ do
 
     echo "sbatch batch/executeOneStation.bash '$lineSta'"
     sbatch batch/executeOneStation.bash $lineSta
+    # echo "NOT USING SLURM batch/executeOneStation.bash '$lineSta'"
+    # ./batch/executeOneStation.bash $lineSta
 
 
 
