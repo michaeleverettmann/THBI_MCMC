@@ -274,5 +274,3 @@ end
 exportgraphics(gcf, sprintf('sage_gage/map_view_V%1.0f.jpeg', version_surf), ...
     'Resolution',500); 
 
-
-35

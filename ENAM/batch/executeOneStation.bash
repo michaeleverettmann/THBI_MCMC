@@ -2,7 +2,7 @@
 #SBATCH --nodes=1                    # Run all processes on a single node	
 #SBATCH --ntasks=1                   # Number of processes
 #SBATCH --cpus-per-task=12 # bb2021.11.17 I think there is one task for each par for iteration, taking one full CPU. Might have to adjust this. 
-#SBATCH --time=17:00:00   # bb2021.11.17 Might have to refine this, just to make sure a failed run will be terminated at a decent time.             # Time limit hrs:min:sec
+#SBATCH --time=20:00:00   # bb2021.11.17 Might have to refine this, just to make sure a failed run will be terminated at a decent time.             # Time limit hrs:min:sec
 ##SBATCH --nice=1000 # bb2021.11.17 Be nice to the other researchers and let their scripts take some precedence. Not in use right now, will be once I really start things. 
 ##SBATCH --output=batch/run_info/slurm.%j.out
 #SBATCH --output=batch/run_info/slurm.%A_%a.out

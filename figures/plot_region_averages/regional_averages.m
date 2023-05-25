@@ -10,11 +10,21 @@ f_regions = 'choose_split_regions/tect_regions.mat'; % File with polygons
 f_results = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_collate'; % Where are stations results stored? 
 f_sta_list_all = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/batch/staList_all.txt'; 
 f_stainf = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/INFO/stations.mat'; 
+tectpath1 = "/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/map_view/whitmeyer_karlstrom/layers/"; % Path to what is currently whitmeyer and karlstrom dataset. 
 
 sta_dir = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_collate/%s_%s_dat1/standard/'; 
 res_str = [sta_dir 'allmodels_perchain_orig.mat']; 
 desired_chains = 12; 
 desired_iter   = 16000; 
+
+% Colors for each region. 
+clr_reg = [[14, 207, 18]; ... % Appalachian
+    [109, 64, 149]; ... % Craton
+    [191, 94, 4]]./255; % Grennvile
+
+% clr_tectfiles = struct("grv_frt", color_front, "MCR", color_rift, ...
+%     "Reelfoot", color_rift, "something_province", color_thrust); % Field names have to precicely correspond to file names from this tectonic dataset. 
+
 
 stainf = load(f_stainf); 
 nt_sta = string(stainf.stainfo.nwk) + '_' + string(stainf.stainfo.stas); 
@@ -140,7 +150,7 @@ if recalculate;
     save([pwd '/stas_collated.mat'], 'regions_str', 'z_med', 'which_region', 'v_med', 'mcont', 'vcont'); 
 else
     %%
-    clear; 
+%     clear; 
     load('./stas_collated.mat'); 
 end
 
@@ -245,11 +255,6 @@ end
 figure(5); clf; hold on; 
 set(gcf, 'pos', [500 815 233 382]); 
 
-% Colors for each region. 
-clr_reg = [[14, 207, 18]; ... % Appalachian
-    [109, 64, 149]; ... % Craton
-    [191, 94, 4]]./255; % Grennvile
-
 make_lgd = []; % Hold legend handles. 
 
 for irgn = 1:length(regions_str); % Plot in reverse order to match west to east 
@@ -302,6 +307,7 @@ clr_reg = [[14, 207, 18]; ... % Appalachian
 
 make_lgd = []; % Hold legend handles. 
 
+profiles_export = zeros(length(z_med),  length(regions_str)); 
 for irgn = 1:length(regions_str); % Plot in reverse order to match west to east 
     fprintf('Plotting %s\n',regions_titles(irgn))
     box on; grid on; set(gca,'LineWidth', 1.5); 
@@ -336,12 +342,57 @@ for irgn = 1:length(regions_str); % Plot in reverse order to match west to east
     plot(percentiles(:,end), z_med, ...
         'linewidth', 1, 'Color', clr_reg(irgn,:)); 
 
+    profiles_export(:,irgn) = percentiles(:,prct_vals==0.5); 
+
 end
+
 legend(make_lgd); 
+
+%% Make a figure of where these averages are being taken. 
+figure(7); clf; hold on; set(gcf, 'pos', [946 849 233 382]); 
+app_bord = [-73.9819443, -74.619146 , -75.520073 , -76.1132732, -76.7944389,-77.1789631, -77.6294266, -77.9920049, -78.2117582, -78.4383114,-79.1416076, -79.8888598, -80.2331436, -80.7605221, -81.2438831,-81.9140786, -82.4853569, -83.2434644, -84.3284171, -84.7700317,-85.1106908, -85.5944904, -86.0889287, -87.330563; 40.4970924,  40.7306085,  40.9467137,  41.1455697,  41.2695495,41.2365112,  41.0959121,  40.8719878,  40.7056279,  40.3967643,39.5548831,  38.4965935,  38.1259146,  37.7272803,  37.5445773,37.3439591,  37.1603165,  36.8268747,  36.1733569,  35.880149 ,35.4427709,  34.7777158,  34.1799976,  32.9349287]; 
+app_bord2 = [-73.9819  -74.1099  -73.8461  -73.3406  -73.0769  -72.4395; 40.4971   40.9965   42.4397   43.8504   44.8247   45.6140];
+app_bord = [flipud(app_bord')', app_bord2]; 
+
+ll_min_max_map = [-90  -70   27   46]; % Map view
+projection = m_proj('mercator', 'long',[ll_min_max_map(1), ll_min_max_map(2)],...
+                   'lat',[ll_min_max_map(3), ll_min_max_map(4)]);
+% State lines
+% [latbord, lonbord] = borders('states'); % add states map
+% for iplace = 1:length(lonbord); 
+%     m_line(lonbord{iplace}, latbord{iplace}, 'LineWidth',1,'color',0.5*[1 1 1])
+% end
+cst = m_coast('patch',[1 1 1], 'FaceAlpha', 0, 'linewidth', 1.5); 
+xy = load(tectpath1 + "grv_frt_0.txt");  
+m_plot(xy(:,1), xy(:,2), 'Color', 'k', 'linewidth', 4); 
+m_plot(app_bord(1,:), app_bord(2,:), 'linewidth', 4, 'color', 'k'); 
+m_grid('box','on','linestyle','none','gridcolor',.5 .*[1,1,1],...
+    'backcolor','none', 'xticklabel', [], 'yticklabel', []);
+
+regions_str = string(fieldnames(regions)); 
+
+% iplace = 1; 
+for iplace = 1:length(regions_str); 
+    thisplace = regions.(regions_str(iplace)); 
+    [x,y]=m_ll2xy(thisplace(:,1), thisplace(:,2)); 
+    fill(x,y, clr_reg(iplace,:)); 
+end
+
 %% Save all figs
 exportgraphics(figure(1), 'vs_average_per_area.pdf'); 
 exportgraphics(figure(2), 'vs_average_merged.pdf'); 
 exportgraphics(figure(4), 'vs_heatmaps.pdf'); 
 exportgraphics(figure(5), 'vs_percentiles.pdf'); 
 exportgraphics(figure(6), 'vs_percentiles_crust.pdf'); 
+exportgraphics(figure(7), 'region_locations.pdf')
+
+% Save versions for gmt
+exportgraphics(figure(5), 'vs_percentiles.eps'); 
+exportgraphics(figure(7), 'region_locations.eps', 'ContentType','vector');
+
+
+%% Export results. 
+z_export = z_med'; 
+figure(7); clf; hold on; plot(profiles_export,z_export); set(gca, 'ydir', 'reverse'); 
+save('enam_mcmc_average_vel_profiles.mat', 'profiles_export', 'z_export', 'prct_vals', 'percentiles'); 
 

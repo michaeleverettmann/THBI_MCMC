@@ -6,20 +6,91 @@ function [par, inv] = update_bayes_inv_parms(parOrig, stamp);
 par = parOrig; 
 str_temp = split(stamp, '/'); 
 
+niter_only   = 16000; 
+burnin_only  = 4000 ; 
+cooloff_only = 3000 ; 
+nchains_only = 12   ; 
 
-% % % % { Different data types alone
-% niter_only   = 16000; 
-% burnin_only  = 4000 ; 
-% cooloff_only = 3000 ; 
-% nchains_only = 12   ; 
-
-niter_only   = 300; 
-burnin_only  = 30 ; 
-cooloff_only = 20 ; 
-nchains_only = 4  ; 
+% niter_only   = 500; 
+% burnin_only  = 30 ; 
+% cooloff_only = 20 ; 
+% nchains_only = 4  ; 
 
 if     strcmp(stamp, 'ENAM_trial'); 
     disp('Using default parameters') 
+
+%%% First list things I'm hoping to actually put in the paper
+elseif strcmp(stamp, 'standard_temp'); 
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;  
+
+% { Different data types alone 
+elseif strcmp(stamp, 'SW_Ray_phV_only'); 
+    par.inv.datatypes                 = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only; 
+elseif strcmp(stamp, 'SW_Lov_phV_only'); 
+    par.inv.datatypes                 = {'SW_Lov_phV'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only; 
+elseif strcmp(stamp, 'RF_Sp_ccp_only'); 
+    par.inv.datatypes                 = {'RF_Sp_ccp'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only; 
+elseif strcmp(stamp, 'HKstack_P_only'); 
+    par.inv.datatypes                 = {'HKstack_P'};
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only; 
+elseif strcmp(stamp, 'SW_HV_only'); 
+    par.inv.datatypes                 = {'SW_HV'}   ;
+    par.inv.niter                     = niter_only  ; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;  
+% } End different data types alone
+
+elseif strcmp(stamp, 'all_no_hv'); 
+%     par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+%         'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+%         'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'};    
+
+    % brb2023/05/23 added code to get rid of one data type. Modify as needed. 
+    dtp = par.inv.datatypes; 
+    dtp = string(dtp); 
+    dtp = dtp(dtp~="SW_HV")
+    dtp = cellstr(dtp); 
+    par.inv.datatypes = dtp; 
+
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only ; 
+    par.inv.nchains                   = nchains_only   ; 
+
+elseif strcmp(stamp, 'synth_no_sed'); 
+    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'};      
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;     
+    par.mod.sed.hmax                  = 0; 
+    par.mod.sed.vsmin                 = 3.3;
+    par.sed.vsmax                     = 3.3; 
+    par.mod.force_no_new_prior        = true; 
+
+
+
+%%% The rest of things were tests I ran while getting everything set up . 
+
     
 
 % % % 'h_kappa_tests/degree_of_freedom/*'
@@ -173,47 +244,6 @@ elseif strcmp(stamp, 'all_001');
     par.inv.cooloff                   = 4500; 
     par.inv.nchains                   = 16; 
     
-    
-% { --- Different data types alone 
-elseif strcmp(stamp, 'SW_Ray_phV_only'); 
-    par.inv.datatypes                 = {'SW_Ray_phV'};
-    par.inv.niter                     = niter_only  ; 
-    par.inv.burnin                    = burnin_only ; 
-    par.inv.cooloff                   = cooloff_only; 
-    par.inv.nchains                   = nchains_only; 
-elseif strcmp(stamp, 'SW_Lov_phV_only'); 
-    par.inv.datatypes                 = {'SW_Lov_phV'};
-    par.inv.niter                     = niter_only  ; 
-    par.inv.burnin                    = burnin_only ; 
-    par.inv.cooloff                   = cooloff_only; 
-    par.inv.nchains                   = nchains_only; 
-elseif strcmp(stamp, 'RF_Sp_ccp_only'); 
-    par.inv.datatypes                 = {'RF_Sp_ccp'};
-    par.inv.niter                     = niter_only  ; 
-    par.inv.burnin                    = burnin_only ; 
-    par.inv.cooloff                   = cooloff_only; 
-    par.inv.nchains                   = nchains_only; 
-elseif strcmp(stamp, 'HKstack_P_only'); 
-    par.inv.datatypes                 = {'HKstack_P'};
-    par.inv.niter                     = niter_only  ; 
-    par.inv.burnin                    = burnin_only ; 
-    par.inv.cooloff                   = cooloff_only; 
-    par.inv.nchains                   = nchains_only; 
-elseif strcmp(stamp, 'SW_HV_only'); 
-    par.inv.datatypes                 = {'SW_HV'}   ;
-    par.inv.niter                     = niter_only  ; 
-    par.inv.burnin                    = burnin_only ; 
-    par.inv.cooloff                   = cooloff_only; 
-    par.inv.nchains                   = nchains_only;    
-elseif strcmp(stamp, 'all_no_hv'); 
-    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
-        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
-        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'};      
-    par.inv.niter                     = niter_only; 
-    par.inv.burnin                    = burnin_only ; 
-    par.inv.cooloff                   = cooloff_only ; 
-    par.inv.nchains                   = nchains_only   ; 
-
 
 
 % { --- ONE CHAIN Different data types alone
@@ -406,15 +436,7 @@ elseif strcmp(stamp, 'simplify');
     par.mod.crust.ximin               = 1     ; 
     par.mod.crust.xistd               = 0     ; 
     par.mod.force_no_new_prior        = true  ; % For debugging only. 
-elseif strcmp(stamp, 'no_sed'); 
-    par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
-        'SW_Ray_phV_lyneqhelm', 'SW_Ray_phV_lynant',...
-        'SW_Lov_phV', 'SW_HV', 'RF_Sp_ccp'}; 
-    par.inv.niter                     = niter_only  ; 
-    par.inv.burnin                    = burnin_only ; 
-    par.inv.cooloff                   = cooloff_only; 
-    par.inv.nchains                   = nchains_only;     
-  
+
     
     
     par.mod.sed.hmax                  = 0     ; 
@@ -576,23 +598,10 @@ elseif strcmp(stamp, 'no_noise_no_hv');
     par.inv.datatypes = cellstr(dtp(dtp ~= 'SW_HV')); 
     
     
-elseif strcmp(stamp, 'synth_no_sed'); 
-    par.inv.datatypes = {'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'};      
-    par.inv.niter                     = niter_only; 
-    par.inv.burnin                    = burnin_only; 
-    par.inv.cooloff                   = cooloff_only; 
-    par.inv.nchains                   = nchains_only;     
-    par.mod.sed.hmax                  = 0; 
-    par.mod.sed.vsmin                 = 3.3;
-    par.sed.vsmax                     = 3.3; 
-    par.mod.force_no_new_prior        = true; 
+
     
     
-elseif strcmp(stamp, 'standard_temp'); 
-    par.inv.niter                     = niter_only; 
-    par.inv.burnin                    = burnin_only; 
-    par.inv.cooloff                   = cooloff_only; 
-    par.inv.nchains                   = nchains_only;  
+
     
 end
 

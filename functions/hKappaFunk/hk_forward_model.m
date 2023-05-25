@@ -51,7 +51,6 @@ else % When model is within HK bounds, run this.
 %         (par.ii==par.inv.niter))                          || ...
 %         (options.insistRerun); % Could put this first to avoid the if isfield code, but this will almost certainly cause me to mess up the code in a few months. 
     runFullHK = true; % 2023/05/19 I am now using the much faster HK package. Lets see if it's fast enough to always use, so that we have just one HK code instead of two sets to maintain. 
-    
     if runFullHK; 
         
         par.hkResetInfo.timesReset = par.hkResetInfo.timesReset + 1; 
@@ -64,7 +63,7 @@ else % When model is within HK bounds, run this.
             tt   = predata.HKstack_P.waves.tt; 
             rayp = predata.HKstack_P.waves.rayParmSecDeg(iWave); 
 
-            [HK_A, HK_H, HK_K] = HKstack_anis_wrapper(... % TODO this should be easily vectorizable. 
+            [HK_A, HK_H, HK_K] = HKstack_anis_wrapper(... % TODO this should be easily vectorizable somewhere within the HK package itself. . Probably very slow with hundreds of receiver functions. 
                 par, model, RF, tt, rayp, 'ifplot', false, ...
                 'hBounds', [par.mod.crust.hmin, par.mod.crust.hmax], ...
                 'kBounds', [par.mod.crust.vpvsmin, par.mod.crust.vpvsmax], ...
