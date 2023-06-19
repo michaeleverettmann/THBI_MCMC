@@ -35,8 +35,8 @@ function [sigma, mu] = gaussfit( x, y, sigma0, mu0 )
 Nmax = 50;
  
 if( length( x ) ~= length( y ))
-    fprintf( 'x and y should be of equal length\n\r' );
-    exit;
+    error( 'x and y should be of equal length\n\r' );
+%     exit;
 end
  
 n = length( x );
@@ -102,7 +102,8 @@ for i=1:Nmax
         sigma = abs( sigma );
         fprintf( 'Instability detected! Rerun with initial values sigma0 and mu0! \n\r' );
         fprintf( 'Check if your data is properly scaled! p.d.f should approx. sum up to \n\r' );
-        fprintf('Exiting Matlab as a consequence\n')
-        exit;
+%         fprintf('Exiting Matlab as a consequence\n')
+%         exit;
+        error('See fprintf message above. Exiting gaussfit. ')
     end
 end

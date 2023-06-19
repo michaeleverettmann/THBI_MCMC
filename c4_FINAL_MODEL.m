@@ -17,6 +17,11 @@ allmodels([allmodels.bestmods]'==false) =  [];
 
 Nm = posterior.Nstored;
 
+%% Indices of models 
+i50     = round(0.5*Nm);
+isig1   = [max( 1,round(0.3173*Nm ))  min( Nm, round(0.6827*Nm) ) ]; % Use min and max in case we used very few iterations and round takes us to index 0. 
+isig2   = [max( 1,round(0.055 *Nm ))  min( Nm, round(0.9545*Nm) ) ];
+iminmax = [max([1,round(0.005 *Nm)])  min([Nm, round(0.995 *Nm)]) ];
 
 %% ===================== GATHER MODELS, FIT WITH GAUSSIANS ================
 %% DISCONTINUITIES
@@ -24,12 +29,21 @@ Zd = struct('mu',[],'std',[]);
 % crust/sed
 X = midpts([0:0.1:par.mod.sed.hmax]);  XX = [0*o4,X,par.mod.sed.hmax*o4];
 Nds = hist(posterior.zsed,X); NNds = [Nds(1)*o4,Nds,Nds(end)*o4];
-if sum(Nds~=0)==1
+if sum(Nds~=0)==1 % brb2023/06/19 I guess this is just for if a problem comes up, and only one value was sampled
     Zd(1).mu = mean(posterior.zsed); Zd(1).std = par.mod.dz/2;
     final_model.zsedav = Zd(1).mu; 
     final_model.zsedsig = Zd(1).std; 
-else
-    [Zd(1).std,Zd(1).mu] = gaussfit( XX, NNds, (X(end)-X(1))/4,X(Nds==max(Nds))  );
+else % brb2023/06/19 I guess this is what we are counting on usually
+    try % brb2023/06/19 The Gaussfit was not always working. I'm taking least intrusive fix: try to use the gaussfit, but if it doesn't work, just use percentiles to get medians and gaussian widths. Return some warning. 
+        [Zd(1).std,Zd(1).mu] = gaussfit( XX, NNds, (X(end)-X(1))/4,X(Nds==max(Nds))  );
+    catch 
+        vord = sort(posterior.zsed);
+        Zd(1).mu = vord(i50); 
+        Zd(1).std = mean(abs(Zd(1).mu - vord(isig1))) ; % Distance from mean to proper percentils, take average for going up and down from mean . 
+        sed_warning = 'To get sediment mean and sigma from PDF: could not converge for mean and std with gaussfit. Resorting to using percentiles for median and std. This might not be done on all stations! '; 
+        warning(sed_warning)
+        final_model.zsed_warning = sed_warning; 
+    end
     final_model.zsedav = Zd(1).mu; 
     final_model.zsedsig = Zd(1).std; 
 end
@@ -42,17 +56,13 @@ if sum(Nds~=0)==1
     Zd(2).mu = mean(posterior.zmoh); Zd(2).std = par.mod.dz/2;
     final_model.zmohav = Zd(2).mu; 
     final_model.zmohsig = Zd(2).std; 
-else
+else % brb2023/06/19 TODO should use gaussfit correction as was done on sediment. But, moho PDF behaves much better, and gaussfit doesn't really have a problem with the Moho. Sediment has very rough PDFs. 
     [Zd(2).std,Zd(2).mu] = gaussfit( X, Nds,(X(end)-X(1))/4, mean(X(Nds==max(Nds))) );
     final_model.zmohav = Zd(2).mu; 
     final_model.zmohsig = Zd(2).std; 
 end
 
-%% Indices of models 
-i50     = round(0.5*Nm);
-isig1   = [max( 1,round(0.3173*Nm ))  min( Nm, round(0.6827*Nm) ) ]; % Use min and max in case we used very few iterations and round takes us to index 0. 
-isig2   = [max( 1,round(0.055 *Nm ))  min( Nm, round(0.9545*Nm) ) ];
-iminmax = [max([1,round(0.005 *Nm)])  min([Nm, round(0.995 *Nm)]) ];
+
 
 %% Vp/Vs
 vord = sort(posterior.vpvs);
