@@ -15,6 +15,7 @@ transferFolds=\
 /Users/brennanbrunsvik/MATLAB/transfer
 /Users/brennanbrunsvik/Documents/repositories/data/models_seismic/transfer
 /Users/brennanbrunsvik/Documents/repositories/Base_code/transfer
+/Users/brennanbrunsvik/Documents/repositories/hk_anis/transfer
 '
 
 for fold in $transferFolds
