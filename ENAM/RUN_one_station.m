@@ -176,10 +176,5 @@ for istamp = [1:length(STAMP_all)];
 end
 
 function execute_run_all_chains
-%     try
     run_all_chains;
-%     catch e
-%         fprintf('Cant execute run_all_chains.m. %s\n%s','(todo put stamp here)',getReport(e)) 
-%     end
 end
-% end

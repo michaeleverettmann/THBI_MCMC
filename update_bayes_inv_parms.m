@@ -28,7 +28,7 @@ elseif strcmp(stamp, 'standard_temp');
 
 % { Different data types alone 
 elseif strcmp(stamp, 'SW_Ray_phV_only'); 
-    par.inv.datatypes                 = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal'};
+    par.inv.datatypes                 = {'SW_Ray_phV_eks','SW_Ray_phV_dal','SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant'};
     par.inv.niter                     = niter_only  ; 
     par.inv.burnin                    = burnin_only ; 
     par.inv.cooloff                   = cooloff_only; 
@@ -68,6 +68,23 @@ elseif strcmp(stamp, 'all_no_hv');
     dtp = par.inv.datatypes; 
     dtp = string(dtp); 
     dtp = dtp(dtp~="SW_HV")
+    dtp = cellstr(dtp); 
+    par.inv.datatypes = dtp; 
+
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only ; 
+    par.inv.cooloff                   = cooloff_only ; 
+    par.inv.nchains                   = nchains_only   ; 
+
+elseif strcmp(stamp, 'all_no_sp'); 
+%     par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
+%         'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
+%         'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'};    
+
+    % brb2023/05/23 added code to get rid of one data type. Modify as needed. 
+    dtp = par.inv.datatypes; 
+    dtp = string(dtp); 
+    dtp = dtp(dtp~="RF_Sp_ccp")
     dtp = cellstr(dtp); 
     par.inv.datatypes = dtp; 
 

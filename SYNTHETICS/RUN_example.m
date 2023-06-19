@@ -2,12 +2,15 @@
 % clear all % Cannot clear all, because then we allways reset network_manual and station_manual below. 
 %% Setup
 % These define what we are running. Make a list of all desired options. 
-% STAMP_all = {'standard_temp', 'standard_temp', 'standard_temp', 'standard_temp'};
-% network_manual_all = {'testnwk', 'testwk', 'testwk', 'testwk'}; 
-% station_manual_all = {'cont_EProt-s1m1m2', 'cont_EProt-s1m2', 'cont_EProt-m1m2', 'cont_EProt-S1m1'}; %
-STAMP_all = {'standard_temp', 'standard_temp'};
-network_manual_all = {'testnwk', 'testwk'}; 
-station_manual_all = {'cont_EProt-s1m1m2', 'cont_EProt-s1m2'}; %
+
+STAMP_all =          {'standard'       , 'all_no_hv'       , 'all_no_sp'       , 'standard'       , 'standard'         , };
+network_manual_all = {'testnwk'        , 'testwk'          , 'testwk'          , 'testnwk'        , 'testnwk'          , }; 
+station_manual_all = {'cont_EProt-s1m1', 'cont_EProt-s1m1' , 'cont_EProt-s1m1' , 'cont_EProt-s1'  , 'cont_EProt-s1m1m2', }; %
+
+
+% STAMP_all = {'standard_temp'};
+% network_manual_all = {'testnwk'}; 
+% station_manual_all = {'cont_EProt-s1m1m2'}; %
 
 start_dir = pwd(); 
 for istamp = 1:length(STAMP_all); 
@@ -56,5 +59,9 @@ for istamp = 1:length(STAMP_all);
     
     %% Run it
     fprintf('Starting synthetic test %s %s %s\n', network_manual, station_manual, STAMP)
-    run_all_chains;
+    execute_run_all_chains; % Put "run_all_chains.m" in a function, so that maybe "clear" won't erase values like STAMP_all 
+end
+
+function execute_run_all_chains
+    run_all_chains;% Put "run_all_chains.m" in a function, so that maybe "clear" won't erase values like STAMP_all 
 end
