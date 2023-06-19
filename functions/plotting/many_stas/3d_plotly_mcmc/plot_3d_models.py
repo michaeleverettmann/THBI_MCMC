@@ -228,6 +228,10 @@ for iz, z in enumerate(z_all):
     # When calculating mean, only utilize nodes close to stations.
     dvmdl[zb] = (dvmdl[zb] - np.mean(dvmdl[zb*closesta])) / np.mean(dvmdl[zb*closesta]) * 100
 
+#%% Set to constant values outside regions of resolution
+# for iz, z in enumerate(z_all):
+#     zb = zmdl == z # z boolean
+
 #%% Get state boundaries information.
 
 thisfile = 'data/other_states/cb_2020_us_state_20m.shp'

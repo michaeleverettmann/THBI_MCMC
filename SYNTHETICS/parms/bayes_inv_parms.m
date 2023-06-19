@@ -14,13 +14,7 @@ inv = struct(    'synthTest',true                ,...
                  'Nsavestate',100                ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x  
-                 'datatypes',{{'RF_Ps','RF_Sp','SW_Ray_phV','SW_Lov_phV'}})  
-%                  'datatypes',{{'HKstack_P'}}); % Don't use ccp for synthetic. We can't really make a ccp stack ourselves...
-
-                                % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
-                                %          'BW_x_y' with x='Sp/Ps' and y=' /lo/fl';}}
-                                %          'RF_x_y' with x='Sp/Ps' and y=' /CCP';}}
-                                %          'HKstack_x' with x='P'
+                 'datatypes',{{'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}});
 
 % Everything below can be copy pasted between real data runs and synthetic runs (as of 2022.08.11). brb
                                 

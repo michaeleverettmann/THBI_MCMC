@@ -8,6 +8,7 @@ import obspy
 import scipy.io as sio
 import pygmt
 import shapefile
+import matplotlib.path as mplPath
 
 # Define region to plot
 region = [-88, -70, 26, 46]
@@ -20,6 +21,7 @@ fsect_locs = '../many_stas/xsect_positions.mat'# cross-section locations.
 
 fvs_averages = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/plot_region_averages/vs_percentiles.eps'
 faverages_locations = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/plot_region_averages/region_locations.eps'
+f_averages_borders = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/plot_region_averages/choose_split_regions/tect_regions.mat'
 
 # Colors
 color_front    = '255/255/255' # Grenville Front, Appalachian front.
@@ -27,7 +29,12 @@ color_thrust   = '125/125/125'
 color_mag      = '190/000/000'
 color_grav     = '000/150/000'
 color_ha       = '255/000/010' # Harrisonburg Anomaly
-color_rift     = '255/111/000'
+color_rift     = '255/191/0'
+
+# The regional velocity profile colors
+reg_keys = ['app', 'cra', 'gre']
+poly_colors = ['black', 'blue', 'yellow']
+clr_reg = ['14/207/18', '189/114/229', '201/124/24'] # Taken straight from my Matlab script. Can be very slightly different in map than velocity profiles, to enhance contrast.
 
 # Any other plot parameters.
 linewidth = "2.0"; # Base linewidth.
@@ -115,7 +122,25 @@ fig.coast(shorelines=True, frame=True,     lakes="lightblue",
     )
 
 # Scatter stations
-fig.plot(x=lon_sta, y=lat_sta, style="t0.15c", fill="black", pen="black")
+
+# Load polygons for different regions where we plotted results.
+
+av_locs = sio.loadmat(f_averages_borders)
+
+which_poly = np.zeros((len(lon_sta)))-1
+for ipolystr, polystr in enumerate(reg_keys):
+    poly = av_locs[polystr]
+
+    p = mplPath.Path(poly) # https://stackoverflow.com/questions/31542843/inpolygon-examples-of-matplotlib-path-path-contains-points-method
+    in_this_poly = p.contains_points(np.array([lon_sta, lat_sta]).T)
+    which_poly[in_this_poly] = ipolystr
+
+    fig.plot(x=lon_sta[in_this_poly], y=lat_sta[in_this_poly],
+             style="t0.28c", fill=clr_reg[ipolystr], pen="black")
+fig.plot(x=lon_sta[which_poly==-1], y=lat_sta[which_poly==-1],
+         style="t0.28c", fill='160/160/160', pen="black")
+
+# fig.plot(x=lon_sta, y=lat_sta, style="t0.15c", fill="black", pen="black")
 # fig.plot(x=lon_obs, y=lat_obs, style="t0.25c", fill="yellow", pen="black")
 
 # # Plot gravity and magnetics
@@ -128,11 +153,11 @@ fig.plot(x=lon_sta, y=lat_sta, style="t0.15c", fill="black", pen="black")
 #     fig.plot(x=pdatx, y=pdaty, close=True, pen="1.5p,"+color),
 
 # Plot South Georgia rift
-for i in [1]: 
-    sgr_poly = pd.read_csv('SGR_polygon/SGR_poly_pt' + str(i) + '.txt', header = None,  delim_whitespace=True)
-    x, y = (sgr_poly[0].values, sgr_poly[1].values)
-    fig.plot(x=x, y=y, close=False, pen=linewidth+"p,"+color_rift)
-    fig.plot(x=x[-1:0:-1], y=y[-1:0:-1], close=False, pen=linewidth+"p,"+color_rift) # Glitch! pygmt only seems to plot a few points at a time. So plot the reversed lines also to make sure everything plots...
+# for i in [1]:
+#     sgr_poly = pd.read_csv('SGR_polygon/SGR_poly_pt' + str(i) + '.txt', header = None,  delim_whitespace=True)
+#     x, y = (sgr_poly[0].values, sgr_poly[1].values)
+#     fig.plot(x=x, y=y, close=False, pen=linewidth+"p,"+color_rift)
+#     fig.plot(x=x[-1:0:-1], y=y[-1:0:-1], close=False, pen=linewidth+"p,"+color_rift) # Glitch! pygmt only seems to plot a few points at a time. So plot the reversed lines also to make sure everything plots...
 
 # Plot Grenville and Appalachian fronts
 for ibord, bord in enumerate([app_bord, app_bord2]): # gre_bord
@@ -158,12 +183,13 @@ def plot_many_shapes(shapes, color=color_rift):
         x, y = shp_to_xy(shape.points)
         fig.plot(x=x, y=y, pen=linewidth+"p," + color)
 
-# Mid-continent rift
-shapes = shapefile.Reader('whitmeyer_karlstrom/layers/MCR.shx').shapes()
-plot_many_shapes(shapes, color_rift)
-
-# Reelfoot rift
+# # Mid-continent rift
+# shapes = shapefile.Reader('whitmeyer_karlstrom/layers/MCR.shx').shapes()
+# plot_many_shapes(shapes, color_rift)
+#
+# # Reelfoot rift
 shapes = shapefile.Reader('whitmeyer_karlstrom/layers/Reelfoot.shx').shapes()
+shapes = [shapes[1]] # Just plot RT, not the other one
 plot_many_shapes(shapes, color_rift)
 
 # Grenville front
@@ -178,11 +204,11 @@ fig.plot(x=x, y=y, pen=linewidth+"p,"+color_front)
 #%% Label features
 fig.text(x=-83.2,  y=40,    text='GF',  font="12p,"+color_front, angle=80)
 fig.text(x=-83,    y=36.5,  text='AF',  font="12p,"+color_front, angle=35)
-fig.text(x=-84.1,  y=31.6,  text='SGR', font="12p,"+color_rift ,         )
+# fig.text(x=-84.1,  y=31.6,  text='SGR', font="12p,"+color_rift ,         )
 fig.text(x=-83.5,  y=37.75, text='RT' , font="12p,"+color_rift ,         )
-fig.text(x=-87.25, y=36.75, text='RR' , font="12p,"+color_rift ,         )
+# fig.text(x=-87.25, y=36.75, text='RR' , font="12p,"+color_rift ,         )
 fig.text(x=-80,    y=38.3,  text='HA',  font="12p,"+color_ha   ,         )
-fig.text(x=-85.25, y=42.5,  text='MCR', font="12p,"+color_rift ,         )
+# fig.text(x=-85.25, y=42.5,  text='MCR', font="12p,"+color_rift ,         )
 # fig.text(x=-71, y=40.5, text='PGA', font="12p,"+color_grav)
 # fig.text(x=-78, y=33.5, text='BMA', font="12p,"+color_mag)
 # fig.text(x=-77, y=30.8, text='ECMA', font="12p,"+color_mag)
@@ -208,8 +234,9 @@ with fig.inset(position="jBL+w2.5c+o0.2/0.2c", margin=0.1): # Move to left side 
     rectangle = [[region[0], region[2], region[1], region[3]]]
     fig.plot(data=rectangle, style="r+s", pen=linewidth+"p,blue")
 
-fig.image(fvs_averages, position="jBR+w4.0c+o0.15/0.15c", box="+pblack+g255/255/255")
-fig.image(faverages_locations, position="jBR+w2c+o0.008/7.13c", box="+pblack+g0/0/0+c0/0")
+fig.image(fvs_averages, position="jBR+w3.8c+o0.15/0.15c", box="+pblack+g255/255/255")
+# fig.image(fvs_averages, position="jBR+w4.0c+o0.15/0.15c")
+# fig.image(faverages_locations, position="jBR+w2c+o0.008/7.13c", box="+pblack+g0/0/0+c0/0")
 
 
 #%%

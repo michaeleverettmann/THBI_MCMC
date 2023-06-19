@@ -6,15 +6,15 @@ function [par, inv] = update_bayes_inv_parms(parOrig, stamp);
 par = parOrig; 
 str_temp = split(stamp, '/'); 
 
-niter_only   = 16000; 
-burnin_only  = 4000 ; 
-cooloff_only = 3000 ; 
-nchains_only = 12   ; 
+% niter_only   = 16000; 
+% burnin_only  = 4000 ; 
+% cooloff_only = 3000 ; 
+% nchains_only = 12   ; 
 
-% niter_only   = 500; 
-% burnin_only  = 30 ; 
-% cooloff_only = 20 ; 
-% nchains_only = 4  ; 
+niter_only   = 500; 
+burnin_only  = 30 ; 
+cooloff_only = 20 ; 
+nchains_only = 4  ; 
 
 if     strcmp(stamp, 'ENAM_trial'); 
     disp('Using default parameters') 

@@ -4,7 +4,9 @@ addpath('/Users/brennanbrunsvik/Documents/repositories/Base_code/colormaps/redbl
 tectpath1 = "/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/map_view/whitmeyer_karlstrom/layers/"; % Path to what is currently whitmeyer and karlstrom dataset. 
 f_distance_pt_to_sta = './_distance_pt_to_sta.mat';
 f_xsect_positions = './xsect_positions.mat'; 
-pt_dist_nan = 100 /(6371 * 2 * pi / 360); % Don't plot if no station within this many km
+
+plot_derivatives = true; 
+
 
 % define colors. 
 color_front    = [255, 255, 255]./255; % Grenville Front, Appalachian front.
@@ -13,8 +15,14 @@ color_mag      = [190, 000, 000]./255;
 color_grav     = [000, 150, 000]./255;
 color_ha       = [255, 000, 010]./255; % Harrisonburg Anomaly
 color_rift     = [255, 111, 000]./255;
-clim_crust = [3.5, 4.1]; 
-clim_mantle = [4.25, 4.75]; 
+if ~plot_derivatives; 
+    clim_crust = [3.5, 4.1]; 
+    clim_mantle = [4.25, 4.75];
+else
+    clim_crust = [-0.05, 0.05]; 
+    clim_mantle = [-0.005, 0.005];
+end
+
 version_surf = 7; 
 max_z = 250; 
 
@@ -50,16 +58,13 @@ n_contour = 30;
 
 % depths = [5, 15, 20, 25, 30, 35, 40, ...
 %         45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 145, 170, 210, 250, 300]; % Try loading these depths. Probably need to type manually for now, but could save as a .mat file in future. 
-depths = [5:5:300]; 
+depths = [5:5:300]; dz = diff(depths); 
 depth_plot = 80; 
 idepth_plot = find(depths==depth_plot); 
 parms_other = ["zsed", "zmoh"]; 
 
 sfsmat = load('surface_out_example.mat'); xgrid = sfsmat.xgrid; ygrid = sfsmat.ygrid; llminmax = sfsmat.llminmax; latgrid = sfsmat.latgrid; longrid = sfsmat.longrid; 
 mdls = load(fresults).mdls; % For sta lon and lat so we know where to and not to plot. 
-ta_data = readtable('TA_station_locations.txt'); % Use TA stations, to decide which parts of our results are well constrained. 
-lat_sta_ta = ta_data.Latitude ; 
-lon_sta_ta = ta_data.Longitude; 
 
 f_3d_model = [pwd() , '/surface_colated_b1_V' , num2str(version_surf) , '.mat']; 
 
@@ -86,6 +91,23 @@ mgrid3d(:,:,idep) = mgrid_out;
 
 end
 
+
+% Make mgrid3d derivatives
+if plot_derivatives; 
+    dz3d = reshape(dz,1,1,length(dz)); 
+    dgrid = (mgrid3d(:,:,2:end)-mgrid3d(:,:,1:end-1)) ./dz3d; 
+
+    dmgrid3d = zeros(size(z3d)); 
+    dmgrid3d(:,:,1:end-1) = dmgrid3d(:,:,1:end-1) + dgrid; 
+    dmgrid3d(:,:,2:end  ) = dmgrid3d(:,:,2:end  ) + dgrid; 
+    dmgrid3d(:,:,2:end-1) = dmgrid3d(:,:,2:end-1) / 2; 
+%     z3d = (z3d(:,:,2:end)+z3d(:,:,1:end-1) ) / 2; 
+%     depths = (depths(2:end) + depths(1:end-1))/2; 
+    mgrid3d = dmgrid3d; % For each code manipulation
+%     mgrid3d = mgrid3d * 50; % To get it into velocity range, arbitrarily!
+%     warning('Fake *50 in mgrid3d')
+end
+
 % Load crust, sed
 sfsmat2 = load(sprintf('zmoh/surface_values_V%1.0f', version_surf)); 
 zmoh_surf = sfsmat2.mgrid_out; 
@@ -105,9 +127,11 @@ app_bord = [-73.9819443, -74.619146 , -75.520073 , -76.1132732, -76.7944389,-77.
 gre_bord = [-82.8790832, -83.5164453, -83.6483134, -84.0878735, -84.3516096, -85.714246 , -87.3406184, -88.1098487; 43.9928145,  41.8040781,  40.8969058,  39.6733704,  38.9764925, 36.6155276,  34.9940038,  34.3978449]; 
 
 %% Save 3-D info, borders, cross-sections, whatever, to plot with Plotly
-save(f_3d_model, 'mgrid3d', 'lat3d', 'lon3d', 'z3d', ...
-    'latgrid', 'longrid', 'xgrid', 'ygrid', 'depths', ...
-    'zmoh_surf', 'zsed_surf'); 
+if ~plot_derivatives; 
+    save(f_3d_model, 'mgrid3d', 'lat3d', 'lon3d', 'z3d', ...
+        'latgrid', 'longrid', 'xgrid', 'ygrid', 'depths', ...
+        'zmoh_surf', 'zsed_surf'); 
+end
 
 %%
 figure(16); clf; hold on; 
@@ -118,29 +142,26 @@ set(gcf, 'pos', [493 109 674 963]); % Roughly 8.5 by 11
 tiledlayout(size(lolim, 1 ), 1,'TileSpacing', 'Compact')
 
 % % % % Load distance from each point to closest station. From b1_plot_paper_maps.m
-pt_dist_struct = load(f_distance_pt_to_sta); 
-pt_dist = pt_dist_struct.pt_dist_km; 
-lat_buff = pt_dist_struct.lat_buff; 
-lon_buff = pt_dist_struct.lon_buff; 
-% pt_dist_TA = pt_dist_struct.pt_dist_TA; % Degrees
+% % % pt_dist_km = load(f_distance_pt_to_sta).pt_dist_km; 
 % % % pt_exclude = pt_dist_km > min_sta_dist_plt; 
 % % % mgrid3d(pt_exclude) = nan; 
 % % % zmoh_surf(pt_exclude) = nan; 
 % % % zsed_surf(pt_exclude) = nan; 
 % % % % End naning
 
-% Redefine cross-sections so they don't go out of where we have constraints. These variables get erased. 
+% Redefine cross-sections so they don't go out of where we have constraints. 
 for ixsect = 1:size(lolim,1); 
     [profd,profaz] = distance(lalim(ixsect,1),lolim(ixsect,1),lalim(ixsect,2),lolim(ixsect,2));
     gcarc = linspace(0, profd, 500)'; 
     [lat_surf_line, lon_surf_line] = reckon(lalim(ixsect, 1), lolim(ixsect,1), gcarc, profaz);
-    section_distances    = nan(size(lat_surf_line)); 
+    section_distances = nan(size(lat_surf_line)); 
     for ipt = 1:length(lat_surf_line); 
-        section_distances   (ipt) = min(...
+        section_distances(ipt) = min(...
                 distance(lat_surf_line(ipt), lon_surf_line(ipt), ...
                 mdls.lat, mdls.lon ),...
-            [], 'all')*6371*2*pi/360; % Fast enough.
+            [], 'all')*6371*2*pi/360; % Fast enough. 
     end
+%     interpn(longrid, latgrid, pt_dist_km, lon_surf_line, lat_surf_line); 
     keep_sect = section_distances < min_sta_dist_plt; 
     keep_sect = find(keep_sect); 
     lolim(ixsect, 1) = lon_surf_line(keep_sect(1)); 
@@ -191,16 +212,24 @@ zsect = linspace( min(depths), max(depths), nxy-1);
 [gcmesh , ~] = ndgrid(gcarc        , zsect); 
 mterp = griddata(lon3d, lat3d, z3d, mgrid3d, lonmesh, latmesh, zmesh); % Interpolated section
 
-% % % % Make a cone to cut off stations far from TA. Find distance to TA stations. 
-buffer_distance = zeros(size(lat_surf_line)); 
-for ipt = 1:length(lat_surf_line); 
-    buffer_distance   (ipt) = min(...
-            distance(lat_surf_line(ipt), lon_surf_line(ipt), ...
-            lat_buff, lon_buff),...
-        [], 'all')*6371*2*pi/360; % Fast enough.
-end
-buffer_keep = zsect < buffer_distance; 
-mterp(~buffer_keep) = nan; 
+% % % % Now trim section to where we have data. 
+% % mterp_t = mterp(:,1); % Model values at top. 
+% sect_trim = ~isnan(mterp(:,2)); % Remove where there isn't data. 
+% gcarc = gcarc(sect_trim); 
+% dist_arc = dist_arc(sect_trim); 
+% lat_surf_line = lat_surf_line(sect_trim); 
+% lon_surf_line = lon_surf_line(sect_trim); 
+% lat_surf_line_all(~sect_trim,i_xsect) = nan; 
+% lon_surf_line_all(~sect_trim,i_xsect) = nan; 
+% lonmesh = lonmesh(sect_trim,:); 
+% latmesh = latmesh(sect_trim,:); 
+% zmesh   = zmesh  (sect_trim,:); 
+% gcmesh  = gcmesh (sect_trim,:); 
+% mterp   = mterp  (sect_trim,:); 
+% gcmesh = gcmesh - min(gcmesh); 
+% dist_arc = dist_arc - min(dist_arc); 
+% Q1 = [latmesh(1), lonmesh(1)]; 
+% Q2 = [latmesh(end), lonmesh(end)]; 
 
 % Station distance and position along line
 slon = mdls.lon; 
@@ -228,9 +257,7 @@ dist_sect = gcmesh*d2km; % For plotting along section. 2-d
 zmohsect = griddata(longrid, latgrid, zmoh_surf, lon_surf_line, lat_surf_line); 
 zsedsect = griddata(longrid, latgrid, zsed_surf, lon_surf_line, lat_surf_line); 
 ztopsect = interpn (lon_top, lat_top, z_top    , lon_surf_line, lat_surf_line, 'cubic'); % can use interpn here for speed because topo is on a grid. But the surface I inverted isn't on a lon/lat grid (it's a linearly spaced grid in x and y), so we have to use griddata above. 
-top_scale = 1/50; 
-ztopsect_scaled = -(ztopsect*top_scale)-10; % Scale topography
-fprintf('Topography scaling is x%1.0f.\n', top_scale*1000) % e.g.: scale from 1 to 1000 coincident with m to km, then * top_scale = 1/50 to shrink it 50x from there. 
+ztopsect_scaled = -(ztopsect/50)-10; % Scale topography
 
 % Set up axes
 % ax_box = nexttile(); % Make axis. Change later. 
@@ -251,19 +278,20 @@ linkaxes([ax_box, ax_mantle, ax_crust]);
 % Color choices. 
 % clim_min = 3.9; 
 % clim_max = 4.75; 
-step_contour = 0.025; 
-v_contours = [0:step_contour:10]+0.5*step_contour; 
+% step_contour = 0.001; 
+% v_contours = [-0.2:step_contour:0.2]+0.5*step_contour; 
 % clim([clim_min, clim_max]); % TODO temporary 
 % n_colors = (clim_max - clim_min) / step_contour; 
-n_colors = 25; 
+% n_colors = length(v_contours)+1; 
+% n_colors = 1000; 
 
 % Prep color map. 
-turbo_map = turbo(n_colors); 
-turbo_map = turbo_map(end:-1:1,:); 
-colormap(turbo_map);
-% rbmap = redblue(n_colors); 
+% % % turbo_map = turbo(n_colors); 
+% % % turbo_map = turbo_map(end:-1:1,:); 
+% % % colormap(turbo_map);
+rbmap = redblue(); %rbmap = redblue(n_colors); 
 % rbmap = rbmap(end:-1:1,:); 
-% colormap(rbmap); 
+colormap(rbmap); 
 
 
 % Contour of velocity
@@ -276,8 +304,8 @@ mterpcrust  = mterp;
 mterpmantle = mterp; 
 mterpcrust (~iscrust ) = nan; 
 mterpmantle(~ismantle) = nan; 
-[fk, hand] = contourf(ax_crust , gcmesh*d2km, zmesh, mterpcrust , v_contours, 'EdgeAlpha', 0.1); 
-[fk, hand] = contourf(ax_mantle, gcmesh*d2km, zmesh, mterpmantle, v_contours, 'EdgeAlpha', 0.1); 
+[fk, hand] = contourf(ax_crust , gcmesh*d2km, zmesh, mterpcrust , 200, 'EdgeAlpha', 0.1); 
+[fk, hand] = contourf(ax_mantle, gcmesh*d2km, zmesh, mterpmantle, 200, 'EdgeAlpha', 0.1); 
 set(ax_crust , 'ydir', 'reverse'); % For some reason contourf occasionally flips figure to unreverse. 
 set(ax_mantle, 'ydir', 'reverse'); % For some reason contourf occasionally flips figure to unreverse. 
 
@@ -359,8 +387,11 @@ box(ax_box, 'on');
 set(ax_box, 'LineWidth', 1.5); 
 ylim(ax_box, axylims); 
 xlim(ax_box, axxlims);
+
+
 clim(ax_crust , clim_crust ); 
 clim(ax_mantle, clim_mantle); 
+
 
 % Change topo labels
 % ax_box.YTickLabel{1} = []; 
@@ -377,7 +408,7 @@ ax_box.YTick = [0:50:10000]; % Steps of 50, starting at 0. Nothing for topograph
 %     xlabel('Distance (km)'); 
 % end
 % if ax_x(i_xsect) == min(ax_x); 
-ylabel('Depth (km)'); 
+`ylabel('Depth (km)'); 
 % end
 if i_xsect == 1; 
     xlabel('Distance (km)'); 

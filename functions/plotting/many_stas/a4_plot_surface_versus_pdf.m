@@ -1,12 +1,24 @@
 clc; clear; 
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 fpdfs = sprintf('%scompiled_pdfs_%s.mat',out_dir,STAMP); % File with pdfs. a2_1...m
+f_xsect_positions = './xsect_positions.mat'; % For loading cross-section positions
 
 version_surf = 7; 
 n_surf_pts = 100; 
 
-lolim = [-87, -76; -86, -68; -88, -78; -87, -80.5]; 
-lalim = [ 43,  35;  30,  47;  36,  33;  38,  25  ]; 
+convert_deg_km = 2*pi*6371/360; % Number to convert degrees to kilometers
+
+
+
+%%% Cross section stuff, copy to cross-section code. , initially from b1_plot_xsects_paper1.m
+version_surf = 7; 
+ll_min_max_map = [-89  -72   32   46]; % Map view
+xsect_positions = load(f_xsect_positions); 
+lolim = xsect_positions.lolim; 
+lalim = xsect_positions.lalim; 
+
+
+%%%
 fnum = 101; 
 scale_pdf = 0.1; 
 offsecmax = 1.5; %5%  distance off section allowed, in degrees
@@ -79,7 +91,9 @@ lon_surf_line_all = lat_surf_line_all;
 all_ms = []; 
 all_pms = []; 
 all_cpms = []; 
-for i_xsect = 1:size(lolim, 1); 
+% for i_xsect = 1:size(lolim, 1); 
+for i_xsect = size(lolim, 1):-1:1; 
+
 
 Q1 = [lalim(i_xsect, 1), lolim(i_xsect, 1)];
 Q2 = [lalim(i_xsect, 2), lolim(i_xsect, 2)]; 
@@ -161,10 +175,11 @@ for ista = plot_these_stas(end:-1:1)';
     color = zeros(1,3); 
     edge_alpha = 1 * (disti < 0.25);
 
-    fill([xbase + pm; xbase - pm(end:-1:1)]', [mm; mm(end:-1:1)]', color, ...
+    fill([xbase + pm; xbase - pm(end:-1:1)]'*convert_deg_km,...
+        [mm; mm(end:-1:1)]', color, ...
         'FaceAlpha', face_alpha, ...
         'EdgeColor', 'k', 'EdgeAlpha', edge_alpha); % mean([face_alpha,1])  
-    scatter(xbase(1), median_mm, 25, 'r', 'diamond', 'filled', 'MarkerFaceAlpha', face_alpha); 
+    scatter(xbase(1)*convert_deg_km, median_mm, 25, 'r', 'diamond', 'filled', 'MarkerFaceAlpha', face_alpha); 
 end
 
 % ylim([])
@@ -178,8 +193,9 @@ lon_surf_line_all(:,i_xsect) = lon_surf_line;
 [vs_surf_line] = griddata(longrid, latgrid, vgrid_out, lon_surf_line, lat_surf_line); 
 
 figure(fnum); % Reopen this figure. 
-plot(gcarc, vs_surf_line, 'color', 'blue', 'LineWidth', 3); 
+plot(gcarc*convert_deg_km, vs_surf_line, 'color', 'blue', 'LineWidth', 3); 
 % ylim([4.1, 5.0]); 
+
 
 %% Plot position of line section on the map. 
 % % % figure(1); 
@@ -191,8 +207,10 @@ plot(gcarc, vs_surf_line, 'color', 'blue', 'LineWidth', 3);
 % % % t2=text(x_surf_line(end), y_surf_line(end), section_letter+"'", 'fontsize', 20, 'color', 'r');
 
 
-
-
+% % %% Change x ticks from degrees to km
+% % xtk = xticks(); 
+% % xtk = xtk * 2*pi*6371/360; 
+% % xticklabels(string(xtk));
 
 end % End loop on different sections. 
 

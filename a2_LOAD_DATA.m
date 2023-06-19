@@ -116,7 +116,7 @@ else
 % % %         par.data.stadeets.Longitude = stainfo(strcmp({stainfo.StationCode},par.data.stadeets.sta)).Longitude;
 % % % 	end
     
-    %% LOAD THE DATA!!
+    %% LOAD THE DATA
     [trudata,zeroDstr,par] = load_data(par);
     par.data.stadeets.sta = [par.data.stadeets.sta,zeroDstr];
     

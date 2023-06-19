@@ -28,7 +28,7 @@ if any(string(pdtyps(:,1))=='HKstack'); % Use the Ps receiver function to get h-
         'ifplot', ifplot, ...
         'hBounds', [par.mod.crust.hmin, par.mod.crust.hmax], ...
         'kBounds', [par.mod.crust.vpvsmin, par.mod.crust.vpvsmax], ...
-        'hNum', par.datprocess.hNum, 'kNum', par.datprocess.kNum); 
+        'hNum', par.datprocess.HKappa.hNum, 'kNum', par.datprocess.HKappa.kNum); 
     
 % 
     [HK_A, HK_H, HK_K, t_pred] = HKstack_anis_wrapper(par, trumodel, ...
@@ -36,7 +36,7 @@ if any(string(pdtyps(:,1))=='HKstack'); % Use the Ps receiver function to get h-
         'ifplot', ifplot, ...
         'hBounds', [par.mod.crust.hmin, par.mod.crust.hmax], ...
         'kBounds', [par.mod.crust.vpvsmin, par.mod.crust.vpvsmax], ...
-        'hNum', par.datprocess.hNum, 'kNum', par.datprocess.kNum); 
+        'hNum', par.datprocess.HKappa.hNum, 'kNum', par.datprocess.HKappa.kNum); 
     
     if ifplot 
         plot_HK_stack(HK_H, HK_K, HK_A, ...
@@ -61,7 +61,7 @@ if any(string(pdtyps(:,1))=='HKstack'); % Use the Ps receiver function to get h-
         hk_maximum_possible_value(waves.rf, waves.tt); 
     
     data.HKstack_P = HKstack_P; 
-    data.HKstack_P_noan = HKstack_P_noan; 
+    data.HKstack_P.HKstack_P_noan = HKstack_P_noan; 
         
     % We needed to calculate synthetic receiver function just to get h-kappa stack. Now, remove the receiver function time series from data. 
     disp('Removing RF_Ps from data, keeping only h-kappa stack.')

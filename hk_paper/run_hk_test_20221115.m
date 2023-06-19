@@ -142,10 +142,10 @@ for ixi = 1:length(xi_a);
     H = trudata.HKstack_P.H;
     K = trudata.HKstack_P.K; 
     Exi = trudata.HKstack_P.Esum; 
-    E00 = trudata.HKstack_P_noan.Esum; 
+    E00 = trudata.HKstack_P.HKstack_P_noan.Esum; 
     waves = trudata.HKstack_P.waves; 
     t_predxi = trudata.HKstack_P.t_pred; 
-    t_pred00 = trudata.HKstack_P_noan.t_pred; 
+    t_pred00 = trudata.HKstack_P.HKstack_P_noan.t_pred; 
 
 %     [Exi_max, iemax] = max(Exi, [], 'all'); %linear index. 
     [ikmax, ihmax] = find(E00 == max(E00 ,[], 'all')); 

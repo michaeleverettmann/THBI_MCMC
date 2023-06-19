@@ -99,7 +99,7 @@ fileattrib(execfile, '+x');
 
 %% read PropMatrix output
 try 
-    [traces,tt] = readPROPMATtr(odatfile);
+    [traces,tt] = readPROPMATtr(odatfile); %brb2023/05/26 Having problems with this. I've had problems compiling Fortran lately on this Mac, maybe that is the problem? 
     delete(modfile,execfile,odatfile,ifile,ofile0,ofile1,ofile2);%% delete files
 catch e 
     delete(modfile,execfile,odatfile,ifile,ofile0,ofile1,ofile2);%% delete files

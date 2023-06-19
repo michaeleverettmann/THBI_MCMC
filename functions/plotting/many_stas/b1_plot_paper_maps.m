@@ -7,6 +7,16 @@ f_xsect_positions = './xsect_positions.mat';
 pt_dist_nan = 100 /(6371 * 2 * pi / 360); % Don't plot if no station within this many km
 
 
+%%% Important! Decide which version of figure to plot. Main figure or supplement. 
+include_non_velocity = true; % True: show things like radial anisotropy. False: Only show velocity. 
+
+if include_non_velocity; 
+    fprintf('\nPlotting main figure paper. \n')
+else
+    fprintf('\nPlotting supp figure. \n')
+end
+    
+
 % define colors. 
 color_front    = [255, 255, 255]./255; % Grenville Front, Appalachian front.
 color_thrust   = [125, 125, 125]./255;
@@ -32,17 +42,19 @@ lalim = xsect_positions.lalim;
 
 n_contour = 30; 
 
-% depths = [5, 15, 20, 25, 30, 35, 40, ...
-%         45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 145, 170, 210, 250, 300]; % Try loading these depths. Probably need to type manually for now, but could save as a .mat file in future. 
-% depth_plot = 80; 
-depths = [25, 95, 145]; % Try loading these depths. Probably need to type manually for now, but could save as a .mat file in future. 
-% depth_plot = 80; 
-% idepth_plot = find(depths==depth_plot); 
+if include_non_velocity; 
+    depths = [25, 95, 145]; % Try loading these depths. Probably need to type manually for now, but could save as a .mat file in future. 
+else
+    depths = [10:30:250]; 
+end
+
 parms_other = ["zsed", "zmoh"]; 
 
 sfsmat = load('surface_out_example.mat'); xgrid = sfsmat.xgrid; ygrid = sfsmat.ygrid; llminmax = sfsmat.llminmax; latgrid = sfsmat.latgrid; longrid = sfsmat.longrid; 
 mdls = load(fresults).mdls; % For sta lon and lat so we know where to and not to plot. 
-
+ta_data = readtable('TA_station_locations.txt'); % Use TA stations, to decide which parts of our results are well constrained. 
+lat_sta_ta = ta_data.Latitude ; 
+lon_sta_ta = ta_data.Longitude; 
 %% Make 3d lat and lon grids. 
 nz = length(depths); 
 mgrid3d = zeros(size(latgrid,1), size(latgrid,2), nz); 
@@ -89,21 +101,46 @@ app_bord = [flipud(app_bord')', app_bord2];
 
 %%
 
-ll_min_max_map = [-89  -68   26   46]; % Map view
-figure(17); clf; hold on; set(gcf,'pos', [87 856 692 476]); 
-tiledlayout(2, 3, 'TileSpacing', 'tight'); 
 
-% Figure out distance from each point to nearest station
+ll_min_max_map = [-89  -68   26   46]; % Map view
+
+% Figure out distance from each point to nearest TA station
 pt_dist = zeros(size(xgrid)); 
+pt_dist_TA = zeros(size(xgrid)); 
 for ipt = 1:(size(xgrid, 1) * size(xgrid,2)); 
     pt_dist(ipt) = min(distance(latgrid(ipt), longrid(ipt), ...
         mdls.lat, mdls.lon));
+    pt_dist_TA(ipt) = min(distance(latgrid(ipt), longrid(ipt), ...
+        lat_sta_ta, lon_sta_ta));
 end
+
+[C,~] = contour(longrid, latgrid, pt_dist_TA, [pt_dist_nan, pt_dist_nan]); % Distance where start to nan things before plotting. Distance to TA stations, since those are more what controls our deep resolution 
+lon_buff = C(1,2:end)'; % First point is junk for some reason. Remove it. 
+lat_buff = C(2,2:end)'; 
+rm_buff = (lon_buff > -83) & (lon_buff < -80) & (lat_buff > 44) & (lat_buff < 46); % Manually remove some parts of lon_buff and lat_buff that aren't useful
+lon_buff = lon_buff(~rm_buff); 
+lat_buff = lat_buff(~rm_buff); 
+figure(1010); clf; hold on; 
+scatter(lon_buff, lat_buff); 
+title('Plot buffer region')
+
 pt_dist_km = pt_dist .* 6371 * 2 * pi / 360; 
-save(f_distance_pt_to_sta, 'pt_dist_km'); % Save for loading in plot_xsects file. 
+pt_dist_TA_km = pt_dist_TA .* 6371 * 2 * pi / 360; 
+save(f_distance_pt_to_sta, 'pt_dist_km', 'pt_dist', 'pt_dist_TA', 'lon_buff', 'lat_buff'); % Save for loading in plot_xsects file. 
+
+n_fig_notvel = 3; % How many figures are not velocity but things like moho
+n_plots = length(depths) + include_non_velocity * n_fig_notvel; % Add 3 if plotting things that arent just velocity
 
 
-for ifig = 1:6; 
+if include_non_velocity; % Main figure spacing
+    figure(17); clf; hold on; set(gcf,'pos', [87 856 692 476]); 
+    tiledlayout(2, 3, 'TileSpacing', 'tight'); 
+else % Figure spacing if only showing velocity
+    figure(17); clf; hold on; set(gcf,'pos', [87 856 692 476*3/2]); 
+    tiledlayout(3, 3, 'TileSpacing', 'tight'); 
+end
+
+for ifig = 1:n_plots; 
 
 nexttile(); hold on; box on; set(gca, 'LineWidth', 1.5);
 m_proj('mercator', 'long',[ll_min_max_map(1), ll_min_max_map(2)],...
@@ -111,10 +148,23 @@ m_proj('mercator', 'long',[ll_min_max_map(1), ll_min_max_map(2)],...
 
 % Pick the right surface.
 cnt_num = 100; 
-n_fig_notvel = 3; % How many figures are not velocity but things like moho
-if ifig > n_fig_notvel; 
-    ind_depth = ifig-n_fig_notvel; 
+
+%% Can plot some things that aren't velocity
+if (ifig > n_fig_notvel) || ~ include_non_velocity; 
+    ind_depth = ifig; 
+    ind_depth = ind_depth - include_non_velocity * n_fig_notvel; % If first few plots aren't velocity, then reduce depth index. 
     grd_cont = mgrid3d(:,:,ind_depth); 
+
+    for ipt = find(~isnan(grd_cont))'; % If any of these within X km of a nan point, kill it. 
+        % Compare to TA stations, not just the ones we used. 
+        dist_buf = distance(latgrid(ipt), longrid(ipt), lat_buff, lon_buff ); % Distance from the buffered edge of stations to each grid point. Output in degrees, to comapare with pt_dist_nan in degrees
+        plt_dist_mod = depths(ind_depth) * 360/(2*pi*6371) ; %pt_dist_nan; % Compare distance, in degrees. 
+        if any(dist_buf < plt_dist_mod); 
+            grd_cont     (ipt) = nan;
+            options.vgrid(ipt) = nan; 
+        end
+    end
+
     label = string(sprintf('Z=%1.0f km', depths(ind_depth))) + newline + "Vs (km/s)"; 
     cmap = turbo(12); 
     cmap = flip(cmap); 
@@ -124,21 +174,12 @@ if ifig > n_fig_notvel;
     elseif any(ind_depth == [2,3]); 
         clim([4.35, 4.75]); 
     end
-    % I tried making x section and horizontal slice colors consistent.
-    % DOesn't look good. 
-%     moho_depth_rough = 40; % ROugh moho depth. Use crust colormap at this depth. 
-%     if depths(ind_depth) <= moho_depth_rough; 
-%         clim(clim_crust ); 
-%     else 
-%         clim(clim_mantle); 
-%     end 
-
-elseif ifig == 1; 
+elseif (ifig == 1) && include_non_velocity; % If we want non-velocity plots, then put then in spots 1, 2, 3
     grd_cont = zsed_surf;
     label = "Sediment (km)"; 
     colormap(gca, viridis()); 
     clim([0, 1]);
-elseif ifig == 2; 
+elseif (ifig == 2) && include_non_velocity; 
     grd_cont = zmoh_surf; 
     label = 'Moho (km)'; 
     colormap(gca, viridis(12)); 
@@ -146,7 +187,7 @@ elseif ifig == 2;
     clim_min = 5*floor(min(zmoh_surf, [], 'all')/5)  ; % Round in 5s
     clim_max = 5*floor(max(zmoh_surf, [], 'all')/5)  ;
     clim([clim_min, clim_max]); 
-elseif ifig == 3; 
+elseif (ifig == 3) && include_non_velocity; 
     grd_cont = xi_surf; % TEMPORARY 
     label = '\xi=(Vsh/Vsv)^2'; 
     colormap(gca, redblue(13)); 
@@ -158,9 +199,25 @@ elseif ifig == 3;
 % %     clim(1+[-1, 1].*.1); 
 end
 
+% Make a buffer where we are supposed to nan the model 
+% buff_lon, buff_lat
+
+% polyout = polybuffer([buff_lon, buff_lat],'lines', 100 * 360 / (2*pi*6371) ); 
+% plot(polyout.Vertices(:,1), polyout.Vertices(:,2))
+
 % Remove stuff from grid outside station area. 
 grd_cont(pt_dist > pt_dist_nan) = nan; 
 options.vgrid(pt_dist > pt_dist_nan) = nan; 
+
+% for ipt = find(~isnan(grd_cont))'; % If any of these within X km of a nan point, kill it. 
+%     % Compare to TA stations, not just the ones we used. 
+%     dist_buf = distance(latgrid(ipt), longrid(ipt), lat_buff, lon_buff ); % Distance from the buffered edge of stations to each grid point. Output in degrees, to comapare with pt_dist_nan in degrees
+%     plt_dist_mod = 0 ; %pt_dist_nan; 
+%     if any(dist_buf < plt_dist_mod); 
+%         grd_cont     (ipt) = nan;
+%         options.vgrid(ipt) = nan; 
+%     end
+% end
 
 % Colorbar and label
 ax = gca(); 
@@ -185,30 +242,30 @@ end
 % Coast lines
 cst = m_coast('patch',[1 1 1], 'FaceAlpha', 0); 
 
-% Cross section position, labels
-if ifig == 1; 
-    xsect_letters = ["A", "B", "C", "D", "E", "F", "G", "H"]; 
-    for ixsect = 1:size(lolim,1); 
-        Q1 = [lalim(ixsect, 1), lolim(ixsect, 1)];
-        Q2 = [lalim(ixsect, 2), lolim(ixsect, 2)]; 
-        [profd,profaz] = distance(Q1(1),Q1(2),Q2(1),Q2(2));
-        gcarc = linspace(0, profd, 100)'; 
-        d2km = 2 * pi * 6371 / 360; % Yes I know this is 111, but might as well be somewhat precise :) 
-        dist_arc = d2km * gcarc; % km 
-        [lat_surf_line, lon_surf_line] = reckon(Q1(1), Q1(2), gcarc, profaz); 
-        m_plot(lon_surf_line, lat_surf_line, 'white', 'linewidth', 1); 
-        if ifig == 1; 
-            line_shift = 7; 
-            color_xsectlab = .8.*[1,1,1]; 
-            m_text(lon_surf_line(1+line_shift ), lat_surf_line(1+line_shift  ), xsect_letters(ixsect), ...
-                'color', color_text, 'fontweight', 'normal', 'units', 'data', ...
-                'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle'); 
-            m_text(lon_surf_line(end-line_shift), lat_surf_line(end-line_shift)  , xsect_letters(ixsect)+"'", ...
-                'color', color_text, 'fontweight', 'normal', 'units', 'data', ...
-                'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle'); 
-        end
-    end
-end
+% % % % Cross section position, labels
+% % % if ifig == 1; 
+% % %     xsect_letters = ["A", "B", "C", "D", "E", "F", "G", "H"]; 
+% % %     for ixsect = 1:size(lolim,1); 
+% % %         Q1 = [lalim(ixsect, 1), lolim(ixsect, 1)];
+% % %         Q2 = [lalim(ixsect, 2), lolim(ixsect, 2)]; 
+% % %         [profd,profaz] = distance(Q1(1),Q1(2),Q2(1),Q2(2));
+% % %         gcarc = linspace(0, profd, 100)'; 
+% % %         d2km = 2 * pi * 6371 / 360; % Yes I know this is 111, but might as well be somewhat precise :) 
+% % %         dist_arc = d2km * gcarc; % km 
+% % %         [lat_surf_line, lon_surf_line] = reckon(Q1(1), Q1(2), gcarc, profaz); 
+% % %         m_plot(lon_surf_line, lat_surf_line, 'white', 'linewidth', 1); 
+% % %         if ifig == 1; 
+% % %             line_shift = 7; 
+% % %             color_xsectlab = .8.*[1,1,1]; 
+% % %             m_text(lon_surf_line(1+line_shift ), lat_surf_line(1+line_shift  ), xsect_letters(ixsect), ...
+% % %                 'color', color_text, 'fontweight', 'normal', 'units', 'data', ...
+% % %                 'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle'); 
+% % %             m_text(lon_surf_line(end-line_shift), lat_surf_line(end-line_shift)  , xsect_letters(ixsect)+"'", ...
+% % %                 'color', color_text, 'fontweight', 'normal', 'units', 'data', ...
+% % %                 'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle'); 
+% % %         end
+% % %     end
+% % % end
 
 
 
@@ -255,8 +312,15 @@ xtck = [-88:6:-68];
 ytck = [28:4:44]; 
 xtckstr = xtck; 
 ytckstr = ytck; 
-xtckcel = {[], [], [], xtckstr, xtckstr, xtckstr}; 
-ytckcel = {ytckstr, [], [], ytckstr, [], []}; 
+
+% Ticks for 3x2
+if include_non_velocity % Main paper
+    xtckcel = {[], [], [], xtckstr, xtckstr, xtckstr}; 
+    ytckcel = {ytckstr, [], [], ytckstr, [], []}; 
+else % Supplemental figure
+    xtckcel = {xtckstr, xtckstr, xtckstr, xtckstr, xtckstr, xtckstr, xtckstr, xtckstr, xtckstr}; % Manually make 3x3. Sorry, future self. 
+    ytckcel = {ytckstr, ytckstr, ytckstr, ytckstr, ytckstr, ytckstr, ytckstr, ytckstr, ytckstr}; 
+end
 
 % Grid, coastlines I think, etc. Background colors. 
 m_grid('box','fancy','linestyle','none','gridcolor',.5 .*[1,1,1],...
@@ -271,6 +335,19 @@ txt= text(0.04, 0.015, subplot_letters(ifig), 'Units', 'normalized', ...
 
 end
 
-exportgraphics(gcf, sprintf('sage_gage/map_view_V%1.0f.jpeg', version_surf), ...
-    'Resolution',500); 
+fname_base = 'sage_gage/map_view_V%1.0f%s.%s'; 
+if include_non_velocity; 
+    sup_txt = ''; 
+else
+    sup_txt = '_supplement'; 
+end
 
+exportgraphics(gcf, sprintf(fname_base, version_surf, sup_txt, 'jpeg'), ...
+    'Resolution',500); 
+savefig(gcf, sprintf(fname_base, version_surf, sup_txt, 'fig')); 
+
+% exportgraphics(gcf, sprintf('sage_gage/map_view_V%1.0f.jpeg', version_surf), ...
+%     'Resolution',500); 
+% savefig(gcf, sprintf('sage_gage/map_view_V%1.0f.fig', version_surf)); 
+
+% save()

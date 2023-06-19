@@ -5,7 +5,7 @@ fpdfs = sprintf('%scompiled_pdfs_%s.mat',out_dir,STAMP); % File with pdfs. a2_1.
 mdls = load(fresults).mdls; 
 
 %% parameters. 
-rough_scale_base = 1e-9; % How much to penalize roughness.
+rough_scale_base  = 1e-9; % How much to penalize roughness.
 re_run = false; 
 
 rough_scale_params = struct('zmoh', .0015*rough_scale_base,...
@@ -28,14 +28,17 @@ to_invert = disconts; % Which model parameters to run. Those come first because 
 % to_invert = {}; 
 % Merge to_invert with other model parameters, when ready. 
 if isempty(to_invert); warning('to_invert should start as == disconts'); end 
-for inum = int16([5, 15, 20, 25, 30, 35, 40, ...
-        45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 145, 170, 210, 250, 300]/5); % Which depths/incidices to run. 
+% for inum = int16([5, 15, 20, 25, 30, 35, 40, ...
+%         45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 145, 170, 210, 250, 300]/5); % Which depths/incidices to run.
+for inum = int16([5:5:300]/5); % Which depths/incidices to run.
     to_invert{end+1} = inum; 
 end
+% to_invert = {[145/5]}; 
 
 % Total hack to not worry as much about having depth slices of vs, but other things not being a function of depth. 
 for iinv = to_invert; %!%! Add strings to the list to handle other parameters. Make sure they are always first in list. 
-iinv = iinv{1}; 
+
+    iinv = iinv{1}; 
 
 %^%^ Handle whether doing depth or other model parameter inversion
 v_at_depth = ~ strcmp(class(iinv), class("A string") ); % Use velocity from a depth, or one of the other parameters like moho depth. If a string is provided, we assume we are not using velocity at depth but another model parameter. %!%! Utilize v_at_depth
