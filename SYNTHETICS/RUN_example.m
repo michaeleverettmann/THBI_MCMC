@@ -4,7 +4,7 @@
 % These define what we are running. Make a list of all desired options. 
 
 STAMP_all =          {'standard'       , 'all_no_hv'       , 'all_no_sp'       , 'standard'       , 'standard'         , };
-network_manual_all = {'testnwk'        , 'testwk'          , 'testwk'          , 'testnwk'        , 'testnwk'          , }; 
+network_manual_all = {'testnwk'        , 'testwk'          , 'testnwk'         , 'testnwk'        , 'testnwk'          , }; 
 station_manual_all = {'cont_EProt-s1m1', 'cont_EProt-s1m1' , 'cont_EProt-s1m1' , 'cont_EProt-s1'  , 'cont_EProt-s1m1m2', }; %
 
 

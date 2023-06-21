@@ -1,0 +1,9 @@
+From script: /Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/many_stas/c1_data_type_maps_and_sigma.m. 
+sig_SW_Ray_phV_eks: sigma = -1.457. N stations = 366
+sig_SW_Ray_phV_dal: sigma = -1.419. N stations = 311
+sig_SW_Ray_phV_lyneqhelm: sigma = -1.414. N stations = 64
+sig_SW_Ray_phV_lynant: sigma = -1.027. N stations = 25
+sig_SW_Lov_phV: sigma = -1.470. N stations = 366
+sig_RF_Sp_ccp: sigma = -0.814. N stations = 366
+sig_HKstack_P: sigma = -1.061. N stations = 366
+sig_SW_HV: sigma = -1.565. N stations = 366

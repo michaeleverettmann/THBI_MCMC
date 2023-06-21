@@ -1,9 +1,13 @@
+% Make a map of where each data type is available. 
+% Also get the average sigma for each data type. 
+
 clc; clear; restoredefaultpath; 
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 addpath('/Users/brennanbrunsvik/Documents/repositories/Base_code/colormaps/redblue'); 
 tectpath1 = "/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/map_view/whitmeyer_karlstrom/layers/"; % Path to what is currently whitmeyer and karlstrom dataset. 
 f_distance_pt_to_sta = './_distance_pt_to_sta.mat';
 f_xsect_positions = './xsect_positions.mat'; 
+compiled_results = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/results_compiled/compiled_results_standard.mat'; % SHould be generated from script: /Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/many_stas/a1_collate_sta_models.m
 pt_dist_nan = 100 /(6371 * 2 * pi / 360); % Don't plot if no station within this many km
 
 
@@ -44,19 +48,27 @@ each_type = ["sig_SW_Ray_phV_eks",...
     "sig_RF_Sp_ccp",...
     "sig_HKstack_P",...
     "sig_SW_HV"]; 
+
+
+mdls = load(compiled_results).mdls; 
+
 nsta = length(mdls.lon); 
 ntypes = length(each_type); 
 
 
-hastype = logical(zeros(nsta, ntypes)); 
+hastype    = logical(zeros(nsta, ntypes)); 
+sigma_mu   = nan(nsta, ntypes); 
+sigma_std  = nan(nsta, ntypes); 
 
 
 for ista = 1:nsta;      
     md = mdls.model{ista}; 
-    hyper = md.hyperparms; 
-    types = string(fieldnames(hyper)); 
+    hyper = md.hyperparms;
+    fnames = fieldnames(hyper); 
+    types = string(fnames); 
     for itype = 1:ntypes; 
-        hastype(ista,itype) = any(each_type(itype) == types);  
+        hastype_i = any(each_type(itype) == types); 
+        hastype(ista,itype) = hastype_i;  
 
         %%% Check for a datatype that wasn't manually added to each_type. Print to screen if something is found. 
         for itype2 = 1:length(types); 
@@ -65,17 +77,37 @@ for ista = 1:nsta;
             end
         end
         %%% End check. 
+        
 
+        %%% Add sigma value, if we have it. 
+        if hastype_i; 
+            sigma_mu (ista, itype) = hyper.(each_type(itype)).mu_log10 ; 
+            sigma_std(ista, itype) = hyper.(each_type(itype)).std_log10; 
+        end
+        %%%
     end
 end
 
 perc_data_mis = 100-100*sum(hastype,'all')/(size(hastype,1)*size(hastype,2)); % Missing data percent
 fprintf('Amount of data that was unavailable: %1.2f%%\n', perc_data_mis)
 
+%% Check sigma inverted for each data type. 
+sigma_mu_10 = 10 .^ sigma_mu; 
+sigma_mean = nanmean(sigma_mu_10, 1); 
+sigma_mean = log10(sigma_mean); 
+n_stations_available = sum(~isnan(sigma_mu_10)); 
+sigma_txt = "From script: /Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/many_stas/c1_data_type_maps_and_sigma.m. \n"; 
+for itype = 1:length(each_type); 
+    sigma_txt = sigma_txt + sprintf("%s: sigma = %1.3f. N stations = %1.0f\n",...
+        each_type(itype), sigma_mean(itype), n_stations_available(itype)); 
+end
+fid = fopen('check_each_data_type/average_sigma.txt', 'wt');
+fprintf(fid, sigma_txt);
+fclose(fid);
 %%
 
 % sfsmat = load('surface_out_example.mat'); xgrid = sfsmat.xgrid; ygrid = sfsmat.ygrid; llminmax = sfsmat.llminmax; latgrid = sfsmat.latgrid; longrid = sfsmat.longrid; 
-mdls = load(fresults).mdls; % For sta lon and lat so we know where to and not to plot. 
+% mdls = load(fresults).mdls; % For sta lon and lat so we know where to and not to plot. 
 
 
 %% Any borders to plot
@@ -223,4 +255,4 @@ hnd_leg(end+1) = h_always_present;
 lgd = legend(hnd_leg, 'Location', 'southeast'); 
 
 
-exportgraphics(gcf, sprintf('data_availability/sta_map.pdf')); 
+exportgraphics(gcf, sprintf('check_each_data_type/sta_map.pdf')); 
