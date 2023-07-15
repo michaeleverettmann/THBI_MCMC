@@ -12,7 +12,7 @@ nxi = length(xi_a);
 ztrue_a = [45  ]; 
 ktrue_a = [1.75];
 
-noise_amt = 0; % 4*0.012; 
+noise_amt = 0; % 4*0.012; %%% brb2023/07/15 If this is >0, it will produce a set of figures with name modification _noisy
 par.synth.noise_sigma_BW_Ps = noise_amt; 
 par.synth.noise_sigma_RF_Ps = noise_amt; 
 rng(1); % Set random number seed in case we want to add noise. 

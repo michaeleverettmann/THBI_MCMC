@@ -1,3 +1,7 @@
+%brb2023/07/15 Not using this script any more. Use
+%run_hk_test_figs_merged_noisy.m and set the noise parameter to 0 if you
+%want no noise. 
+
 rng(1); % Set random number seed in case we want to add noise. 
 
 run_hk_test_setup_bs; % This does some obnoxious setup. % Run it then comment it out if you want to save some time. 
