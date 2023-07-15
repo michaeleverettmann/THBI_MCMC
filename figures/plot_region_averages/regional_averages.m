@@ -25,19 +25,26 @@ clr_reg = [[14 , 207, 18 ]; ... % Appalachian
 % clr_tectfiles = struct("grv_frt", color_front, "MCR", color_rift, ...
 %     "Reelfoot", color_rift, "something_province", color_thrust); % Field names have to precicely correspond to file names from this tectonic dataset. 
 
-
-stainf = load(f_stainf); 
-nt_sta = string(stainf.stainfo.nwk) + '_' + string(stainf.stainfo.stas); 
-lon_sta = stainf.stainfo.slons; 
-lat_sta = stainf.stainfo.slats; 
+%%% brb2023/07/12 Switching to the station list that had QC done on it for the 3rd results 
+f_compiled_stations = '~/Documents/UCSB/ENAM/THBI_ENAM/data/results_compiled/compiled_results_standard.mat'; % The same stations that went into the 3D inversion. QC was done on those stations already. 
+mdls = load(f_compiled_stations).mdls; 
+nt_sta = string(mdls.nwk) + "_" + string(mdls.sta); 
+lon_sta = mdls.lon; 
+lat_sta = mdls.lat; 
+% % % ### brb2023/07/12 Removing the station list which didn't have QC on it. 
+% % % stainf = load(f_stainf); 
+% % % nt_sta = string(stainf.stainfo.nwk) + '_' + string(stainf.stainfo.stas); 
+% % % lon_sta = stainf.stainfo.slons; 
+% % % lat_sta = stainf.stainfo.slats; 
+sta_list_all = nt_sta.replace('_', ' ');  % Compatibility with how code was previously written. 
 
 regions = load(f_regions);
 regions_str = string(fieldnames(regions)); 
-sta_list_all = string(table2cell(readtable(...
-    f_sta_list_all, 'ReadVariableNames', 0))); 
-
-sta_list_all = sta_list_all(:,1) + ' ' + sta_list_all(:,2); % Combine net and sta
-sta_list_all = sta_list_all(1:end-1,:); % Remove non station final line
+% % % sta_list_all = string(table2cell(readtable(...
+% % %     f_sta_list_all, 'ReadVariableNames', 0))); 
+% % % 
+% % % sta_list_all = sta_list_all(:,1) + ' ' + sta_list_all(:,2); % Combine net and sta
+% % % sta_list_all = sta_list_all(1:end-1,:); % Remove non station final line
 
 
 % have_results = nan(length(sta_list_all),1); 
