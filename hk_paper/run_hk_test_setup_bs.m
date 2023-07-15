@@ -12,7 +12,7 @@ fig_path = sprintf('%s/../figures/hk_paper', pwd()) ;
 fhand_figname = @(zmoh, k, thisfig, frmt)sprintf(...
     '%s/z%3.0f_k%3.0f_%s.%s',fig_path, zmoh*10, k*100, thisfig, frmt); % Convenient function to make figure names. Get rid of decimals. 
 
-proj = struct('name', 'SYNTHETICS'); % bb2021.08.04 changed from EXAMPLE because I don't have the example data files. %,'EXAMPLE');
+proj = struct('name', 'hk_paper'); % bb2021.08.04 changed from EXAMPLE because I don't have the example data files. %,'EXAMPLE');
 paths = getPaths(); 
 proj.STAinversions = paths.STAinversions; 
 proj.dir = [fileparts(mfilename('fullpath')),'/'];
@@ -71,7 +71,7 @@ run parms/bayes_inv_parms
 [par, inv] = update_bayes_inv_parms(par, STAMP); % Modify this function to make different tests. 
 
 
-if strcmp(projname,'SYNTHETICS')
+if strcmp(projname,'SYNTHETICS') || strcmp(projname,'hk_paper') %brb2023/07/15 I added hk_paper, don't really know what this block is about but I am doing synthetics...
     par.stadeets = struct('sta',sta','nwk',nwk'); 
 	noisesta = 'RSSD';
 	noisenwk = 'IU';

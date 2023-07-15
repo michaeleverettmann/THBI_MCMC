@@ -26,7 +26,7 @@ if any(strcmp(par.proj.name,{'EXAMPLE'}))
     
     %% -----------------------------------------------------------------
 %% SYNTHETICS
-elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
+elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW', 'hk_paper'}))
     
     fprintf(' > Creating custom model and synthetic data\n')
     
@@ -47,7 +47,7 @@ elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
     trudata = duplicate_data_distribute(trudata,par);
    
     % convert to receiver functions from body waves
-    if any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
+    if any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW', 'hk_paper'}))
         trudata = BW_2_RF(trudata,par);
 %         figure(1102); clf; hold on; plot(trudata.RF_Sp.tt, trudata.RF_Sp.PSV); title('After deconvolution'); 
 

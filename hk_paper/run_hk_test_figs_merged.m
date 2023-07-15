@@ -1,4 +1,7 @@
+rng(1); % Set random number seed in case we want to add noise. 
+
 run_hk_test_setup_bs; % This does some obnoxious setup. % Run it then comment it out if you want to save some time. 
+par.inv.datatypes = {'HKstack_P'}
 
 %% HK tests, analysis, starts here. 
 xi_a = [0.85, 0.9, 0.95, 1, 1.05, 1.1, 1.15]'; 
@@ -10,15 +13,17 @@ nxi = length(xi_a);
 ztrue_a = [45  ]; 
 ktrue_a = [1.75];
 
+par.synth.noise_sigma_BW_Ps = 0; 
+par.synth.noise_sigma_RF_Ps = 0; 
+
 nzi = length(ztrue_a); 
 nki = length(ktrue_a); 
 
 
 % par.datprocess.kNum = 101; 
 % par.datprocess.hNum = 100; 
-par.datprocess.kNum = 501; 
-par.datprocess.hNum = 500; 
-warning('Less hk resolution right now')
+par.datprocess.HKappa.kNum = 501; 
+par.datprocess.HKappa.hNum = 500; 
 
 % Exi_all = zeros(nzi, nki, nxi, ) % Nope, not worth it
 
@@ -378,7 +383,7 @@ exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'rf_error', 'pdf'), 'ContentType
 E_intersect = 0.9;  % Want to know which values intersect this high of E
 
 % For this, need to make E that is nxi x nh x nk, (or something like that).
-Eob = zeros(nxi, par.datprocess.kNum, par.datprocess.hNum); 
+Eob = zeros(nxi, par.datprocess.HKappa.kNum, par.datprocess.HKappa.hNum); 
 for ixi = 1:nxi; 
     Eob(ixi,:,:) = Exi_all{ixi}; 
 end
