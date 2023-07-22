@@ -1,5 +1,13 @@
 
 run_hk_test_setup_bs; % This does some obnoxious setup. % Run it then comment it out if you want to save some time. 
+
+% Parameters you can change and will produce figures with different identifying names. 
+station_manual = 'simple_layers_1'; % brb2023/07/15 simple_layers_1 or simple_layers_1_1. Change from default to a more complicted example. 
+noise_amt = .04; %%% brb2023/07/15 0 or 0.04 first values tried in paper during revisions. If this is >0, it will produce a set of figures with name modification _noisy
+
+
+
+
 par.inv.datatypes = {'HKstack_P'}
 
 %% HK tests, analysis, starts here. 
@@ -12,14 +20,25 @@ nxi = length(xi_a);
 ztrue_a = [45  ]; 
 ktrue_a = [1.75];
 
-noise_amt = 0; % 4*0.012; %%% brb2023/07/15 If this is >0, it will produce a set of figures with name modification _noisy
+%%% Option for noise
 par.synth.noise_sigma_BW_Ps = noise_amt; 
 par.synth.noise_sigma_RF_Ps = noise_amt; 
 rng(1); % Set random number seed in case we want to add noise. 
 
+%%% Option for more complex structure
+% station_manual was probably defined as simple_layers_1 in run_hk_test_setup_bs
+run_params.sta = station_manual;
+sta = station_manual; 
+par.stadeets.sta = sta'; 
+
+
 name_modifier = ""; 
 if noise_amt > 0; 
     name_modifier = name_modifier + "_noisy"; 
+end
+if string(station_manual).contains('_1_1'); 
+    name_modifier = name_modifier + "_mr_cmplx"; 
+    par.forc.mindV = 0.01; % Do higher resolution receiver functions for the more complicated models. 
 end
 
 nzi = length(ztrue_a); 

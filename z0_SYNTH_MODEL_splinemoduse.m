@@ -97,17 +97,31 @@ elseif strcmp(versta, 'crat_2mld'); % Original(ish) version.
     xi_mantle = 1.0; 
     
     use_splines = true; 
-elseif strcmp(versta, 'simple_layers_1'); 
+% elseif strcmp(versta, 'simple_layers_1'); % simple 1 layer of crust 1 layer of mantle for hk paper
+elseif string(versta).contains('simple_layers_1'); 
     selev = 0;
     h_sed = 0;
     h_crust = options.h_crust;
 
     vs_sed = [3.5, 3.5];
 
-    kvs_crust = 3.5 * ones(4,1);
-    cknots = linspace(h_sed, h_sed+h_crust,3)';
-    fcknots = (cknots-h_sed)/h_crust;
-    k_crust = length(cknots);
+    if strcmp(versta, 'simple_layers_1'); % Don't do any modifications beyond baseline model
+        kvs_crust = 3.5 * ones(4,1);
+        cknots = linspace(h_sed, h_sed+h_crust,3)';
+        fcknots = (cknots-h_sed)/h_crust;
+        k_crust = length(cknots);
+    elseif strcmp(versta, 'simple_layers_1_1'); % Do some modification beyond baseline model. 
+%         kvs_crust = 3.5 * ones(4,1);
+%         cknots = linspace(h_sed, h_sed+h_crust,3)';
+%         kvs_crust = [2.8  , 3.2, 2.5, 3.5         , 3.6]'; 
+%         cknots =       [h_sed, 22 , 26 , h_sed+h_crust]';
+        cknots = linspace(h_sed, h_sed+h_crust,100)';
+        kvs_crust = ones(length(cknots)+1, 1)* 3.5; 
+        kvs_crust(20:30) = 3.0; 
+        kvs_crust(60:70) = 4.0; 
+        fcknots = (cknots-h_sed)/h_crust;
+        k_crust = length(cknots);
+    end
 
     kvs_mantle = 4.2 * ones(6,1);
     mknots = [h_sed+h_crust, 60, 110, 140, par.mod.maxz]';
@@ -118,6 +132,7 @@ elseif strcmp(versta, 'simple_layers_1');
     xi_mantle = 1.0; 
     
     use_splines = true; 
+
 end
 
 
