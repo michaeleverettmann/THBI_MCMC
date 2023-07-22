@@ -4,6 +4,15 @@ addpath('/Users/brennanbrunsvik/Documents/repositories/Base_code/colormaps/redbl
 tectpath1 = "/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/map_view/whitmeyer_karlstrom/layers/"; % Path to what is currently whitmeyer and karlstrom dataset. 
 f_distance_pt_to_sta = './_distance_pt_to_sta.mat';
 f_xsect_positions = './xsect_positions.mat'; 
+
+% Get lab/mld results. Zach intially sent this in mid/late july. 
+lab_mld_fold = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/many_stas/zach_lithosphere_results/'; % Where Zach sent mld lab results in mid/late july 2023
+T_lab = 1150;
+lab_file = [lab_mld_fold,'LAB_MLD/LAB_T',num2str(T_lab),'.mat']; 
+mld_file = [lab_mld_fold 'LAB_MLD/MLD_vgrads.mat']; 
+lab_in = load(lab_file); 
+mld_in = load(mld_file); 
+
 pt_dist_nan = 100 /(6371 * 2 * pi / 360); % Don't plot if no station within this many km
 
 % define colors. 
@@ -24,16 +33,18 @@ clr_tectfiles = struct("grv_frt", color_front, "MCR", color_rift, ...
 
 %%% Cross section stuff, copy to cross-section code. 
 version_surf = 7; 
+% ll_min_max_map = [-89  -68   32   46]; % Map view
 ll_min_max_map = [-89  -72   32   46]; % Map view
 lobase = [-87, -76]; 
 labase = [ 43,  35]; 
-% lobase = [-87 - 1.37*4, -76+1.37*4]; 
-% labase = [ 43+4,  35-4]; 
 vdx = 1; 
 vdy = 0.8;
 dshifts = [-4, -2, 0, 1.5]'; 
 lolim = lobase + vdx * dshifts; 
 lalim = labase + vdy * dshifts; 
+
+% lolim(4,:) = [-83, -70]; 
+% lalim(4,:) = [42, 43]; 
 
 % Add EW slice
 % lolim = [lolim; -88,-74]; 
@@ -172,6 +183,11 @@ ax_dx = nan(size(ax_dy));
 % for i_xsect = 1; 
 for i_xsect = 1:n_sections;
 
+% if i_xsect ~= 4; 
+%     disp('Skipping all but last cross section')
+%     continue
+% end
+
 %%% Pre-plot prep
 % Conversions from xy and latlon
 Q1 = [lalim(i_xsect, 1), lolim(i_xsect, 1)];
@@ -286,6 +302,28 @@ set(ax_mantle, 'ydir', 'reverse'); % For some reason contourf occasionally flips
 moh_color = [250, 2, 192]/250; 
 plot(ax_box, gcarc*d2km, zmohsect, 'color', moh_color, 'LineWidth', 4); % Moho
 plot(ax_box, gcarc*d2km, ztopsect_scaled, 'k', 'LineWidth', 3); % Topography
+
+%%% Good spot for LAB, MLD
+% mld_in, lab_in
+% lab_line = interp2(lon_surf_line, )
+labsect = griddata(lab_in.longrid, lab_in.latgrid, lab_in.z_lab_Tiso_smth, ...
+    lon_surf_line, lat_surf_line); 
+plot(ax_box, gcarc*d2km, labsect, 'color', moh_color, 'LineWidth', 4,...
+    'LineStyle','--'); % Moho
+
+
+mld_info = mld_in.MLD_info; 
+zmld_pref = mld_info.zmld_pref; 
+mldsect = griddata(mld_info.longrid, mld_info.latgrid, zmld_pref, ...
+    lon_surf_line, lat_surf_line, 'linear'); 
+% plot(ax_box, gcarc*d2km, mldsect, 'color', moh_color, 'LineWidth', 4,...
+%     'LineStyle',':'); % Moho
+plot(ax_box, gcarc*d2km, mldsect, 'color', 1.*[1,1,1], 'LineWidth', 4,...
+    'LineStyle','-'); % Moho
+% plot(ax_box, gcarc*d2km, mldsect, 'color', [255,255,255]./255, 'LineWidth', 4,...
+%     'LineStyle','-'); % Moho
+% scatter(ax_box, gcarc*d2km, mldsect, 25, '+', 'color', 'k', 'linewidth', 0.75); % Moho
+%%%
 
 % Plot stations
 sta_y_plt = interp1(dist_arc, ztopsect_scaled, sta_x_dist); 
@@ -453,7 +491,6 @@ set(gcf, 'Renderer', 'painters');
 exportgraphics(gcf, sprintf('sage_gage/xsections_V%1.0f.jpeg', version_surf), ...
     'Resolution', 300); 
 savefig(gcf, sprintf('sage_gage/xsections_V%1.0f.fig', version_surf)); 
-
 
 
 
