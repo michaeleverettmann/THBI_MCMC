@@ -33,8 +33,8 @@ clr_tectfiles = struct("grv_frt", color_front, "MCR", color_rift, ...
 
 %%% Cross section stuff, copy to cross-section code. 
 version_surf = 7; 
-% ll_min_max_map = [-89  -68   32   46]; % Map view
-ll_min_max_map = [-89  -72   32   46]; % Map view
+ll_min_max_map = [-89  -68   32   46]; % Map view
+% ll_min_max_map = [-89  -72   32   46]; % Map view
 lobase = [-87, -76]; 
 labase = [ 43,  35]; 
 vdx = 1; 
@@ -43,8 +43,8 @@ dshifts = [-4, -2, 0, 1.5]';
 lolim = lobase + vdx * dshifts; 
 lalim = labase + vdy * dshifts; 
 
-% lolim(4,:) = [-83, -70]; 
-% lalim(4,:) = [42, 43]; 
+lolim(4,:) = [-83, -70]; 
+lalim(4,:) = [42, 43]; 
 
 % Add EW slice
 % lolim = [lolim; -88,-74]; 
