@@ -133,13 +133,13 @@ n_fig_notvel = 3; % How many figures are not velocity but things like moho
 n_plots = length(depths) + include_non_velocity * n_fig_notvel; % Add 3 if plotting things that arent just velocity
 
 
-if include_non_velocity; % Main figure spacing
-    figure(17); clf; hold on; set(gcf,'pos', [87 856 692 476]); 
-    tiledlayout(2, 3, 'TileSpacing', 'tight'); 
-else % Figure spacing if only showing velocity
+% if include_non_velocity; % Main figure spacing
+%     figure(17); clf; hold on; set(gcf,'pos', [87 856 692 476]); 
+%     tiledlayout(2, 3, 'TileSpacing', 'tight'); 
+% else % Figure spacing if only showing velocity
     figure(17); clf; hold on; set(gcf,'pos', [87 856 692 476*3/2]); 
     tiledlayout(3, 3, 'TileSpacing', 'tight'); 
-end
+% end
 
 for ifig = 1:n_plots; 
 
@@ -204,91 +204,78 @@ end
 grd_cont(pt_dist > pt_dist_nan) = nan; 
 options.vgrid(pt_dist > pt_dist_nan) = nan; 
 
-% Colorbar and label
-ax = gca(); 
-cbar = colorbar('Location', 'south'); 
-cbar.Position(3) = ax.Position(3) * .4; 
-cbar.Position(1) = (ax.Position(1)+ax.Position(3)*.5) ; 
-if ifig == 1; 
-    cbar.Position(1) = cbar.Position(1) - 0.01; % For some reason first axis is off. 
-end
+b1_plot_paper_maps_setup_colorbar; 
 
 % Main contours
 num_cnt = 100; 
 m_contourf(longrid, latgrid, grd_cont, cnt_num,...
     'LineStyle','none'); 
 
-% State lines
-[latbord, lonbord] = borders('states'); % add states map
-for iplace = 1:length(lonbord); 
-    m_line(lonbord{iplace}, latbord{iplace}, 'LineWidth',1,'color',0*[1 1 1])
-end
-
-% Coast lines
-cst = m_coast('patch',[1 1 1], 'FaceAlpha', 0); 
-
-%%%% Tectonic stuff
-% Tectonic fronts. 
-m_plot(app_bord(1,:), app_bord(2,:), 'linewidth', 1.5, 'color', color_front); 
-% m_plot(gre_bord(1,:), gre_bord(2,:), 'linewidth', 3, 'color', color_front); 
-
-% Load tectonic files to plot. 
-plt_ftrs = ["grv_frt"]; % Which things to plot. Not showing thrusts because not pertinent. Those they are mislabeled as mislabeled as  "something_province" % , "MCR", "Reelfoot"
-plt_ftrs_path = tectpath1 + plt_ftrs + "*.txt";
-for iftr = 1:length(plt_ftrs); 
-    fplot = ls(plt_ftrs_path(iftr)); 
-    fplot = splitlines(fplot(1:end-1)); % Need to remove last line, to prevent nonsense empty extra cell index. 
-    this_color = clr_tectfiles.(plt_ftrs(iftr)); 
-    for ifplot = 1:length(fplot); 
-        xy = load(fplot{ifplot});  
-        x = xy(:,1); 
-        y = xy(:,2); 
-        m_plot(x, y, 'Color', this_color, 'linewidth', 1.5); % TODO color for each feature
-    end
-end
-
-% Label features. 
-if ifig == 1; 
-    m_text(-83, 39, 'GF', 'color', color_text, 'fontsize', 12, ...
-        'rotation', 75, 'horizontalalignment', 'center', 'verticalalignment', 'middle', 'fontweight', 'bold'); 
-    m_text(-83, 36, 'AF', 'color', color_text, 'fontsize', 12, ...
-        'rotation', 45, 'horizontalalignment', 'center', 'verticalalignment', 'middle', 'fontweight', 'bold'); 
-end
-
-
-%%%% Labels, ticks, states, etc. 
-% Label the plot
-m_text(-74, 30.5, label, 'Units','data', 'HorizontalAlignment', 'center',...
-    'VerticalAlignment', 'bottom'); 
-
-% Handle ticks across different subplots. 
-xtck = [-88:6:-68]; 
-ytck = [28:4:44]; 
-xtckstr = xtck; 
-ytckstr = ytck; 
-
-% Ticks for 3x2
-if include_non_velocity % Main paper
-    xtckcel = {[], [], [], xtckstr, xtckstr, xtckstr}; 
-    ytckcel = {ytckstr, [], [], ytckstr, [], []}; 
-else % Supplemental figure
-    xtckcel = {xtckstr, xtckstr, xtckstr, xtckstr, xtckstr, xtckstr, xtckstr, xtckstr, xtckstr}; % Manually make 3x3. Sorry, future self. 
-    ytckcel = {ytckstr, ytckstr, ytckstr, ytckstr, ytckstr, ytckstr, ytckstr, ytckstr, ytckstr}; 
-end
-
-% Grid, coastlines I think, etc. Background colors. 
-m_grid('box','fancy','linestyle','none','gridcolor',.5 .*[1,1,1],...
-    'backcolor',[.8, .8, .8], 'xticklabel', xtckcel{ifig}, 'yticklabel', ytckcel{ifig},... % 'backcolor',[.3 .75 1]
-    'xtick', xtck, 'ytick', ytck);
-
-% Figure subletter labels - do this late in script so letters don't get covered. 
-subplot_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']; 
-txt= text(0.04, 0.015, subplot_letters(ifig), 'Units', 'normalized', ...
-    'HorizontalAlignment', 'left', 'VerticalAlignment','bottom', ...
-    'FontSize',13, 'Color',[0,0,0]); 
+b1_plot_paper_maps_setup_background; %  Describe
 
 end
 
+
+%%% Zach's lithosphere stuff
+addpath('/Users/brennanbrunsvik/Documents/repositories/Base_code/colormaps/colorbrewer'); 
+load('zach_lithosphere_results/LAB_MLD/fastlith_map.mat')
+% LAB from temperature analysis
+T_lab = 1150;
+load(['zach_lithosphere_results/LAB_MLD/LAB_T',num2str(T_lab),'.mat'])
+% MLD from gradient analysis
+load('zach_lithosphere_results/LAB_MLD/MLD_vgrads.mat')
+
+%% LAB depth
+ifig = ifig + 1; 
+nexttile(ifig); hold on; box on; set(gca, 'LineWidth', 1.5);
+label = ['LAB depth (km)']; 
+colormap(gca,brewermap(15,'PuOr')); 
+clim([80, 260]); 
+b1_plot_paper_maps_setup_colorbar; % setup colorbar, external script
+m_contourf(longrid,latgrid,z_lab_Tiso_smth,30,'linestyle','none'); 
+b1_plot_paper_maps_setup_background; % Set up map junk, external script
+
+%% Lithosphere speed
+ifig = ifig + 1; 
+nexttile(ifig); hold on; box on; set(gca, 'LineWidth', 1.5);
+% label = ['Lithosphere' newline, ' speed relative']; 
+% label = ['  Relative' newline 'Lithosphere Vs' newline '(km/s)']; 
+label = ['    Lithosphere' newline ' Vs relative' newline '(km/s)']; 
+clim([0.1,2]); 
+colormap(gca,flipud(turbo(15))),
+b1_plot_paper_maps_setup_colorbar; % setup colorbar, external script
+m_contourf(longrid,latgrid,fastlithsmth_norm,30,'linestyle','none')
+m_contour(longrid,latgrid,fastlithsmth_norm,1*[1 1],'linewidth',1.5/2,'color','k')
+m_contour(longrid,latgrid,fastlithsmth_norm,1.5*[1 1],'linewidth',2/2,'color','k')
+m_contour(longrid,latgrid,fastlithsmth_norm,2*[1 1],'linewidth',2.5/2,'color','k')
+b1_plot_paper_maps_setup_background; % Set up map junk, external script
+
+
+
+%% MLD depths
+ifig = ifig + 1; 
+zz = 51:150; % depth
+sz = 300*log10(zz./50).^2; % associated size
+nexttile(ifig); cla; hold on; box on; set(gca, 'LineWidth', 1.5);
+
+m_scatter(longrid(:),latgrid(:),interp1(zz,sz,MLD_info.zmld_pref(:)),MLD_info.vmld_pref(:),...
+    'filled','markeredgecolor',0.2*[1 1 1],'markerfacealpha',1)
+label = 'MLD Vs (km/s)'; 
+caxis(gca,[4.3 4.65]);
+colormap(gca,brewermap(15,'BrBG')) 
+b1_plot_paper_maps_setup_colorbar; % setup colorbar, external script
+
+zz_scale = [60:10:110];
+lon_scale = -69.5;
+lat_scale = 39.5; 
+for iz = 1:length(zz_scale)
+    m_scatter(lon_scale,lat_scale-iz,interp1(zz,sz,zz_scale(iz)),1,'markeredgecolor',0.2*[1 1 1],'markerfacecolor',0.5*[1 1 1]);
+    m_text(lon_scale-0.7,lat_scale-iz,[num2str(zz_scale(iz)),' km'],'horizontalalignment','right','verticalalignment','middle','fontsize',11)
+end
+b1_plot_paper_maps_setup_background; % Set up map junk, external script
+%%%
+
+%%
 fname_base = 'sage_gage/map_view_V%1.0f%s.%s'; 
 if include_non_velocity; 
     sup_txt = ''; 
