@@ -28,7 +28,7 @@ color_front    = '255/255/255' # Grenville Front, Appalachian front.
 color_thrust   = '125/125/125'
 color_mag      = '190/000/000'
 color_grav     = '000/150/000'
-color_ha       = '255/000/010' # Harrisonburg Anomaly
+color_ha       = '250/020/020' # '255/000/010' # Harrisonburg Anomaly
 color_rift     = '255/191/0'
 
 # The regional velocity profile colors
@@ -166,7 +166,7 @@ for ibord, bord in enumerate([app_bord, app_bord2]): # gre_bord
     fig.plot(x=x, y=y, pen=linewidth+"p,"+color_front)
 
 # Plot Harrisonburg anomaly circle
-fig.plot(x=[-80], y=[38.3], size=[200], style='E-', pen=linewidth+"p,"+color_ha)
+# fig.plot(x=[-80], y=[38.3], size=[200], style='E-', pen=linewidth+"p,"+color_ha)
 
 #%% Whitmeyer and Karlstrom stuff
 def shp_to_xy(shape):
@@ -202,12 +202,14 @@ fig.plot(x=x, y=y, pen=linewidth+"p,"+color_front)
 
 
 #%% Label features
-fig.text(x=-83.2,  y=40,    text='GF',  font="12p,"+color_front, angle=80)
-fig.text(x=-83,    y=36.5,  text='AF',  font="12p,"+color_front, angle=35)
+fig.text(x=-83.2,  y=40,    text='GF',  font="14p,"+color_front, angle=80)
+fig.text(x=-83,    y=36.5,  text='AF',  font="14p,"+color_front, angle=35)
 # fig.text(x=-84.1,  y=31.6,  text='SGR', font="12p,"+color_rift ,         )
-fig.text(x=-83.5,  y=37.75, text='RT' , font="12p,"+color_rift ,         )
+fig.text(x=-83.5,  y=37.75, text='RT' , font="14p,"+color_rift ,         )
 # fig.text(x=-87.25, y=36.75, text='RR' , font="12p,"+color_rift ,         )
-fig.text(x=-80,    y=38.3,  text='HA',  font="12p,"+color_ha   ,         )
+fig.text(x=-84.9,    y=35,  text='SAA',  font="14p,"+color_ha   ,         )
+fig.text(x=-80,    y=38.3,  text='CAA',  font="14p,"+color_ha   ,         )
+fig.text(x=-72.4,  y=43.4,  text='NAA',  font="14p,"+color_ha   ,         )
 # fig.text(x=-85.25, y=42.5,  text='MCR', font="12p,"+color_rift ,         )
 # fig.text(x=-71, y=40.5, text='PGA', font="12p,"+color_grav)
 # fig.text(x=-78, y=33.5, text='BMA', font="12p,"+color_mag)
