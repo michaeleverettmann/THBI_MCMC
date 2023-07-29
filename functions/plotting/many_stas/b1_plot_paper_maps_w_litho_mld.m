@@ -8,9 +8,9 @@ pt_dist_nan = 100 /(6371 * 2 * pi / 360); % Don't plot if no station within this
 
 
 %%% Important! Decide which version of figure to plot. Main figure or supplement. 
-include_non_velocity = true; % True: show things like radial anisotropy. False: Only show velocity. 
+main_paper_figure = true; % True: show things like radial anisotropy. False: Only show velocity. 
 
-if include_non_velocity; 
+if main_paper_figure; 
     fprintf('\nPlotting main figure paper. \n')
 else
     fprintf('\nPlotting supp figure. \n')
@@ -42,10 +42,10 @@ lalim = xsect_positions.lalim;
 
 n_contour = 30; 
 
-if include_non_velocity; 
-    depths = [25, 95, 145]; % Try loading these depths. Probably need to type manually for now, but could save as a .mat file in future. 
+if main_paper_figure; 
+    depths = [25, 60, 95, 145]; % Try loading these depths. Probably need to type manually for now, but could save as a .mat file in future. 
 else
-    depths = [10:30:250]; 
+    depths = [10:30:220]; 
 end
 
 parms_other = ["zsed", "zmoh"]; 
@@ -129,11 +129,15 @@ pt_dist_km = pt_dist .* 6371 * 2 * pi / 360;
 pt_dist_TA_km = pt_dist_TA .* 6371 * 2 * pi / 360; 
 save(f_distance_pt_to_sta, 'pt_dist_km', 'pt_dist', 'pt_dist_TA', 'lon_buff', 'lat_buff'); % Save for loading in plot_xsects file. 
 
-n_fig_notvel = 3; % How many figures are not velocity but things like moho
-n_plots = length(depths) + include_non_velocity * n_fig_notvel; % Add 3 if plotting things that arent just velocity
+if main_paper_figure; 
+    n_fig_notvel = 2; % How many figures are not velocity but things like moho
+else
+    n_fig_notvel = 1; 
+end
+n_plots = length(depths) + n_fig_notvel; % Add 3 if plotting things that arent just velocity
 
 
-% if include_non_velocity; % Main figure spacing
+% if main_paper_figure; % Main figure spacing
 %     figure(17); clf; hold on; set(gcf,'pos', [87 856 692 476]); 
 %     tiledlayout(2, 3, 'TileSpacing', 'tight'); 
 % else % Figure spacing if only showing velocity
@@ -151,9 +155,9 @@ m_proj('mercator', 'long',[ll_min_max_map(1), ll_min_max_map(2)],...
 cnt_num = 100; 
 
 %% Can plot some things that aren't velocity
-if (ifig > n_fig_notvel) || ~ include_non_velocity; 
+if (ifig > n_fig_notvel); 
     ind_depth = ifig; 
-    ind_depth = ind_depth - include_non_velocity * n_fig_notvel; % If first few plots aren't velocity, then reduce depth index. 
+    ind_depth = ind_depth - n_fig_notvel; % If first few plots aren't velocity, then reduce depth index. 
     grd_cont = mgrid3d(:,:,ind_depth); 
 
     for ipt = find(~isnan(grd_cont))'; % If any of these within X km of a nan point, kill it. 
@@ -175,12 +179,14 @@ if (ifig > n_fig_notvel) || ~ include_non_velocity;
     elseif any(ind_depth == [2,3]); 
         clim([4.35, 4.75]); 
     end
-elseif (ifig == 1) && include_non_velocity; % If we want non-velocity plots, then put then in spots 1, 2, 3
+
+elseif (ifig == 1) && (~main_paper_figure); % If we want non-velocity plots, then put then in spots 1, 2, 3
     grd_cont = zsed_surf;
     label = "Sediment (km)"; 
     colormap(gca, viridis()); 
     clim([0, 1]);
-elseif (ifig == 2) && include_non_velocity; 
+
+elseif (ifig == 1) && main_paper_figure; 
     grd_cont = zmoh_surf; 
     label = 'Moho (km)'; 
     colormap(gca, viridis(12)); 
@@ -188,7 +194,7 @@ elseif (ifig == 2) && include_non_velocity;
     clim_min = 5*floor(min(zmoh_surf, [], 'all')/5)  ; % Round in 5s
     clim_max = 5*floor(max(zmoh_surf, [], 'all')/5)  ;
     clim([clim_min, clim_max]); 
-elseif (ifig == 3) && include_non_velocity; 
+elseif (ifig == 2) && main_paper_figure; 
     grd_cont = xi_surf; % TEMPORARY 
     label = '\xi=(Vsh/Vsv)^2'; 
     colormap(gca, redblue(13)); 
@@ -216,68 +222,70 @@ b1_plot_paper_maps_setup_background; %  Describe
 end
 
 
-%%% Zach's lithosphere stuff
-addpath('/Users/brennanbrunsvik/Documents/repositories/Base_code/colormaps/colorbrewer'); 
-load('zach_lithosphere_results/LAB_MLD/fastlith_map.mat')
-% LAB from temperature analysis
-T_lab = 1150;
-load(['zach_lithosphere_results/LAB_MLD/LAB_T',num2str(T_lab),'.mat'])
-% MLD from gradient analysis
-load('zach_lithosphere_results/LAB_MLD/MLD_vgrads.mat')
-
-%% LAB depth
-ifig = ifig + 1; 
-nexttile(ifig); hold on; box on; set(gca, 'LineWidth', 1.5);
-label = ['LAB depth (km)']; 
-colormap(gca,brewermap(15,'PuOr')); 
-clim([80, 260]); 
-b1_plot_paper_maps_setup_colorbar; % setup colorbar, external script
-m_contourf(longrid,latgrid,z_lab_Tiso_smth,30,'linestyle','none'); 
-b1_plot_paper_maps_setup_background; % Set up map junk, external script
-
-%% Lithosphere speed
-ifig = ifig + 1; 
-nexttile(ifig); hold on; box on; set(gca, 'LineWidth', 1.5);
-% label = ['Lithosphere' newline, ' speed relative']; 
-% label = ['  Relative' newline 'Lithosphere Vs' newline '(km/s)']; 
-label = ['    Lithosphere' newline ' Vs relative' newline '(km/s)']; 
-clim([0.1,2]); 
-colormap(gca,flipud(turbo(15))),
-b1_plot_paper_maps_setup_colorbar; % setup colorbar, external script
-m_contourf(longrid,latgrid,fastlithsmth_norm,30,'linestyle','none')
-m_contour(longrid,latgrid,fastlithsmth_norm,1*[1 1],'linewidth',1.5/2,'color','k')
-m_contour(longrid,latgrid,fastlithsmth_norm,1.5*[1 1],'linewidth',2/2,'color','k')
-m_contour(longrid,latgrid,fastlithsmth_norm,2*[1 1],'linewidth',2.5/2,'color','k')
-b1_plot_paper_maps_setup_background; % Set up map junk, external script
-
-
-
-%% MLD depths
-ifig = ifig + 1; 
-zz = 51:150; % depth
-sz = 300*log10(zz./50).^2; % associated size
-nexttile(ifig); cla; hold on; box on; set(gca, 'LineWidth', 1.5);
-
-m_scatter(longrid(:),latgrid(:),interp1(zz,sz,MLD_info.zmld_pref(:)),MLD_info.vmld_pref(:),...
-    'filled','markeredgecolor',0.2*[1 1 1],'markerfacealpha',1)
-label = 'MLD Vs (km/s)'; 
-caxis(gca,[4.3 4.65]);
-colormap(gca,brewermap(15,'BrBG')) 
-b1_plot_paper_maps_setup_colorbar; % setup colorbar, external script
-
-zz_scale = [60:10:110];
-lon_scale = -69.5;
-lat_scale = 39.5; 
-for iz = 1:length(zz_scale)
-    m_scatter(lon_scale,lat_scale-iz,interp1(zz,sz,zz_scale(iz)),1,'markeredgecolor',0.2*[1 1 1],'markerfacecolor',0.5*[1 1 1]);
-    m_text(lon_scale-0.7,lat_scale-iz,[num2str(zz_scale(iz)),' km'],'horizontalalignment','right','verticalalignment','middle','fontsize',11)
+if main_paper_figure; 
+    %%% Zach's lithosphere stuff
+    addpath('/Users/brennanbrunsvik/Documents/repositories/Base_code/colormaps/colorbrewer'); 
+    load('zach_lithosphere_results/LAB_MLD/fastlith_map.mat')
+    % LAB from temperature analysis
+    T_lab = 1150;
+    load(['zach_lithosphere_results/LAB_MLD/LAB_T',num2str(T_lab),'.mat'])
+    % MLD from gradient analysis
+    load('zach_lithosphere_results/LAB_MLD/MLD_vgrads.mat')
+    
+    %% LAB depth
+    ifig = ifig + 1; 
+    nexttile(ifig); hold on; box on; set(gca, 'LineWidth', 1.5);
+    label = ['LAB depth (km)']; 
+    colormap(gca,brewermap(15,'PuOr')); 
+    clim([80, 260]); 
+    b1_plot_paper_maps_setup_colorbar; % setup colorbar, external script
+    m_contourf(longrid,latgrid,z_lab_Tiso_smth,30,'linestyle','none'); 
+    b1_plot_paper_maps_setup_background; % Set up map junk, external script
+    
+    %% Lithosphere speed
+    ifig = ifig + 1; 
+    nexttile(ifig); hold on; box on; set(gca, 'LineWidth', 1.5);
+    % label = ['Lithosphere' newline, ' speed relative']; 
+    % label = ['  Relative' newline 'Lithosphere Vs' newline '(km/s)']; 
+    label = ['    Lithosphere' newline ' Vs relative' newline '(km/s)']; 
+    clim([0.1,2]); 
+    colormap(gca,flipud(turbo(15))),
+    b1_plot_paper_maps_setup_colorbar; % setup colorbar, external script
+    m_contourf(longrid,latgrid,fastlithsmth_norm,30,'linestyle','none')
+    m_contour(longrid,latgrid,fastlithsmth_norm,1*[1 1],'linewidth',1.5/2,'color','k')
+    m_contour(longrid,latgrid,fastlithsmth_norm,1.5*[1 1],'linewidth',2/2,'color','k')
+    m_contour(longrid,latgrid,fastlithsmth_norm,2*[1 1],'linewidth',2.5/2,'color','k')
+    b1_plot_paper_maps_setup_background; % Set up map junk, external script
+    
+    
+    
+    %% MLD depths
+    ifig = ifig + 1; 
+    zz = 51:150; % depth
+    sz = 300*log10(zz./50).^2; % associated size
+    nexttile(ifig); cla; hold on; box on; set(gca, 'LineWidth', 1.5);
+    
+    m_scatter(longrid(:),latgrid(:),interp1(zz,sz,MLD_info.zmld_pref(:)),MLD_info.vmld_pref(:),...
+        'filled','markeredgecolor',0.2*[1 1 1],'markerfacealpha',1)
+    label = 'MLD Vs (km/s)'; 
+    caxis(gca,[4.3 4.65]);
+    colormap(gca,brewermap(15,'BrBG')) 
+    b1_plot_paper_maps_setup_colorbar; % setup colorbar, external script
+    
+    zz_scale = [60:10:110];
+    lon_scale = -69.5;
+    lat_scale = 39.5; 
+    for iz = 1:length(zz_scale)
+        m_scatter(lon_scale,lat_scale-iz,interp1(zz,sz,zz_scale(iz)),1,'markeredgecolor',0.2*[1 1 1],'markerfacecolor',0.5*[1 1 1]);
+        m_text(lon_scale-0.7,lat_scale-iz,[num2str(zz_scale(iz)),' km'],'horizontalalignment','right','verticalalignment','middle','fontsize',11)
+    end
+    b1_plot_paper_maps_setup_background; % Set up map junk, external script
+    %%%
 end
-b1_plot_paper_maps_setup_background; % Set up map junk, external script
-%%%
 
 %%
 fname_base = 'sage_gage/map_view_V%1.0f%s.%s'; 
-if include_non_velocity; 
+if main_paper_figure; 
     sup_txt = ''; 
 else
     sup_txt = '_supplement'; 

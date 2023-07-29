@@ -51,7 +51,7 @@ xtckstr = xtck;
 ytckstr = ytck; 
 
 % Ticks for 3x2
-if include_non_velocity % Main paper
+if main_paper_figure % Main paper
 %     xtckcel = {[], [], [], xtckstr, xtckstr, xtckstr}; 
 %     ytckcel = {ytckstr, [], [], ytckstr, [], []}; 
     xtckcel = {[], [], [], [], [], [], xtckstr, xtckstr, xtckstr}; 
