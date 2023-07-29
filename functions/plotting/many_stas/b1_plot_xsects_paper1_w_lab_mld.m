@@ -370,9 +370,18 @@ if plot_COT;
 end
 
 % Section letters. 
-section_letter = char(64+i_xsect); % Text for cross-section name. ith letter of alphabet
-t1=text(ax_box, 0.01, 1.12, section_letter    , 'fontsize', 14, 'color', 'k', 'units', 'normalized', 'VerticalAlignment','top'); 
-t2=text(ax_box, 0.99, 1.12, section_letter+"'", 'fontsize', 14, 'color', 'k', 'units', 'normalized', 'VerticalAlignment','top', 'HorizontalAlignment','right'); 
+section_letter = char(64+n_sections+1-i_xsect); % Text for cross-section name. ith letter of alphabet
+t1=text(ax_box, 0.01, 1.13, section_letter    , 'fontsize', 14, 'color', 'k', 'units', 'normalized', 'VerticalAlignment','top'); 
+t2=text(ax_box, 0.99, 1.13, section_letter+"'", 'fontsize', 14, 'color', 'k', 'units', 'normalized', 'VerticalAlignment','top', 'HorizontalAlignment','right'); 
+
+% Feature labels, very manual 
+if i_xsect == 1; 
+    text(ax_box, 290, 125, 'SAA')
+elseif i_xsect == 3;
+    text(ax_box, 700, 100, 'CAA')
+elseif i_xsect == 4;
+    text(ax_box, 820, 110, 'NAA')
+end
 
 % Exageration
 dexag = 25; 
