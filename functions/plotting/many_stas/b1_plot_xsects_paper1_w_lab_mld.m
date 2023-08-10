@@ -463,7 +463,8 @@ for iplace = 1:length(lonbord);
     m_line(lonbord{iplace}, latbord{iplace}, 'LineWidth',1,'color',.5*[1 1 1])
 end
 cst = m_coast('patch',.5*[1 1 1], 'FaceAlpha', 0); 
-xsect_letters = ["A", "B", "C", "D", "E", "F", "G", "H"]; 
+xsect_letters = ["A", "B", "C", "D"]; 
+xsect_letters = flip(xsect_letters); 
 % xsect_letters = xsect_letters(size(lolim):-1:1); % Flip letters so we label going from top to bottom
 for ixsect = 1:size(lolim,1); 
     Q1 = [lalim(ixsect, 1), lolim(ixsect, 1)];
