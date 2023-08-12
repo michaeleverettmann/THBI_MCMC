@@ -18,6 +18,7 @@ fstas = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/results_compi
 finventory = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/DatabaseOBSPY/AttenBody_201910OBSPY/misc/inventory_june_all.xml' # inventory file, if wanting extra stations.
 ffigpath = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/map_view/figure_out/map_fig.pdf' # output figure.
 fsect_locs = '../many_stas/xsect_positions.mat'# cross-section locations.
+fcamp = './CAMP_digitize/CAMP_fromGao2000f1_nan.mat' # CAMP dykes Zach sent after digitizing from figure from ... paper
 
 fvs_averages = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/plot_region_averages/vs_percentiles.eps'
 faverages_locations = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/plot_region_averages/region_locations.eps'
@@ -107,6 +108,21 @@ stas = stamat['mdls']
 lon_sta = stas[0]['lon'][0].astype('float64').ravel()
 lat_sta = stas[0]['lat'][0].astype('float64').ravel()
 
+# #%% Get camp dykes from Dataset Zach digitized
+#
+# # Load camp dykes.
+# campmat = sio.loadmat(fcamp)
+# camp = campmat['a']
+#
+# # Find indices of NaN values. Dykes are split at nan values.
+# brk = np.where(np.isnan(camp[:, 1]))[0]
+# brk = np.concatenate(([0], brk, [camp.shape[0]]))
+#
+# # Loop through breaks and plot segments
+# for ibrk in range(len(brk) - 1):
+#     lon = camp[brk[ibrk]:brk[ibrk + 1], 1]
+#     lat = camp[brk[ibrk]:brk[ibrk + 1], 2]
+
 #%% Load topography grid in target area
 grid = pygmt.datasets.load_earth_relief(resolution="01m", region=region)
 #%%
@@ -120,6 +136,27 @@ fig.grdimage(grid=grid, cmap="oleron")
 fig.coast(shorelines=True, frame=True,     lakes="lightblue",
     borders=["1/thick,black", "2/thin,black", "3/thin,black"],
     )
+
+#%% Get camp dykes from Dataset Zach digitized
+color_camp = "252/101/210"
+# color_camp = "238/255/0"
+
+# Load camp dykes.
+campmat = sio.loadmat(fcamp)
+camp = campmat['a']
+
+# Find indices of NaN values. Dykes are split at nan values.
+brk = np.where(np.isnan(camp[:, 1]))[0]
+brk = np.concatenate(([0], brk, [camp.shape[0]]))
+
+# Loop through breaks and plot segments
+for ibrk in range(len(brk) - 1):
+    lon = camp[brk[ibrk]+1:brk[ibrk + 1], 1]
+    lat = camp[brk[ibrk]+1:brk[ibrk + 1], 2]
+    fig.plot(x=lon, y=lat, pen='0.75'+"p,"+color_camp)
+
+#%%
+
 
 # Scatter stations
 
