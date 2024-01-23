@@ -460,7 +460,7 @@ cbar_mantle.Label.String = 'Mantle Vs';
 %% Map view of cross-section locations. 
 % axmap = axes('Position', [ax_dx(end)+0.075, (ax_y(end)+ax_dy(end)/6), ax_dy(end)*.8, ax_dy(end)*.8]);
 axmap = axes('Position', [ax_dx(1)+0.1, (ax_y(1)-0.025), ax_dy(1)*1.25, ax_dy(1)*1.25]);
-cla; hold on; 
+cla(axmap); hold on; 
 % set(gca, 'FontSize', 12);
 m_proj('mercator', 'long',[ll_min_max_map(1)-1, ll_min_max_map(2)+1],...
                    'lat',[ll_min_max_map(3)-2, ll_min_max_map(4)]); 
@@ -471,6 +471,22 @@ for iplace = 1:length(lonbord);
     m_line(lonbord{iplace}, latbord{iplace}, 'LineWidth',1,'color',.5*[1 1 1])
 end
 cst = m_coast('patch',.5*[1 1 1], 'FaceAlpha', 0); 
+
+
+% Appalachian and Grenville fronts. 
+app_bord = [-73.9819443, -74.619146 , -75.520073 , -76.1132732, -76.7944389,-77.1789631, -77.6294266, -77.9920049, -78.2117582, -78.4383114,-79.1416076, -79.8888598, -80.2331436, -80.7605221, -81.2438831,-81.9140786, -82.4853569, -83.2434644, -84.3284171, -84.7700317,-85.1106908, -85.5944904, -86.0889287, -87.330563; 40.4970924,  40.7306085,  40.9467137,  41.1455697,  41.2695495,41.2365112,  41.0959121,  40.8719878,  40.7056279,  40.3967643,39.5548831,  38.4965935,  38.1259146,  37.7272803,  37.5445773,37.3439591,  37.1603165,  36.8268747,  36.1733569,  35.880149 ,35.4427709,  34.7777158,  34.1799976,  32.9349287]; 
+app_bord2 = [-73.9819  -74.1099  -73.8461  -73.3406  -73.0769  -72.4395; 40.4971   40.9965   42.4397   43.8504   44.8247   45.6140];
+app_bord = [flipud(app_bord')', app_bord2]; 
+m_plot(app_bord(1,:), app_bord(2,:), 'Color', 'k', 'linewidth', 2, 'linestyle', ':'); % , 'LineStyle', '-.');
+
+% Load Grenville file and plot 
+plt_ftrs_path = tectpath1 + "grv_frt*.txt";
+fplot = ls(plt_ftrs_path); 
+fplot=fplot(1:end-1)
+xy = load(fplot);  
+m_plot(xy(:,1), xy(:,2), 'Color', 'k', 'linewidth', 2, 'linestyle', ':'); 
+
+% cross section locations
 xsect_letters = ["A", "B", "C", "D"]; 
 xsect_letters = flip(xsect_letters); 
 % xsect_letters = xsect_letters(size(lolim):-1:1); % Flip letters so we label going from top to bottom
@@ -496,6 +512,7 @@ for ixsect = size(lolim,1):-1:1; % 1:size(lolim,1);
         'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', ...
         'fontsize', 11, 'BackgroundColor', 'w', 'EdgeColor', 'k', 'Margin', 0.5);   
 end
+
 % m_grid('box','fancy','linestyle','none','gridcolor',.5 .*[1,1,1],...
 %     'backcolor','none', 'xtick', [-85:10:75], 'ytick', [35:10:45]); 
 m_grid('box','fancy','linestyle','none','gridcolor',.5 .*[1,1,1],...
