@@ -207,14 +207,14 @@ text(xlbl, ylbl, '(c)', 'Units','normalized');
 axes(ax4); 
 xlabel('\kappa'); 
 ylabel('H (km)'); 
-title('H\kappa stack: ignoring \xi', 'fontweight', 'normal'); 
+title('H-\kappa stack: ignoring \xi', 'fontweight', 'normal'); 
 text(xlbl, ylbl, '(d)', 'Units','normalized'); 
 
 axes(ax5); 
 xlabel('\kappa'); 
 ylabel('H (km)'); 
 % yticklabels([]); 
-title('H\kappa stack: \xi corrected', 'fontweight', 'normal'); 
+title('H-\kappa stack: \xi corrected', 'fontweight', 'normal'); 
 text(xlbl, ylbl, '(e)', 'Units','normalized'); 
 
 
@@ -415,7 +415,9 @@ set(gcf, 'pos', [2235 809 251 366]);
 tiledlayout(3,1,'TileSpacing','compact'); 
 LW = 1.25; 
 
-nexttile(), hold on, ylim(ylim_man), box on, grid on; set(gca,'LineWidth', LW); 
+letter_shift = 1.1; 
+nexttile(), hold on, ylim(ylim_man), box on, grid on; set(gca,'LineWidth', LW);
+text(0, letter_shift, '(a)', 'units', 'normalized', 'fontsize', 12)
 xlabel('H (km)'); xlim([25, 60]); 
 toplt = flatar(Eob(xitruei, ktruei, :)); 
 plot( H, toplt ,...
@@ -429,6 +431,7 @@ fprintf('H crosses %1.2f at [%s]\n\n', E_intersect, sprintf('%1.3f, ', intersect
 
 
 nexttile(), hold on, ylim(ylim_man), box on, grid on; set(gca,'LineWidth', LW); 
+text(0, letter_shift, '(b)', 'units', 'normalized', 'fontsize', 12)
 xlabel('\kappa'); % xlim([25, 60]); 
 ylabel('E'); 
 toplt = Eob(xitruei, :, ztruei); 
@@ -442,6 +445,7 @@ intersecting_x = funct_find_intersection(K, toplt, E_intersect) ;
 fprintf('K crosses %1.2f at [%s]\n\n', E_intersect, sprintf('%1.3f, ', intersecting_x))
 
 nexttile(), hold on, ylim(ylim_man), box on, grid on; set(gca,'LineWidth', LW); 
+text(0, letter_shift, '(c)', 'units', 'normalized', 'fontsize', 12)
 xlabel('\xi'); 
 toplt = Eob(:,ktruei, ztruei); 
 plot( xi_a, toplt ,...
@@ -454,6 +458,7 @@ text(0.03, 0.1, sprintf('$H=%1.1f$ km, $\\kappa = %1.2f$', ztrue, ktrue), ...
 intersecting_x = funct_find_intersection(xi_a, toplt, E_intersect) ; 
 fprintf('xi crosses %1.2f at [%s]\n\n', E_intersect, sprintf('%1.3f, ', intersecting_x))
 
+set(gcf, 'Renderer', 'painters'); 
 exportgraphics(gcf, fhand_figname(ztrue, ktrue, 'HK_objective_function', 'pdf'), 'ContentType', 'vector'); 
 
 

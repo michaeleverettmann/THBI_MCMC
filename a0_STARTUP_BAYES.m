@@ -153,7 +153,7 @@ warning('brb2022.04.05 : Not deleting pathsAutoGen.m. Cant do this if running ma
 itries = 0; 
 while itries < 10; 
     try 
-        pause_time = rand(1)*2; 
+        pause_time = rand(1)*.2; 
         fprintf('Pausing for %1.3f seconds before loading paths file\n',pause_time); 
         pause(pause_time); % Wait a random amount of time to reduce risk of many stations simultaneously writing this file. Give chance for another station to write this variable. 
     %     paths_old = getPaths(); 
