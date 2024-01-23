@@ -5,6 +5,12 @@ tectpath1 = "/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plot
 f_distance_pt_to_sta = './_distance_pt_to_sta.mat';
 f_xsect_positions = './xsect_positions.mat'; 
 
+% DEBUG OPTION
+downsamp_model = 1; % Downsample the original model by this factor. Only use this for debuging to make griddata faster.  
+if downsamp_model ~= 1; 
+    warning('DEBUG PLOT. Turn downsamp_model == 1 for your final plot')
+end 
+
 % Get lab/mld results. Zach intially sent this in mid/late july. 
 lab_mld_fold = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/many_stas/zach_lithosphere_results/'; % Where Zach sent mld lab results in mid/late july 2023
 T_lab = 1150;
@@ -62,6 +68,7 @@ n_contour = 30;
 % depths = [5, 15, 20, 25, 30, 35, 40, ...
 %         45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 145, 170, 210, 250, 300]; % Try loading these depths. Probably need to type manually for now, but could save as a .mat file in future. 
 depths = [5:5:300]; 
+
 depth_plot = 80; 
 idepth_plot = find(depths==depth_plot); 
 parms_other = ["zsed", "zmoh"]; 
@@ -173,7 +180,7 @@ n_sections = size(lolim, 1) ;
 ax_x  = [0.07 ] * ones([1, n_sections]); 
 % ax_y  = [0.7 ]; 
 % ax_y  = [.2:0.2:.8]
-ax_y = 0.1 + .185*[0:length(ax_x)-1]; 
+ax_y = 0.1 + .190*[0:length(ax_x)-1]; 
 ax_dy = [0.15] * ones([1, n_sections]); 
 ax_dx = nan(size(ax_dy)); 
 
@@ -205,7 +212,13 @@ zsect = linspace( min(depths), max(depths), nxy-1);
 [lonmesh, zmesh ] = ndgrid(lon_surf_line, zsect); 
 [latmesh, ~] = ndgrid(lat_surf_line, zsect); 
 [gcmesh , ~] = ndgrid(gcarc        , zsect); 
-mterp = griddata(lon3d, lat3d, z3d, mgrid3d, lonmesh, latmesh, zmesh); % Interpolated section
+
+% Convert to new evenly spaced basis. downsamp_model option is provided only to make developing code easier, because griddata can take >1min to run. 
+mterp = griddata(lon3d   (1:downsamp_model:end,1:downsamp_model:end,1:downsamp_model:end), ...
+    lat3d                (1:downsamp_model:end,1:downsamp_model:end,1:downsamp_model:end), ...
+    z3d                  (1:downsamp_model:end,1:downsamp_model:end,1:downsamp_model:end), ...
+    mgrid3d              (1:downsamp_model:end,1:downsamp_model:end,1:downsamp_model:end), ...
+    lonmesh, latmesh, zmesh); % Interpolated section
 
 % % % % Make a cone to cut off stations far from TA. Find distance to TA stations. 
 buffer_distance = zeros(size(lat_surf_line)); 
@@ -260,7 +273,7 @@ ax_box = axes('Position',[ax_x(i_xsect), ax_y(i_xsect), ...
 set(ax_box, 'YDir', 'reverse'); 
 ax_mantle = copyobj(ax_box, gcf); hold on; % Displayed in middle order.  
 ax_crust = copyobj(ax_box, gcf); hold on; 
-linkaxes([ax_box, ax_mantle, ax_crust]); 
+% linkaxes([ax_box, ax_mantle, ax_crust]); 
 
 %%% Plot velocity
 % TODO multiple colors here later
@@ -348,9 +361,9 @@ for ibord = 1:2
 %     text(ax_box, bord_dist+13, bord_height+7, textplt, ...
 %         'HorizontalAlignment','left', 'VerticalAlignment','top', ...
 %         'FontSize',8); 
-    text(ax_box, bord_dist+13, 5, textplt, ...
+    text(ax_box, bord_dist+19, -35, textplt, ...
         'HorizontalAlignment','left', 'VerticalAlignment','bottom', ...
-        'FontSize',6); 
+        'FontSize',15, 'BackgroundColor', 'w', 'EdgeColor', 'k', 'Margin', 3); 
 
 end
 
@@ -371,16 +384,16 @@ end
 
 % Section letters. 
 section_letter = char(64+n_sections+1-i_xsect); % Text for cross-section name. ith letter of alphabet
-t1=text(ax_box, 0.01, 1.13, section_letter    , 'fontsize', 14, 'color', 'k', 'units', 'normalized', 'VerticalAlignment','top'); 
-t2=text(ax_box, 0.99, 1.13, section_letter+"'", 'fontsize', 14, 'color', 'k', 'units', 'normalized', 'VerticalAlignment','top', 'HorizontalAlignment','right'); 
+t1=text(ax_box, 0.01, 1.14, section_letter    , 'fontsize', 18, 'color', 'k', 'units', 'normalized', 'VerticalAlignment','top'); 
+t2=text(ax_box, 0.99, 1.14, section_letter+"'", 'fontsize', 18, 'color', 'k', 'units', 'normalized', 'VerticalAlignment','top', 'HorizontalAlignment','right'); 
 
 % Feature labels, very manual 
 if i_xsect == 1; 
-    text(ax_box, 290, 125, 'SAA')
+    text(ax_box, 270, 115, 'SAA', 'fontsize', 16);
 elseif i_xsect == 3;
-    text(ax_box, 700, 100, 'CAA')
+    text(ax_box, 660, 100, 'CAA', 'fontsize', 16);
 elseif i_xsect == 4;
-    text(ax_box, 820, 110, 'NAA')
+    text(ax_box, 820, 100, 'NAA', 'fontsize', 16);
 end
 
 % Exageration
@@ -414,21 +427,12 @@ clim(ax_mantle, clim_mantle);
 ax_box.YTick = [0:50:10000]; % Steps of 50, starting at 0. Nothing for topography. 
 
 
-% xlabel(ax_box, 'Distance (km)'); % TODO remove except on bottom plots. 
-% ylabel(ax_box, 'Depth (km)'); % TODO remove from right plots. 
 
-% if ax_x(i_xsect) == min(ax_x); 
-%     ylabel('Depth (km)'); 
-% end
-% if ax_y(i_xsect) == min(ax_y); 
-%     xlabel('Distance (km)'); 
-% end
-% if ax_x(i_xsect) == min(ax_x); 
 ylabel('Depth (km)'); 
-% end
 if i_xsect == 1; 
     xlabel('Distance (km)'); 
 end
+set(gca, 'FontSize', 12);
 
 end
 
@@ -443,17 +447,21 @@ end
 % Colorbars if vertical
 cbar_crust  = colorbar(ax_crust ,'Location', 'east'); 
 cbar_mantle = colorbar(ax_mantle,'Location', 'east'); 
+set(cbar_crust , 'FontSize', 12);
+set(cbar_mantle, 'FontSize', 12);
+
 % cbar_crust.Position      = [ax_dx(1) + 0.1  , ax_y(1), .02, ax_dy(1)]; 
 % cbar_mantle.Position     = [ax_dx(1) + 0.2, ax_y(1), .02, ax_dy(1)]; 
 cbar_crust.Position      = [ax_dx(end) + 0.08  , ax_y(end), .0175, ax_dy(1)]; 
-cbar_mantle.Position     = [ax_dx(end) + 0.15 , ax_y(end), .0175, ax_dy(1)]; 
+cbar_mantle.Position     = [ax_dx(end) + 0.16 , ax_y(end), .0175, ax_dy(1)]; 
 cbar_crust.Label.String  = 'Crust Vs' ; 
 cbar_mantle.Label.String = 'Mantle Vs'; 
 
 %% Map view of cross-section locations. 
 % axmap = axes('Position', [ax_dx(end)+0.075, (ax_y(end)+ax_dy(end)/6), ax_dy(end)*.8, ax_dy(end)*.8]);
-axmap = axes('Position', [ax_dx(1)+0.1, (ax_y(1)), ax_dy(1)*.8, ax_dy(1)*.8]);
+axmap = axes('Position', [ax_dx(1)+0.1, (ax_y(1)-0.025), ax_dy(1)*1.25, ax_dy(1)*1.25]);
 cla; hold on; 
+% set(gca, 'FontSize', 12);
 m_proj('mercator', 'long',[ll_min_max_map(1)-1, ll_min_max_map(2)+1],...
                    'lat',[ll_min_max_map(3)-2, ll_min_max_map(4)]); 
 % box on; 
@@ -466,7 +474,7 @@ cst = m_coast('patch',.5*[1 1 1], 'FaceAlpha', 0);
 xsect_letters = ["A", "B", "C", "D"]; 
 xsect_letters = flip(xsect_letters); 
 % xsect_letters = xsect_letters(size(lolim):-1:1); % Flip letters so we label going from top to bottom
-for ixsect = 1:size(lolim,1); 
+for ixsect = size(lolim,1):-1:1; % 1:size(lolim,1); 
     Q1 = [lalim(ixsect, 1), lolim(ixsect, 1)];
     Q2 = [lalim(ixsect, 2), lolim(ixsect, 2)]; 
     [profd,profaz] = distance(Q1(1),Q1(2),Q2(1),Q2(2));
@@ -480,19 +488,19 @@ for ixsect = 1:size(lolim,1);
         xsect_letters(ixsect), ...
         'color', 'k', 'fontweight', 'normal', 'units', 'data', ...
         'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', ...
-        'fontsize', 8); 
+        'fontsize', 11, 'BackgroundColor', 'w', 'EdgeColor', 'k', 'Margin', 0.5); 
     m_text(lon_surf_line(end) +1.75, ...
         lat_surf_line(end),...
         xsect_letters(ixsect)+"'", ...
         'color', 'k', 'fontweight', 'normal', 'units', 'data', ...
         'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', ...
-        'fontsize', 8);  
+        'fontsize', 11, 'BackgroundColor', 'w', 'EdgeColor', 'k', 'Margin', 0.5);   
 end
 % m_grid('box','fancy','linestyle','none','gridcolor',.5 .*[1,1,1],...
 %     'backcolor','none', 'xtick', [-85:10:75], 'ytick', [35:10:45]); 
 m_grid('box','fancy','linestyle','none','gridcolor',.5 .*[1,1,1],...
     'backcolor','none', 'xtick', [-85:10:75], 'ytick', [35:10:45], ...
-    'fontsize', 8, 'ylabeldir', 'middle', 'YaxisLocation', 'right'); 
+    'fontsize', 12, 'ylabeldir', 'middle', 'YaxisLocation', 'right'); 
 
 %%
 
@@ -500,17 +508,17 @@ mkdir('xsections');
 set(gcf, 'Renderer', 'painters'); 
 exportgraphics(gcf, sprintf('sage_gage/xsections_V%1.0f.jpeg', version_surf), ...
     'Resolution', 300); 
-savefig(gcf, sprintf('sage_gage/xsections_V%1.0f.fig', version_surf)); 
+% savefig(gcf, sprintf('sage_gage/xsections_V%1.0f.fig', version_surf)); 
 
 
 
 
-%% Plot of cross-section positions
-% ll_min_max_map
-a3_2_plot_surface_simple(llminmax, 'stalon', mdls.lon, 'stalat', mdls.lat, ...
-    'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', mgrid3d(:, :, idepth_plot),...
-    'sectlon', lon_surf_line_all, 'sectlat', lat_surf_line_all); 
-text(0.75, 0.1, sprintf('Z=%1.0f km',depth_plot), 'Units', 'normalized'); 
-set(gcf, 'pos',[295 476 426 321]); 
-exportgraphics(gcf, sprintf('sage_gage/xsections_map_V%1.0f.pdf', version_surf)); 
-fprintf('\n'); 
+% %% Plot of cross-section positions
+% % ll_min_max_map
+% a3_2_plot_surface_simple(llminmax, 'stalon', mdls.lon, 'stalat', mdls.lat, ...
+%     'xgrid', xgrid, 'ygrid', ygrid, 'vgrid', mgrid3d(:, :, idepth_plot),...
+%     'sectlon', lon_surf_line_all, 'sectlat', lat_surf_line_all); 
+% text(0.75, 0.1, sprintf('Z=%1.0f km',depth_plot), 'Units', 'normalized'); 
+% set(gcf, 'pos',[295 476 426 321]); 
+% exportgraphics(gcf, sprintf('sage_gage/xsections_map_V%1.0f.pdf', version_surf)); 
+% fprintf('\n'); 
