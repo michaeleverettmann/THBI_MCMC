@@ -4,6 +4,9 @@ from telewavesim import utils as ut
 from telewavesim import wiggle as wg
 import numpy as np 
 
+def junk(a): 
+    return 1+1 
+
 # LAYmodel,ID,ph,samprate,inc,synthperiod,nsamps,cutf,sourc
 def run_telewavesim(modfile, wvtype, npts, dt, dp, use_obs, c, rhof, slow, baz): 
     model = ut.read_model(modfile)
@@ -23,10 +26,10 @@ def run_telewavesim(modfile, wvtype, npts, dt, dp, use_obs, c, rhof, slow, baz):
         rtr.data, ttr.data = rotate_ne_rt(ntr.data, etr.data, baz)
 
     traces = np.array([rtr, ttr, ztr]) # TODO double check. do we want radial transverse? 
-    tt = np.arange(0, npts, dt) # TODO double check. 
-    status = ''
-    cmdout = '' 
-    return traces, tt, status, cmdout
+    tt = np.arange(0, npts)*dt # TODO double check. 
+    # status = ''
+    # cmdout = '' 
+    return traces, tt # , status, cmdout
 
 
 # Test the function
@@ -47,4 +50,4 @@ if __name__ == '__main__':
     slow = 0.06 # Horizontal slowness (or ray parameter) in s/km 
     baz = 0.    # Back-azimuth direction in degrees (has no influence if model is isotropic)
 
-    run_telewavesim(modfile, wvtype, npts, dt, dp, use_obs, c, rhof, slow, baz)
+    traces, tt, status, cmdout = run_telewavesim(modfile, wvtype, npts, dt, dp, use_obs, c, rhof, slow, baz)
