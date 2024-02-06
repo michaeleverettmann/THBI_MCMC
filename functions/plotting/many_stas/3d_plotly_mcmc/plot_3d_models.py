@@ -480,12 +480,12 @@ def update_layout(fig):
 #                                     )]
 
 
-
+cbar = dict(x=-.02, title = '%dVs')
 
 dataVel = [
         go.Isosurface(
         value = vmdl, isomin = vmin_plt, isomax = vmax_plt, colorscale = 'rdbu', reversescale = False, cmin = vmin_plt, cmax = vmax_plt,
-        colorbar = dict(x=-.02, title = 'Vs (km/s)'),
+        colorbar = cbar,
         x = xmdl, y = ymdl, z = zmdl,
         opacity=opacity, surface_count=2,
         caps=dict(x_show=False, y_show=False, z_show=False),
@@ -495,7 +495,7 @@ d_v_step = (vmax_plt-vmin_plt)/3; # If there are four contours, add 1/3 diff of 
 dataVel += [
         go.Isosurface(
         value = vmdl, isomin = vmin_plt+d_v_step, isomax = vmax_plt-d_v_step, colorscale = 'rdbu', reversescale = False, cmin = vmin_plt, cmax = vmax_plt,
-        colorbar = dict(x=-.02, title = 'Vs (km/s)'),
+        colorbar = cbar,
         x = xmdl, y = ymdl, z = zmdl,
         opacity=.15, surface_count=2,
         caps=dict(x_show=False, y_show=False, z_show=False),
@@ -515,7 +515,7 @@ d_prtb_step = (2*prtb)/3; # If there are four contours, add 1/3 diff of max and 
 dataVelR = [ # Relative
         go.Isosurface(
         value = dvmdl, isomin = -prtb, isomax = prtb, colorscale = 'rdbu', reversescale = False, cmin = -prtb, cmax = prtb,
-        colorbar = dict(x=-.02, title = 'Vs (km/s)'),
+        colorbar = cbar,
         x = xmdl, y = ymdl, z = zmdl,
         opacity=opacity, surface_count=2,
         caps=dict(x_show=False, y_show=False, z_show=False),
@@ -523,7 +523,7 @@ dataVelR = [ # Relative
 dataVelR +=[ # Relative
         go.Isosurface(
         value = dvmdl, isomin = -prtb+d_prtb_step, isomax = prtb-d_prtb_step, colorscale = 'rdbu', reversescale = False, cmin = -prtb, cmax = prtb,
-        colorbar = dict(x=-.02, title = 'Vs (km/s)'),
+        colorbar = cbar,
         x = xmdl, y = ymdl, z = zmdl,
         opacity=.15, surface_count=2,
         caps=dict(x_show=False, y_show=False, z_show=False),

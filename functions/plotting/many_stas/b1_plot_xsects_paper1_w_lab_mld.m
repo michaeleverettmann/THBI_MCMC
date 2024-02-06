@@ -7,9 +7,7 @@ f_xsect_positions = './xsect_positions.mat';
 
 % DEBUG OPTION
 downsamp_model = 1; % Downsample the original model by this factor. Only use this for debuging to make griddata faster.  
-if downsamp_model ~= 1; 
-    warning('DEBUG PLOT. Turn downsamp_model == 1 for your final plot')
-end 
+hide_text = 1; % Put the colors and stuff over the text and stuff. 
 
 % Get lab/mld results. Zach intially sent this in mid/late july. 
 lab_mld_fold = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/many_stas/zach_lithosphere_results/'; % Where Zach sent mld lab results in mid/late july 2023
@@ -396,6 +394,10 @@ elseif i_xsect == 4;
     text(ax_box, 820, 100, 'NAA', 'fontsize', 16);
 end
 
+if downsamp_model ~= 1; 
+    text(ax_box, 0, 100, 'Test figure. downsamp_model was not 1. \nSet it to 1 to get the full model resolution. ', 'fontsize', 10);
+end 
+
 % Exageration
 dexag = 25; 
 plot(ax_box, [min(dist_arc)+dexag, min(dist_arc)+dexag] , [max_z, max_z-dexag], 'k', 'linewidth', 1.5); 
@@ -411,6 +413,10 @@ plot(ax_box, [min(dist_arc), min(dist_arc)+dexag] , [max_z-dexag, max_z-dexag], 
 
 linkaxes([ax_box, ax_mantle, ax_crust]); % done already, but I guess do it again. 
 axes(ax_crust); axes(ax_mantle); axes(ax_box); 
+if hide_text; % If we want to hide the text and stuff for debugging or for help making the cartoon figure, reorganize the axes. Should be false for the final cross-section figure! 
+    axes(ax_box); axes(ax_crust); axes(ax_mantle); 
+end
+
 
 % Some axis set up that only works after plots are made for some reason
 ax_box.Visible = 'on' ; ax_mantle.Visible = 'off'; ax_crust.Visible = 'off'; 
