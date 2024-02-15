@@ -59,6 +59,16 @@ addpath([hd '/MATLAB/seis_tools-master/surface_waves']); % '/Users/zeilon/Dropbo
 % path to gaussfit dir
 % addpath('~/Dropbox/MATLAB/lib/gaussfit'); % BB commented 2021.08.04 % don't think used any more
 
+% Handle telewavesim and it's Python environment. 
+p_tws = [bayesdir,'matlab_to_telewavesim']; 
+addpath(p_tws); 
+if count(py.sys.path, p_tws) == 0
+    insert(py.sys.path, int32(0), p_tws);
+end
+pyenv('Version', '~/opt/anaconda3/envs/tws/bin/python', ... % Use anaconda environment where telewavesim is installed. This affects the entire Matlab session. TODO define this path in somewhere more obvious. 
+    'ExecutionMode','OutOfProcess'); % ERROR ALERT Could not import numpy if using an anconda environment. Matlab would simply crash. However, setting executionMode=OutOfProcess fixed that for me. https://www.mathworks.com/matlabcentral/answers/502458-why-can-py-numpy-array-not-be-resolved
+
+
 addpath([hd '/MATLAB/seis_tools-master']); % bb2021.08.04 Adding because some functions were missing that are here. I'm worried this might break something though. Why was it not already added? 
 % addpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup_alt'); % bb2021.08.04 Need taup
 

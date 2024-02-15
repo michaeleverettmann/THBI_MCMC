@@ -1,12 +1,6 @@
 restoredefaultpath(); 
 run_hk_test_setup_bs; % This does some obnoxious setup. % Run it then comment it out if you want to save some time. 
 addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/hk_paper'); % For a2_LOAD_DATA_hk_test
-% addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_telewavesim'); 
-pyenv('Version', '~/opt/anaconda3/envs/tws/bin/python', ... % Use anaconda environment where telewavesim is installed. This affects the entire Matlab session. TODO define this path in somewhere more obvious. 
-    'ExecutionMode','OutOfProcess'); % ERROR ALERT Could not import numpy if using an anconda environment. Matlab would simply crash. However, setting executionMode=OutOfProcess fixed that for me. https://www.mathworks.com/matlabcentral/answers/502458-why-can-py-numpy-array-not-be-resolved
-if count(py.sys.path, '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_telewavesim') == 0
-    insert(py.sys.path, int32(0), '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_telewavesim');
-end
 
 
 %% HK tests, analysis, starts here. 
@@ -21,7 +15,6 @@ ktrue_a = [1.75];
 
 nzi = length(ztrue_a); 
 nki = length(ktrue_a); 
-
 
 par.datprocess.kNum = 201; 
 par.datprocess.hNum = 200; 
