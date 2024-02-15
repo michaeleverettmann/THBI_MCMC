@@ -86,7 +86,7 @@ baz = 180; % Angle in degree.
 % TODO how to handle synth period? 
 
 output = py.run_telewavesim_py.run_telewavesim( ...
-    modfile, ph(1), nsamps, sampperiod, dp, use_obs, c, rhof, ray_parm, baz); 
+    modfile, ph(1), nsamps, sampperiod, dp, use_obs, c, rhof, ray_parm, baz); %ph(1) -> this chooses the incident wave type. So, the first part of our receiver function name should be the wave type we want. P, for Ps. 
 output = cell(output); 
 traces = double(output{1})'; % In RTZ
 tt = double(output{2})'; 
