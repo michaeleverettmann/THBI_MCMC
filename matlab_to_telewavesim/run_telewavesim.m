@@ -1,5 +1,14 @@
 function [traces,tt,status,cmdout] = run_telewavesim(LAYmodel,ID,ph,samprate,ray_parm,synthperiod,nsamps,cutf,sourc)
 % [traces,tt,status,cmdout] = run_propmat(LAYmodel,ID,ph,samprate,ray_parm,synthperiod,nsamps,cutf,sourc)
+
+% This function requires the proper py object in Matlab. 
+% You can open it like this: 
+% pyenv('Version', '~/opt/anaconda3/envs/tws/bin/python', ... % Use anaconda environment where telewavesim is installed. This affects the entire Matlab session. TODO define this path in somewhere more obvious. 
+%     'ExecutionMode','OutOfProcess')
+% Then you need to make sure the python path includes the path to the
+% Python telewavesim function. You can add it like this: 
+% insert(py.sys.path, int32(0), '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_telewavesim')
+
 paths = getPaths(); 
 % Function to run the propagator matrix code for a given layerised model. 
 % demoPlot = true; % whether to plot the propmat results
@@ -64,12 +73,6 @@ if strcmp(sourc, 'sine');
 end
 
 %% Call telewavesim 
-
-% Wrap python function run_telewavesim.py
-% /Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_telewavesim/run_telewavesim_py.py
-pyenv('Version', '~/opt/anaconda3/envs/tws/bin/python', ... % Use anaconda environment where telewavesim is installed. This affects the entire Matlab session. TODO define this path in somewhere more obvious. 
-    'ExecutionMode','OutOfProcess'); % ERROR ALERT Could not import numpy if using an anconda environment. Matlab would simply crash. However, setting executionMode=OutOfProcess fixed that for me. https://www.mathworks.com/matlabcentral/answers/502458-why-can-py-numpy-array-not-be-resolved
-
 % Simple test parameters. 
 % Left here in comments to show examples of values with correct units. 
 % modfile = './demo.txt'; 
