@@ -2,7 +2,8 @@ function [traces,tt,status,cmdout] = run_propmat(LAYmodel,ID,ph,samprate,inc,syn
 % [traces,tt,status,cmdout] = run_propmat(LAYmodel,ID,ph,samprate,inc,synthperiod,nsamps,cutf,sourc)
 paths = getPaths(); 
 % Function to run the propagator matrix code for a given layerised model. 
-demoPlot = false; % whether to plot the propmat results
+% demoPlot = false; % whether to plot the propmat results
+demoPlot = strcmp(ph, 'Ps'); 
 
 if nargin < 2 || isempty(ID)
     ID = 'example';
@@ -113,12 +114,13 @@ end
 if demoPlot; 
     % plot
     figure(2); clf, hold on
-    comps = {'VERTICAL','RADIAL','TRANSVERSE'}; traces = traces(:,[3,1,2]);
+    comps = {'VERTICAL','RADIAL','TRANSVERSE'}; 
+    traces2 = traces(:,[3,1,2]);
     for ip = 1:3
-    subplot(3,1,ip)
-    plot(tt,traces(:,ip),'Linewidth',1.5)
-    xlim([0 max(tt)]);
-    ylabel(comps{ip},'fontsize',19,'fontweight','bold')
+        subplot(3,1,ip)
+        plot(tt,traces2(:,ip),'Linewidth',1.5)
+        xlim([0 max(tt)]);
+        ylabel(comps{ip},'fontsize',19,'fontweight','bold')
     end
     set(gcf,'position',[680         273        1058         825])
 end

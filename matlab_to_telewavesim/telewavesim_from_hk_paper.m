@@ -1,9 +1,11 @@
+restoredefaultpath(); 
 run_hk_test_setup_bs; % This does some obnoxious setup. % Run it then comment it out if you want to save some time. 
 addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/hk_paper'); % For a2_LOAD_DATA_hk_test
+addpath(pwd());
 
 %% HK tests, analysis, starts here. 
-xi_a = [0.85, 1]'; 
-xi_true = 0.85; 
+xi_a = [1]'; 
+xi_true = 1; 
 if ~ any(xi_a == xi_true); error('Pick xi true that is in xi_a'); end
 i_xi_true = find(xi_a == xi_true); 
 nxi = length(xi_a); 

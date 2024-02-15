@@ -4,11 +4,9 @@ from telewavesim import utils as ut
 from telewavesim import wiggle as wg
 import numpy as np 
 
-def junk(a): 
-    return 1+1 
-
 # LAYmodel,ID,ph,samprate,inc,synthperiod,nsamps,cutf,sourc
 def run_telewavesim(modfile, wvtype, npts, dt, dp, use_obs, c, rhof, slow, baz): 
+    # Back azimuth is in degrees: used in rotate_ne_rt. 
     model = ut.read_model(modfile)
     trxyz = ut.run_plane(model, slow, npts, dt, baz=baz, wvtype=wvtype,
                         obs=use_obs, dp=dp, c=c, rhof=rhof)
@@ -34,15 +32,16 @@ def run_telewavesim(modfile, wvtype, npts, dt, dp, use_obs, c, rhof, slow, baz):
 
 # Test the function
 if __name__ == '__main__': 
+    import matplotlib.pyplot as plt 
     modfile = './demo.txt'
     wvtype = 'P'
 
     npts = 3000 # Number of samples
     dt = 0.01   # Sample distance in seconds
 
-    dp = 2000. # Deployment depth below sea level in meters
+    dp = 0 # 2000. # Deployment depth below sea level in meters
     # use_obs = dp > 0 # Only use OBS code if deployment depth is beneath sea level. 
-    use_obs = True
+    use_obs = False
 
     c = 1.5      # P-wave velocity in salt water (km/s)
     rhof = 1027. # Density of salt water (kg/m^3)
@@ -50,4 +49,9 @@ if __name__ == '__main__':
     slow = 0.06 # Horizontal slowness (or ray parameter) in s/km 
     baz = 0.    # Back-azimuth direction in degrees (has no influence if model is isotropic)
 
-    traces, tt, status, cmdout = run_telewavesim(modfile, wvtype, npts, dt, dp, use_obs, c, rhof, slow, baz)
+    traces, tt = run_telewavesim(modfile, wvtype, npts, dt, dp, use_obs, c, rhof, slow, baz)
+
+    fig = plt.figure() 
+    plt.ion()
+    plt.plot(tt, traces.T) 
+    plt.savefig('./figs_test/test1.jpeg') 

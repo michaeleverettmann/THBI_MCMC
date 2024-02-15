@@ -11,6 +11,11 @@ burnin_only  = 4000 ;
 cooloff_only = 3000 ; 
 nchains_only = 12   ; 
 
+par.synth.samprate = 60; % TODO figure this out. 
+par.forc.nsamps = par.synth.samprate / 10 * 10^13; % 2^12; % TODO figure this out. 
+par.synth.noise_sigma_BW_Ps = 0.000;%1; 
+par.synth.noise_sigma_BW_Sp = 0.000;%1; 
+
 % niter_only   = 500; 
 % burnin_only  = 30 ; 
 % cooloff_only = 20 ; 

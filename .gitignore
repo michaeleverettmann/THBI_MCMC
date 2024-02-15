@@ -40,6 +40,7 @@ data/**
 **.fig
 **.asv
 **.mat
+**.pyc
 
 
 papers_etc/**

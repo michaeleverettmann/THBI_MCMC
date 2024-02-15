@@ -1,3 +1,4 @@
+function writeTELEWAVESIM_modfile(LAYmodel, modfile); 
 % load('example_input.mat'); 
 
 % Function to write LAYmodel in the format that telewavesim can work with
@@ -37,10 +38,12 @@ for i = 1:nlay;
 end
 
 % Open a file for writing
-fid = fopen('demo.txt', 'w');
+fid = fopen(modfile, 'w');
 
 % Write the data string to the file in one go
 fprintf(fid, '%s', dataStr);
 
 % Close the file
 fclose(fid);
+
+end
