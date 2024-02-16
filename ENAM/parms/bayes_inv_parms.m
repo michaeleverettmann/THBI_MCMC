@@ -228,6 +228,7 @@ synth = struct( 'gcarcs',[70]                 ,... % average gcarc
                 'SW_Ray_grV_periods',logspace(log10(6),log10(40),10)',...  % Rayleigh wave phV periods
                 'SW_Lov_phV_periods',logspace(log10(6),log10(40),10)',...  % Love wave phV periods
                 'SW_HV_periods',[16 20 24 28 32 36 40 50 60 70 80 90]',...  % Rayleigh wave HV periods. From Shen and ritzwoller 2016. 
+                'propmat_or_telewavesim', 'propmat', ... % propmat or telewavesim
                 'synthperiod',forc.synthperiod   ,...  % period for propmat synth
                 'nsamps',[]                      );  % number of samples. 
 

@@ -4,8 +4,8 @@ addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/hk_paper'); % For 
 
 
 %% HK tests, analysis, starts here. 
-xi_a = [0.85, 1]'; 
-xi_true = 0.85; 
+xi_a = [1]'; 
+xi_true = 1; 
 if ~ any(xi_a == xi_true); error('Pick xi true that is in xi_a'); end
 i_xi_true = find(xi_a == xi_true); 
 nxi = length(xi_a); 
