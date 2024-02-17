@@ -68,7 +68,7 @@ if any(strcmp(pdtyps(:,2),'Ps'))
         rayp = unique_rayps_P(ir);
         samprate = unique([final_predata.(Psdat)(irayps_P==ir).samprate]);
         P_inc = rayp2inc(rayp,laymodel.Vp(end),6371-laymodel.zlayb(end));
-        [predat_ps,tt_ps] = run_propmat(laymodel,ID,'Ps',samprate, P_inc, par.forc.synthperiod,par.forc.nsamps);
+        [predat_ps,tt_ps] = run_propmat_or_telewavesim(par.synth.propmat_or_telewavesim, laymodel,ID,'Ps',samprate, P_inc, rayp, par.forc.synthperiod,par.forc.nsamps);
         % pad with zeros
         tt_ps = [tt_ps(1) + [-1000:-1]'./samprate; tt_ps ;tt_ps(end) + [1:1000]'./samprate];
         predat_ps = [zeros(1000,3);predat_ps;zeros(1000,3)];
@@ -137,7 +137,7 @@ if any(~strcmp(pdtyps(strcmp(pdtyps(:,2),'Sp'),3),'ccp'))
             laymodel_Suse = laymodel;
         end
         
-        [predat_sp,tt_sp] = run_propmat(laymodel_Suse,ID,'Sp',samprate, S_inc, par.forc.synthperiod,par.forc.nsamps);
+        [predat_sp,tt_sp] = run_propmat_or_telewavesim(par.synth.propmat_or_telewavesim, laymodel_Suse,ID,'Sp',samprate, S_inc, rayp, par.forc.synthperiod,par.forc.nsamps);
         % pad with zeros
         tt_sp = [tt_sp(1) + [-1000:-1]'./samprate; tt_sp ;tt_sp(end) + [1:1000]'./samprate];
         predat_sp = [zeros(1000,3);predat_sp;zeros(1000,3)];
@@ -252,7 +252,7 @@ if any(strcmp(pdtyps(strcmp(pdtyps(:,2),'Sp'),3),'ccp'))
         else
             laymodel_Suse = laymodel;
         end
-        [predat_sp,tt_sp] = run_propmat(laymodel_Suse,ID,'Sp',samprate, S_inc, par.forc.synthperiod,par.forc.nsamps);
+        [predat_sp,tt_sp] = run_propmat_or_telewavesim(par.synth.propmat_or_telewavesim, laymodel_Suse,ID,'Sp',samprate, S_inc, rayp, par.forc.synthperiod,par.forc.nsamps);
         % pad with zeros
         tt_sp = [tt_sp(1) + [-1000:-1]'./samprate; tt_sp ;tt_sp(end) + [1:1000]'./samprate];
         predat_sp = [zeros(1000,3);predat_sp;zeros(1000,3)];

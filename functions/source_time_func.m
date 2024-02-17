@@ -5,8 +5,8 @@ function [ stf ] = source_time_func( par )
 onelayin = struct('zlayt',0,'zlayb',par.mod.maxz,...
                   'Vs',4.1,'Vp',1.81*3.9,'rho',3.1,'nlay',1);
 
-[stf_ps,tt_ps] = run_propmat(onelayin,'mrfunc','Ps',par.synth.samprate, 0.1, par.forc.synthperiod,par.forc.nsamps);
-[stf_sp,tt_sp] = run_propmat(onelayin,'mrfunc','Sp',par.synth.samprate, 0.1, par.forc.synthperiod,par.forc.nsamps);
+[stf_ps,tt_ps] = run_propmat_or_telewavesim(par.synth.propmat_or_telewavesim, onelayin,'mrfunc','Ps',par.synth.samprate, 0.1, [], par.forc.synthperiod,par.forc.nsamps); % TODO not actually sure what ray parameter to give here. 
+[stf_sp,tt_sp] = run_propmat_or_telewavesim(par.synth.propmat_or_telewavesim, onelayin,'mrfunc','Sp',par.synth.samprate, 0.1, [], par.forc.synthperiod,par.forc.nsamps);
 
 for ic = 1:3
     stf_pow(ic) = diff(tt_ps)'*midpts(stf_ps(:,ic))/max(max(stf_ps));
