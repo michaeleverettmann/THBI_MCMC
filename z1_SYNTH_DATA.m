@@ -34,15 +34,8 @@ tpS = tauptime('deg',gcarc,'phases','S'); rayps = tpS.rayparameter;
 P_inc = rayp2inc(raypp,TLM.Vp(end),6371-TLM.zlayb(end));
 S_inc = rayp2inc(rayps,TLM.Vs(end),6371-TLM.zlayb(end));
 
-if strcmp(par.synth.propmat_or_telewavesim, 'propmat'); 
-    [trudat_ps,tt_ps] = run_propmat(TLM,'TegPs','Ps',samprate, P_inc, par.synth.synthperiod); % in R,T,Z
-    [trudat_sp,tt_sp] = run_propmat(TLM,'TegSp','Sp',samprate, S_inc, par.synth.synthperiod); % in R,T,Z
-elseif strcmp(par.synth.propmat_or_telewavesim, 'telewavesim'); 
-    [trudat_ps,tt_ps] = run_telewavesim(TLM,'TegPs','Ps',samprate, raypp, par.synth.synthperiod); % in R,T,Z
-    [trudat_sp,tt_sp] = run_telewavesim(TLM,'TegSp','Sp',samprate, rayps, par.synth.synthperiod); % in R,T,Z
-else
-    error('par.synth.propmat_or_telewavesim option not recognized. '); 
-end
+[trudat_ps,tt_ps] = run_propmat_or_telewavesim(par.synth.propmat_or_telewavesim, TLM,'TegPs','Ps',samprate, P_inc, raypp, par.synth.synthperiod); % in R,T,Z
+[trudat_sp,tt_sp] = run_propmat_or_telewavesim(par.synth.propmat_or_telewavesim, TLM,'TegSp','Sp',samprate, S_inc, rayps, par.synth.synthperiod); % in R,T,Z
 
 % channel order
 trudat_ps_ZRT = trudat_ps(:,[3,1,2]); % in Z,R,T

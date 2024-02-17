@@ -1,42 +1,26 @@
 function [traces,tt,status,cmdout] = run_propmat(LAYmodel,ID,ph,samprate,inc,synthperiod,nsamps,cutf,sourc)
-% [traces,tt,status,cmdout] = run_propmat(LAYmodel,ID,ph,samprate,inc,synthperiod,nsamps,cutf,sourc)
-paths = getPaths(); 
+% Most argument checks are done in run_propmat_or_telewavesim. 
+if isempty(samprate); 
+    samprate = 5; 
+end
+if isempty(nsamps); 
+    nsamps = 2^11; 
+end
+if isempty(inc); 
+    inc = 5; 
+end 
+if ~all(unique(factor(nsamps))==2)
+    error('Nsamps must be some power of 2')
+end
+if isempty(cutf)
+    cutf = ceil((4 / synthperiod) * (nsamps / samprate));
+end
+
 % Function to run the propagator matrix code for a given layerised model. 
 % demoPlot = false; % whether to plot the propmat results
 demoPlot = strcmp(ph, 'Ps'); 
 
-if nargin < 2 || isempty(ID)
-    ID = 'example';
-end
-if nargin < 3 || isempty(ph)
-    ph= 'Ps';
-end
-if nargin < 4 || isempty(samprate)
-    samprate = 5;
-end
-if nargin < 5 || isempty(inc)
-    inc = 5; % this is the incidence angle at the bottom of the model
-end
-if nargin < 6 || isempty(synthperiod)
-    synthperiod = 1;
-end
-if nargin < 7 || isempty(nsamps)
-    nsamps = 2^11; % must be power of 2, MAKE SURE FORTRAN ARRAY IS BIG ENOUGH!
-end
-if nargin < 8 || isempty(cutf)
-    cutf = ceil((4/synthperiod)*(nsamps/samprate));
-    % cutf is not actually the frequency, it is the multiple of the
-    % fundamental frequency that is the actual Nyquist. Since we want a
-    % nyquist at least half of the input period (4/synthperiod), we need
-    % cutf = fNyq / f_fund      where    f_fund = samprate/nsamps
-end
-if nargin < 9 || isempty(sourc)
-    sourc = 'gauss';
-end
-
-if ~all(unique(factor(nsamps))==2)
-    error('Nsamps must be some power of 2')
-end
+paths = getPaths(); 
 
 % remaining parms
 obsdist = 0;

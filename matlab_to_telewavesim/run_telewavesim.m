@@ -1,5 +1,17 @@
 function [traces,tt,status,cmdout] = run_telewavesim(LAYmodel,ID,ph,samprate,ray_parm,synthperiod,nsamps,cutf,sourc)
-% [traces,tt,status,cmdout] = run_propmat(LAYmodel,ID,ph,samprate,ray_parm,synthperiod,nsamps,cutf,sourc)
+% Most argument checks are done in run_propmat_or_telewavesim. 
+if isempty(samprate); 
+    samprate = 60; 
+end
+if isempty(nsamps); 
+    nsamps = 2^13; 
+end
+if isempty(ray_parm); 
+    ray_parm = 0.06; 
+end 
+if ~all(unique(factor(nsamps))==2)
+    error('Nsamps must be some power of 2')
+end
 
 % This function requires the proper py object in Matlab. 
 % You can open it like this: 
@@ -9,43 +21,14 @@ function [traces,tt,status,cmdout] = run_telewavesim(LAYmodel,ID,ph,samprate,ray
 % Python telewavesim function. You can add it like this: 
 % insert(py.sys.path, int32(0), '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_telewavesim')
 
-paths = getPaths(); 
 % Function to run the propagator matrix code for a given layerised model. 
+
 % demoPlot = true; % whether to plot the propmat results
 demoPlot = strcmp(ph, 'Ps'); 
 
-if nargin < 2 || isempty(ID)
-    ID = 'example';
-end
-if nargin < 3 || isempty(ph)
-    ph= 'Ps';
-end
-if nargin < 4 || isempty(samprate)
-    samprate = 60;
-end
-if nargin < 5 || isempty(ray_parm)
-    error('Not using default ray parameter...')
-end
-if nargin < 6 || isempty(synthperiod)
-    synthperiod = 1;
-end
-if nargin < 7 || isempty(nsamps)
-    nsamps = 2^13; % TODO 2^13 might run slow. Maybe come back to this. must be power of 2
-end
-if nargin < 8 || isempty(cutf)
-    cutf = ceil((4/synthperiod)*(nsamps/samprate));
-    % cutf is not actually the frequency, it is the multiple of the
-    % fundamental frequency that is the actual Nyquist. Since we want a
-    % nyquist at least half of the input period (4/synthperiod), we need
-    % cutf = fNyq / f_fund      where    f_fund = samprate/nsamps
-end
-if nargin < 9 || isempty(sourc)
-    sourc = 'gauss';
-end
 
-if ~all(unique(factor(nsamps))==2)
-    error('Nsamps must be some power of 2')
-end
+%%% Done getting arguments. 
+paths = getPaths(); 
 
 % remaining parms
 obsdist = 0;
@@ -93,6 +76,8 @@ output = py.run_telewavesim_py.run_telewavesim( ...
 output = cell(output); 
 traces = double(output{1})'; % In RTZ
 tt = double(output{2})'; 
+status = ''; 
+cmdout = ''; 
 
 delete(modfile);  % TODO bring back delete
 
