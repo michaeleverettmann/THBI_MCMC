@@ -273,7 +273,7 @@ with fig.inset(position="jBL+w2.5c+o0.2/0.2c", margin=0.1): # Move to left side 
     rectangle = [[region[0], region[2], region[1], region[3]]]
     fig.plot(data=rectangle, style="r+s", pen=linewidth+"p,blue")
 
-fig.image(fvs_averages, position="jBR+w3.8c+o0.15/0.15c", box="+pblack+g255/255/255")
+# fig.image(fvs_averages, position="jBR+w3.8c+o0.15/0.15c", box="+pblack+g255/255/255")
 # fig.image(fvs_averages, position="jBR+w4.0c+o0.15/0.15c")
 # fig.image(faverages_locations, position="jBR+w2c+o0.008/7.13c", box="+pblack+g0/0/0+c0/0")
 
