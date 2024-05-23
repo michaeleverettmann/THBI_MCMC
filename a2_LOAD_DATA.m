@@ -23,7 +23,7 @@ if any(strcmp(par.proj.name,{'EXAMPLE'}))
     
     %% -----------------------------------------------------------------
 %% SYNTHETICS
-elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW'}))
+elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW', 'transition_to_russell_mineos'}))
     
     fprintf(' > Creating custom model and synthetic data\n')
     
