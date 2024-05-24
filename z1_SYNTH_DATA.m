@@ -209,7 +209,7 @@ for id = 1:length(par.inv.datatypes)
         truSWdat.HVr = run_HVkernel(TRUEmodel,SWperiods,'initmod',1,0,par.inv.verbose);
     else
         par_mineos = struct('R_or_L',pdtyp{2},'phV_or_grV',pdtyp{3},'ID','synthmod');
-        [truSWdat.phV,truSWdat.grV] = run_mineos(TRUEmodel,SWperiods,par_mineos,1,0,par.inv.verbose); 
+        [truSWdat.phV,truSWdat.grV] = run_mineos(TRUEmodel,SWperiods,par_mineos,1,0,par.inv.verbose); %MINEOS_REPLACE
     end
 
     % add noise
