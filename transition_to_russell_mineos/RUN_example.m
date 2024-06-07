@@ -3,6 +3,10 @@
 %% Setup
 % These define what we are running. Make a list of all desired options. 
 
+% Temporary brb20240604
+addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/transition_to_russell_mineos/new_code'); % Remove when ready
+addpath('/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/MINEOS_synthetics/run_MINEOS'); % Move when ready 
+
 STAMP_all =          {'standard'       };
 network_manual_all = {'testnwk'        }; 
 station_manual_all = {'simple_layers_1'}; %
