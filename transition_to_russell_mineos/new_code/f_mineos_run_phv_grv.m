@@ -1,5 +1,6 @@
 function [mode] = f_mineos_run_phv_grv()
 
+parameter_FRECHET_save([]);  
 parameter_FRECHET
 a1_run_mineos_check
 a2_mk_kernels
