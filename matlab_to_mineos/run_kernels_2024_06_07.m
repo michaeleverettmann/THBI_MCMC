@@ -78,15 +78,6 @@ wd = pwd;
 
 %% CALCULATE AND READ IN PERTURBATION KERNELS 
 %(frechet derivatves of parm perturbation)
-
-
-% %%% New Mineos code
-% f_mineos_kernels(parm); 
-% %%%
-
-
-
-%%% Original mineos code. 
     
 %% write kernel calc executable
 ikernelfiles = writeKERNELCALCexecfile(swperiods,parm.R_or_L(1),ph_gr,execfile_k,stripfile,eigfiles,qmod,tabfile,qfile,kernelfile,ID,logfile);
@@ -115,8 +106,6 @@ for ip = 1:length(ikernelfiles)
     SW_V_kernels{ip,iv}.period = swperiods(ip);
 end
 end
-
-%%% End original mineos code
 
 %% plot
 if ifplot

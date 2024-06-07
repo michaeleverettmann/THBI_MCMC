@@ -80,9 +80,9 @@ wd = pwd;
 %(frechet derivatves of parm perturbation)
 
 
-% %%% New Mineos code
-% f_mineos_kernels(parm); 
-% %%%
+%%% New Mineos code
+f_mineos_kernels(parm); 
+%%%
 
 
 
