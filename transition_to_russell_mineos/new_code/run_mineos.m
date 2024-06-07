@@ -142,7 +142,7 @@ copyfile('/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/MINEOS_syn
 % %%%
 
 % Try putting JOshs stuff in one function 
-[mode] = f_mineos_run_phv_grv(); 
+[mode] = f_mineos_run_phv_grv(parm); 
 % brb20240605 TODO next order of business is putting Josh's codes in their
 % own functions so we don't clear the workspace. 
 phV = interp1(mode.Tq,mode.phvq,swperiods); % Get the q corrected phase velocities, or I guess the phase velocity that would be measured if there were no q? brb20240605
