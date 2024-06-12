@@ -21,3 +21,6 @@ Dependencies for forward modelling. What you need depends on which data you will
 Some steps: 
 - update_bayes_inv_parms.m will change the parameters of your inversion depending on the stamp name. I recommend using this to develop any custom tests. 
 - To speed up splines, go to your fastBSpline folder. Run the compile mex code. 
+
+Some behaviors to expect: 
+- In order to speed up IO on systems with many cores (e.g. 40 cores), we read and write to a folder in the ram directly for calling some fortran codes. A folder called "ramDriveTHBI" should mount automatically. 
