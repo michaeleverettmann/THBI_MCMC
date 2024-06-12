@@ -32,7 +32,8 @@ elseif any(strcmp(par.proj.name,{'SYNTHETICS','test_RF_vs_BW', 'transition_to_ru
     save([par.res.resdir,'/trumodel'],'TRUEmodel');
 
     % make synth data
-    [ trudata ] = z1_SYNTH_DATA(par,0); % in ZRT format
+    ifplot = true; 
+    [ trudata ] = z1_SYNTH_DATA(par,ifplot); % in ZRT format
 %     figure(1101); clf; hold on; plot(trudata.BW_Sp.tt, trudata.BW_Sp.PSV); title('Before deconvolution'); 
 
     if strcmp(par.synth.noisetype,'real')

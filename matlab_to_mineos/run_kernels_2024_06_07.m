@@ -107,8 +107,6 @@ for ip = 1:length(ikernelfiles)
 end
 end
 
-%%% End original mineos code
-
 %% plot
 if ifplot
     %% read modes output
