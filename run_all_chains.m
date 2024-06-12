@@ -263,7 +263,7 @@ fprintf('END Some info on split:\n');
 
 %% % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 fprintf('\n\n### Not Running loop in parallel right now ###\n\n')
-for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
 % for asdfasdf = [1:10]; warning('BB2021.11.22 Not in parallel!!!'); end; 
 par = PR.Value; 
 trudata = TD.Value; 

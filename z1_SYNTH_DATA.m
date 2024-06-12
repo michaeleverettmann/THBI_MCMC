@@ -216,7 +216,7 @@ for id = 1:length(par.inv.datatypes)
     truSWdat.(pdtyp{3}) = truSWdat.(pdtyp{3}) + random('norm',0,par.synth.(nstr),size(truSWdat.(pdtyp{3})));
 
     if ifplot
-        hold on; plot(SWperiods,truSWdat.phV,'o')
+        hold on; plot(SWperiods,truSWdat.(pdtyp{3}),'o')
     end
 
     data.(dtype) = struct('periods',SWperiods,pdtyp{3},truSWdat.(pdtyp{3}),'sigma',par.mod.data.prior_sigma.(pdtyp{1}).(pdtyp{2}).(pdtyp{3}));

@@ -17,20 +17,6 @@ function [phV,grV,eigfiles_fix] = run_mineos(model,swperiods,par_mineos,ifdelete
 % around (ifdelete==false) then they can be used to calculate perturbation
 % kernels with the complementary run_kernelcalc.m script
 
-%%% 
-% brb2024/05/23 Insert code to allow switching between different versions
-% of Mineos. Then, put the below code in something like
-% run_mineos_original. 
-% Current script becomes a wrapper. 
-%%%
-
-
-
-
-
-
-
-
 %%%%% Previous. Temporary. 
 paths = getPaths(); 
 

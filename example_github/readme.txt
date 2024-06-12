@@ -1,0 +1,3 @@
+Starting place for testing MCMC on your computer. After all packages are installed and compiled, try running this example. It is minimalistic in that there will be a small number of chains and models in your posterior, so exect the results to look very rough. If this runs OK, you can increase the number of chains and iterations for more realistic models. Then, you can move from synthetic to real data. 
+
+It might help if you bring in one data type at a time. Play with "datatypes" in bayes_inv_parms.m to do this. 
