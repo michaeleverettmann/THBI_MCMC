@@ -55,5 +55,5 @@ for istamp = 1:length(STAMP_all); % Loop over each synthetic model.
 end
 
 function execute_run_all_chains
-    run_all_chains;% Put "run_all_chains.m" in a function, so that maybe "clear" won't erase values like STAMP_all 
+    run_all_chains; % Put "run_all_chains.m" in a function, so that maybe "clear" won't erase values like STAMP_all 
 end

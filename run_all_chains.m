@@ -1,4 +1,9 @@
-clear % clear all to make sure we use values below
+% This script does: 
+% 1. Load data and prepare for inversion. 
+% 2. Do a parallel loop over each MCMC chain. 
+% 3. Plot and store results. 
+
+clear % clear all to make sure we use values below. No longer needed maybe? 
 close all
 
 time_start_inversion = now() * 24; % In hours. 
@@ -6,7 +11,7 @@ time_start_inversion = now() * 24; % In hours.
 global run_params
 paths = getPaths(); 
 
-if isempty(run_params)
+if isempty(run_params) % Some default values. 
     projname = 'AK'; % SYNTHETICS, LAB_tests, or US, for now
     sta = 'BPAW';
     nwk = 'AK';
@@ -16,7 +21,7 @@ if isempty(run_params)
     STAMP=[sta,datestr(now,'_yyyymmddHHMM_pll')];
     overwrite = true;
     cd AK
-else
+else 
     projname = run_params.projname;
     sta = run_params.sta;
     nwk = run_params.nwk;
@@ -27,8 +32,6 @@ else
     overwrite = run_params.overwrite;
 end
 
-
-
 notes = ['']; 
 
 %% ------------------------- START -------------------------
@@ -36,34 +39,21 @@ global projdir TRUEmodel
 projdir = [paths.THBIpath,'/',projname,'/'];
 cd(projdir);
 
-% load paths which might change from one to another computer
-% pathsToChange = loadPathsToChange(); bb2021.09.13 Started this but it's going to be a PITA
-
-run([paths.THBIpath,'/a0_STARTUP_BAYES']);
-load('project_details'); %TODO_STATION_NETWORK bb2021.11.12
-addpath([proj.dir,'matguts/']);
-
-
+run([paths.THBIpath,'/a0_STARTUP_BAYES']); % Crucial: setup all paths. 
+load('project_details'); 
+addpath([proj.dir,'matguts/']); 
 
 %% PARMS
 run parms/bayes_inv_parms
-[par, inv] = update_bayes_inv_parms(par, STAMP); % Modify this function to make different tests. 
-
-% if exist('external_data_types', 'var') && external_data_types; 
-%     % For this block, external_data_types and this_data_type have to be
-%     % created before running run_all_chains.m 
-%     % They should only serve to manually modify par.inv.datatypes after
-%     % running bayes_inv_parms. 
-%     par.inv.datatypes = this_data_type; % bb2021.12.07 Thinking of way to loop over each data type in solo. 
-% end
+[par, inv] = update_bayes_inv_parms(par, STAMP); % Modify inversion parameters depending on your STAMP. Useful for doing various synthetic tests. 
 
 if strcmp(projname,'SYNTHETICS') || strcmp(projname, 'transition_to_russell_mineos'); 
-% % %     bb2021.12.07 Removing the re-definitions of sta. I want synthetic test charactaristic, not noise, to define sta. 
-% % %     if isfield(par.synth,'noisetype') && strcmp(par.synth.noisetype,'real'); 
-% % %         sta=['SYNTH_',sta]; 
-% % %     else
-% % %         sta = 'SYNTH'; 
-% % %     end
+%     bb2021.12.07 Removing the re-definitions of sta. I want synthetic test charactaristic, not noise, to define sta. 
+%     if isfield(par.synth,'noisetype') && strcmp(par.synth.noisetype,'real'); 
+%         sta=['SYNTH_',sta]; 
+%     else
+%         sta = 'SYNTH'; 
+%     end
     par.stadeets = struct('sta',sta','nwk',nwk'); 
 
 	% noise details, if "real"
@@ -140,13 +130,11 @@ save([resdir,'/par'],'par');
 % save par and copy the parms.m file to the results directory
 eval(sprintf('! cp parms/bayes_inv_parms.m %s',resdir))
 
-% allpdytp = parse_dtype_all(par);
-
 %% Get some directories ready. 
 % Switch to execution folder, to make synthetic data. 
 prev_dir = pwd(); 
 cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
-mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
+mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean.  
 
 %% ========================  LOAD + PREP DATA  ========================
 [trudata,par] = a2_LOAD_DATA(par, 'nwk', nwk, 'sta', sta);
@@ -165,8 +153,7 @@ else
     redoprior = true;
 end
 
-% redoprior = true; warning('Forcing redo prior = true'); 
-
+% Estimate prior PDFs. For comparison to the inverted PDFs. 
 if ~par.mod.force_no_new_prior && redoprior
     fprintf('  > Building prior distribution from %.0f runs\n',max([par.inv.niter,1e5]))
     prior = a3_BUILD_EMPIRICAL_PRIOR(par,max([par.inv.niter,1e5]),14,par.res.zatdep);
@@ -174,13 +161,10 @@ if ~par.mod.force_no_new_prior && redoprior
     save([proj.dir,'/prior'],'prior','par');
 end
 
-% error('Done with redoing prior. Exiting'); 
-
 %% ---------------------------- INITIATE PARALLEL -------------------------
 
 % ===== Prepare for parallel pool =====
 delete(gcp('nocreate'));
-% distcomp.feature( 'LocalUseMpiexec', false ); % Trying this to make sure I can open many parpool on cluster. See: https://www.mathworks.com/matlabcentral/answers/196549-failed-to-start-a-parallel-pool-in-matlab2015a  This didn't help, and it slowed down opening parallel pools. 
 myCluster = parcluster('local');
 maxWorkers = myCluster.NumWorkers; 
 
@@ -188,13 +172,10 @@ maxWorkers = myCluster.NumWorkers;
 fprintf('\nChecking storage availability on /tmp/ folder\n\n'); 
 !du -h /tmp/
 !df -h /tmp/
-fprintf('\nTemporarily using user storage for JobStorageLocation\n'); 
 JobStorageLocation = sprintf('%s/job_info_scratch/%s_%s_%s',...
     paths.THBIpath, nwk, sta, STAMP); 
 JobStorageLocation_old = [JobStorageLocation '_old']; 
-% % % JobStorageLocation = sprintf('/tmp/mcmcthbi_%s_%s_%s/',... % Use tmp for local disk. % https://researchcomputing.princeton.edu/support/knowledge-base/matlab
-% % %     nwk, sta, STAMP); % tmp would be a good place, but the node might have full tmp storage. 
-% % % %  Another option is to use Matlab process ID. pid = feature('getpid')
+% JobStorageLocation = sprintf('/tmp/mcmcthbi_%s_%s_%s/',... % Use tmp for local disk. % https://researchcomputing.princeton.edu/support/knowledge-base/matlab
 mkdir(JobStorageLocation);
 mkdir(JobStorageLocation_old); 
 system(sprintf('mv %s/* %s',JobStorageLocation, JobStorageLocation_old)); 
@@ -237,81 +218,34 @@ misfits_perchain = cell(par.inv.nchains,1);
 allmodels_perchain = cell(par.inv.nchains,1);
 SWs_perchain = cell(par.inv.nchains,1);
 
+t = now;
+
+% Option to profile code. 
+if profileRun;  % Start profiling parfor iterations, where most calculations happen. 
+    mpiprofile on; 
+end
+
+cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
+mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
+
+% fprintf('Debug: if this split definition if the Seizmo one and not Matlab builtin, the code will break:\n'); 
+% help split
+% fprintf('END Some info on split:\n'); 
+
 %% ========================================================================
 %% ========================================================================
 fprintf('\n ============== STARTING CHAIN(S) ==============\n')
 %% ========================================================================
 %% ========================================================================
-t = now;
-% mkdir([resdir,'/chainout']);
-% parfor iii = 1:par.inv.nchains
 
-if profileRun;  % Start profiling parfor iterations, where most calculations happen. 
-    mpiprofile on; 
-end
-
-% mainDir = [paths.execPath '/' nwk '_' sta]; % Keep track of where the main folder is, where we want to return after changing directory back from ram drive. 
-% TODO might cause problems to change to new directory because of prior.mat (which loads from absolute directory though, maybe ok) and project_details.mat) which might be different for different stations? 
-% if ~ exist(mainDir); mkdir(mainDir); end % This is where we will cd to for final processing, and save final results. using exist here is ok, because we only do it once per stations.  NOTE don't need if exists, but it's REALLY important to not accidentally overwrite the whole folder. 
-cd(paths.ramDrive); % Execute everything from a folder in ram for major speedup. 
-mkdir([nwk '_' sta]); cd([nwk '_' sta]); % Go to station specific folder to keep things clean . TODO just to cd once. 
-
-fprintf('Some info on split:\n'); 
-help split
-fprintf('END Some info on split:\n'); 
-
-
-%% % % % % % parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-fprintf('\n\n### Not Running loop in parallel right now ###\n\n')
+% Probably do not run in parallel until you know it works in serial for loop. 
 parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
-% for asdfasdf = [1:10]; warning('BB2021.11.22 Not in parallel!!!'); end; 
-par = PR.Value; 
-trudata = TD.Value; 
-
-[ model0_perchain{iii}, misfits_perchain{iii},...
-    allmodels_perchain{iii}, SWs_perchain{iii} ]=...
-    run_one_chain(par, trudata, nwk, sta, iii)
-
-end % parfor loop
-
-%%% Some tests to try and make all chains stop at same time. 
-% Chains really have to be totally independent. Can't find a way to do it. 
-% % % % % % ii_each_chain = zeros( par.inv.nchains , 1 ); 
-% % % % ii_each_chain = parallel.pool.Constant(ii_each_chain)
-% % % parfor iii = 1:par.inv.nchains; 
-% % % 
-% % % %     ii_each_chain = ii_each_chain + zeros
-% % % %     ii_each_chain = ii_each_chain.Value; 
-% % %     for ii = 1:5; 
-% % % %         arr_mult = ones(par.inv.nchains,1); 
-% % % %         arr_mult(iii) = 0; 
-% % %         arr_add = zeros(par.inv.nchains,1); 
-% % %         arr_add(iii) = ii; 
-% % %         ii_each_chain = max(ii_each_chain, arr_add); 
-% % % %         ii_each_chain = ii_each_chain .* arr_mult + arr_add; 
-% % % %         ii_each_chain = ii_each_chain + arr_add; 
-% % % %         ii_each_chain{iii} = ii; 
-% % % %         if iii == 1; 
-% % % %             disp(ii_each_chain)
-% % % %         end
-% % %         sum(ii_each_chain)
-% % %     end
-% % % end
-% % % desired_iter = (par.inv.niter-par.inv.burnin) * par.inv.nchains; 
-% % % tot_iter = 0; 
-% % % parfor iii = 1:par.inv.nchains; 
-% % %     ii = 0; 
-% % %     while ii < (2*par.inv.niter); 
-% % %         ii = ii + 1
-% % %         tot_iter = tot_iter + 1; 
-% % %         
-% % % %         should_stop = tot_iter > 9000; 
-% % %         
-% % % %         if tot_iter > desired_iter; 
-% % % %             break 
-% % % %         end
-% % %     end
-% % % end
+    par = PR.Value; 
+    trudata = TD.Value; 
+    [ model0_perchain{iii}, misfits_perchain{iii},...
+        allmodels_perchain{iii}, SWs_perchain{iii} ]=...
+        run_one_chain(par, trudata, nwk, sta, iii)
+end 
 
 [ram_copy_stats] = ram_to_HD(paths, resdir, nwk, sta); % Copy final results from ram to hard disk. Also remove the ram drive for this station, and change directory to main results folder for this statino. 
 
@@ -340,8 +274,6 @@ plot_invtime(misfits_perchain,[resdir,'/invTime.pdf']);
 
 %% Process results
 fprintf('  > Processing results\n')
-% misfits_perchain = misfits_perchain_original;
-% allmodels_perchain = allmodels_perchain_original;
 [misfits_perchain,allmodels_perchain,goodchains,...
  misfits_perchain_original,...
  allmodels_perchain_original,...
@@ -383,8 +315,7 @@ end
 
 
 %% Final interpolated model with errors
-% If you have to few iterations/chains, there aren't enough models, and you
-% will get an error in c4_FINAL_MODEL. 
+% If you have to few iterations/chains, there aren't enough models. You may get an error in c4_FINAL_MODEL. 
 final_model = c4_FINAL_MODEL(posterior,allmodels_collated,par,1,[resdir,'/final_model']);
 plot_FINAL_MODEL( final_model,posterior,1,[resdir,'/final_model.pdf'],true,[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
 plot_HEATMAP_ALLMODELS(suite_of_models,final_model,par,1,[resdir,'/heatmap_of_models.pdf']);
