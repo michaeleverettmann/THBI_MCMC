@@ -6,11 +6,17 @@ function [par, inv] = update_bayes_inv_parms(parOrig, stamp);
 par = parOrig; 
 str_temp = split(stamp, '/'); 
 
+% Number of iterations, and such. Can use to determine which tests run for
+% for inversion, and which tests get cut short for debug. 
 niter_only   = 16000; 
 burnin_only  = 4000 ; 
 cooloff_only = 3000 ; 
 nchains_only = 12   ; 
 
+niter_only   = 500; 
+burnin_only  = 30 ; 
+cooloff_only = 20 ; 
+nchains_only = 4  ; 
 
 % % For testing telewavesim
 % par.synth.samprate = 60; % TODO figure this out. 
@@ -19,10 +25,7 @@ nchains_only = 12   ;
 % par.synth.noise_sigma_BW_Sp = 0.000;%1; 
 % par.synth.propmat_or_telewavesim = 'telewavesim'; % propmat or telewavesim
 
-% niter_only   = 500; 
-% burnin_only  = 30 ; 
-% cooloff_only = 20 ; 
-% nchains_only = 4  ; 
+
 
 if     strcmp(stamp, 'ENAM_trial'); 
     disp('Using default parameters') 

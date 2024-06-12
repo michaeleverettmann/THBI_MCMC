@@ -3,10 +3,6 @@ close all;
 clear; 
 restoredefaultpath; 
 
-% Temporary brb20240604
-% addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/transition_to_russell_mineos/new_code'); % Remove when ready
-% addpath('/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/MINEOS_synthetics/run_MINEOS'); % Move when ready 
-
 %% Setup
 % These define what model we are running. Make a list of all desired options. Check SYNTHETICS/bayes_inv_parms.m for more options. 
 STAMP_all =          {'standard'       };
