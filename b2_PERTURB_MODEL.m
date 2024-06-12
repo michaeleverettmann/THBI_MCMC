@@ -26,8 +26,7 @@ P_bd = 1; %default, for non b/d moves
 model0 = model;
 
 ptbopts = {'ptb_Vmod','ptb_disc','ptb_Mmod','ptb_sigdat'};
-% opt_rel_P = [3,2,2,1]; % relative probabilities of altering each one
-opt_rel_P = [3,2,2,1];
+opt_rel_P = [3,2,2,1]; % relative probabilities of altering each one
 
 opt_plim = cumsum(opt_rel_P)/sum(opt_rel_P);
 
@@ -102,6 +101,7 @@ switch ptbopts{optflag} % decide what to modify
                     model.crustmparm.VS_sp(ind) = V1; % insert perturbed val
                     if par.inv.verbose, fprintf('    Changed crustal VS(%.0f) from %.2f to %.2f\n',ind,V0,V1); end
                     
+                    %brb20240612 I don't remember why we comment out the within bounds test for velocity but not other parameters. 
                     % within bounds?
 %                     vma = par.mod.crust.vsmax;
 %                     vmi = par.mod.crust.vsmin;

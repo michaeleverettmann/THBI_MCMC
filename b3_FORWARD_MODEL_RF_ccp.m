@@ -32,35 +32,12 @@ if isempty(laymodel)
     warning('brb2022.07.06 Why didnt layer model get passed to this function?'); 
     [zlayt,zlayb,Vslay,...% brb2022.07.06 Version that prevents us from needing to make assumptions here about xi, rho, eta, ...
     Vplay,rholay,xilay,philay] = ...
-    layerise(model.z,model.VS,par.forc.mindV,0,...
-    model.VP, model.rho, ...
-    model.Sanis./100+1,model.Panis./100+1); 
+        layerise(model.z,model.VS,par.forc.mindV,0,...
+        model.VP, model.rho, ...
+        model.Sanis./100+1,model.Panis./100+1); 
     nlay = length(Vslay);
     etalay = ones(nlay,1); % eta anisotropy TODO get eta from model. eta is not in model right now, so can't yet. 
     
-    
-    
-% % %     [zlayt,zlayb,Vslay] = ...
-% % %     layerise(model.z,model.VS,par.forc.mindV,0); 
-% % % 
-% % %     nlay = length(Vslay);
-% % % 
-% % %     % S to P and rho structure
-% % %     xs = 1:find(zlayb==model.zsed); if model.zsed ==0, xs = []; end
-% % %     xc = find(zlayt==model.zsed):find(zlayb==model.zmoh);
-% % %     xm = find(zlayt==model.zmoh):nlay;
-% % %     Vplay = [sed_vs2vp(Vslay(xs));...
-% % %              model.crustmparm.vpvs*Vslay(xc);...
-% % %              mantle_vs2vp(Vslay(xm),mean([zlayt(xm),zlayb(xm)],2))];
-% % %     rholay = [sed_vs2rho(Vslay([xs,xc]));...
-% % %               mantle_vs2rho(Vslay(xm),mean([zlayt(xm),zlayb(xm)],2))];
-% % %     xilay = [ones(length(xs),1);...
-% % %              model.crustmparm.xi*ones(length(xc),1);...
-% % %              model.mantmparm.xi*ones(length(xm),1)]; % S radial anisotropy
-% % %     disp(xilay)
-% % %     philay = ones(nlay,1); % P radial anisotropy
-% % %     etalay = ones(nlay,1); % eta anisotropy
-
     laymodel = struct('zlayt',zlayt,'zlayb',zlayb,'Vs',Vslay,'Vp',Vplay,'rho',rholay,'nlay',nlay,'xi',xilay,'phi',philay,'eta',etalay);
     if any(isnan(laymodel.rho))
         error('NaN densities')
@@ -73,9 +50,6 @@ end
 % scatter(laymodel.zlayt,1+ones(size(laymodel.zlayt))); 
 % scatter(laymodel.zlayb,ones(size(laymodel.zlayb))); 
 % ylim([-30, 10]); 
-
-
-
 
 %% ===================  SP RFs FROM PROPAGATOR MATRIX  ====================
 rayp = predata.RF_Sp_ccp.rayp;
@@ -187,12 +161,6 @@ end
 % -----------------  PUT INTO DATA STRUCTURE  -----------------
 predata.RF_Sp_ccp.PSV = [RF_Pw,RF_SV]; 
 
-
-
-
-
-
-
 %% ifplot....
 % ifplot = true; if ifplot; warning('Setting ifplot = true'); end; 
 if ifplot
@@ -215,8 +183,6 @@ if ifplot
         'ylim',[-par.datprocess.CCP.parent_zw/2 par.datprocess.CCP.Zwin.def(2)])
     title('SV comp (= parent)','fontsize',19,'fontweight','bold')
 end % on ifplot
-
-
 
 end
 

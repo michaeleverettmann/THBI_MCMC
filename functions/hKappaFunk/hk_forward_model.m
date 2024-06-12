@@ -10,12 +10,16 @@ function [predata, par] = hk_forward_model(...
         options.showPlot = false; % Leave as true... this can only plot on iterations where doing HK stack anyway. 
         options.insistRerun = false; % Turn this to true only if you want full HK stack plot every iteration 
     end
+% Take Ps receiver functions and make HK stacks from them. 
+% Note that the older version of this did a "full reset" of HKxi stack only
+% rarely. Since increasing the speed of the anisotropic HK package, it
+% might be viable to just always completely reset the HKxi stack. This has
+% not been thoroughly tested for speed (brb20240612). If it is slow, switch
+% back to the old logic of not always resetting the HKxi stack. 
     
-predata = predataOrig; 
-% parReturn = par; 
+predata = predataOrig; % Par needs some default values that are assigned in the parfor loop but are removed after the par for loop. 
 
-% Par needs some default values that are assigned in the parfor loop but
-% are removed after the par for loop. 
+% Deal with whether we completely reset HK stack or do some assumptions to speed it up. 
 if ~isfield(par, 'hkResetInfo'); 
     par.hkResetInfo = struct('timesReset', 0, 'timesSWKernelsReset',0); 
     par.res.chainstr = ''; 
@@ -24,16 +28,9 @@ if ~isfield(par, 'ii');
     par.ii = 0; 
 end
 
-% end default par values. 
 HKdat = par.inv.datatypes{find(strcmp(pdtyps(:,1),'HKstack'),1,'first')};
 
-% if ~isfield(predataOrig.(HKdat), 'Emax_per_iter'); % First iteration, make new Emax_per_iter array
-%     predata.(HKdat).Emax_per_iter = zeros(par.inv.niter,1); 
-% else; % Other iterations, keep track of the Emax_per_iter saved in previous iteration
-%     predata.(HKdat).Emax_per_iter = predata.(HKdat).Emax_per_iterOrig;
-% end
-
-if (model.vpvs > max(predata.(HKdat).K)) || (model.vpvs < min(predata.(HKdat).K)) ... % Give maximum error if model is outside the bounds of the actual HK stack. 
+if (model.vpvs > max(predata.(HKdat).K)) || (model.vpvs < min(predata.(HKdat).K)) ... % Give maximum available error if model is outside the bounds of the actual HK stack. 
         || (model.zmoh > max(predata.(HKdat).H)) || (model.zmoh < min(predata.(HKdat).H)); 
     predata.(HKdat).Hgrid     = predata.(HKdat).H             ; % Had to use H/Kgrid elsewhere because for somereason zmoh replaces H, similar with kappa. Leaving us with 1x1 arrays, not vectors. H/Kgrid are thus present as backups. And we always have to define them when we define H or k. brb2022.05.08. 
     predata.(HKdat).Kgrid     = predata.(HKdat).K             ;
@@ -42,7 +39,7 @@ if (model.vpvs > max(predata.(HKdat).K)) || (model.vpvs < min(predata.(HKdat).K)
     predata.(HKdat).E_by_Emax = min(min(predata.(HKdat).Esum));
     warning('brb2022.03.02 HK outside bounds! THis should not happen. Thus, I am simply giving maximum HK stack error. Hypothetically this model will be rejected as having prior = 0')
 else % When model is within HK bounds, run this. 
-    nSurfRes = 1; % Multiple of surface wave kernel resets that we will also reset HK stack
+    nSurfRes = 1; % Multiple of surface wave kernel resets that we will also reset HK stack. If 1, we reset HK stack any time we reset surface wave kernels. 
     
     % Kind of complicated to figure out if we do full HK or just one h and k
 %     runFullHK = ...
@@ -52,7 +49,6 @@ else % When model is within HK bounds, run this.
 %         (options.insistRerun); % Could put this first to avoid the if isfield code, but this will almost certainly cause me to mess up the code in a few months. 
     runFullHK = true; % 2023/05/19 I am now using the much faster HK package. Lets see if it's fast enough to always use, so that we have just one HK code instead of two sets to maintain. 
     if runFullHK; 
-        
         par.hkResetInfo.timesReset = par.hkResetInfo.timesReset + 1; 
         par.hkResetInfo.timesSWKernelsReset = 0; % Reset our surface wave kernel counter. This only is analyzed for the HK stacks. 
         
@@ -63,7 +59,7 @@ else % When model is within HK bounds, run this.
             tt   = predata.HKstack_P.waves.tt; 
             rayp = predata.HKstack_P.waves.rayParmSecDeg(iWave); 
 
-            [HK_A, HK_H, HK_K] = HKstack_anis_wrapper(... % TODO this should be easily vectorizable somewhere within the HK package itself. . Probably very slow with hundreds of receiver functions. 
+            [HK_A, HK_H, HK_K] = HKstack_anis_wrapper(... 
                 par, model, RF, tt, rayp, 'ifplot', false, ...
                 'hBounds', [par.mod.crust.hmin, par.mod.crust.hmax], ...
                 'kBounds', [par.mod.crust.vpvsmin, par.mod.crust.vpvsmax], ...
@@ -78,35 +74,7 @@ else % When model is within HK bounds, run this.
         predata.(HKdat).Hgrid    = HK_H  ; % H/Kgrid is here because sometimes, the old code replaces H and K with a single value and not vector. brb2022.05.08. 
         predata.(HKdat).Kgrid    = HK_K  ; 
         predata.(HKdat).Esum     = HK_new; 
-        
-% % %         %%% brb2022.03.28 Temporary. See what is the maximum ever
-% % %         %%% obtainable HK stack value. 
-% % %         figure(1); clf; hold on; 
-% % %         xlim([-2, 40]); 
-% % %         tmin = 2; % Minimum time to consider in RFs. Width of pulse? 
-% % %         tmax = 40; % Max time 
-% % %         for iWave = [1:size(predata.HKstack_P.waves.rf,2)]; 
-% % %             RF   = predata.HKstack_P.waves.rf(:,iWave); 
-% % %             tt   = predata.HKstack_P.waves.tt; 
-% % % 
-% % % %             rfmax = max(RF());
-% % %             inWind = and(tt>=tmin,tt<=tmax); 
-% % %             [pks,locs] = findpeaks( RF(inWind),tt(inWind) ); 
-% % %             [pksSort,indSort] = sort(pks); 
-% % %             pksSort = flip(pksSort); 
-% % %             indSort = flip(indSort); 
-% % %             
-% % %             % Maximum obtainable HK value. 
-% % %             % Assume Ps phase is the largest, PpPs is second largest, PpSs,
-% % %             % PsPs are the most negative value. 
-% % %             maxHKStack = 0.5 * pksSort(1) + 0.3 * pksSort(2) - 0.2 * pksSort(end); 
-% % % 
-% % %             plot(tt, RF)
-% % %             plot(tt, maxHKStack + 0 .* tt)
-% % %             
-% % %         end
-% % %         %%%
-                
+                        
         % Extract some values to make things easier to work with. 
         h          = predata.(HKdat).H   ; 
         k          = predata.(HKdat).K   ; 
@@ -116,22 +84,16 @@ else % When model is within HK bounds, run this.
         
         E_no_norm       = interpn(k',h,Esum,kTrial,hTrial)           ; 
         E_by_Emax       = E_no_norm / maxgrid(Esum)                  ;
-        E_by_Esuper_max = E_no_norm / predata.(HKdat).E_by_Esuper_max; % brb2022.04.27 Not sure what this is doing. I think it's a mixed up naming scheme. 
-        
-        
-%         plot_HK_stack(h, k, Esum, ...
-%             'model_vpvs', model.vpvs, 'model_zmoh', model.zmoh, ...
-%             'title', sprintf('Iteration = %1.0f',par.ii),'figNum', 198) 
-        
+        E_by_Esuper_max = E_no_norm / predata.(HKdat).E_by_Esuper_max; % brb2022.04.27 This might not be in use. It was supposed to do normalization by the highest possible value that the combination of your receiver functions could make in an HK stack under optimal conditions. 
+                
         if options.showPlot; 
             plot_HK_stack(HK_H, HK_K, HK_new, ...
                 'model_vpvs', model.vpvs, 'model_zmoh', model.zmoh, ...
                 'title', sprintf('Iteration = %1.0f',par.ii),'figNum', 198) ; 
-
             exportgraphics(gcf, sprintf('./HK_%s_at_iter_%07d.pdf',...
                 par.res.chainstr, par.ii) ) ; 
         end
-    else % If not remaking whole HK stack, just sample waveforms directly. This is what usually runs. 
+    else % If not remaking whole HK stack, just sample waveforms directly. This is what usually ran before switching to the anisotropic HK package, but it doesn't run if runFullHK = true. Leave this here in case it is needed for a speed up at a later date. 
         RF          = predata.HKstack_P.waves.rf(:,:)         ; 
         tt          = predata.HKstack_P.waves.tt              ; 
         rayp        = predata.HKstack_P.waves.rayParmSecDeg(:); 
@@ -149,15 +111,10 @@ else % When model is within HK bounds, run this.
         hTrial                = model.zmoh               ; 
         
         E_no_norm_old_hk    = interpn(k',h,Esum,kTrial,hTrial); 
-%         E_no_norm = E_not_by_Emax; % 
         E_by_Emax           = E_no_norm / maxgrid(Esum); % Dividing over maxgrid of the old HK stack. This induces a small amount of error, only in so much as the maximum value in the HK stack changes between iterations. I think this is small... We recalculate the full HK stack every so often. 
         E_by_Esuper_max     = E_no_norm / predata.(HKdat).E_by_Esuper_max; % WRONG?!
         E_by_Emax           = min(E_by_Emax, 1); % brb2022.03.06 Just in case an un-updated Esum in maxgrid causes us to have higher than 1 normalized energy. That could cause problems when converting energy to mismatch (negative mismatch). 
-               
-%         plot_HK_stack(h, k, Esum, ...
-%             'model_vpvs', model.vpvs, 'model_zmoh', model.zmoh, ...
-%             'title', sprintf('Iteration = %1.0f',par.ii),'figNum', 198) 
-        
+                       
         displayHKGridChange = false; 
         if displayHKGridChange; % If we want to see how much the value of energy at h,k has changed from the old grid versus the value sampled at only h and k just now. 
             E_by_Emax2 = interpn(k',h,Esum,kTrial,hTrial) ...
@@ -167,7 +124,7 @@ else % When model is within HK bounds, run this.
 
     end
 
-    % brb2022.03.04 The distance approach below is mostly irrelevant. 
+    %% brb2022.03.04 The distance approach below is mostly irrelevant. 
     % Right now I always set all weight toward the actual HK stack values. 
     
     % Find the portion of the h_kappa stack that gives maximum energy. 
@@ -188,37 +145,7 @@ else % When model is within HK bounds, run this.
     % weight than E_by_Emax will generally give. 
     EDist = 1 - EDist; 
 
-% % The commented code here is an alternative way to weight between E_by_Emax and Edist.                 
-% %         % Now give weighted average of EDist and E_by_Emax
-% %         % Fraction of the way through burnin. 
-% %         % Will use to weight E, so don't let go beneath 0. 
-% %         % When value is 0 use only E_by_Emax
-% %         fracBurn = max( ...
-% %             (par.inv.burnin - par.ii)/par.inv.burnin, ...
-% %             0); 
-% %         
-% %         % Relative weighting for EDist and E_by_Emax
-% %         % When value is 0 use only E_by_Emax
-% %         % When value is 1 use only EDist
-% %         wDistEmax = 0.5; 
-% %         wDist = (    fracBurn) * (    wDistEmax); 
-% %         wEmax = (1 - fracBurn) * (1 - wDistEmax); 
-% %         
-% %         % Scale combination of weights to make them sum to 1. 
-% %         % This should help prevent h-kappa stacks sigma (error) 
-% %         % value from being inverted as totally wrong during burnin. 
-% %         wTot = wDist + wEmax; 
-% %         wDist = wDist / wTot; 
-% %         wEmax = wEmax / wTot; 
-
-% %         fracBurn = max( ...
-% %             (par.inv.burnin - par.ii)/par.inv.burnin, ...
-% %             0); 
-
-% %         % Assign the penalty value. 
-% %         predata.(HKdat).E_by_Emax = E_by_Emax * wEmax + EDist * wDist; 
-
-    % Give relative weighting to EDist
+    % Give relative weighting to EDist. This weighting is most likely 0. 
     % Start with max val. 
     % Scale toward min val by end of burnin. 
     % NOTE I'm not using this anymore, so use 0 for dist and 1 for stack. brb2022.02.08
@@ -229,18 +156,15 @@ else % When model is within HK bounds, run this.
 %         sprintf('wDist = %1.2f', wDist)
     wEmax = 1 - wDist; 
 
-    % Assign the penalty value. 
+    %% Assign the penalty value. Combine "distance" (probably weighted at 0) with actual HK stack "error". 
     predata.(HKdat).E_by_Emax = E_by_Emax * wEmax + EDist * wDist; 
     predata.(HKdat).E_by_Esuper_max = E_by_Esuper_max; 
 
-    % Assign other value for compatibility with remaining code. 
+    % Assign other values for compatibility with remaining code. 
     predata.(HKdat).Hgrid = predata.(HKdat).H;
     predata.(HKdat).Kgrid = predata.(HKdat).K; % For some reason these are getting replaced with single values, making it hard to plot later. So keep track of the grid values here. 
     predata.(HKdat).H     = model.zmoh;
     predata.(HKdat).K     = model.vpvs;         
 end
-
-% predata.(HKdat).Emax_per_iter(par.ii) = max(max(predata.(HKdat).Esum)); 
-
 
 end

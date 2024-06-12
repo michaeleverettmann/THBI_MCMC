@@ -46,7 +46,7 @@ for idt = 1:length(indtypes)
 end
 
 %% ===================  LAYERISE PROFILE  ===================
-if isfield(par.datprocess.CCP, 'layerise_version') && strcmp(par.datprocess.CCP.layerise_version, 'no_sed'); % Remove sediment for propmat. 
+if isfield(par.datprocess.CCP, 'layerise_version') && strcmp(par.datprocess.CCP.layerise_version, 'no_sed'); % Remove sediment for TESTING propmat. 
     [zlayt,zlayb,Vslay,... % brb2022.07.06 Version that prevents us from needing to make assumptions here about xi, rho, eta, ...
         Vplay,rholay,xilay,philay] = ...
         layerise_test_sediment_sp_ccp(model.z,model.VS,par.forc.mindV,0,...
@@ -61,25 +61,6 @@ else
 end
 nlay = length(Vslay);
 etalay = ones(nlay,1); % eta anisotropy TODO get eta from model. eta is not in model right now, so can't yet. 
-% % % 
-% % % [zlayt,zlayb,Vslay] = ...
-% % %     layerise(model.z,model.VS,par.forc.mindV,0); 
-% % % nlay = length(Vslay);
-% % % 
-% % % % S to P and rho structure
-% % % xs = 1:find(zlayb==model.zsed); if model.zsed ==0, xs = []; end
-% % % xc = find(zlayt==model.zsed):find(zlayb==model.zmoh);
-% % % xm = find(zlayt==model.zmoh):nlay;
-% % % Vplay = [sed_vs2vp(Vslay(xs));...
-% % %          model.crustmparm.vpvs*Vslay(xc);...
-% % %          mantle_vs2vp(Vslay(xm),mean([zlayt(xm),zlayb(xm)],2))];
-% % % rholay = [sed_vs2rho(Vslay([xs,xc]));...
-% % %           mantle_vs2rho(Vslay(xm),mean([zlayt(xm),zlayb(xm)],2))];
-% % % xilay = [ones(length(xs),1);...
-% % %          model.crustmparm.xi*ones(length(xc),1);...
-% % %          model.mantmparm.xi*ones(length(xm),1)]; % S radial anisotropy
-% % % philay = ones(nlay,1); % P radial anisotropy
-% % % etalay = ones(nlay,1); % eta anisotropy
 
 laymodel = struct('zlayt',zlayt,'zlayb',zlayb,'Vs',Vslay,'Vp',Vplay,'rho',rholay,'nlay',nlay,'xi',xilay,'phi',philay,'eta',etalay);
 if any(isnan(laymodel.rho))

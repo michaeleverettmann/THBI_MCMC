@@ -79,43 +79,26 @@ elseif strcmp(par.proj.name,'LAB_tests')
 %% -----------------------------------------------------------------
 %% REAL DATA
 else
-% % % 	try 
-% % %         try % Janky try catch in try catch... I cant use internet with slurm on CNSI computers? so have to have a simple solution for loading saved .mat file instead of using irisetch. 
-% % %             stadeets = irisFetch.Stations('station',par.data.stadeets.nwk,par.data.stadeets.sta,'*','*'); 
-% % %             save([par.proj.rawdatadir,'/stadeets.mat'], 'stadeets'); 
-% % %         catch e
-% % %             warning(['brb2022.04.11 Could not irisFetch stadeets. Loading saved file instead. ',...
-% % %               'For this to work, you have to send the stadeets.mat file ',...
-% % %               'to this cluster!!! I did this MANUALLY before.'])
-% % %             stadeets = load([par.proj.rawdatadir,'/stadeets.mat']); 
-% % %             stadeets = stadeets.stadeets; 
-% % %         end    
-
-        if isempty(options.nwk) || isempty(options.sta); 
-            error('Provide nwk and sta to a2_LOAD_DATA.m so we know what to load if you are using real data'); 
-        end
+    if isempty(options.nwk) || isempty(options.sta); 
+        error('Provide nwk and sta to a2_LOAD_DATA.m so we know what to load if you are using real data'); 
+    end
+    
+    fname = [par.proj.rawdatadir,'stadeets_' options.nwk '_' options.sta '.mat']; 
+    
+    if ~ java.io.File(fname).exists(); 
+        error('stadeets file for %s.%s does not exist. Probably you need to run RUN_prep_data on this machine.'); 
+    end
+    
+    % Get station details. If you don't have this file, you might need to download it with something like: stadeets = irisFetch.Stations('station',par.data.stadeets.nwk,par.data.stadeets.sta,'*','*')
+    % I sent the stadeets files to computers I used a long time ago and don't remember exactly how to get them. brb20240612
+    % Check github versions before 20240612 for some commented hints as to how to get these files. 
+    stadeets = load(fname); 
+    stadeets = stadeets.stadeets_netsta; 
         
-        fname = [par.proj.rawdatadir,'stadeets_' options.nwk '_' options.sta '.mat']; 
-        
-        if ~ java.io.File(fname).exists(); 
-            error('stadeets file for %s.%s does not exist. Probably you need to run RUN_prep_data on this machine.'); 
-        end
-        
-        stadeets = load(fname); 
-        stadeets = stadeets.stadeets_netsta; 
-            
-        fns = fieldnames(stadeets);
-        for ii = 1:length(fns)
-            par.data.stadeets.(fns{ii}) = stadeets.(fns{ii});
-        end
-        
-% % % 	catch e 
-% % %         warning('Could not get stadeets.mat. Might need to send that directly to the cluster computer. Looking for stainfo_master.mat instead - might not work...')
-% % %         fprintf('\nError report was: %s\n',getReport(e)); 
-% % %         load([par.proj.rawdatadir,'/stainfo_master.mat']); 
-% % %         par.data.stadeets.Latitude = stainfo(strcmp({stainfo.StationCode},par.data.stadeets.sta)).Latitude;
-% % %         par.data.stadeets.Longitude = stainfo(strcmp({stainfo.StationCode},par.data.stadeets.sta)).Longitude;
-% % % 	end
+    fns = fieldnames(stadeets);
+    for ii = 1:length(fns)
+        par.data.stadeets.(fns{ii}) = stadeets.(fns{ii});
+    end
     
     %% LOAD THE DATA
     [trudata,zeroDstr,par] = load_data(par);
@@ -152,8 +135,7 @@ else
             end
             fprintf('WARNING - removing %s data not in cluster %.0f\n',trudtypes{idt},par.inv.BWclust)
             trudata.(trudtypes{idt}) = trudata.(trudtypes{idt})([trudata.(trudtypes{idt}).clust]==par.inv.BWclust);
-            % if getting rid of that cluster killed the data type, then
-            % delete the data fieldname
+            % if getting rid of that cluster killed the data type, then delete the data fieldname
             if isempty(trudata.(trudtypes{idt}))
                 fprintf('THAT WAS ALL THE %s data\n',trudtypes{idt})
                 trudata = rmfield(trudata,trudtypes{idt});
@@ -165,8 +147,7 @@ else
     kill = false(length(par.inv.datatypes),1);
     for idt = 1:length(par.inv.datatypes)
         dtype = par.inv.datatypes{idt}; pdt = parse_dtype( dtype ); 
-        % since we added in all data types above, if any not left now, it
-        % is because they don't exist in the real data - should not use
+        % since we added in all data types above, if any not left now, it is because they don't exist in the real data - should not use
         if ~isfield(trudata,par.inv.datatypes{idt}) %&& strcmp(pdt{1},'BW') 
             kill(idt) = true;
         end
@@ -174,9 +155,6 @@ else
     par.inv.datatypes(kill) = [];
 
 end
-
-% save data
-% save([par.res.resdir,'/trudata_ORIG'],'trudata');
 
 %% PROCESS - window, filter data 
 for idt = 1:length(par.inv.datatypes)
@@ -192,8 +170,8 @@ trudata = dofTHBI(trudata, par);
 % plot_TRUvsPRE(trudata,trudata);
 save([par.res.resdir,'/trudata_USE'],'trudata');
 
-if ~exist('sta','var') %TODOEXIST bb2021.11.22 exist is SUPER slow - It's ok since you don't load data often. 
-        sta = 'SYN';
+if ~exist('sta','var') 
+    sta = 'SYN';
 end 
 
 end
