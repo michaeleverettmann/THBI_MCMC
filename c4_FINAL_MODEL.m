@@ -19,6 +19,7 @@ Nm = posterior.Nstored;
 
 %% Indices of models 
 i50     = round(0.5*Nm);
+warning('brb20240612 Sigma bounds were incorrect. These are not the 68-95-99.7 rule. We should have an updated version. ')
 isig1   = [max( 1,round(0.3173*Nm ))  min( Nm, round(0.6827*Nm) ) ]; % Use min and max in case we used very few iterations and round takes us to index 0. 
 isig2   = [max( 1,round(0.055 *Nm ))  min( Nm, round(0.9545*Nm) ) ];
 iminmax = [max([1,round(0.005 *Nm)])  min([Nm, round(0.995 *Nm)]) ];
@@ -33,7 +34,7 @@ if sum(Nds~=0)==1 % brb2023/06/19 I guess this is just for if a problem comes up
     Zd(1).mu = mean(posterior.zsed); Zd(1).std = par.mod.dz/2;
     final_model.zsedav = Zd(1).mu; 
     final_model.zsedsig = Zd(1).std; 
-else % brb2023/06/19 I guess this is what we are counting on usually
+else 
     try % brb2023/06/19 The Gaussfit was not always working. I'm taking least intrusive fix: try to use the gaussfit, but if it doesn't work, just use percentiles to get medians and gaussian widths. Return some warning. 
         [Zd(1).std,Zd(1).mu] = gaussfit( XX, NNds, (X(end)-X(1))/4,X(Nds==max(Nds))  );
     catch 
@@ -61,8 +62,6 @@ else % brb2023/06/19 TODO should use gaussfit correction as was done on sediment
     final_model.zmohav = Zd(2).mu; 
     final_model.zmohsig = Zd(2).std; 
 end
-
-
 
 %% Vp/Vs
 vord = sort(posterior.vpvs);
@@ -95,35 +94,34 @@ variable = {'VS','VP','rho','Sanis','Panis'}; % If you add other variables to in
 for iv = 1:length(variable)
     fprintf('%s... ',variable{iv});
 
-varz = zeros(Nz,Nm);
-for ii = 1:Nm
-    varz(:,ii) = linterp(allmodels(ii).z,allmodels(ii).(variable{iv}),Z);
-end 
-
-
-lb = zeros(Nz,1); ub = lb; 
-l1std = lb;  u1std = lb; 
-l2std = lb;  u2std = lb; 
-mdn = lb;
-
-for iz = 1:Nz
-    vord = sort(varz(iz,:));
-    lb(iz) = vord(iminmax(1));     % lower bound (not quite min, to avoid wacky ones)
-    ub(iz) = vord(iminmax(2));     % upper bound (not quite max, to avoid wacky ones)
-    l1std(iz) = vord(isig1(1)); % 1 std below median
-    u1std(iz) = vord(isig1(2)); % 1 std above median
-    l2std(iz) = vord(isig2(1)); % 2 std below median
-    u2std(iz) = vord(isig2(2)); % 2 std above median
-    mdn(iz) = vord(i50);      % median value
-end
-
-final_model.Z = Z;
-final_model.([variable{iv},'av']) = mdn;
-final_model.([variable{iv},'minmax']) = [lb ub];
-final_model.([variable{iv},'sig1']) = [l1std u1std];
-final_model.([variable{iv},'sig2']) = [l2std u2std];
-
-suite_of_models.(variable{iv}) = varz;
+    varz = zeros(Nz,Nm);
+    for ii = 1:Nm
+        varz(:,ii) = linterp(allmodels(ii).z,allmodels(ii).(variable{iv}),Z);
+    end 
+    
+    lb = zeros(Nz,1); ub = lb; 
+    l1std = lb;  u1std = lb; 
+    l2std = lb;  u2std = lb; 
+    mdn = lb;
+    
+    for iz = 1:Nz
+        vord = sort(varz(iz,:));
+        lb(iz) = vord(iminmax(1));     % lower bound (not quite min, to avoid wacky ones)
+        ub(iz) = vord(iminmax(2));     % upper bound (not quite max, to avoid wacky ones)
+        l1std(iz) = vord(isig1(1)); % 1 std below median
+        u1std(iz) = vord(isig1(2)); % 1 std above median
+        l2std(iz) = vord(isig2(1)); % 2 std below median
+        u2std(iz) = vord(isig2(2)); % 2 std above median
+        mdn(iz) = vord(i50);      % median value
+    end
+    
+    final_model.Z = Z;
+    final_model.([variable{iv},'av']) = mdn;
+    final_model.([variable{iv},'minmax']) = [lb ub];
+    final_model.([variable{iv},'sig1']) = [l1std u1std];
+    final_model.([variable{iv},'sig2']) = [l2std u2std];
+    
+    suite_of_models.(variable{iv}) = varz;
 
 end % loop on variables
 fprintf('\n');
@@ -139,7 +137,6 @@ vpvs_above_depth3 = cumtrapz(final_model.Z, ...
     final_model.VPav./final_model.VSav ) ./ final_model.Z; % integral style average. 
 final_model.vpvsav_v3 = vpvs_above_depth3(is_crust(end)); 
 
-
 %%  HYPERPARAMETERS 
 fns = fieldnames(posterior.datahparm);
 hyperparms = struct([]);
@@ -153,10 +150,8 @@ for ihp = 1:length(fns)
 end
 
 %% ===================== add other parameters ================
-
 final_model.hyperparms = hyperparms;
 final_model.Zd = Zd;
-
 
 if ifsave
     save(ofile,'final_model')

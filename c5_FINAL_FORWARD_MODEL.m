@@ -1,4 +1,6 @@
 function [ final_predata ] = c5_FINAL_FORWARD_MODEL( final_model,par,data,posterior )
+% Do forward model from final median model. This script should follow the
+% same procedure as forward modelling during the inversion. 
 
 ID = [par.data.stadeets.nwk '.' par.data.stadeets.sta '_finalmod'];
 
@@ -27,37 +29,10 @@ end
 nlay = length(Vslay);
 etalay = ones(nlay,1); % eta anisotropy TODO get eta from model. eta is not in model right now, so can't yet. 
 
-% Commented is the way of getting  rho, xi etc. But since we are looking over a suite of models that had different discontinuity depths, its better to just average over those suits of models. I think. Maybe. brb2022.07.06. 
-% % % [zlayt,zlayb,Vslay,Vplay,rholay] = ...
-% % %     layerise(final_model.Z,final_model.VSav,par.forc.mindV,1,final_model.VPav,final_model.rhoav); 
-% % % nlay = length(Vslay);
-% % % laymodel = struct('zlayt',zlayt,'zlayb',zlayb,'Vs',Vslay,'Vp',Vplay,'rho',rholay,'nlay',nlay);
-% % % if any(isnan(laymodel.rho))
-% % %     error('NaN densities')
-% % % end
-% % % % S to P and rho structure
-% % % zsed = final_model.Zd(1).mu;
-% % % zmoh = final_model.Zd(2).mu;
-% % % xs = 1:mindex(zlayb,zsed); if zsed==0, xs = []; end
-% % % xc = mindex(zlayt,zsed):mindex(zlayb,zmoh);
-% % % xm = mindex(zlayt,zmoh):nlay;
-% % % Vplay = [sed_vs2vp(Vslay(xs));...
-% % %          final_model.vpvsav*Vslay(xc);...
-% % %          mantle_vs2vp(Vslay(xm),mean([zlayt(xm),zlayb(xm)],2))];
-% % % rholay = [sed_vs2rho(Vslay([xs,xc]));...
-% % %           mantle_vs2rho(Vslay(xm),mean([zlayt(xm),zlayb(xm)],2))];
-% % % xilay = [zeros(length(xs),1);...
-% % %          final_model.xicrav*ones(length(xc),1);...
-% % %          final_model.ximaav*ones(length(xm),1)]; % S radial anisotropy
-% % % philay = ones(nlay,1); % P radial anisotropy
-% % % etalay = ones(nlay,1); % eta anisotropy
-% % % if any(xilay==0); error('xi probably shouldnt be zero but should be one. Check notes brb2022.07.06.'); end
-
 laymodel = struct('zlayt',zlayt,'zlayb',zlayb,'Vs',Vslay,'Vp',Vplay,'rho',rholay,'nlay',nlay,'xi',xilay,'phi',philay,'eta',etalay);
 if any(isnan(laymodel.rho))
     error('NaN densities')
 end
-
 
 %% ===================  PS RFs FROM PROPAGATOR MATRIX  ====================
 
@@ -112,76 +87,74 @@ end
 
 %% ===================  SP RFs FROM PROPAGATOR MATRIX  ====================
 if any(strcmp(pdtyps(:,2),'Sp'))
-if any(~strcmp(pdtyps(strcmp(pdtyps(:,2),'Sp'),3),'ccp'))
-    Spdat = par.inv.datatypes{find(strcmp(pdtyps(:,2),'Sp'),1,'first')};
-    [ unique_rayps_S,irayps_S ] = rayp_vals( [final_predata.(Spdat).rayp] );
-    for ir = 1:length(unique_rayps_S)
-        rayp = unique_rayps_S(ir);
-        samprate = unique([final_predata.(Spdat)(irayps_S==ir).samprate]);
-        S_inc = rayp2inc(rayp,laymodel.Vs(end),6371-laymodel.zlayb(end));
-        
-        P_inc = rayp2inc(rayp,laymodel.Vp(end),6371-laymodel.zlayb(end));
-        % find layers where S to P conversion will not go inhomogeneous
-        Play_incs = asind(laymodel.Vp*sind(P_inc)./laymodel.Vp(end));
-        if any(~isreal(Play_incs))
-            nimagplay = [1:find(imag(Play_incs),1,'first')-1];
-            fns = fieldnames(laymodel);
-            laymodel_Suse = laymodel; 
-            laymodel_Suse.nlay = length(nimagplay);
-            for jj = 1:length(fns)
-                if length(laymodel.(fns{jj}))==1, continue; end
-                laymodel_Suse.(fns{jj}) = laymodel_Suse.(fns{jj})(nimagplay);
+    if any(~strcmp(pdtyps(strcmp(pdtyps(:,2),'Sp'),3),'ccp'))
+        Spdat = par.inv.datatypes{find(strcmp(pdtyps(:,2),'Sp'),1,'first')};
+        [ unique_rayps_S,irayps_S ] = rayp_vals( [final_predata.(Spdat).rayp] );
+        for ir = 1:length(unique_rayps_S)
+            rayp = unique_rayps_S(ir);
+            samprate = unique([final_predata.(Spdat)(irayps_S==ir).samprate]);
+            S_inc = rayp2inc(rayp,laymodel.Vs(end),6371-laymodel.zlayb(end));
+            
+            P_inc = rayp2inc(rayp,laymodel.Vp(end),6371-laymodel.zlayb(end));
+            % find layers where S to P conversion will not go inhomogeneous
+            Play_incs = asind(laymodel.Vp*sind(P_inc)./laymodel.Vp(end));
+            if any(~isreal(Play_incs))
+                nimagplay = [1:find(imag(Play_incs),1,'first')-1];
+                fns = fieldnames(laymodel);
+                laymodel_Suse = laymodel; 
+                laymodel_Suse.nlay = length(nimagplay);
+                for jj = 1:length(fns)
+                    if length(laymodel.(fns{jj}))==1, continue; end
+                    laymodel_Suse.(fns{jj}) = laymodel_Suse.(fns{jj})(nimagplay);
+                end
+                S_inc = rayp2inc(rayp,laymodel_Suse.Vs(end),6371-laymodel_Suse.zlayb(end));
+            else
+                laymodel_Suse = laymodel;
             end
-            S_inc = rayp2inc(rayp,laymodel_Suse.Vs(end),6371-laymodel_Suse.zlayb(end));
-        else
-            laymodel_Suse = laymodel;
+            
+            [predat_sp,tt_sp] = run_propmat_or_telewavesim(par.synth.propmat_or_telewavesim, laymodel_Suse,ID,'Sp',samprate, S_inc, rayp, par.forc.synthperiod,par.forc.nsamps);
+            % pad with zeros
+            tt_sp = [tt_sp(1) + [-1000:-1]'./samprate; tt_sp ;tt_sp(end) + [1:1000]'./samprate];
+            predat_sp = [zeros(1000,3);predat_sp;zeros(1000,3)];
+            %correct corrdinate order
+            predat_sp_ZRT = predat_sp(:,[3,1,2]); % in Z,R,T
+            if strcmp(par.forc.PSVorZR,'PSV')
+                clear predat_sp_PSV;
+                % convert to P, SV
+                [predat_sp_PSV(:,1),predat_sp_PSV(:,2)] = ...
+                    Rotate_XZ_to_PSV(predat_sp_ZRT(:,2),-predat_sp_ZRT(:,1),...
+                    mean([final_predata.(Spdat).Vp_surf]),mean([final_predata.(Spdat).Vs_surf]),...
+                    rayp_sdeg2skm(rayp,laymodel_Suse.zlayb(end)));
+            elseif strcmp(par.forc.PSVorZR,'ZR')
+                % keep as ZR (but kill T; Z positive UP)
+                predat_sp_PSV = predat_sp_ZRT(:,[1,2]);         
+            end
+            
+            predat_sp_PSV = predat_sp_PSV./maxab(predat_sp_PSV(:,2)); % normalise on parental max, make positive
+            tt_sp_Sar = mean(tt_sp(predat_sp_PSV(:,2)==max(predat_sp_PSV(:,2)))); % estimate main S-wave arrival time from first big upswing
+            tt_sp = tt_sp - tt_sp_Sar;
+            tt_sp = round_level(tt_sp,0.001);
+    
+            Sp_widewind = [-50 10];
+            inwind = (tt_sp >= Sp_widewind(1)) & (tt_sp < Sp_widewind(2)); 
+            % crop
+            predat_sp_PSV = predat_sp_PSV(inwind,:);
+            tt_sp = tt_sp(inwind);
+            % taper
+            predat_sp_PSV = flat_hanning_win(tt_sp,predat_sp_PSV,Sp_widewind(1),Sp_widewind(2),3); % 3s taper
+            % normalise to unit energy
+            normf_sp = predat_sp_PSV(:,1)'*predat_sp_PSV(:,1) + predat_sp_PSV(:,2)'*predat_sp_PSV(:,2);
+            predat_sp_PSV = predat_sp_PSV/sqrt(normf_sp);
+    % -----------------  PUT INTO DATA STRUCTURE  -----------------
+            inds = find(irayps_S==ir);
+            for iir = 1:length(inds)
+                final_predata.(Spdat)(inds(iir),1).PSV=predat_sp_PSV; 
+                final_predata.(Spdat)(inds(iir),1).tt=tt_sp;
+                final_predata.(Spdat)(inds(iir),1).nsamp = length(final_predata.(Spdat)(inds(iir)).PSV);
+            end
         end
-        
-        [predat_sp,tt_sp] = run_propmat_or_telewavesim(par.synth.propmat_or_telewavesim, laymodel_Suse,ID,'Sp',samprate, S_inc, rayp, par.forc.synthperiod,par.forc.nsamps);
-        % pad with zeros
-        tt_sp = [tt_sp(1) + [-1000:-1]'./samprate; tt_sp ;tt_sp(end) + [1:1000]'./samprate];
-        predat_sp = [zeros(1000,3);predat_sp;zeros(1000,3)];
-        %correct corrdinate order
-        predat_sp_ZRT = predat_sp(:,[3,1,2]); % in Z,R,T
-        if strcmp(par.forc.PSVorZR,'PSV')
-            clear predat_sp_PSV;
-            % convert to P, SV
-            [predat_sp_PSV(:,1),predat_sp_PSV(:,2)] = ...
-                Rotate_XZ_to_PSV(predat_sp_ZRT(:,2),-predat_sp_ZRT(:,1),...
-                mean([final_predata.(Spdat).Vp_surf]),mean([final_predata.(Spdat).Vs_surf]),...
-                rayp_sdeg2skm(rayp,laymodel_Suse.zlayb(end)));
-        elseif strcmp(par.forc.PSVorZR,'ZR')
-            % keep as ZR (but kill T; Z positive UP)
-            predat_sp_PSV = predat_sp_ZRT(:,[1,2]);         
-        end
-        
-        predat_sp_PSV = predat_sp_PSV./maxab(predat_sp_PSV(:,2)); % normalise on parental max, make positive
-        tt_sp_Sar = mean(tt_sp(predat_sp_PSV(:,2)==max(predat_sp_PSV(:,2)))); % estimate main S-wave arrival time from first big upswing
-        tt_sp = tt_sp - tt_sp_Sar;
-        tt_sp = round_level(tt_sp,0.001);
-
-        Sp_widewind = [-50 10];
-        inwind = (tt_sp >= Sp_widewind(1)) & (tt_sp < Sp_widewind(2)); 
-        % crop
-        predat_sp_PSV = predat_sp_PSV(inwind,:);
-        tt_sp = tt_sp(inwind);
-        % taper
-        predat_sp_PSV = flat_hanning_win(tt_sp,predat_sp_PSV,Sp_widewind(1),Sp_widewind(2),3); % 3s taper
-        % normalise to unit energy
-        normf_sp = predat_sp_PSV(:,1)'*predat_sp_PSV(:,1) + predat_sp_PSV(:,2)'*predat_sp_PSV(:,2);
-        predat_sp_PSV = predat_sp_PSV/sqrt(normf_sp);
-% -----------------  PUT INTO DATA STRUCTURE  -----------------
-        inds = find(irayps_S==ir);
-        for iir = 1:length(inds)
-            final_predata.(Spdat)(inds(iir),1).PSV=predat_sp_PSV; 
-            final_predata.(Spdat)(inds(iir),1).tt=tt_sp;
-            final_predata.(Spdat)(inds(iir),1).nsamp = length(final_predata.(Spdat)(inds(iir)).PSV);
-        end
-    end
-end % Sp not ccp
+    end % Sp not ccp
 end
-
-
 
 %% distribute data for different processing (e.g. _lo, _cms)
 % for idt = 1:length(par.inv.datatypes)
@@ -192,10 +165,8 @@ end
 %     end
 % end
 
-
-%% ===================  CALCULATE SURPHASE WAVE VELOCITIES  ===================
+%% ===================  CALCULATE SURFACE WAVE VELOCITIES  ===================
 if any(strcmp(pdtyps(:,1),'SW'))
-
     modminrun = struct('z',final_model.Z,...
                        'VS',final_model.VSav,...
                         'VP',final_model.VPav,...
@@ -222,7 +193,6 @@ if any(strcmp(pdtyps(:,1),'SW'))
         final_predata.(dtype).(pdtyp{3}) = interp1(data.(dtype).for_mod_info.all_periods, ...
             SW.(pdtyp{2}).(pdtyp{3}), data.(dtype).periods);
     end
-
 end
 
 %% ===================  SP RFs FROM PROPAGATOR MATRIX  ====================
@@ -338,8 +308,6 @@ if any(strcmp(pdtyps(:,1),'HKstack'))
     fm.VP = final_model.VPav; 
     fm.z = fm.Z; % this is why we should always use cammel case or something else consistent! 
     fm.vpvs = fm.vpvsav;
-%     fm.vpvs = fm.vpvsav_v2; 
-%     fm.vpvs = fm.vpvsav_v3; 
     fm.Panis = fm.Panisav; 
     fm.Sanis = fm.Sanisav; 
     
@@ -355,12 +323,6 @@ if any(strcmp(pdtyps(:,1),'HKstack'))
                   'title','HK stack based on inverted model',...
                   'saveStr',[par.res.resdir '/HK_from_inverted_model.pdf']); 
                           
-%     HKdat = par.inv.datatypes{find(strcmp(pdtyps(:,1),'HKstack'),1,'first')};
-%     ik = mindex(data.(HKdat).K,final_model.vpvsav);
-%     ih = mindex(data.(HKdat).H,zmoh);
-%     final_predata.(HKdat).H = zmoh;
-%     final_predata.(HKdat).K = final_model.vpvsav;
-%     final_predata.(HKdat).E_by_Emax = data.(HKdat).Esum(ik,ih)/maxgrid(data.(HKdat).Esum);
 
 end
 
