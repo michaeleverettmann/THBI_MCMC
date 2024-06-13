@@ -15,9 +15,8 @@ if nargin < 6 || isempty(goodChainsManual)
     goodChainsManual = []; 
 end
 
-
 figure(88);clf, set(gcf,'pos',[850 198 900 888])
-%% title
+% title
 htit = title_custom([par.data.stadeets.sta,' ',par.data.stadeets.nwk],0.5,'fontweight','bold','fontsize',25);
 
 ax1 = subplot(2,1,1); ax1pos = get(ax1,'pos');
@@ -34,8 +33,6 @@ ch2_min = inf;
 ch2_max = -inf;
 
 downsampfac = 2;
-
-
 
 %% loop through each chain
 nchains = length(misfits);
@@ -57,7 +54,6 @@ for iii = 1:nchains
 
     % kill allmodels beyond N
     am(N+1:end) = [];
-    
 
     % kill misfits beyond N
     fns = fieldnames(mf);
@@ -102,44 +98,24 @@ for iii = 1:nchains
     %%% END remove models that had particularly low likelihood 
 
     if ~isinf(par.inv.bestNmod2keep) % subset if not inf to keep. Else keep all
-    if par.inv.bestNmod2keep>0 % if specifying how many to keep based on low error
-
-        score_overall = zeros(length(bestind),length(par.inv.datatypes));
-        for id = 1:length(par.inv.datatypes)
-            dtype = par.inv.datatypes{id};
-%             pdtyp = parse_dtype(dtype);
-    %         if strcmp(pdtype{1},'BW') && (~strcmp(pdtype{3},'def') || ~strcmp(pdtype{4},'def')), continue; end
-            chi2 = [mf.chi2.(dtype)]';
-            [~,irank_mf] = sort(sum(chi2(bestind,:),2));
-            [~,score_overall(:,id)] = sort(irank_mf);
+        if par.inv.bestNmod2keep>0 % if specifying how many to keep based on low error
+    
+            score_overall = zeros(length(bestind),length(par.inv.datatypes));
+            for id = 1:length(par.inv.datatypes)
+                dtype = par.inv.datatypes{id};
+                chi2 = [mf.chi2.(dtype)]';
+                [~,irank_mf] = sort(sum(chi2(bestind,:),2));
+                [~,score_overall(:,id)] = sort(irank_mf);
+            end
+            score_overall = sum(score_overall,2);   
+            sort_score_overall = sort(score_overall);
+            min_score_overall = sort_score_overall(min([par.inv.bestNmod2keep,length(bestind)]));
+            bestind(score_overall>min_score_overall) = [];
+        elseif par.inv.bestNmod2keep<0
+            bestind = bestind(randperm(length(bestind),min([-par.inv.bestNmod2keep,length(bestind)])));
         end
-        score_overall = sum(score_overall,2);
-
-    %     if isfield(mf.chi2,'BW_Ps') && isfield(mf,'BW_Ps') && isfield(mf,'SW')
-    %         [~,irank_mf_ps] = sort(mf.chi2(bestind)); [~,rank_mf_ps] = sort(irank_mf_ps);
-    %         [~,irank_mf_sp] = sort(mf.chi2_sp(bestind)); [~,rank_mf_sp] = sort(irank_mf_sp);
-    %         [~,irank_mf_sw] = sort(mf.chi2_SW(bestind)); [~,rank_mf_sw] = sort(irank_mf_sw);
-    %         score_overall = rank_mf_ps + rank_mf_sp + rank_mf_sw;
-    %     else
-    %             [~,irank_mf] = sort(mf.chi2sum(bestind)); [~,score_overall] = sort(irank_mf);
-    %     end
-
-        sort_score_overall = sort(score_overall);
-        min_score_overall = sort_score_overall(min([par.inv.bestNmod2keep,length(bestind)]));
-        bestind(score_overall>min_score_overall) = [];
-    elseif par.inv.bestNmod2keep<0
-        bestind = bestind(randperm(length(bestind),min([-par.inv.bestNmod2keep,length(bestind)])));
     end
-    end
-    
-% % % % Trying to remove iterations with nan chi2. For some reason I couldn't get rid of those iterations earily enough. 
-% % %     if any(isnan(mf.chi2sum)); % Something sometimes goes wrong and there is a nan liklihood... not really sure how. brb2022.07.18. 
-% % %         bad_ind = find(isnan(mf.chi2sum)); 
-% % %         for ibad_ind = 1:length(bad_ind); 
-% % %             bestind(bestind==bad_ind(ibad_ind)) = []; % bestind might already disinclude nan chi2 models, and then this line of code won't do anything. 
-% % %         end
-% % %     end
-    
+        
     mf.bestmods = false(mf.Nstored,1);
     mf.bestmods(bestind) = true;
     
@@ -163,7 +139,6 @@ for iii = 1:nchains
     %% PLOT IMPROVEMENT IN MODEL FIT
     downsamp = (1:downsampfac:length(am));
 
-%     [~,h1,h2] = plotyy(ax1,mf.iter(downsamp),mf.chi2sum(downsamp),mf.iter(downsamp),mf.logLike(downsamp),'semilogy');
     h1 = plot(ax1,mf.iter(downsamp),mf.chi2sum(downsamp));
     h2 = plot(ax2,mf.iter(downsamp),mf.logLike(downsamp));
     
@@ -186,10 +161,7 @@ for iii = 1:nchains
            'markerfacecolor',basecol,'markeredgecolor',col2);
     set(get(ax1,'ylabel'),'String','$\chi^2$ misfit','Fontsize',20,'interpreter','latex','color',col1)
     set(get(ax2,'ylabel'),'String','$\log_{10}{\,p(m|d)}$','Fontsize',20,'interpreter','latex','color',col2)
-    
-    
-%     cols = [[0 0.447 0.741];[0.85 0.325 0.098];[0.929 0.694 0.125];[0.494 0.184 0.556];[0.466 0.674 0.188];[0.1 0.76 0.288]];
-    
+        
     Nd = length(par.inv.datatypes);
     cols = colour_get([1:Nd],Nd,1,[parula;flipud(spring)]);
     
@@ -206,14 +178,7 @@ for iii = 1:nchains
     ylabel(ax3,'RMS misfit','Fontsize',20,'interpreter','latex')
     xlabel(ax3,'Iteration','Fontsize',20)
     hl = legend(hrms(1:idt),strrep(par.inv.datatypes,'_','-'));
-
-    
-    % rate of acceptance past burnin
-
 end % loop on chains
-
-
-%% determine "good" models
 
 if ifsave
     fprintf('saving, may take a while\n')
@@ -227,7 +192,7 @@ chi2_alldata = nan(nchains,length(par.inv.datatypes));
 % gather average rms errors of each chain
 nchainsRej = 4;
 nIterRej = 500; 
-if (nchains <= nchainsRej) || (par.inv.niter < nIterRej); % bb2021.09.17 I copied this (if nchains... else... end) from Jon's version of the code, where the else block is all that was in Zach's. If you have too few chains, they often fail here due to some... glitch? 
+if (nchains <= nchainsRej) || (par.inv.niter < nIterRej); % bb2021.09.17 If you have too few chains, they often fail here. This makes debugging hard. So, if there are too few models, let's assume it is for debugging and not reject them.  
     warning('BRENNAN WARNING: nchains is less than %1.0f or nIter is less than %1.0f. Thus, NOT rejecting chains. Only use this few of chains if you are debugging.', nchainsRej, nIterRej)
     goodchains = 1:nchains;
 else
@@ -262,10 +227,8 @@ else
         'Removing some if high chi2 for any dtype'],...
         sum(goodchains)); 
     for id = 1:length(par.inv.datatypes) % brb2022.07.18. This looks across each data type. It finds the mean chi2 across each chain for that datatype. Then it finds the std of chi2 for that datatype (for some reason only considering the chains that had lower than average chi2...?). Then for chains with chi2 greater than the mean + 5 * the standard deviation, for any data type(?), that chain is removed. 
-        % Q: is this block really useful? Some chains will preference one data type over another. It's expected. But when that happens, this block of code will remove that chain often. 
         mean_chi2_dtp = nanmean(chi2_alldata(:,id));
         std_chi2_gdtp = nanstd(chi2_alldata(chi2_alldata(:,id)<mean_chi2_dtp,id)); % bb2021.09.17 Might get debugging problems here if nanstd(f) calculates on f where f has only 1 non nan value. ::: Why are we calculating the standard deviation only for chains that did better than average? That's not exactly a standard deviation...
-%         std_chi2_gdtp = nanstd(chi2_alldata(:,id)); % bb2021.09.17 Might get debugging problems here if nanstd(f) calculates on f where f has only 1 non nan value. ::: Why are we calculating the standard deviation only for chains that did better than average? That's not exactly a standard deviation...
         keep_this_d = (chi2_alldata(:,id) < mean_chi2_dtp + 5*std_chi2_gdtp); % bb2021.09.17 chains might fail here if you are using small iteration chains for debugging. 
 %         if any(~keep_this_d); 
 %             fprintf(['\nRemoving chain %1.0f for %s, chi2=%1.3f, ',...
@@ -288,25 +251,24 @@ end
 %% GET TARGET MODEL for comparison
 global TRUEmodel
 if ~isempty(TRUEmodel)
-Z = TRUEmodel.Z;
-vs = TRUEmodel.vs;
-vp = TRUEmodel.vp;
-rho = TRUEmodel.rho;
-fprintf('TRUE sed thickness = %.1f km\n',Z(find(vs>=3.2,1,'first')))
-fprintf('TRUE moho depth = %.1f km\n',Z(find(vs>4.0,1,'first')))
-fprintf('TRUE Vs seds top = %.1f km/s\n',vs(1))
-fprintf('TRUE Vs seds bot = %.1f km/s\n',vs(find(vs<3.45,1,'last')))
-fprintf('TRUE Vs crust top = %.1f km/s\n',vs(find(vs>3.45,1,'first')))
-fprintf('TRUE Vs crust bot = %.1f km/s\n',vs(find(rho<3.2,1,'last')))
-fprintf('TRUE fractional dVs sed/crust = %.1f %% \n',-100*(vs(find(vs<3.5,1,'last')) - vs(find(vs>3.5,1,'first')))/vs(find(vs<3.5,1,'last')))
-fprintf('TRUE fractional dVs crust/mantle = %.1f %% \n',-100*(vs(find(rho<3.2,1,'last')) - vs(find(rho>3.2,1,'first')))/vs(find(rho<3.2,1,'last')))
-for ii = linspace(par.mod.sed.hmax+par.mod.crust.hmax,par.mod.maxz,6)
-    try fprintf('TRUE Vs at %.0f km = %.2f km/s\n',ii,linterp(Z,vs,ii));end
-end
+    Z = TRUEmodel.Z;
+    vs = TRUEmodel.vs;
+    vp = TRUEmodel.vp;
+    rho = TRUEmodel.rho;
+    fprintf('TRUE sed thickness = %.1f km\n',Z(find(vs>=3.2,1,'first')))
+    fprintf('TRUE moho depth = %.1f km\n',Z(find(vs>4.0,1,'first')))
+    fprintf('TRUE Vs seds top = %.1f km/s\n',vs(1))
+    fprintf('TRUE Vs seds bot = %.1f km/s\n',vs(find(vs<3.45,1,'last')))
+    fprintf('TRUE Vs crust top = %.1f km/s\n',vs(find(vs>3.45,1,'first')))
+    fprintf('TRUE Vs crust bot = %.1f km/s\n',vs(find(rho<3.2,1,'last')))
+    fprintf('TRUE fractional dVs sed/crust = %.1f %% \n',-100*(vs(find(vs<3.5,1,'last')) - vs(find(vs>3.5,1,'first')))/vs(find(vs<3.5,1,'last')))
+    fprintf('TRUE fractional dVs crust/mantle = %.1f %% \n',-100*(vs(find(rho<3.2,1,'last')) - vs(find(rho>3.2,1,'first')))/vs(find(rho<3.2,1,'last')))
+    for ii = linspace(par.mod.sed.hmax+par.mod.crust.hmax,par.mod.maxz,6)
+        try fprintf('TRUE Vs at %.0f km = %.2f km/s\n',ii,linterp(Z,vs,ii));end
+    end
 end
 
 %% collate all
-
 misfits_orig = misfits;    % misfits_perchain = misfits_perchain_original;
 allmodels_orig = allmodels;% allmodels_perchain = allmodels_perchain_original;
 if par.inv.nchains > 1
@@ -315,43 +277,3 @@ end
 misfits = misfits(goodchains);
 
 [ allmodels_collated ] = collate_allmodels_perchain( allmodels,par );
-
-
-% 
-%% PLOT PROGRESS OF MODEL
-% figure(99); clf; set(gcf,'pos',[120 151 920 947])
-% Nacc = allmodels.Nstored;
-% for ii = 1:3:Nacc 
-%     if allmodels(ii).iter <= par.inv.burnin, continue, end
-%     
-%     if mod(ii,30)==1, 
-%     figure(99);
-%     subplot(131), hold on; 
-%     plot(vs,Z,'b','Linewidth',2)
-%     subplot(132), hold on;
-%     plot(vp,Z,'b','Linewidth',2)
-%     subplot(133), hold on;
-%     plot(rho,Z,'b','Linewidth',2)
-%     end
-%     
-%     subplot(131), hold on;
-%     hp1 = plot(allmodels(ii).VS,allmodels(ii).z,'-o',...
-%         'color',colour_get(misfits.chi2(ii),50,1,autumn));
-%     set(gca,'ydir','reverse');
-%     
-%     subplot(132), hold on;
-%     hp2 = plot(allmodels(ii).VP,allmodels(ii).z,'-o',...
-%         'color',colour_get(misfits.chi2(ii),50,1,autumn));
-%     set(gca,'ydir','reverse')
-% 
-%     subplot(133), hold on;
-%     hp3 = plot(allmodels(ii).rho,allmodels(ii).z,'-o',...
-%         'color',colour_get(misfits.chi2(ii),50,0,autumn));
-%     set(gca,'ydir','reverse')
-%     
-%     
-%     pause(0.01)
-%     figure(99);
-%     set(hp1,'color',[0.5 0.5 0.5]),set(hp2,'color',[0.5 0.5 0.5]),set(hp3,'color',[0.5 0.5 0.5])
-% end
-

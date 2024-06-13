@@ -8,5 +8,4 @@ save([resdir,'/misfits_perchain_orig'],'misfits_perchain');
 save([resdir,'/allmodels_perchain_orig'],'allmodels_perchain');
 save([resdir,'/par'],'par'); % Par can get modified. 
 
-
 end

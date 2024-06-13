@@ -1,6 +1,4 @@
 function posterior = c2_BUILD_POSTERIOR(allmodels,par,zatdep)
-% profile clear
-% profile on
 
 o = [];
 
@@ -64,16 +62,12 @@ for iii = 1:nchains
         % nvg
         [zwa(1),zwa(2),zwa(3)] =  model_NVG_info(am(ii));
         posterior.NVGzwa(inds(ii),:) = zwa;
-        
-            
     end    
-    
 end
 
 % flip the datahparm sigma values to be columns
 for id = 1:length(dtypes)
     posterior.datahparm.(dtypes{id}) = posterior.datahparm.(dtypes{id})';
 end
-
 
 end

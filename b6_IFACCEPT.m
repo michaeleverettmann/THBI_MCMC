@@ -17,7 +17,6 @@ if p_bd == 0
     return
 end
 
-
 % sprintf('log likelihood %s', num2str(log_likelihood))
 % sprintf('previous log likelihood %s', num2str(last_loglikelihood))
 % definitely accept if better (with caveats for prior prob)
@@ -32,9 +31,7 @@ else % accept according to Metropolis-Hastings law
         ifaccept = false;
     end
 
-end
-    
-
+end    
 
 end
 

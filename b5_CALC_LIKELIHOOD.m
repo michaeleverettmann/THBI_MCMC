@@ -41,20 +41,7 @@ for id = 1:length(par.inv.datatypes)
     for itr = 1:length(data.(dtype))
         N(itr) = data.(dtype)(itr).dof;
     end
-    
-    %     Below is now done once at the beginning in a2_load_data by dofTHBI.m
-%         if strcmp(pdt{1},'SW') 
-%             N(itr) = length(data.(dtype)(itr).periods);
-%         elseif any(strcmp({'BW','RF'},pdt{1}))
-%             if strcmp(pdt{3},'ccp')
-%                 N(itr) = length(data.(dtype)(itr).zz)*data.(dtype)(itr).dof_per_z;
-%             else
-%                 N(itr) = mean([scdofcalc(data.(dtype)(itr).PSV(:,1)),...
-%                                scdofcalc(data.(dtype)(itr).PSV(:,2))]);
-%             end
-%         end
-%     end
-    
+        
     chi2 = misfit.E2.(dtype)./sig./sig;
     rms  = sqrt(misfit.E2.(dtype)./N);
     logL(id) = sum(-N.*log(sig) - 0.5*chi2)./M(id);
@@ -64,8 +51,6 @@ for id = 1:length(par.inv.datatypes)
     misfit.logL_indivdat.(dtype) = logL(id); % brb2022.06.28, see if this gives us insight into relative importance of different datatypes in driving inversion. 
 end
 
-%% collate
-
 % summed misfit
 misfit.chi2sum = 0;
 for id = 1:length(par.inv.datatypes)
@@ -74,10 +59,7 @@ for id = 1:length(par.inv.datatypes)
 end
 
 % summed log likelihood
-
 log_likelihood = sum(logL);
-
-
 
 end
 

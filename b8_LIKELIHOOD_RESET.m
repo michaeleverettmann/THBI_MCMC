@@ -1,6 +1,4 @@
 function [log_likelihood_reset,misfit_reset] = b8_LIKELIHOOD_RESET(par,predata,trudata,Kbase,datahparm)
-% [Kbase] = make_allkernels(model,Kbase,periods,ID,par)
-%   Function to make all surface wave kernels
 
 ifplot = 0;
 

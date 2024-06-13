@@ -32,7 +32,6 @@ for id = 1:length(par.inv.datatypes)
     pdtyp = parse_dtype(dtype);
     if ~strcmp(pdtyp{1},'SW'), continue, end
     
-
 %% --------------------  Phase Velocities  --------------------
     switch pdtyp{2}
 
@@ -61,9 +60,9 @@ for id = 1:length(par.inv.datatypes)
             est_dc_c_interp = interp1(period_k, est_dc_c, period_interp, 'spline'); % "spline"... shouldn't matter each of period_interp is in period_k. But, I used linear in case of future code changes. 
             phV_interp      = interp1(period_k, Kbase.(pdtyp{2}).(pdtyp{3}), period_interp, 'spline'); 
             predata.(dtype).phV = (1+est_dc_c_interp).*phV_interp; % estimated model1 phase velocities
-            %!%! Modify if including group velocity. if pdtyp{3} grV, interpolate that. Otherwise, phV. 
+            % brb TODO Modify if including group velocity. if pdtyp{3} grV, interpolate that. Otherwise, phV. 
             
-% % %             % Check interpolated and actual phase velocities match. Comment out if you believe this is working. 
+% % %             % You can uncomment this to check that interpolated and actual phase velocities match. 
 % % %             figure(1); clf; hold on; box on; set(gca, 'linewidth', 1.5);
 % % %             set(gcf, 'pos', [-929 622 484 300], 'color', 'white'); 
 % % %             xlabel('Period (s)'); ylabel('Phase velocity (km/s)'); 
@@ -123,7 +122,7 @@ for id = 1:length(par.inv.datatypes)
                                       drh_rh.*Kzh_rho) )); % Trapz returns three values: the integral over each kernel. Then we need to sum each of those.           
                 
                                   
-% % % %                 % Test. See if we can get discontinuity kernel going. 
+% % % %                 % Below is a test to see if we can get discontinuity kernels going, which maybe handle sediment depth changes better than using dV? I do not think it was working better though. brb2022/2023 
 % % % %                 Kzh_d = Kbase.(pdtyp{2}).KHV{ip}.Kzh_d; 
 % % % %                 dHV_disc = 0; 
 % % % %                 fns = {'zmoh', 'zsed'}; % Field names to work on
@@ -155,25 +154,8 @@ for id = 1:length(par.inv.datatypes)
 % % % % %                 dHV = dHV_disc; 
 % % % %                 fprintf('\nHV contribution from disc: dHV=%1.5f, dzmoh=%1.2f\n',dHV_disc, nan);
                 
-%                  [izmoh_old , Kbase.(pdtyp{2}).KHV{ip}.Z1, Kbase.(pdtyp{2}).KHV{ip}.Z2, Kzh_d]
 
-%                 predata.(dtype).HVr(ip) = ( Kbase.(pdtyp{2}).(pdtyp{3})(ip)) + dHV ); % Predata has HV, not ZH. Toshiros kernels are dZH. So add dZH to our 1/HV, then convert back to HV. brb2022.07.14
-                predata.(dtype).HVr(ip) = 1./( (1./Kbase.(pdtyp{2}).(pdtyp{3})(ip)) + dHV ); % Predata has HV, not ZH. Toshiros kernels are dZH. So add dZH to our 1/HV, then convert back to HV. brb2022.07.14
-%                 predata.(dtype).HVr(ip) = Kbase.(pdtyp{2}).(pdtyp{3})(ip) - dHV; % Zach's version, which didn't consider HV versus ZH
-% % %                 dHV = sum(trapz(zzz, ...
-% % %                                      (dvs_vs.*Kzh_Vs + ...
-% % %                                       dvp_vp.*Kzh_Vp + ...
-% % %                                       drh_rh.*Kzh_rho) )); % Trapz returns three values: the integral over each kernel. Then we need to sum each of those.           
-% % %                 
-% % % %                 dHV = trapz(zzz, dvs_vs.*Kzh_Vs ); 
-% % %                 
-% % %                 hv0 = Kbase.(pdtyp{2}).(pdtyp{3})(ip); 
-% % %                 pdat = hv0; 
-% % %                 trapz(zzz, 1./(hv0)
-% % %                 predata.(dtype).HVr(ip) = 1./( (1./Kbase.(pdtyp{2}).(pdtyp{3})(ip)) + dHV ); % Predata has HV, not ZH. Toshiros kernels are dZH. So add dZH to our 1/HV, then convert back to HV. brb2022.07.14
-% % %                 predata.(dtype).HVr(ip) = pdat; 
-% % %                                   
-% % %                 % Test. See if we can get discontinuity kernel going. 
+% % %                 % A different attempt to get discontinuity kernels going. brb2022/2023
 % % %                 d_zmoh = model.zmoh - Kbase.modelk.zmoh; 
 % % %                 d_zmoh = - d_zmoh; % Toshiro's code might be by radius, not depth
 % % %                 Kzh_d = Kbase.(pdtyp{2}).KHV{ip}.Kzh_d; 
@@ -184,9 +166,8 @@ for id = 1:length(par.inv.datatypes)
 % % %                 dHV = dHV + dHV_disc; 
 % % %                 fprintf('\nHV contribution from disc: dHV=%1.5f, dzmoh=%1.2f\n',dHV_disc, d_zmoh);
 % % % 
-% % % %                 predata.(dtype).HVr(ip) = ( Kbase.(pdtyp{2}).(pdtyp{3})(ip)) + dHV ); % Predata has HV, not ZH. Toshiros kernels are dZH. So add dZH to our 1/HV, then convert back to HV. brb2022.07.14
-% % %                 predata.(dtype).HVr(ip) = 1./( (1./Kbase.(pdtyp{2}).(pdtyp{3})(ip)) + dHV ); % Predata has HV, not ZH. Toshiros kernels are dZH. So add dZH to our 1/HV, then convert back to HV. brb2022.07.14
-% % % %                 predata.(dtype).HVr(ip) = Kbase.(pdtyp{2}).(pdtyp{3})(ip) - dHV; % Zach's version, which didn't consider HV versus ZH
+
+                predata.(dtype).HVr(ip) = 1./( (1./Kbase.(pdtyp{2}).(pdtyp{3})(ip)) + dHV ); % Predata has HV, not ZH. Toshiros kernels are dZH. So add dZH to our 1/HV, then convert back to HV. brb2022.07.14
 
             end           
     end

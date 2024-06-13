@@ -8,7 +8,7 @@ end
 am = allmodels_collated;
 if ~isfield(am,'chain'), am = dealto(am,'chain',1); end
 
-% don't use pre burn-in models! Just in case
+% don't use pre burn-in models
 am([am.bestmods]'==false) =  [];
 
 fprintf('  > Building suite of models\n')
