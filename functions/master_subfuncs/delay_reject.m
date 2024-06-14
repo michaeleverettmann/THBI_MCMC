@@ -8,54 +8,8 @@ function [model1,ptbnorm,ifpass,p_bd,Pm_prior1,...
 
 plotTrue = false; % Set to true if you want to see how the models are changing according to delayed rejection.  
     
-    
 p_bd = p_bdOrig; 
 
-% % % if non_acceptk > 0; % Decide if we perturb again, even though we are working with a failed perturbed model. 
-% % %     toReset = rand(1) > 0.5; % If previous model failed, there is an X percent chance we perturb again
-% % % elseif non_acceptk == 0; 
-% % %     toReset = true; 
-% % % end
-% % %     
-% % % if toReset; % We just accepted the last model. Definitely perturb from base model.  
-% % %     [model1,ptbnorm,ifpass,p_bd,Pm_prior1,...
-% % %         ptb,modptb,nchain,breakTrue]...
-% % %         = perturb_model(model, Pm_prior, ptb, ii, par, temp, Kbase,nchain); 
-% % %     non_acceptk = 1; 
-% % %     
-% % % elseif ~toReset; % We perturbed model and failed. Let's perturb one more time. 
-% % %     [model2,ptbnormk,ifpass,p_bdk,Pm_prior1,...
-% % %         ptb,modptb,nchain,breakTrue]...
-% % %         = perturb_model(model1, Pm_prior, ptb, ii, par, temp, Kbase,nchain); 
-% % %     % model1 is now perturbed twice. 
-% % %     ptbnorm = ptbnormk + ptbnorm;  % Not sure what to do here yet. 
-% % %     % ifpass no changing tI think
-% % %     p_bd = p_bd * p_bdk;  % TODO get p_bd, probability for previous model bd. 
-% % %     % Pm_prior SHould be fine. 
-% % %     % ptb TODO decide what to do here. 
-% % %     % modptb = modptb idk yet. 
-% % %     % nchain, ? 
-% % %     non_acceptk = non_acceptk + 1; 
-% % %     
-% % %     plotTrue = true; 
-% % %     if plotTrue
-% % %         figure(500); clf; hold on; 
-% % %         LineWidth = 3; 
-% % %         plot(model .VS, model .z, 'k',    'linewidth', LineWidth, 'Displayname', 'model base')
-% % %         plot(model1.VS, model1.z, 'b--',  'linewidth', LineWidth, 'Displayname', 'model n-1')
-% % %         plot(model2.VS, model2.z, 'r--',  'linewidth', LineWidth, 'Displayname', 'model n')
-% % %         legend()    
-% % %         xlabel('Vs'); 
-% % %         ylabel('Depth'); 
-% % %         set(gca, 'ydir', 'reverse'); 
-% % %         title(sprintf('Perturbations 0, n-1, n (n=%1.0f)', non_acceptk))
-% % %         grid on; 
-% % %         box on; 
-% % %         set(gcf, 'color', 'white')
-% % %         sprintf('Did another perturbation at ii = %1.0f', ii)
-% % %     end
-    
-    % % % 
 % Below code is basic delayed rejection. Perturb once always if last model
 % failed. Start from last successful model after that. 
 if non_acceptk == 0; % We just accepted the last model. Definitely perturb from base model.  
@@ -90,13 +44,6 @@ elseif non_acceptk == 1; % We perturbed model and failed. Let's perturb one more
     [model2,ptbnormk,ifpass,p_bdk,Pm_prior1,...
         ptb,modptb,nchain,breakTrue]...
         = perturb_model(model1, Pm_prior, ptb, ii, par, temp, Kbase,nchain); 
-    
-%     for ii = [1:1000]; 
-%                 [model2,ptbnormk,ifpass,p_bdk,Pm_prior1,...
-%         ptb,modptb,nchain,breakTrue]...
-%         = perturb_model(model1, Pm_prior, ptb, ii, par, temp, Kbase,nchain); 
-%         model1 = model2; 
-%     end
     
     % model1 is now perturbed twice. 
     % However, we do NOT want to combine ptbnormk and ptbnorm. 

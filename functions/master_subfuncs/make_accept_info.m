@@ -1,4 +1,6 @@
 function [accept_info] = make_accept_info(par); 
+% accept_info keeps track of things mostly related to when a model is
+% accepted/rejected and why. Initialize that structure here. 
 
 accept_info = struct('ifaccept'          , zeros(par.inv.niter,1)*nan,...; ; % Initialize structure with acceptance info for each iteration. 
                      'misfit'            , zeros(par.inv.niter,1)*nan,...

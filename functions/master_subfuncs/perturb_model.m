@@ -1,11 +1,13 @@
 function [model1,ptbnorm,ifpass,p_bd,Pm_prior1,ptb,modptb,nchain,breakTrue]...
     = perturb_model(model, Pm_prior, ptbOrig, ii, par, temp, Kbase,nchainOrig)
-%% ===========================  PERTURB  ===========================
+    % Wrapper for perturbing the model. 
 
-ptb = ptbOrig; 
-nchain = nchainOrig; 
+    %% ===========================  PERTURB  ===========================
+    
+    ptb = ptbOrig; 
+    nchain = nchainOrig; 
 
-%% ===========================  PERTURB  ===========================
+    %% ===========================  PERTURB  ===========================
     if ii==1 % no perturb on first run
         model1 = model; ptbnorm = 0; ifpass = 1; p_bd = 1; Pm_prior1 = Pm_prior; 
         modptb = nan; breakTrue = false; % In case not assigned in else. 

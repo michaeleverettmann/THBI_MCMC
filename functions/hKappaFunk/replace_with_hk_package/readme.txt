@@ -1,0 +1,1 @@
+I think these functions were the old way of doing anisotropic HK stacks in the inversion. Now, there is a dedicated Github repository for that. TODO delete this folder and make sure the anisotropic HK stacks still work. 

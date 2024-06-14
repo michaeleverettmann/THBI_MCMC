@@ -5,6 +5,7 @@ function [clearStat,clearMessage]=clean_ram(ii,par,options)
         options.clearRamInterval=500
         options.verbose=false
     end
+% Function to keep the ram from filling up if something goes wrong. 
 
 if mod(ii,options.clearRamInterval)==0 &&... % If on iteration where we want to clear the ram. 
         contains(par.res.chainExecFold, 'ramDrive'); % If we know we are in ramDrive

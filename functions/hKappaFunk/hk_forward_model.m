@@ -10,6 +10,7 @@ function [predata, par] = hk_forward_model(...
         options.showPlot = false; % Leave as true... this can only plot on iterations where doing HK stack anyway. 
         options.insistRerun = false; % Turn this to true only if you want full HK stack plot every iteration 
     end
+    
 % Take Ps receiver functions and make HK stacks from them. 
 % Note that the older version of this did a "full reset" of HKxi stack only
 % rarely. Since increasing the speed of the anisotropic HK package, it

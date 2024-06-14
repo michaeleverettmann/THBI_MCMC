@@ -21,17 +21,6 @@ colorbar();
 xlim([min(HK_K), max(HK_K)]); 
 ylim([min(HK_H), max(HK_H)]); 
 
-
-% An unfinished attempt to interpolate to find the exact point of maximum h-k energy. 
-%         F = griddedInterpolant({HK_K, HK_H},HK_A,'spline');
-%         HK_K2 = linspace(min(HK_K)+.1, max(HK_K)-.1, 1000); 
-%         HK_H2 = linspace(min(HK_H)+.1, max(HK_H)-.1, 1001); 
-%         [HK_K2, HK_H2] = ndgrid(HK_K2, HK_H2); 
-%         HK_A2 = F(HK_K2, HK_H2); 
-%         Emax = max(max(HK_A2));
-%         [xmax,ymax] = find(Emax==HK_A2); 
-%         scatter(gca, HK_K2(xmax), HK_H2(ymax), 50, 'red')
-
 % Simple wasy to estimate maximum h-k energy point. 
 Emax = max(max(HK_A));
 [xmax,ymax] = find(Emax==HK_A); 

@@ -1,15 +1,16 @@
 function [predata,predata0,laymodel1,fail_chain,breakTrue,newK,SW_precise] = forward_model(...
     ID,ptb,ii,predataOrig,model1,par,TD,laymodel1,fail_chainOrig,ptbnorm,newKOrig,SW_preciseOrig)
+    % Wrap forward modelling during inversion into one place. 
 
-% Mostly these are variables that might be redefined in this function. 
-predata=predataOrig;
-predata0=predata; % save orig.
-newK=newKOrig; 
-SW_precise=SW_preciseOrig; 
-breakTrue=false; 
-fail_chain=fail_chainOrig; 
+    % Mostly these are variables that might be redefined in this function. 
+    predata=predataOrig;
+    predata0=predata; % save orig.
+    newK=newKOrig; 
+    SW_precise=SW_preciseOrig; 
+    breakTrue=false; 
+    fail_chain=fail_chainOrig; 
 
-%% ===========================  FORWARD MODEL  ===========================
+    %% ===========================  FORWARD MODEL  ===========================
 	% don't re-calc if the only thing perturbed is the error, or if there
 	% is zero probability of acceptance!
     if ~strcmp('sig',ptb{ii}(1:3)) || isempty(predata)

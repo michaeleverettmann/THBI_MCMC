@@ -1,9 +1,9 @@
 function [ifpass, numFails, model0, model,...
     Pm_prior, par, Kbase] = initiate_model(...
         parOrig, tdvalue, chainstr, fail_chain, iii); 
+% Make the inversions starting model. 
     
 par = parOrig; 
-
 
 ifpass = 0;
 numFails = 0; 
@@ -32,7 +32,7 @@ while ifpass==0
     end
 
 end % now we have a starting model!
-% diary off % Ending diary early for debugging. 
+
 % figure(22); clf; hold on
 % contourf(trudata.HKstack_P.K,trudata.HKstack_P.H,trudata.HKstack_P.Esum',20,'linestyle','none')
 % set(gca,'ydir','reverse')
