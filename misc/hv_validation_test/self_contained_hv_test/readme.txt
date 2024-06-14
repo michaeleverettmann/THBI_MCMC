@@ -1,0 +1,1 @@
+This folder should be sufficient to run some tests of the HV package. I sent it to Toshiro in ~2022 so we could diagnose things. brb20240613
