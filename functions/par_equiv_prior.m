@@ -50,21 +50,7 @@ for iff = 1:length(mcfns1)
         if par1.mod.crust.(mcfn)(hh) ~= par2.mod.crust.(mcfn)(hh)
             redoprior = true; return
         end
-    end
-% %     try % will work if not function handle
-% %         if par1.mod.crust.(mcfn) ~= par2.mod.crust.(mcfn)
-% %             redoprior = true;
-% %         end
-% %     catch e 
-% %         fprintf('\n%s\n',getReport(e)); % must be function handle
-% %         var = strtok(mcfn,'_'); % grab type of variable ('h','vpvs')
-% %         % test with 10 random values
-% %         hh = random('unif',par1.mod.crust.([var,'min']),par1.mod.crust.([var,'max']),10,1);
-% %         if par1.mod.crust.(mcfn)(hh) ~= par2.mod.crust.(mcfn)(hh)
-% %             redoprior = true; return
-% %         end
-% %         
-% %     end       
+    end  
 end
 
 % seds

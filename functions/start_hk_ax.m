@@ -1,5 +1,6 @@
 function [ax1, ax2] = start_hk_ax(ax1, kStack, hStack, eStack)
 % Function to help with other function plot_h_kappa_progress.m 
+% This should probably be moved to the plotting subfolder. 
 
 
 % Copy basic axis. One axis for h-kappa stack, one for model locations. 

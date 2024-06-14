@@ -1,3 +1,6 @@
+% Trying to understand why likelihood drops so notably sometimes when
+% kernels are reset. 
+
 load('/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/workspaces/kernel_testing/examples_2022-07-13/no_sed_radanis_vpvs/TA.R54A_C_ii_500_likelihood_drop_hv_workspace.mat'); 
 
 model  = Kbase.modelk; 

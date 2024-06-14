@@ -1,4 +1,8 @@
+% Trying to understand why likelihood drops so notably sometimes when
+% kernels are reset. 
 
+% Script to test how similar a kernel and perturbation calculation is to a
+% full data calculation. 
 [ model ] = make_mod_from_parms( model,par );
 [ model0 ] = make_mod_from_parms( Kbase.modelk ,par );
 

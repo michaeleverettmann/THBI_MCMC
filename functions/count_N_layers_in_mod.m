@@ -8,8 +8,6 @@ am = allmodels_collated;
 
 bms = find([am.bestmods]');
 k = length(bms);
-% inds = randperm(length(bms),k);
-% bms = bms(inds);
 
 Nmod = zeros(k,1);
 for ik = 1:k

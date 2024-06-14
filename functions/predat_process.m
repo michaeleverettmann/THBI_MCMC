@@ -71,16 +71,6 @@ for itr = 1:length(dat_in)
     if par.datprocess.clipmain 
         [ dat_out(itr).PSV ] = clip_main_arrival( dat_out(itr).PSV,dat_out(itr).tt,1./cp.fhi,pdt{2}(1) );
     end
-    % inwind = (tt_ps >= par.datprocess.Twin.PsRF(1)) & (tt_ps <= par.datprocess.Twin.PsRF(2)); 
-    % % crop
-    % predat_ps = predat_ps(inwind,:);
-    % tt_ps = tt_ps(inwind);
-
-
-    % inwind = (tt_ps >= par.datprocess.Twin.PsRF(1)) & (tt_ps <= par.datprocess.Twin.PsRF(2)); 
-    % % crop
-    % predat_ps = predat_ps(inwind,:);
-    % tt_ps = tt_ps(inwind);
 
 
     %% normalise to unit energy, flip so max is positive

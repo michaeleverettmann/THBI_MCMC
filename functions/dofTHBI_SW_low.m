@@ -65,13 +65,7 @@ end
 
 end
 
-% % % dtype = 'SW_HV'; % dal. DOF = 5; Eks: DOF = 5, but statistically valid at only 3. Same Lov. 
-% % % 
-% % % x = trudata.(dtype).periods; 
-% % % y = trudata.(dtype).HVr; 
-%
-
-%%% Scratch cde to remoce. 
+%%% Scratch code for some tests, if needed. 
 % pnew = linspace(6, 167, 10)'; 
 % vnew = interp1(trudata.('SW_Ray_phV')(1).periods, trudata.('SW_Ray_phV')(1).phV, pnew);      
 % scdofcalc(vnew)
