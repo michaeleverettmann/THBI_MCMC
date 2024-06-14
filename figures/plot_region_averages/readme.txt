@@ -1,0 +1,1 @@
+This folder can stuff to plot the average velocities within various regions. See Figure 1 in Brunsvik et al. 2024 for example. If you choose to use it, expect to do some modifying. 

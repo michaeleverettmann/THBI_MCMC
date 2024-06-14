@@ -151,17 +151,6 @@ stainfo.chans = chans;
 stainfo.chandips = chandips;
 stainfo.chanazs = chanazs;
 
-% % % brb2022.02.28 Get receiver function traces downloading. 
-% % paths = getPaths(); 
-% % thisDir = pwd(); 
-% % rfWaveformFolder = [paths.models_seismic, '/US_EARS/IRIS_EARS']; 
-% % cd(rfWaveformFolder)
-% % [inf1, inf2] = system(['conda activate seis_gen';...
-% %     'python getEarsRFByStation.py';...
-% %     'python getEarsRFByStation_unpack.py']); % Run python codes to download IRIS data. 
-% % cd(thisDir); 
-% % % End getting receiver function waveforms. 
-
 save([proj.infodir,'stations'],'stainfo','stations_IRIS','stations_request');
 save([proj.infodir 'proj.mat'], 'proj'); 
 

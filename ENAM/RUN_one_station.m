@@ -5,6 +5,8 @@ BWclust = 1;
 onesta = '';
 overwrite = true;
 
+% Below, decide which stamps you want to use. 
+
 % STAMP = 'ENAM_trial';
 % STAMP_all = {...
 %       'adding_sediment_pt1',...
@@ -90,17 +92,6 @@ STAMP_all = {...
 %     'synth_no_sed'         ,... 
 }; % This determines which tests we want to run now. They will run sequentially, not in parallel (each station only has one ram folder. )
 
-
-
-
-% if exist('STAMP', 'var'); % If we defined this already in a bash script, then only run that stamp. Otherwise, go through the list of stamps above. 
-%     STAMP_all = {STAMP}; 
-% end
-
-
-% RUN_prep_data; warning('bb2021.11.15. Doing RUN_prep_data in RUN_one_station - but this only needs to be ran once, not for every station.') % Gets event data and data paths on this computer. 
-% evdata1_database; disp('Temporary - downloading station info in RUN_ALL_STAS.m') 
-
 for istamp = [1:length(STAMP_all)]; 
     STAMP = STAMP_all{istamp}; 
 
@@ -109,7 +100,9 @@ for istamp = [1:length(STAMP_all)];
 
 
     %%%%% Important! Must define network and station before runnig this! 
-    % If we have not defined network and station, use default net.sta
+    % These should already be defined in the Bash/Slurm script which calls
+    % this Matlab script. But, you aren't running from Bash/Slurm, we can
+    % use these default values. 
     if ~ (exist('network_manual', 'var') && exist('station_manual', 'var')) ; 
         network_manual = 'TA'; 
         station_manual = 'S57A'; 

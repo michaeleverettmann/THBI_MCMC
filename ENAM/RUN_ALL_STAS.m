@@ -1,3 +1,5 @@
+% One way to run many stations. Use the Batch Slurm scripts instead for proper parallelization. 
+
 close all
 clear all
 %% Setup
@@ -72,9 +74,5 @@ end
 
 function execute_run_all_chains
     global run_params
-%     try
     run_all_chains;
-%     catch
-%          1;
-%     end
 end

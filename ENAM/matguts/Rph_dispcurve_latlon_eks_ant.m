@@ -24,16 +24,6 @@ end
 paths = getPaths(); 
 seismoddir = [paths.models_seismic '/']; 
 
-% 
-% seismoddir = '/Volumes/data/models_seismic/';
-% if ~exist(seismoddir,'dir')
-%     try
-%         seismoddir = '/Volumes/eilon_data/models_seismic/';
-%     catch
-%         error('NO SEISMOD DIR FOUND');
-%     end
-% end
-
 %% EQ data:
 if strcmp(EQauth, 'DALTON'); 
     ddir = [seismoddir,'US_RAYLEIGH_EQ_phV_DALTON/'];
@@ -44,7 +34,6 @@ if strcmp(EQauth, 'DALTON');
 else
     error('bb2021.09.30 I didnt build code for this earthquake phase velocity author yet. Should be easy to do this.') 
 end
-
 
 %% AN data:
 if strcmp(ANauth, 'SHEN'); 
@@ -60,7 +49,6 @@ elseif strcmp(ANauth, 'EKSTROM');
 else
     error('bb2021.09.30 I didnt build code for this ambient noise phase velocity author yet. Should be easy to do this.')
 end 
-
 
 %% composite
 p1 = ANperiods(ANperiods<min(Eperiods));

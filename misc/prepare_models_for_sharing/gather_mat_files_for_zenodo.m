@@ -3,6 +3,7 @@
 
 
 clc; clear; restoredefaultpath; 
+cd .. % brb20240614 Moved to misc folder, so adding cd .. in case the starting folder was important. 
 file_upload = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/paper_submission/'; % Name of file we will upload. 
 path_many_stas = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/many_stas/'; 
 out_dir = '~/Documents/UCSB/ENAM/THBI_ENAM/data/results_compiled/'; 

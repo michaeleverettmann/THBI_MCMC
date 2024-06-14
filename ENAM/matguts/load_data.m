@@ -83,36 +83,6 @@ if any(strcmp(allpdytp(:,1),'BW'))
                                  'Vp_surf',avar.Vp_Vs_surf(1),'Vs_surf',avar.Vp_Vs_surf(2));
         end
 
-    % ------------------------- OLD - BASED ON ZRT  ---------------------------
-    %         if any(Pind)
-    %             Pdat = avar.dataZRT(:,:,Pind); 
-    %             Pdat(:,1) = -Pdat(:,1);
-    %             Pdat_t  = flat_hanning_win(avar.tt(:,Pind),Pdat,P_win(1),P_win(2),tapertime);
-    %             Pdat_td = downsamp(Pdat_t,unique(round(1./diff(avar.tt(:,Pind)))),samprate);
-    %             tt_d = avar.tt(1,Pind) + [0:size(Pdat_td,1)-1]'/samprate;
-    %             tt_w = P_win(1) + [0:(diff(P_win)*samprate-1)]'./samprate;
-    %             Pdat_tdw = interp1(tt_d,Pdat_td,tt_w);
-    %             % flip polarity based on Zmax (=> main arrival positive for all)
-    %             if maxab(Pdat_tdw(:,1))<0, Pdat_tdw = -Pdat_tdw; end
-    %             np = np+1;
-    %             BW_Ps(np,1) = struct('ZRT',Pdat_tdw,'tt',tt_w,'rayp',avar.rayp(Pind),'samprate',samprate,'nsamp',size(Pdat_tdw,1));
-    %         end
-    %         
-    %         %% SpRF ==> flip Z to 'up', taper, downsample, window
-    %         if any(Sind)
-    %             Sdat = avar.dataZRT(:,:,Sind); 
-    %             Sdat(:,1) = -Sdat(:,1); 
-    %             Sdat_t  = flat_hanning_win(avar.tt(:,Sind),Sdat,S_win(1),S_win(2),tapertime);
-    %             Sdat_td = downsamp(Sdat_t,unique(round(1./diff(avar.tt(:,Sind)))),samprate);
-    %             tt_d = avar.tt(1,Sind) + [0:size(Sdat_td,1)-1]'/samprate;
-    %             tt_w = S_win(1) + [0:(diff(S_win)*samprate-1)]'./samprate;
-    %             Sdat_tdw = interp1(tt_d,Sdat_td,tt_w);
-    %             % flip polarity based on Rmax (=> main arrival positive for all)
-    %             if maxab(Sdat_tdw(:,2))<0, Sdat_tdw = -Sdat_tdw; end
-    %             ns = ns+1;
-    %             BW_Sp(ns,1) = struct('ZRT',Sdat_tdw,'tt',tt_w,'rayp',avar.rayp(Sind),'samprate',samprate,'nsamp',size(Sdat_tdw,1));
-    %         end
-    % ------------------------- OLD - BASED ON ZRT  ---------------------------
     end % end loop on data files
 
     cd(wd);
@@ -142,24 +112,6 @@ if any(strcmp(allpdytp(:,1),'RF'))
             taperz = par.datprocess.CCP.taperz;
             RF_dzw = flat_hanning_win(zz_d,RF_dz,Zwin(1)-taperz/2,Zwin(2)+taperz/2,taperz);
             
-            
-
-            % migrate to time
-%             if strcmpi(par.datprocess.CCP.migratemodel,'PREM')
-%                 premmod = prem;
-%                 model = struct('z',linterp(premmod.depth(1:20),premmod.depth(1:20),zz(zz<280)),...
-%                                'VS',linterp(premmod.depth(1:20),premmod.vs(1:20),zz(zz<280)),...
-%                                'VP',linterp(premmod.depth(1:20),premmod.vp(1:20),zz(zz<280)));
-%                 RFzz = interp1(zz(zz<280),RFz(zz<280),model.z);
-%             end        
-%             rayp = rayp_sdeg2skm(par.datprocess.CCP.rayp_S); % N.B. should this be at a depth of zero, or the bottom of the model?
-%             fprintf(' Migrating RF(z) to RF(t) using %s, rayp = %.3f s/deg\n',par.datprocess.CCP.migratemodel,par.datprocess.CCP.rayp_S)
-%             [RF_tmig,tt_tmig] = migrate_depth2time(RFzz,model,rayp,allpdytp{idt,2},1./samprate);
-%             % convert migrated RF to appropriate length defined by Twin
-%             tt_RF = [Twin(1):1./samprate:Twin(2) - 1./samprate]';
-%             RF_d  = interp1(tt_tmig,RF_tmig,tt_RF,'linear',0);
-
-
             % make synthetic parent
             RF_p = synthtrace(par.datprocess.CCP.parent_zw/2 + max(Zwin),...
                               par.datprocess.CCP.parent_zw,...
@@ -235,19 +187,6 @@ if any(strcmp(allpdytp(:,1),'SW'))
             end
         end
         
-        % brb2022.06.28 below is old way of loading many surface wave datasets. It was a pain and not automatic, and couldn't address cases where one data set was not available for a station. Delete when you know you don't need it. 
-%         [Rperiods1,RphV,SW_Ray_phV_dal]=...
-%             Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','SW_Ray_phV_dal');
-%         [Rperiods2,RphV,SW_Ray_phV_eks]=...
-%             Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','SW_Ray_phV_eks');
-%         [Rperiods3,RphV,SW_Ray_phV_lyneqeik]=...
-%             Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','SW_Ray_phV_lyneqeik');
-%         [Rperiods4,RphV,SW_Ray_phV_lyneqhelm]=...
-%             Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','SW_Ray_phV_lyneqhelm');
-%         [Rperiods5,RphV,SW_Ray_phV_lynant]=...
-%             Rph_dispcurve_latlon_single_auth(slat,slon,'dataset','SW_Ray_phV_lynant');
-%         all_periods = unique(sort([Rperiods1; Rperiods2; Rperiods3; Rperiods4; Rperiods5])); 
-
         all_periods = unique(sort(all_periods)); 
         min_period = min([all_periods]); 
         max_period = max([all_periods]); 
@@ -264,13 +203,6 @@ if any(strcmp(allpdytp(:,1),'SW'))
             SW_Ray_phV_structures.(fns{ifn}).for_mod_info = for_mod_info; 
         end
         
-        % brb2022.06.28 Old way of attaching forward model info structure to dataset structures. 
-%         SW_Ray_phV_eks                .for_mod_info = for_mod_info; % Forward modelling shouldn't change for any author. We forward model once, and interpolate from those results.
-%         SW_Ray_phV_dal                .for_mod_info = for_mod_info; 
-%         SW_Ray_phV_lyneqeik           .for_mod_info = for_mod_info; 
-%         SW_Ray_phV_lyneqhelm          .for_mod_info = for_mod_info; 
-%         SW_Ray_phV_lynant             .for_mod_info = for_mod_info; 
-
     end
 
     %% -------- Love waves
