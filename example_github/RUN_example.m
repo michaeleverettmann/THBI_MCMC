@@ -5,7 +5,7 @@ restoredefaultpath;
 
 %% Setup
 % These define what model we are running. Make a list of all desired options. Check SYNTHETICS/bayes_inv_parms.m for more options. 
-STAMP_all =          {'standard'       };
+STAMP_all =          {'standard_temp'  };
 network_manual_all = {'testnwk'        }; 
 station_manual_all = {'simple_layers_1'}; %
 

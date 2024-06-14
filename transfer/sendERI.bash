@@ -1,9 +1,9 @@
 #/bin/bash 
+# Send code just from the THBI folder. 
 # Needs to be ran from the main THBI_ENAM folder. 
 
 computer=${1:-brunsvik@bellows.eri.ucsb.edu} # First argument is the computer you will send to. 
 # excludeExtra=${2:---exclude={"**.mat","**.jpg","**.png","**.jpg"}} # Second argument is just more things to pass to rsync. 
-
 
 rsync -ahv \
 --exclude-from='exclude_THBI.txt' \

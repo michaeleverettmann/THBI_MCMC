@@ -77,3 +77,6 @@ investigations/h-kappa-tests/ears_waveforms/Ears/gauss_2.5/**
 figures/xsect/stafile*.txt
 
 .vscode/*
+
+transition_to_russell_mineos/MODE
+transition_to_russell_mineos/IDAGRN

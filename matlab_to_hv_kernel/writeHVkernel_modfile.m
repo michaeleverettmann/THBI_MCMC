@@ -30,17 +30,6 @@ if nargin<7 || isempty(Qmu) || nargin<6 || isempty(Qp)
     end
 
     prem_mod = prem_isotropic;
-        % refine depths
-%         zz = prem_mod.depth;
-%         while any(diff(zz)>minlaydz)
-%             irep = find(diff(zz)>minlaydz);
-%             zz = sort([zz;mean([zz(irep),zz(irep+1)],2)]);
-%         end
-
-%         prem_mod = prem('depths',zz,'dcbelow',false);
-%         prem_mod.vpv = prem_mod.vp; prem_mod.vph = prem_mod.vp;
-%         prem_mod.vsv = prem_mod.vs; prem_mod.vsh = prem_mod.vs;
-%         prem_mod.eta = ones(size(prem_mod.depth));
 
     if isempty(Qmu)
         Qmu = linterp(prem_mod.depth,prem_mod.qu,Z); %#ok<NASGU>

@@ -1,3 +1,5 @@
+%brb2022 There is a theoretical resonance frequency for HV that could maybe
+%make HV kernels work poorly. See what that frequency is. 
 b = linspace(0.5,5,100); 
 z = linspace(0.1,50,201); 
 

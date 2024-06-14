@@ -91,8 +91,8 @@ for ista = 1:nsta;
 
         %%% Add sigma value, if we have it. 
         if hastype_i; 
-            sigma_mu (ista, itype) = hyper.(each_type(itype)).mu_log10 ; 
-            sigma_std(ista, itype) = hyper.(each_type(itype)).std_log10; 
+            sigma_mu (ista, itype) = hyper.(each_type(itype)).mu_log10 ; % Tricky! mu is the mean value of the hyperparameter. In otherwords, it is the sigma of data. 
+            sigma_std(ista, itype) = hyper.(each_type(itype)).std_log10; % Tricky! std is the standard deviation of the hyperparameter. Be careful to understand that this is NOT the error of the data, but the error in our estimation of the error in the data. 
         end
         %%%
     end

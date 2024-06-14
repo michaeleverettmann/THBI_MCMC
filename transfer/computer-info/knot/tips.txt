@@ -1,13 +1,11 @@
-Some useful info collated here.
+The UCSB CNSI campus clusters can be accessed via 'ssh' at 'knot7.cnsi.ucsb.edu' and 'pod-login1.cnsi.ucsb.edu'.
 
-The campus clusters can be accessed via 'ssh' at 'knot7.cnsi.ucsb.edu' and 'pod-login1.cnsi.ucsb.edu'.
-
-For graphics while using Mac. I haven't found out what this means exactly yet...
+For graphics while using Mac. 
 ssh -Y brunsvik@knot7.cnsi.ucsb.edu
 
 Load Matlab: 
 module load MatLab/R2021b
 
-Use PBS for job scheduling. 
+Use Slurm instead of PBS. But, if you use PBS: 
 https://gif.biotech.iastate.edu/torque-pbs-job-management-cheat-sheet
 https://www.msi.umn.edu/slurm/pbs-conversion

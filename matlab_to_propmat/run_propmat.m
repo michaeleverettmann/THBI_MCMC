@@ -1,5 +1,5 @@
 function [traces,tt,status,cmdout] = run_propmat(LAYmodel,ID,ph,samprate,inc,synthperiod,nsamps,cutf,sourc)
-% Most argument checks are done in run_propmat_or_telewavesim. 
+% Most argument checks are done in run_propmat_or_telewavesim.m 
 if isempty(samprate); 
     samprate = 5; 
 end

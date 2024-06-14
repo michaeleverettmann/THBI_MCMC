@@ -1,3 +1,4 @@
+# Transfer the MCMC code and all dependencies to another computer. 
 # This script should point to and send each of the scripts I use to transfer stuff from personal computer to HPC. 
 
 computer=${1:-brunsvik@tong.eri.ucsb.edu} # This is the computer you are sending things to. 

@@ -1,0 +1,1 @@
+In progress work to get telewavesim fully working with MCMC. This was largely working in MCMC, but would need more testing before committing to using it instead of propmat. brb202402

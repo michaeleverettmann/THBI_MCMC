@@ -1,3 +1,4 @@
+% Example of running HV kernels. You need the Fortran codes compiled. 
 % must be in this directory to run
 clear 
 addpath('../'); 

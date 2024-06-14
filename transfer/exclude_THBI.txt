@@ -1,3 +1,4 @@
+# Don't send any of this over rsync. 
 **external_code_STORAGE/**
 **code_storage_DELETE_when_know_its_not_needed/**
 **papers_etc/**

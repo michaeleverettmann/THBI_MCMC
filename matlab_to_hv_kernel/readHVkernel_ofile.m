@@ -33,7 +33,6 @@ phV_fs = zeros(Nf,1);
 grV_fs = zeros(Nf,1);
 fE_fs = zeros(Nf,1);
 
-
 %% read for each freq
 ik = 0;
 while ~feof(fid)
@@ -65,10 +64,6 @@ while ~feof(fid)
     Kzh_d(end) = Kzh_d(end-1); 
     HVK_fs(ik,1).Kzh_d = Kzh_d; 
     
-%     Kzh_d_diff = diff(Kzh_d); 
-%     Kzh_d = max([[Kzh_d_diff;0], [0;Kzh_d_diff]], [], 2); % Don't know whether to associate with each point the diff to the point above or below. So just give the larger of the two values. 
-%     HVK_fs(ik,1).Kzh_d = Kzh_d; 
-    
     % account for possibilty of error
     fpos = ftell(fid);
     fgets(fid);
@@ -82,7 +77,7 @@ while ~feof(fid)
     field_names = fieldnames(HVK_fs); 
     for ifn = 1:length(field_names); 
         if any(isnan([HVK_fs.(field_names{ifn})])); 
-            error('Nan values in HV kernel! Not usuable. Is this fixable? brb2022.07.01'); % brb2022.07.01 I'm finding nan values at some indicies. This is sneaky and can break the rest of the code: An integral over kenel with any nan will be nan, so this kernel will be completely uselss as is. 
+            error('Nan values in HV kernel! Not usuable. Is this fixable? brb2022.07.01'); 
         end
     end
     

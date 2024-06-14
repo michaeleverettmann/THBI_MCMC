@@ -1,0 +1,1 @@
+This folder contains a (failed?) attempt to run many synthetic tests. From what I recall, it did not work well, and I just use the execute*.bash scripts in the parent folder. If you get into a crazy situation where you actually need many synthetic tests to run in parallel, you can try starting here. 
