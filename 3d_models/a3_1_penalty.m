@@ -1,5 +1,7 @@
 function [penalty] = a3_1_penalty(vgrid,...
     pdfs, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay); 
+% The original penalty function I used. It's slow. Shouldn't be in use any
+% more. 
 
 dvdx2 = ((vgrid(1:end-2,:) - 2*vgrid(2:end-1,:) + vgrid(3:end,:))./dx2); 
 dvdy2 = ((vgrid(:,1:end-2) - 2*vgrid(:,2:end-1) + vgrid(:,3:end))./dy2); 
@@ -13,10 +15,8 @@ pv_mod = zeros(size(stax));
 for ista=1:length(pv_mod); 
     pv_mod(ista) = interp1(pdfs(ista).mm, pdfs(ista).pm, vsta(ista),...
         'linear', 0 ); % Probability of a velocity at a specific station, from our velocity model surface. 
-    % Use linear interpolation for speed... Don't care for more precision
-    % here I think .
-    % Use 0 as extrap value, since we might sample outside a pdf. That's
-    % fine: we just assume 0 probability. 
+    % Use linear interpolation for speed... Don't care for more precision here
+    % Use 0 as extrap value, since we might sample outside a pdf. That's fine: we just assume 0 probability. 
 end
 
 penalty = - sum(pv_mod); % Lower penalty is higher probability. 

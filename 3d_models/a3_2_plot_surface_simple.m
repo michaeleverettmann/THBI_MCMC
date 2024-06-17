@@ -14,6 +14,7 @@ function [] = a3_2_plot_surface_simple(llminmax, options)
         options.sectlon = []; 
         options.sectlat = []; 
     end
+% Handle some redundant code for making part of the map figures. 
 
 % llminmax = [lonmin, lonmax, latmin, latmax]. Is used to define map
 % projection and relation to x y coordinates. 
@@ -60,7 +61,6 @@ if ~isempty(options.xgrid);
 
     contourf(options.xgrid, options.ygrid, options.vgrid, 15,...
         'LineStyle','none'); 
-%     m_contourf(options.xgrid, options.ygrid, options.vgrid, 15); 
 end
 
 
@@ -69,11 +69,8 @@ for iplace = 1:length(lonbord);
     m_line(lonbord{iplace}, latbord{iplace}, 'LineWidth',1,'color',0*[1 1 1])
 end
 
-% m_grid('box','fancy','linestyle','-','gridcolor','w','backcolor',[.3 .75 1]);
 m_grid('box','fancy','linestyle','-','gridcolor',.5 .*[1,1,1],'backcolor',[.3 .75 1]);
-%%% TODO find a way to nan all the data that leaks out of the projection
-%%% box. 
-
+% TODO find a way to nan all the data that leaks out of the projection box. 
 
 if ~isempty(options.title); 
     title(options.title, 'fontweight', 'normal')
@@ -90,7 +87,6 @@ end
 
 cbar = colorbar(); 
 cbar.Label.String = 'Vs'; 
-% cbar.Position = [0.9    0.1426    0.0452    0.7512]; 
 cmap = turbo(); 
 cmap = cmap(end:-1:1,:); 
 colormap(cmap); 

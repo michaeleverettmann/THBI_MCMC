@@ -1,5 +1,5 @@
 
-run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
+run('a0_parameters_setup.m'); % Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 
 %% Parameters to set. 
 nkernel = 100; % Number of points in histogram kernels. 
@@ -37,15 +37,11 @@ pdfs_allparm.vs = {};
 for iz = 1:length(zatdep); 
     pdfs_allparm(1).vs{iz} = pdfs_empty; 
 end
-% % % pdfs_allparm.vs = cell2struct(pdfs_allparm.vs, fieldnames(pdfs_empty)', length(zatdep) )'; 
-% % % pdfs_allparm.zatdep = zatdep; 
 
 %% Loop over posteriors and make pdfs. 
 for is = 1:length(mdls.lon); 
 
     posterior = load(mdls.fposterior{is}).posterior;
-%     pdfs(is).nwk = mdls.nwk{is}; 
-%     pdfs(is).sta = mdls.sta{is}; 
 
     % Loop over most individual parameters. 
     for iparam = 1:length(indiv_parameters); 
@@ -74,8 +70,6 @@ for is = 1:length(mdls.lon);
         depth = posterior.zatdep(iz); 
         samps = posterior.VSmantle(:,iz); 
         [pdfm, mm] = ksdensity(samps, kernel_points, 'width', widthkernel_vel); % pdf of model parameter. And ... model parameters. 
-%         figure(1); clf; hold on; 
-%         plot(mm, pdfm); 
         pdfs_allparm(is).vs{iz}(1).mm = mm'; 
         pdfs_allparm(is).vs{iz}(1).pm = pdfm'; 
         pdfs_allparm(is).vs{iz}(1).nwk = mdls.nwk{is}; 
@@ -86,5 +80,4 @@ for is = 1:length(mdls.lon);
 
 end
 
-% save(fpdfs, 'pdfs', 'is', 'iz'); % Save iz and is as a reminder that this might not be complete.  
 save(fpdfs, 'pdfs_allparm', 'is', 'iz'); 

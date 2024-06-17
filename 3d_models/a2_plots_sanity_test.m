@@ -1,5 +1,5 @@
 clc; clear; 
-run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
+run('a0_parameters_setup.m'); % Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 mdls = load(fresults).mdls; 
 
 %% % Reorganize structure. Could be more - or less - useful one way or other. 
@@ -9,10 +9,7 @@ zmohsig       = zeros(length(mdls.nwk),1);
 zsed          = zeros(length(mdls.nwk),1);
 zsedsig       = zeros(length(mdls.nwk),1);
 xicr          = zeros(length(mdls.nwk),1); 
-% xicrboundsmaybe= zeros(length(mdls.nwk),2);
 vpvs          = zeros(length(mdls.nwk),1); 
-% vpvssig       = zeros(length(mdls.nwk),1);
-
 
 z_vs          = [0.5, 15, 50, 100, 150, 200]; 
 vs            = zeros(length(mdls.nwk),length(z_vs)); 
@@ -27,14 +24,13 @@ for imd = 1:length(mdls.nwk);
     models(imd).model = mdls.model{imd}; 
     models(imd).dir   = mdls.dir  {imd}; 
     
-    % Extract map-view inversion results in cases where there's just one paramete for a station. 
+    % Extract map-view inversion results in cases where there's just one parameter for a station. 
     mdl = mdls.model{imd}; 
     zmoh              (imd) = mdl.zmohav; 
     zmohsig           (imd) = mdl.zmohsig; 
     zsed              (imd) = mdl.zsedav;     
     zsedsig           (imd) = mdl.zsedsig; 
     xicr              (imd) = mdl.xicrav;     
-%     xicrboundsmaybe   (imd,:) = mdl.xicrsig2'; 
     vpvs              (imd) = mdl.vpvsav; 
 
     % Pseudo-tomography

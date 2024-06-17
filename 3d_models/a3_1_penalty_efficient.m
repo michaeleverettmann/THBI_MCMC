@@ -1,13 +1,14 @@
 function [penalty, penalty_no_prior, roughness, pen_norm] = a3_1_penalty_efficient(vgrid,...
     pdf_terp, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay,...
     nearesti, weighti, min_mm_terp, dmm_di, nmm, nsta); 
+% Calculate the penalty based on model parameters at each point, compared
+% to the pdf for each station. 
+% Probably need to run p_prep_grid_to_sta_interp first. 
 
 dvdx2 = ((vgrid(1:end-2,:) - 2*vgrid(2:end-1,:) + vgrid(3:end,:))./dx2); 
 dvdy2 = ((vgrid(:,1:end-2) - 2*vgrid(:,2:end-1) + vgrid(:,3:end))./dy2); 
 roughness = sum(dvdx2 .^ 2, 'all') + sum(dvdy2 .^ 2, 'all'); % Using very simple roughness for now. For speed Should change to the below line. 2022.09.27. 
 roughness = roughness * rough_scale; 
-
-% vsta = interpn(xgrid, ygrid, vgrid, stax, stay, 'linear'); % Modelled velocity at each station 
 
 % Interpolate v at stations. All the spatial work is already done. 
 % nearesti and weightsi come from "p_prep_grid_to_sta_interp"

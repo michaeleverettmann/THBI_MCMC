@@ -1,5 +1,4 @@
-%%% Before running this script, may need to run
-%%% /Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/examine_results/examine_results.m
+%%% Before running this script, may need to run a1_0_collate_results.m
 %%% to get results combined from each station. 
 
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 

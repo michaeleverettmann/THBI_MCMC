@@ -1,8 +1,7 @@
-% Compile all the different model files into one. 
-% Takes a while to run (a minute or two). 
+% Define some paths and things. 
 
 clear;close all
-run("../../../a0_STARTUP_BAYES.m"); 
+run("./../a0_STARTUP_BAYES.m"); 
 
 %% Setup
 ifsave = true;
@@ -18,7 +17,6 @@ desired_chains = 12;
 desired_iter   = 16000; 
 
 addpath('~/MATLAB/m_map');
-% addpath('~/Documents/MATLAB/BayesianJointInv/functions');
 addpath('~/Documents/UCSB/ENAM/THBI_ENAM/functions'); 
 addpath('~/MATLAB/seizmo/cmap'); warning('adding cmap in seismo. Is this breaking split?'); 
 addpath('~/MATLAB/borders'); 
