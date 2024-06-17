@@ -1,6 +1,7 @@
 #%%
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# Modified version of the map view figure. Doesn't have the averaged velocity profile figures. 
 
 import numpy as np
 import pandas as pd
