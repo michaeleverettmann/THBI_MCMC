@@ -2,16 +2,16 @@ This code does a joint inversion of receiver functions and surface wave data usi
 
 This repository was used to run the inversion in Brunsvik et al. (2024). The code is adapted from Eilon et al. (2018). See also Golos et al. (2024), Petruska and Eilon (2022). See: Brunsvik, B., Eilon, Z., & Lynner, C. (2024). Plate‐scale imaging of eastern US reveals ancient and ongoing continental deformation. Geophysical Research Letters, 51(12), e2024GL109041.
 
-There are dependencies for forward modelling. What you need depends on which data you will use. We are working to make these available as well in Github, but for now, you can contact me for the codes. 
-- Mineos for surface wave phase velocity. As of 20240612 I am working to use the Josh Russell version of Mineos.  
-- Propmat for receiver functions. 
-- Tanimoto HV code for surface wave ellipticity. 
-- We partially set up MCMC to work with telewavesim. There are still probably some minor errors. There is an option to use telewavesim instead of propmat, but you should be fine to just use propmat. 
+There are dependencies for forward modelling. What you need depends on which data you will use. We are working to make these available as well in Github, but email me for any non-public codes you need.
+- Mineos for surface wave phase velocity. Email me for this. As of 20240612 I am working to use the Josh Russell version of Mineos, and I will update the MCMC repo once this is done: https://github.com/jbrussell/MINEOS_synthetics.  
+- Tanimoto HV code for surface wave ellipticity. We are working to make this public.  
+- Propmat for receiver functions: https://github.com/brennanbrunsvik/PropMat
+- We partially set up MCMC to work with telewavesim: https://github.com/paudetseis/Telewavesim. If you want to use this instead of Propmat, you will need solve a few more minor errors. There is an option to use telewavesim instead of propmat, but you should be fine to just use propmat. 
 - The anisotropic HK stack repository is available if you want HK stacks. https://github.com/brennanbrunsvik/hk_anis
 
 Some other dependencies. Look through a0_STARTUP_BAYES.m to understand these.  
 - fastBSpline
-- Seizmo. Velocity models maybe needed? Maybe also needed for taup. 
+- Seizmo. Use for the 1-D velocity models, and for Tau-p. 
 - seis_tools-master. Get most recent version from Brennan. 
 - EilonmyFUNCTIONS. Get most recent version from Brennan. 
 - Some colormaps from Matlab file exchange. 

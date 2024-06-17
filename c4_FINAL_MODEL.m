@@ -19,10 +19,9 @@ Nm = posterior.Nstored;
 
 %% Indices of models 
 i50     = round(0.5*Nm);
-warning('brb20240612 Sigma bounds were incorrect. These are not the 68-95-99.7 rule. We should have an updated version. ')
-isig1   = [max( 1,round(0.3173*Nm ))  min( Nm, round(0.6827*Nm) ) ]; % Use min and max in case we used very few iterations and round takes us to index 0. 
-isig2   = [max( 1,round(0.055 *Nm ))  min( Nm, round(0.9545*Nm) ) ];
-iminmax = [max([1,round(0.005 *Nm)])  min([Nm, round(0.995 *Nm)]) ];
+isig1   = [round(0.158*Nm) round(0.84*Nm)];
+isig2   = [round(0.022*Nm) round(0.976*Nm)]; 
+iminmax = [max([1,round(0.005*Nm)]) min([Nm,round(0.995*Nm)])];
 
 %% ===================== GATHER MODELS, FIT WITH GAUSSIANS ================
 %% DISCONTINUITIES
