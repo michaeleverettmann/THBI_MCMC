@@ -56,8 +56,6 @@ if ~isempty(dat);
     title('Love Phv', 'fontweight', 'normal'); 
     ylabel('Period'); 
     xlabel('V (km/s)'); 
-%     xlim(
-%     ylim(
     set(gca, 'YScale', 'log'); 
     grid off; grid on; 
     plot(dat.phV,dat.periods,...

@@ -1,4 +1,4 @@
-% Set path manually depending on what you are trying to plot I guess. 
+% Set path manually depending on what you are trying to plot. 
 % brb2022.03.21 This file is made in z1_SYNTH....m
 rfStruct = load('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/SYNTHETICS/inversion_results/teststa_testnwk_dat0/examplerun/tru_receiver_functions.mat');
 rf = rfStruct.rfSave; 
@@ -20,8 +20,6 @@ plot(rf.tt_ps, rf.trudat_ps_PSV(:,2), 'LineWidth', lw    ,...
     'DisplayName', 'R', 'Color', 'k'   ); 
 lgd = legend(); 
 title(lgd, 'Component'); 
-
-
 
 %%% Text. Made using Matlab GUI
 figure1=gcf; 

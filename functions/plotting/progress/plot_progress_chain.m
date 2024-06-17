@@ -7,7 +7,6 @@ if any(par.ii==[10 100 500 1000]) || (mod(par.ii, 2000) == 0) % Every thousand i
     iter      = [accept_info(1:par.ii).iter           ]'; 
     fail_chain= [accept_info(1:par.ii).fail_chain     ]'; 
     fail_total= [accept_info(1:par.ii).fail_total     ]'; 
-%     ifpass    = [accept_info(1:par.ii).ifpass         ]'; 
  
     nRow = 5; nCol = 1; 
     figure(3001); clf; hold on; set(gcf, 'color', 'white', 'pos', [1000 673 800 664]);

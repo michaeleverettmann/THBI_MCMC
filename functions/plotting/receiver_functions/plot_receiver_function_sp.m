@@ -36,10 +36,6 @@ nexttile(2); cla; hold on; box on; grid on; xlim(tlim);
 ylabel('SV'); 
 plot(tt_sp, predat_sp_PSV(:,2))
 
-% nexttile(3); cla; hold on; box on; grid on; 
-% ylabel('T'); 
-% plot(tt_sp, predat_sp(:,2))
-
 xlabel('Time? (s)'); 
 
 % end

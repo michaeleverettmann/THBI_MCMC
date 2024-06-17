@@ -32,8 +32,6 @@ exportgraphics(gcf, sprintf('%s/rf_at_iter_contour_%s.png',par.res.resdir,par.re
 % PDF of receiver functions
 nbin = 100; % Bins to apply in hist. 
 rfvals = linspace(-3/2*max(abs(rf_obs)),3/2*max(abs(rf_obs)),nbin)'; % Values to give to hist. 
-% rfvals = linspace(prctile(rfgrid,0.2,"all"), prctile(rfgrid,99.8,"all"), nbin)'; 
-
 
 hrf = zeros(nz, nbin); % histogram of receiver function.
 for iz = 1:nz; 
@@ -51,18 +49,6 @@ ncont = 100;
 med_rf = nanmedian(rfgrid,2); 
 mea_rf = nanmean  (rfgrid,2); 
 
-% subplot(2,1,1); cla; hold on; box on; set(gca, 'lineWidth', 1.5); 
-% contourf(z, rfvals', hrf', ncont, 'edgecolor', 'none'); % pclr = pcolor(z, rfvals', hrf'); pclr.LineStyle = 'none'; 
-% cbar = colorbar(); 
-% cbar.Label.String = 'p(d)';
-% colormap(viridis);
-% xlabel('Depth'); 
-% plot([min(z), max(z)], [0,0], 'k', 'linewidth', 0.25); 
-% rf_obs_hand = plot(z_obs, rf_obs, 'k'               , 'linewidth', 2.5); 
-% med_rf_hand = plot(z    , med_rf, 'red'             , 'linewidth', 1.5); 
-% mea_rf_hand = plot(z    , mea_rf, ...
-%     'color', [28, 221, 235]./256, 'linewidth', 1.5); 
-
 subplot(1,1,1); cla; hold on; box on; set(gca, 'lineWidth', 1.5); 
 hrf_log = log(hrf); 
 hrf(isinf(hrf_log)) = -20; 
@@ -76,7 +62,6 @@ rf_obs_hand = plot(z_obs, rf_obs, 'k'               , 'linewidth', 2.5);
 med_rf_hand = plot(z    , med_rf, 'red'             , 'linewidth', 1.5); 
 mea_rf_hand = plot(z    , mea_rf, ...
     'color', [28, 221, 235]./256, 'linewidth', 1.5); 
-
 
 ylim([ -3/2 * virt_lim_expect, 3/2 * virt_lim_expect ]); 
 

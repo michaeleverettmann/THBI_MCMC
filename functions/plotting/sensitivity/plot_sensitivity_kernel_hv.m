@@ -48,7 +48,6 @@ if ~isempty(model);
     ylim(options.z_limits); 
     xlim([1, 9.5]); 
     grid on; 
-%     set(gca, 'YTickLabel', []); 
     ylabel('Depth (km)'); 
     plot(model.VS , model.z, 'linewidth', 2, 'DisplayName', 'Vs' ); 
     plot(model.VP , model.z, 'linewidth', 2, 'DisplayName', 'Vp' ); 
