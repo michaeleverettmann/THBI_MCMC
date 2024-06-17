@@ -533,9 +533,9 @@ m_grid('box','fancy','linestyle','none','gridcolor',.5 .*[1,1,1],...
 
 mkdir('xsections'); 
 set(gcf, 'Renderer', 'painters'); 
-exportgraphics(gcf, sprintf('sage_gage/xsections_V%1.0f.jpeg', version_surf), ...
+exportgraphics(gcf, sprintf('model_output/xsections_V%1.0f.jpeg', version_surf), ...
     'Resolution', 300); 
-% savefig(gcf, sprintf('sage_gage/xsections_V%1.0f.fig', version_surf)); 
+% savefig(gcf, sprintf('model_output/xsections_V%1.0f.fig', version_surf)); 
 
 
 
@@ -547,5 +547,5 @@ exportgraphics(gcf, sprintf('sage_gage/xsections_V%1.0f.jpeg', version_surf), ..
 %     'sectlon', lon_surf_line_all, 'sectlat', lat_surf_line_all); 
 % text(0.75, 0.1, sprintf('Z=%1.0f km',depth_plot), 'Units', 'normalized'); 
 % set(gcf, 'pos',[295 476 426 321]); 
-% exportgraphics(gcf, sprintf('sage_gage/xsections_map_V%1.0f.pdf', version_surf)); 
+% exportgraphics(gcf, sprintf('model_output/xsections_map_V%1.0f.pdf', version_surf)); 
 % fprintf('\n'); 

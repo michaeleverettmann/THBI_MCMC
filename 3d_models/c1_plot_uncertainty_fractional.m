@@ -170,5 +170,5 @@ for ifig = 1:n_plots;
 
 end
 
-exportgraphics(gcf, sprintf('sage_gage/map_view_p_exceed_background.jpeg'), ...
+exportgraphics(gcf, sprintf('model_output/map_view_p_exceed_background.jpeg'), ...
     'Resolution',500); 

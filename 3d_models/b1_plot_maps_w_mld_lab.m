@@ -264,7 +264,7 @@ if main_paper_figure;
 end
 
 %%
-fname_base = 'sage_gage/map_view_V%1.0f%s.%s'; 
+fname_base = 'model_output/map_view_V%1.0f%s.%s'; 
 if main_paper_figure; 
     sup_txt = ''; 
 else

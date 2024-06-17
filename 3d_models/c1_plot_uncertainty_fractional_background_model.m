@@ -180,6 +180,6 @@ for ifig = 1:n_plots;
 end
 
 
-exportgraphics(gcf, sprintf('sage_gage/map_view_p_only_background_model.jpeg'), ...
+exportgraphics(gcf, sprintf('model_output/map_view_p_only_background_model.jpeg'), ...
     'Resolution',500); 
 % savefig(gcf, sprintf(fname_base, version_surf, sup_txt, 'fig')); 

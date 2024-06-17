@@ -1,0 +1,1 @@
+These scripts came from Zach Eilon. The estimate a 3D temperature model from velocity, and identify MLDs and the LAB from the velocity model. 

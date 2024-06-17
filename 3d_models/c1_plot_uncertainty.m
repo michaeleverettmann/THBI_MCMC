@@ -116,5 +116,5 @@ for ifig = 1:n_plots;
 end
 
 
-exportgraphics(gcf, sprintf('sage_gage/map_view_sigma.jpeg'), ...
+exportgraphics(gcf, sprintf('model_output/map_view_sigma.jpeg'), ...
     'Resolution',500); 
