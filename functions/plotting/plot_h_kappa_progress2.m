@@ -3,9 +3,6 @@ function plot_h_kappa_progress2(trudata, allmodelsOrig, resdir, chainNo, ...
 %% brb2022.02.09
 % Make several plots of h-kappa inversion progress. 
 % This applies for just one chain. 
-% % % 
-% % % save('/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/workspaces/for_perturbing/plot_hk_progress.mat'); 
-% % % warning('Saving in this function'); 
 
 %% Extract some info
 hStack              = trudata.HKstack_P.H; 
@@ -57,8 +54,6 @@ sig                 = [accept_info.sig_hk]';
 %% Delayed rejection stuff
 nak = [accept_info.non_acceptk]'; 
 yShift = 0.05; % For accepted or rejected
-% yPos = nak - yShift; 
-% yPos(ifaccept) = yPos(ifaccept) + 2 * yShift; 
 
 figure(1425); clf; hold on; set(gcf, 'pos', [2156 1099 851 184]); 
 grid on; 
@@ -97,33 +92,15 @@ rj1 = scatter(iIter(thisCond), 1-yShift+zeros(sum(thisCond),1), '|r', 'DisplayNa
 leg = legend([ac1, rj1, ac2, rj2], 'Location', 'east','NumColumns',2);
 legTitle = title(leg, 'Percent iterations per category'); 
 
-% % % scatter([accept_info.iter], [accept_info.non_acceptk], 40, [accept_info.ifaccept], 'filled'); 
-% % % scatter([accept_info.iter], [accept_info.non_acceptk], 40, [accept_info.ifaccept], 'filled'); 
-% % % cbar=colorbar(); 
-% % % colormap('cool'); 
-% % % cbar.Label.String = 'Accept?'; 
-% % % set(gcf, 'color', 'white'); 
-% % % grid on; 
-
 perc2pert = sum([accept_info.non_acceptk]==2) ./ length([accept_info.non_acceptk]) .* 100; 
-% title(sprintf('Perturbed twice %2.1f percent of time', perc2pert)); 
 exportgraphics(gcf, [resdir, '/delayed_perturbation_' num2str(chainNo) '.pdf']);  % pdf probably faster here. 
 
 %% Plots with h-k as x and y in plots. 
-
-%%% To make these plots of HK perturbations happen, need to uncomment the
-%%% accept_info(:).model = model in run_one_chain
-% allmodels           = [accept_info(:).model            ] ; 
-% if ~isempty(allmodels); 
-%     hIter               = [allmodels.zmoh                  ]'; 
-%     kIter               = [allmodels.vpvs                  ]'; 
-
 
 figure(1); clf; hold on; 
 set(gcf, 'pos', [[723 198 456 397]]); % [1550, 410, 1500, 1300]); 
 
 % First ax. 
-% ax1hk = subplot(2,2,1); cla; hold on; 
 ax1hk = gca; cla; hold on; 
 title('HK-stack - accepted and rejected models'); 
 ax1   = start_hk_ax(ax1hk, kStack, hStack, eStack); hold on; 
@@ -135,35 +112,6 @@ scatter(ax1, kIter(1        ), hIter(1        ), 110, 'k');
 scatter(ax1, kIter(end      ), hIter(end      ), 110, '*k'); 
 xlabel('Vp/Vs'); 
 ylabel('Moho depth (km)'); 
-
-% % % % Second ax. 
-% % % ax2hk = subplot(2,2,2); cla; hold on; 
-% % % ax2   = start_hk_ax(ax2hk, kStack, hStack, eStack); 
-% % % plot(kIter(~ifaccept), hIter(~ifaccept), 'LineWidth', 1/4', 'Color', 'r'); 
-% % % plot(kIter(ifaccept), hIter(ifaccept), 'LineWidth', 1', 'Color', 'k'); 
-% % % scatter(ax2, kIter, hIter, 10, iIter); 
-% % % xlabel('Vp/Vs'); 
-% % % ylabel('Hmoh'); 
-% % % 
-% % % % Third ax. 
-% % % ax3hk = subplot(2,2,3); cla; hold on; 
-% % % ax3   = start_hk_ax(ax3hk, kStack, hStack, eStack); 
-% % % plot(kIter(~ifaccept), hIter(~ifaccept), 'LineWidth', 1/4', 'Color', 'r'); 
-% % % plot(kIter(ifaccept), hIter(ifaccept), 'LineWidth', 1', 'Color', 'k'); 
-% % % scatter(ax3, kIter, hIter, 40, chi2);
-% % % title('chi2'); 
-% % % xlabel('Vp/Vs'); 
-% % % ylabel('Hmoh'); 
-% % % 
-% % % % Four ax. 
-% % % ax4hk = subplot(2,2,4); cla; hold on;
-% % % colormap(ax4hk, flipud(colormap)); 
-% % % title('Error(h-k stack)'); 
-% % % xlabel('Vp/Vs'); 
-% % % ylabel('Hmoh'); 
-% % % ax4   = start_hk_ax(ax4hk, kStack, hStack, misfSurf); hold on; 
-% % % colorbar(ax4hk, 'location', 'north'); 
-% % % linkaxes([ax4, ax4hk]); 
 
 exportgraphics(gcf, [resdir '/convergence_info_chain_' num2str(chainNo) '_v0.png'], 'Resolution', 100);
 if par.inv.verbose; 
@@ -236,45 +184,6 @@ if par.inv.verbose;
     xlim(currentXlim); 
     set(gca, 'yscale', 'log');
 
-    % brb2022.02.09 Don't remember wha tthe commented code is below. 
-    % % % subplot(nRow, nCol, 9); cla; hold on; grid on; box on; 
-    % % % dLogLik = log_lik(2:end) - log_lik(1:end-1); 
-    % % % ifacceptDLog = ifaccept(2:end); 
-    % % % iIterDLog = iIter(2:end); % at each iteration, show change from previous iteration
-    % % % % plot(iIterDLog, dLogLik, 'k', 'LineWidth', 0.5); 
-    % % % scatter(iIterDLog(~ifacceptDLog), dLogLik(~ifacceptDLog), 15, 'r', 'filled');
-    % % % scatter(iIterDLog( ifacceptDLog), dLogLik( ifacceptDLog), 15, 'g');
-    % % % ylabel('log_lik change');
-    % % % % set(gca, 'yscale', 'log'); 
-    % % % 
-    % % % 
-    % % % 
-    % % % clipVal = 5; 
-    % % % subplot(nRow, nCol, 10); cla; hold on; grid on; box on; 
-    % % % dLogLik = log_lik(2:end) - log_lik(1:end-1); % Recalculate for bug prevention
-    % % % ifacceptDLog = ifaccept(2:end); 
-    % % % dLogLik(dLogLik >  clipVal) =  clipVal; 
-    % % % dLogLik(dLogLik < -clipVal) = -clipVal; 
-    % % % iIterDLog = iIter(2:end); % at each iteration, show change from previous iteration
-    % % % % plot(iIterDLog, dLogLik, 'k', 'LineWidth', 0.5); 
-    % % % scatter(iIterDLog(~ifacceptDLog), dLogLik(~ifacceptDLog), 15, 'r', 'filled');
-    % % % scatter(iIterDLog( ifacceptDLog), dLogLik( ifacceptDLog), 15, 'g');
-    % % % ylabel('log_lik change');
-    % % % xlim(currentXlim); 
-    % % % 
-    % % % clipVal = 0.5; 
-    % % % subplot(nRow, nCol, 12); cla; hold on; grid on; box on; 
-    % % % dLogLik = log_lik(2:end) - log_lik(1:end-1); % Recalculate for bug prevention
-    % % % ifacceptDLog = ifaccept(2:end); 
-    % % % dLogLik(dLogLik >  clipVal) =  clipVal; 
-    % % % dLogLik(dLogLik < -clipVal) = -clipVal; 
-    % % % iIterDLog = iIter(2:end); % at each iteration, show change from previous iteration
-    % % % % plot(iIterDLog, dLogLik, 'k', 'LineWidth', 0.5); 
-    % % % scatter(iIterDLog(~ifacceptDLog), dLogLik(~ifacceptDLog), 15, 'r', 'filled');
-    % % % scatter(iIterDLog( ifacceptDLog), dLogLik( ifacceptDLog), 15, 'g');
-    % % % ylabel('log_lik change');
-    % % % xlim(currentXlim); 
-
     subplot(nRow, nCol, 9); cla; hold on; grid on; box on; 
     plot(iIter, Pm_prior, 'k', 'LineWidth', 1,'DisplayName', 'p(m) prior'); 
     scatter(iIter, p_bd, 'blue', 'DisplayName', 'p b/d'); 
@@ -327,7 +236,6 @@ if par.inv.verbose;
     dLogLik(dLogLik >  clipVal) =  clipVal; 
     dLogLik(dLogLik < -clipVal) = -clipVal; 
     iIterDLog = iIter(2:end); % at each iteration, show change from previous iteration
-    % plot(iIterDLog, dLogLik, 'k', 'LineWidth', 0.5); 
     scatter(iIterDLog(~ifacceptDLog), dLogLik(~ifacceptDLog), 15, 'r', 'filled');
     scatter(iIterDLog( ifacceptDLog), dLogLik( ifacceptDLog), 15, 'g');
     ylabel('log_lik change');
@@ -376,7 +284,6 @@ if par.inv.verbose;
     window = 300; 
     indsEval = [window:length(ifaccept)]'; 
     perAcc = zeros(size(indsEval)); 
-    % dLogLikFull = dLogLik
     for ii = indsEval'; 
         whichAcc = ifaccept(ii+1-window:ii); 
         whichAcc = int64(whichAcc); 

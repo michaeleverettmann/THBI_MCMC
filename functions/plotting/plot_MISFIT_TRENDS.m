@@ -5,7 +5,6 @@ if length(misfits) < 2; % below code accesses cell arrays I think.
     allmodels = {allmodels}; 
 end
 
-
 % Parameters you define. 
 resolution = 200; % DPI. These are possibly supplemental figures. 
 ylimits    = [10^(-2.5), 2]; % Set manually based on what you expect to be the highest versus lowest error and sigma. 
@@ -47,7 +46,6 @@ for idat = [1:ndattyps];
         bestmods = misfiti.bestmods; 
         scatter(iter( bestmods), thisval( bestmods), dot_size,      'filled');
         scatter(iter(~bestmods), thisval(~bestmods), dot_size, 'k', 'filled');
-
     end
 end
 
@@ -93,9 +91,7 @@ for idat = [1:ndattyps];
     
     ax=nexttile(idat, [1,1]); 
     each_ax = [each_ax; ax]; 
-    hold on; box on; set(gca, 'linewidth', box_line_width); 
-%     ylim(ylimits); 
-%     set(gca, 'yscale', 'log');     
+    hold on; box on; set(gca, 'linewidth', box_line_width);   
     
     title(replace(thisdat, '_', ' '), 'fontweight', 'normal');
 
@@ -104,15 +100,12 @@ for idat = [1:ndattyps];
          
         thisval = [misfiti.logL_indivdat.(thisdat)]'; 
         iter = misfiti.iter; 
-       
-%         scatter(iter, thisval, dot_size, 'filled');
-        
+               
         bestmods = misfiti.bestmods; 
         scatter(iter( bestmods), thisval( bestmods), dot_size,      'filled');
         scatter(iter(~bestmods), thisval(~bestmods), dot_size, 'k', 'filled');
     end
     each_lim = [each_lim; prctile(thisval,1); max(thisval)]; 
-%     ylim([prctile(thisval,1), max(thisval)]); 
 end
 
 ylim(each_ax, [min(each_lim), max(each_lim)]); 

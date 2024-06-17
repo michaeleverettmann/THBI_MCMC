@@ -46,19 +46,12 @@ end
 
 
 if any(strcmp(fieldnames(trudata),'HKstack_P'))
-%     ax12 = axes('pos',[axpos(ax2,[1,2,3]) sum(axpos(ax1,[2,4]))-axpos(ax2,2)]); hold on % HK
     ax12  = axes('position',[0.05 0.39 0.20 0.3]); hold on % Ps? 
     delete([ax1,ax2]);
     set(ax12, 'Box', 'on'); 
     set(ax12, 'linewidth', boxLineWidth); 
     axs=[ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9,ax10,ax11];
 end
-
-% % % 
-% % % for iaxs = [1:length(axs)]; 
-% % %     set(axs(iaxs), 'Box', 'on'); 
-% % %     set(axs(iaxs), 'linewidth', 2); 
-% % % end
 
 for id = 1:length(dtypes)
 dtype = dtypes{id};
@@ -93,8 +86,6 @@ switch pdtyp{1}
     ylabel(ax,ylabstr,'fontsize',18)
     title(ax, 'Surface waves','fontsize',titleSize, 'fontweight', 'normal') ; 
 
-%     title(ax,['SW-',pdtyp{2}],'fontsize',titleSize)
-
 %% BWs
     case {'BW','RF'}
         axn = 0;
@@ -121,8 +112,6 @@ switch pdtyp{1}
           
             
             if ifnorm
-%                 trumax(itr) = max(abs(maxab(trudata.(dtype)(itr).PSV))); % get the max, to normalise trace
-%                 premax = max(abs(maxab(predata.(dtype)(1).PSV))); % get the max, to normalise trace
                 trunrm(itr) = norm(trudata.(dtype)(itr).PSV); % get the norm of the traces, to normalise power
                 prenrm(itr) = norm(predata.(dtype)(itr).PSV); % get the norm of the traces, to normalise power
             else
@@ -151,31 +140,17 @@ switch pdtyp{1}
     end
     
 %% HKstack        
-    case {'HKstack'}
-%         contourf(ax12,trudata.(dtype).K,trudata.(dtype).H,trudata.(dtype).Esum',30,'linestyle','none');
-%         axis(ax12); 
-%         box on;         
+    case {'HKstack'}         
         [~,contH] = contourf(ax12,predata.(dtype).Kgrid,predata.(dtype).Hgrid,...
             predata.(dtype).Esum',30,'linestyle','none'); % Use final_predata to get the HK stack estimated with our velocity model. 
-%         uistack(cntr,'top')
 
         cbar = colorbar(ax12,'eastoutside'); 
         set(cbar, 'fontsize', 12); 
-%         cbar = colorbar(ax12,'south'); 
-%         a =  cbar.Position;  %gets the positon and size of the color bar
-%         set(cbar,'Position',[a(1)+.5 * a(3), a(2) .5 * a(3), a(4)],...
-%             'fontsize', 12, ...
-%             'linewidth', .01, ...
-%             'color', [1 1 1]); % To change size
-
-%         cmapSCM = 'imola'; 
-%         load(sprintf('/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/ScientificColourMaps7/%s/%s.mat',cmapSCM,cmapSCM)); % Temporary. Try out a new colormap. 
         try 
             colormap(viridis); 
         catch 
             warning('Missing colormap viridis. Should be in repositories somewhere. '); 
         end
-%         colorbar(ax12,'south')
         
         plot(predata.HKstack_P.K,predata.HKstack_P.H,'ok','linewidth',2,...
             'markerfacecolor','r','markersize',7)
@@ -184,45 +159,18 @@ switch pdtyp{1}
         xlabel(ax12, 'Vp/Vs ratio','fontsize',16)
         ylabel(ax12, 'Moho depth','fontsize',16)
         set(ax12,'ydir','reverse', 'linewidth', 4)
-        
-        
-% % % %         figure(1); clf; hold on; 
-% % %         axPdf = copyobj(ax12, gcf); 
-% % %         axes(axPdf); 
-% % %         cla; 
-% % %         ax12.Visible = 'on'; 
-% % %         axPdf.Visible = 'off'; 
-% % %         kgrd = predata.HKstack_P.Kgrid; 
-% % %         hgrd = predata.HKstack_P.Hgrid; 
-% % %         kgrd = linspace(min(kgrd), max(kgrd), 101); 
-% % %         hgrd = linspace(min(hgrd), max(hgrd), 100); 
-% % %         [hist_counts] = hist3(...
-% % %             [posterior.vpvs, posterior.zmoh],'ctrs',{kgrd,hgrd}); 
-% % %         hist_counts = imgaussfilt(hist_counts, 'FilterSize', 5); 
-% % %         hist_counts = log(hist_counts); 
-% % %         [pdf_hand] = contourf(axPdf, kgrd, hgrd', hist_counts', 5, 'w'); 
-% % %         linkaxes([ax12,axPdf]); 
-% % %         sprintf(''); 
-    
-    
+  
 end
 end
 
 pause(0.001)
 
-
 if ifsave
-%     save2pdf(58,ofile,'/');
     exportgraphics(gcf, ofile, 'resolution', 300); 
 end
 
-
-
 if any(string(par.inv.datatypes) == 'HKstack_P'); 
-%     predata = final_predata; 
-%     model = final_model; 
     dtype = 'HKstack_P'; 
-%     titleSize = 12; 
     xlim_arr = [1.6, 2.1];
     ylim_arr = [15 , 70 ];
     fsetlims = @()set(gca(),'xlim', xlim_arr, 'ylim', ylim_arr, ...
@@ -237,7 +185,6 @@ if any(string(par.inv.datatypes) == 'HKstack_P');
     set(ax12, 'Color', 'none'); 
     fsetlims(); 
 
-
     %%% Top 
     axes(ax12); 
     Esum = predata.(dtype).Esum'; 
@@ -248,13 +195,8 @@ if any(string(par.inv.datatypes) == 'HKstack_P');
         'markerfacecolor','r','markersize',7)
     %%%
 
-
-
-
-
     ax12.Visible = 'on'; 
     axPdf.Visible = 'off'; 
-
 
     %%% Bottom
     axes(axPdf); 
@@ -268,12 +210,10 @@ if any(string(par.inv.datatypes) == 'HKstack_P');
     hist_counts = log(hist_counts); 
     [pdf_hand] = contourf(axPdf, kgrd, hgrd', hist_counts', 15,...
         'linestyle', 'none'); 
-%     cbar = colorbar(axPdf,'South'); 
     cbar = colorbar(); 
     cbar.Label.String = 'ln(times sampled)'; cbar.Label.FontSize = 12; 
     %%%
 
-    % linkaxes([ax12,axPdf]); 
     linkaxes([axPdf,ax12 ]); 
     set(ax12, 'Position', axPdf.Position); 
     axes(axPdf); axes(ax12); 
@@ -290,68 +230,3 @@ if any(string(par.inv.datatypes) == 'HKstack_P');
     end
     
 end
-
-
-% %% Ps
-% if isfield(predata,'PsRF') && ~isempty(predata.PsRF(1).PSV)
-% axes(ax5), hold on, set(gca,'fontsize',13,'xticklabel',[])
-% axes(ax6), hold on, set(gca,'fontsize',13)
-% for itr = 1:length(predata.PsRF)
-% plot(trudata.PsRF.tt,trudata.PsRF.PSV(:,1),'k','linewidth',2.5), title('Ps','fontsize',22)
-% plot(predata.PsRF.tt,predata.PsRF.PSV(:,1),'r','linewidth',1.5), 
-% plot(trudata.PsRF.tt,trudata.PsRF.PSV(:,2),'k','linewidth',2.5), xlabel('Time from P arrival','fontsize',18)
-% plot(predata.PsRF.tt,predata.PsRF.PSV(:,2),'r','linewidth',1.5), 
-% end
-% xlim(ax5,ps_xlims), ylim(ax5,1.1*max(abs(trudata.PsRF.PSV(:,1)))*[-1 1])
-% xlim(ax6,ps_xlims), ylim(ax6,1.1*max(abs(trudata.PsRF.PSV(:,2)))*[-1 1])
-% else
-% delete(ax5),delete(ax6) 
-% end
-% 
-% %% Sp
-% if isfield(predata,'SpRF') && ~isempty(predata.SpRF.PSV)
-% axes(ax7), hold on, set(gca,'fontsize',13,'xticklabel',[])
-% plot(trudata.SpRF.tt,trudata.SpRF.PSV(:,1),'k','linewidth',2.5), title('Sp','fontsize',22)
-% plot(predata.SpRF.tt,predata.SpRF.PSV(:,1),'r','linewidth',1.5),
-% xlim(sp_xlims), ylim(1.1*max(abs(trudata.SpRF.PSV(:,1)))*[-1 1])
-% axes(ax8), hold on, set(gca,'fontsize',13)
-% plot(trudata.SpRF.tt,trudata.SpRF.PSV(:,2),'k','linewidth',2.5), xlabel('Time from S arrival','fontsize',18)
-% plot(predata.SpRF.tt,predata.SpRF.PSV(:,2),'r','linewidth',1.5), 
-% xlim(sp_xlims), ylim(1.1*max(abs(trudata.SpRF.PSV(:,2)))*[-1 1])
-% else
-% delete(ax7),delete(ax8) 
-% end
-% 
-% 
-% %% Ps_lo
-% if isfield(predata,'PsRF_lo') && ~isempty(predata.PsRF_lo.PSV)
-% axes(ax1), hold on, set(gca,'fontsize',13,'xticklabel',[])
-% plot(trudata.PsRF_lo.tt,trudata.PsRF_lo.PSV(:,1),'k','linewidth',2.5), title('Ps-lo','fontsize',22)
-% plot(predata.PsRF_lo.tt,predata.PsRF_lo.PSV(:,1),'r','linewidth',1.5), 
-% xlim(ps_xlims), ylim(1.1*max(abs(trudata.PsRF_lo.PSV(:,1)))*[-1 1])
-% axes(ax2), hold on, set(gca,'fontsize',13)
-% plot(trudata.PsRF_lo.tt,trudata.PsRF_lo.PSV(:,2),'k','linewidth',2.5), xlabel('Time from P arrival','fontsize',18)
-% plot(predata.PsRF_lo.tt,predata.PsRF_lo.PSV(:,2),'r','linewidth',1.5), 
-% xlim(ps_xlims), ylim(1.1*max(abs(trudata.PsRF_lo.PSV(:,2)))*[-1 1])
-% else
-% delete(ax1),delete(ax2) 
-% end
-% 
-% %% Sp_lo
-% if isfield(predata,'SpRF_lo') && ~isempty(predata.SpRF_lo.PSV)
-% axes(ax3), hold on, set(gca,'fontsize',13,'xticklabel',[])
-% plot(trudata.SpRF_lo.tt,trudata.SpRF_lo.PSV(:,1),'k','linewidth',2.5), title('Sp-lo','fontsize',22)
-% plot(predata.SpRF_lo.tt,predata.SpRF_lo.PSV(:,1),'r','linewidth',1.5),
-% xlim(sp_xlims), ylim(1.1*max(abs(trudata.SpRF_lo.PSV(:,1)))*[-1 1])
-% axes(ax4), hold on, set(gca,'fontsize',13)
-% plot(trudata.SpRF_lo.tt,trudata.SpRF_lo.PSV(:,2),'k','linewidth',2.5), xlabel('Time from S arrival','fontsize',18)
-% plot(predata.SpRF_lo.tt,predata.SpRF_lo.PSV(:,2),'r','linewidth',1.5), 
-% xlim(sp_xlims), ylim(1.1*max(abs(trudata.SpRF_lo.PSV(:,2)))*[-1 1])
-% else
-% delete(ax3),delete(ax4) 
-% end
-
-
-
-% end
-

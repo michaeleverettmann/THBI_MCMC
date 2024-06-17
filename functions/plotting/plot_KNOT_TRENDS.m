@@ -65,7 +65,6 @@ for iii = 1:nchains
     knlim = 2+[par.mod.mantle.kmin+par.mod.crust.kmin,par.mod.mantle.kmax+par.mod.crust.kmax]; if diff(knlim)==0, knlim = knlim+[-0.5 0.5]; end
     
     %% plotting
-
     % knot locations
     plot(ax1,itmat_c(:,downsamp),knmat_c(:,downsamp),'.','color',[0.8 0.8 0.8])
     plot(ax1,itmat_c(:,[am.bestmods]'&ydownsamp),knmat_c(:,[am.bestmods]'&ydownsamp),'s','color',basecol,'markerfacecolor',basecol)
@@ -95,9 +94,7 @@ for iii = 1:nchains
     set(ax4,'fontsize',15,...
         'ylim',knlim,...
         'xlim',[0,1.05*max(pnsp)]) 
-    
 end 
-
 
 if ~isempty(ofile)
     if nchains>1

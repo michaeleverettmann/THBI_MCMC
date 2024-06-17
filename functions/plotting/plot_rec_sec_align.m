@@ -16,19 +16,6 @@ ic = strcmp(eqar.components,comp);
 
 dt = 1./unique(round(1./diff(eqar.tt(:,1,1))));
 
-% % plot at seaz
-% figure(45), clf, set(gcf,'pos',[92 265 1124 781]);
-% hold on
-% for ie = 1:length(evinds)
-%     evind = evinds(ie);
-%     dat = eqar.dataZRT(:,evind,ic,ip);
-%     dat = dat./max(abs(dat));
-%     dat = dat./ddpol(evind);
-%     datf = filt_quick(dat,filtfs(1),filtfs(2),dt);
-%     datf = datf./max(abs(datf));
-%     plot(eqar.tt(:,evind,ip)+dcor(ie),eqar.seazs(evind)+1*datf)
-% end
-
 % plot in seaz order
 [szs,isz] = sort(eqar.seazs(evinds));
 SEP = 1;

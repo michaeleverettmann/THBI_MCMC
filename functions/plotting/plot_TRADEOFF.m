@@ -26,8 +26,6 @@ R2y = 1 - sum((y-yest).^2)/sum((y-mean(y)).^2);
 R2x = 1 - sum((x-xest).^2)/sum((x-mean(x)).^2);
 
 plot(ax1,x,y,'or');
-% plot(ax1,x,yest,'b','linewidth',1.5)
-% plot(ax1,xest,y,'c','linewidth',1.5)
 set(ax1,'fontsize',16)
 xlabel(ax1,sprintf('VS at %.0f km',posterior.zmantle(zm1)),'Fontsize',18)
 ylabel(ax1,sprintf('VS at %.0f km',posterior.zmantle(zm2)),'Fontsize',18)
@@ -57,8 +55,6 @@ R2y = 1 - sum((y-yest).^2)/sum((y-mean(y)).^2);
 R2x = 1 - sum((x-xest).^2)/sum((x-mean(x)).^2);
 
 plot(ax2,x,y,'or');
-% plot(ax2,x,yest,'b','linewidth',1.5)
-% plot(ax2,xest,y,'c','linewidth',1.5)
 set(ax2,'fontsize',16)
 xlabel(ax2,sprintf('VS at %.0f km',posterior.zmantle(zm1)),'Fontsize',18)
 ylabel(ax2,sprintf('VS at %.0f km',posterior.zmantle(zm2)),'Fontsize',18)
@@ -86,8 +82,6 @@ R2y = 1 - sum((y-yest).^2)/sum((y-mean(y)).^2);
 R2x = 1 - sum((x-xest).^2)/sum((x-mean(x)).^2);
 
 plot(ax3,x,y,'or');
-% plot(ax3,x,yest,'b','linewidth',1.5)
-% plot(ax3,xest,y,'c','linewidth',1.5)
 set(ax3,'fontsize',16)
 xlabel(ax3,'Moho depth','Fontsize',18)
 ylabel(ax3,'Moho % dVS','Fontsize',18)
@@ -115,8 +109,6 @@ R2y = 1 - sum((y-yest).^2)/sum((y-mean(y)).^2);
 R2x = 1 - sum((x-xest).^2)/sum((x-mean(x)).^2);
 
 plot(ax4,x,y,'or');
-% plot(ax4,x,yest,'b','linewidth',1.5)
-% plot(ax4,xest,y,'c','linewidth',1.5)
 set(ax3,'fontsize',16)
 xlabel(ax4,'Seds depth','Fontsize',18)
 ylabel(ax4,'Seds % dVS','Fontsize',18)

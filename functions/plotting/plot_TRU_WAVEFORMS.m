@@ -12,24 +12,20 @@ if nargin < 3 || isempty(ofile)
     ofile='true_data';
 end
 
-% xlims = [-5 26;-31 5]; %[P;S]
-
-
-
 figure(58),clf,set(gcf,'pos',[15 54 1046 1051])
 px = 0.28;
 py = 0.12;
 sy = 0.4;
 axs = zeros(6,3);
 for ix = 1:2
-for iy = 1:3
-for iyy = 1:2
-    xl = 0.04 + 1.15*px*(ix-1);
-    yc = 0.5 + 2.7*py*(2-iy);
-    yb = -mod(iyy+1,2)*1.05*py + yc;
-    axs(2*(iy-1)+iyy,ix) = axes('position',[xl yb px py]); hold on        
-end
-end
+    for iy = 1:3
+        for iyy = 1:2
+            xl = 0.04 + 1.15*px*(ix-1);
+            yc = 0.5 + 2.7*py*(2-iy);
+            yb = -mod(iyy+1,2)*1.05*py + yc;
+            axs(2*(iy-1)+iyy,ix) = axes('position',[xl yb px py]); hold on        
+        end
+    end
 end
 axs(1,3) = axes('position',[(0.05+2.3*px) (axpos(axs(1,1),2)+axpos(axs(1,1),4)-sy) px sy]); hold on
 axs(2,3) = axes('position',[(0.05+2.3*px) axpos(axs(end,1),2) px sy]); hold on
@@ -39,24 +35,9 @@ axs(2,4) = axes('position',[axpos(axs(4,2),1)+axpos(axs(4,2),3)-px/2.2 axpos(axs
 % HKstack if needed
 axs(1,5) = axes('position',[0.04 sum(axpos(axs(4,1),[2,4])) px sum(axpos(axs(1,1),[2,4])) - sum(axpos(axs(4,1),[2,4]))]); hold on
 
-
-% 
-% ax1 = axes('position',[0.03 0.52 0.17 0.4]); hold on
-% ax2 = axes('position',[0.03 0.09 0.17 0.4]); hold on
-% ax3 = axes('position',[0.22 0.52 0.17 0.4]); hold on
-% ax4 = axes('position',[0.22 0.09 0.17 0.4]); hold on
-% ax5 = axes('position',[0.41 0.52 0.17 0.4]); hold on
-% ax6 = axes('position',[0.41 0.09 0.17 0.4]); hold on
-% ax7 = axes('position',[0.60 0.52 0.17 0.4]); hold on
-% ax8 = axes('position',[0.60 0.09 0.17 0.4]); hold on
-% ax9 = axes('position',[0.80 0.10 0.17 0.82]); hold on
-
-% axs=[ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9];
-
 dtypes = fieldnames(trudata);
 axus = zeros(length(dtypes),2);
 for id = 1:length(dtypes)
-%     allpdytp(id,:)=parse_dtype(dtypes{id});
     pdtyp = parse_dtype(dtypes{id});
     if strcmp(pdtyp{1},'BW') || strcmp(pdtyp{1},'RF')
         if strcmp(pdtyp{2},'Ps')
@@ -87,7 +68,6 @@ for id = 1:length(dtypes)
             iy = 1;
     end
     axus(id,1:length(iy)) = axs(iy,ix);
-%     title(axus(id,1),regexprep(dtypes{id},'_','-'))
 end
 
 delete(setdiff(axs,axus));
@@ -149,7 +129,6 @@ switch pdtyp{1}
                 for itr = 1:length(trudata.(dtype))
                     trudata.(dtype)(itr).tt  = trudata.(dtype)(itr).tt(~isnan(trudata.(dtype)(itr).PSV(:,1)));
                     trudata.(dtype)(itr).PSV = trudata.(dtype)(itr).PSV(~isnan(trudata.(dtype)(itr).PSV(:,1)),:);
-        %             trumax(itr) = max(abs(maxab(trudata.(dtype)(itr).PSV))); % get the max, to normalise trace
                     trunrm(itr) = maxgrid(trudata.(dtype)(itr).PSV); % get the norm of the trace, to normalise the power
                     plot(xa1,trudata.(dtype)(itr).tt,trudata.(dtype)(itr).PSV(:,1)./trunrm(itr),'k','linewidth',2.5)
                     plot(xa2,trudata.(dtype)(itr).tt,trudata.(dtype)(itr).PSV(:,2)./trunrm(itr),'k','linewidth',2.5)

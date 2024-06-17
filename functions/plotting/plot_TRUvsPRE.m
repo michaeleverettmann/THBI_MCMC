@@ -12,10 +12,6 @@ if nargin < 4 || isempty(ofile)
     ofile='true_vs_predicted_data';
 end
 
-% if nargin < 5 
-%     allmodels_collated = nan; 
-% end
-
 figure(57),clf,set(gcf,'pos',[015 576 1750 600])
 ax1 = axes('position',[0.03 0.53 0.235 0.4]); hold on
 ax2 = axes('position',[0.29 0.53 0.24 0.4]); hold on
@@ -23,9 +19,6 @@ ax3 = axes('position',[0.03 0.09 0.235 0.4]); hold on
 ax4 = axes('position',[0.29 0.09 0.24 0.4]); hold on
 ax5 = axes('position',[0.565 0.09 0.205 0.83]); hold on
 ax6 = axes('position',[0.795 0.09 0.19 0.83]); hold on
-
-% ax11 = axes('position',[0.03 0.09 0.11 0.84]); hold on
-% ax12 = axes('position',[0.155 0.09 0.11 0.84]); hold on
 
 if any(strcmp(fieldnames(trudata),'HKstack_P'))
     ax7 = axes('pos',[axpos(ax3,[1,2,3]) sum(axpos(ax1,[2,4]))-axpos(ax3,2)]); hold on
@@ -104,22 +97,15 @@ switch pdtyp{1}
             hl = legend(hp,'True','Pred','Location','NorthEast'); set(hl,'fontsize',15);
             set(ax6,'fontsize',15,'xlim',[0 1.1/min(trudata.(dtype).periods)])
             xlabel('Frequency (Hz)','fontsize',18)
-%             ylabel('HV ratio)','fontsize',18)
             title(ax6,'HV ratio','fontsize',22)
         end
    
 %% HKstack        
     case {'HKstack'}
-%         clf; 
-%         ax7 = axes(); 
-%         ax7a = copyobj(ax7, gcf); % ax7a.Visible = 'off';
-%         axes(ax7); 
-%         contourf(ax7,trudata.(dtype).K,trudata.(dtype).H,trudata.(dtype).Esum',30,'linestyle','none');
         contourf(ax7,predata.(dtype).Kgrid,predata.(dtype).Hgrid,...
             predata.(dtype).Esum',30,'linestyle','none'); % Use final_predata to get the HK stack estimated with our velocity model. 
 
         colorbar(ax7,'southoutside')
-%         colormap('cool'); 
         
         plot(predata.HKstack_P.K,predata.HKstack_P.H,'ok','linewidth',2,...
             'markerfacecolor','r','markersize',7)
@@ -132,16 +118,12 @@ switch pdtyp{1}
         
         if exist('allmodels_collated', 'var'); % If you passed the allmodels_collated variable, plot each attempted h-k value.
             
-%             axes(ax7a); 
-% %             cla; 
-%             colormap('hot')
             thing = scatter([allmodels_collated.vpvs], [allmodels_collated.zmoh],...
                 30, ...
                 [[allmodels_collated.iter]...
                 / max([allmodels_collated.iter])...
                 * max(max(predata.HKstack_P.Esum))]); 
         end       
-%         linkaxes([ax7,ax7a])
 
 
 end

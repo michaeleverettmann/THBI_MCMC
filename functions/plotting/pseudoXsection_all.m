@@ -5,18 +5,14 @@ run("../../a0_STARTUP_BAYES.m");
 
 %% Setup
 paths = getPaths(); 
-% proj = struct('name','ENAM');
-% proj.dir = [paths.THBIpath '/' proj.name];
 proj = load('~/Documents/UCSB/ENAM/THBI_ENAM/ENAM/INFO/proj.mat'); 
 proj = proj.proj; 
 paths.STAinversions = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_collate/'; % Place where your results are. 
 proj.STAinversions = paths.STAinversions; 
 
-% figPath = '~/Documents/UCSB/ENAM/THBI_ENAM/figures/xsect/'; 
 figPath = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/figures/xsect/'; warning('Export path not relative path')
     
 addpath('~/MATLAB/m_map');
-% addpath('~/Documents/MATLAB/BayesianJointInv/functions');
 addpath('~/Documents/UCSB/ENAM/THBI_ENAM/functions'); 
 addpath('~/MATLAB/seizmo/cmap'); warning('adding cmap in seismo. Is this breaking split?'); 
 addpath('~/MATLAB/borders'); 
@@ -31,7 +27,6 @@ overallQ_thresh = 1; % 2 is good, 1 is ok, 0 is bad
 Sp_Q_thresh = 1; % Sp data quality (same bounds as above)
 
 vlims = [4.15 4.8];
-% vlims = [3.2 4.5];
 vcmp = flipud(jet);
 ccplim = 12;
 ccpcmp = cmap_makecustom([0 0 1],[1 0 0],0.1);
@@ -39,11 +34,7 @@ ccpcmp = cmap_makecustom([0 0 1],[1 0 0],0.1);
 ifsave = true;
 
 %% lon/lat limits on stations to include:
-% % lolim = [-84,-76] + [0, 0] ;
-% % lalim = [35, 43] + [0, 0]; 
-% lolim = [-98.5,-80] + [-2, 2] +5;
 lolim = [-87, -76]; 
-% lalim = [32.5 49] + [-2, 2]; 
 lalim = [35, 43]; 
 %% section ends
 % WNW to ESE across whole region
@@ -51,35 +42,22 @@ ofile1 = [figPath 'Xsect1_',STAMP];
 ofile2 = [figPath 'Xsect1_wCCP_',STAMP];
 Q1 = [lalim(2), lolim(1)];
 Q2 = [lalim(1), lolim(2)]; 
-% lonBounds = sort([Q1(2) Q2(2)]); latBounds = sort([Q1(1) Q2(1)]); 
-offsecmax = 3; %5%  distance off section allowed, in degrees
-% NNW to SSE across Yellowstone
-% ofile1 = ['figs/Xsect2_',STAMP];
-% ofile2 = ['figs/Xsect2_wCCP_',STAMP];
-% Q1 = [48.7, -117.5];
-% Q2 = [40, -106]; 
-% offsecmax = 1.5; % distance off section allowed, in degrees
+offsecmax = 3; % distance off section allowed, in degrees
 
-%profile deets
+
+% profile deets
 [profd,profaz] = distance(Q1(1),Q1(2),Q2(1),Q2(2));
 
 % output names of stations
 ostafile = [figPath 'stafile_',STAMP,'.txt'];
 
 %% load project & station details
-% % % load([proj.dir,'/project_details.mat']);
 infodir = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/INFO/'; 
 stations = load([infodir 'stations.mat']); 
 stainfo = stations.stainfo; 
 stainfo.overallQ = ones(size(stainfo.slons)); 
-% if ~exist(proj.STAinversions)
-%     proj.STAinversions = '/Volumes/eilon_data/BayesianJointInv/NWUS_STASinv/';
-% end
-% grab processed station info
-% % % load(['stationsummary_',STAMP,'.mat']); % Just another reason to hate matlab. I don't have this variable and can't easily find what it is supposed to load. 
 
 % retrieve comparison models
-% % % addpath('/Volumes/eilon_data/models_seismic/SEMum2_avg_VS/');
 semPath = '~/Documents/repositories/data/models_seismic/SEMum2_avg_VS'
 addpath(semPath); 
 a = SEMum2_avgprofiles(0,[semPath '/']);
@@ -91,45 +69,17 @@ figure(mapFigNum); clf; hold on; set(gcf, 'color', 'white', 'pos', [-1152 439 37
 m_proj('lambert','long',lolim + [-2 2],'lat',lalim + [-2 2]);
 m_coast('patch',[1 .85 .7]);
 
-% m_coast('patch', [222, 164, 7]./255); 
-
-
 [latbord, lonbord] = borders('states'); % add states map
 for iplace = 1:length(lonbord); 
     m_line(lonbord{iplace}, latbord{iplace}, 'LineWidth',1,'color',0*[1 1 1])
 end
 
-% m_elev('contourf',[-1000:10:1000]);
-% m_grid('box','fancy','tickdir','in');
 lineCol = [168, 58, 50]./255; 
 sectLine = m_line([Q1(2) Q2(2)], [Q1(1), Q2(1)]); 
 set(sectLine, 'LineWidth', 3, 'color', lineCol); 
 sectScat = m_scatter([Q1(2), Q2(2)], [Q1(1), Q2(1)], ...
     'MarkerFaceColor', lineCol, 'MarkerEdgeColor', lineCol, 'LineWidth', 6); 
 m_grid('box','fancy','linestyle','-','gridcolor','w','backcolor',[.3 .75 1]);
-
-
-
-% colormap(flipud(copper));
-
-%%%
-
-% plot map 
-% % [mapfig] = map_stas(['stationsummary_',STAMP,'.mat']);
-% % mapax = gca;
-% % 
-% % % plot section
-% % plot_greatcircle(mapax,Q1,Q2)
-% % 
-% % % save map
-% % if ifsave
-% %     save2jpg(55,['figs/stationsummary_',STAMP,'_map'])
-% % end
-% % % m_plot([Q1(2),Q2(2)],[Q1(1),Q2(1)],'-or','linewidth',3)
-% % 
-% % %if ifsave
-% % %    save2pdf(55,[ofile1,'_map']);
-% % %end
 
 % get usable stations
 stinbounds = stainfo.slats<=max(lalim) & stainfo.slats>=min(lalim) &...
@@ -141,18 +91,7 @@ for is = 1:stainfo.nstas
     
     % check in bounds
     if stinbounds(is)==0, continue; end
-    % check overall fit
-% % %     if isnan(stainfo.overallQ(is)), continue; end
-% % %     if stainfo.overallQ(is) < overallQ_thresh, continue; end
-    % check Sp data quality
     clear sdtyp
-    % find Sp data type...
-%     for id = 1:length(stainfo.datatypes{is}')
-%         sdtyp(id) = ~isempty(regexp(stainfo.datatypes{is}{id},'Sp'));
-%     end
-%     Sp_Q = sum(stainfo.datQ{is}(sdtyp));  if Sp_Q<Sp_Q_thresh, continue; end
-    % to reach this point, has to pass all Q requirements and be in bounds
-    %%%
     sta = stainfo.stas{is}; 
     nwk = stainfo.nwk {is}; 
     
@@ -164,15 +103,8 @@ for is = 1:stainfo.nstas
     par=load([resdir,'/par.mat']); par=par.par; 
     disp(par.inv)
     gdstas(is) = (par.inv.niter>=8000) && (par.inv.nchains>=5); % Don't plot results if we didn't run the inversion with enough chains or iterations. Might have been test runs...
-%     fprintf('\n%s\n',fdir)
-%     if gdstas(is); 
-%         warning('Breaking at first good station. .'); 
-%         break; 
-%     end; % can't load par if it doesn't exist. Just do continue. 
-
 end
 gdstas = find(gdstas);
-% % % gdstas = [1:stainfo.nstas]'; warning('Setting all stas as good stas'); 
 
 Ngd = length(gdstas);
 
@@ -182,7 +114,6 @@ lolim = [min(stainfo.slons(gdstas)),max(stainfo.slons(gdstas))] + [-1 1];
 cmap2gmtcpt(lolim(2),lolim(1),flipud(parula),'parula_lolim.cpt');
 
 %% Load CCP
-% addpath /Volumes/eilon_data/models_seismic/
 addpath(paths.models_seismic); 
 nccp = 100; 
 ccpla = linspace(Q1(1),Q2(1),nccp);
@@ -194,7 +125,6 @@ fid = fopen(ostafile,'w');
 
 %% prep figure
 fig = figure(56); clf; 
-% set(fig,'pos',[468 333 93.4198*profd 620]); 
 set(fig,'pos',[-1204 344 1092 620]); 
 set(gcf, 'color', 'white');
 ax1 = axes; hold on
@@ -207,7 +137,6 @@ ax4 = axes; hold on
 x0 = 0.08; xw = 0.82;
 ax1Height = 0.45 ; 
 set(ax1,'pos',[x0 0.36 xw ax1Height]);
-% set(ax1,'pos',[x0 0.36 xw 0.62]);
 set(ax2,'pos',[x0 0.22 xw 0.11]);
 set(ax3,'pos',[x0 0.08 xw 0.11]);
 set(ax4,'pos',[x0 0.85 xw 0.11], 'XTick', []); %!%!
@@ -217,11 +146,6 @@ set(ax4,'pos',[x0 0.85 xw 0.11], 'XTick', []); %!%!
 [topox, topoy, topoz] = get_z_etopo1(...
     lolim(1)-.5, lolim(2)+.5, ...
     lalim(1)-.5, lalim(2)+.5  );
-
-% figmap = figure(46); clf; set(figmap,'pos',[30 1016 943 278]);
-% axin = axes; hold on
-% inset_map_NWUS(axin)
-
 
 % ==================  LOOP OVER STATIONS IN DB  ================== 
 iKeepSta = 0; 
@@ -233,10 +157,6 @@ for ii = 1:Ngd
     fprintf(fid,'%s %8.4f %8.4f\n',sta,stainfo.slats(is),stainfo.slons(is)); 
     % get results directory
     resdir = sprintf('%s/%s_%s_dat%.0f/%s',proj.STAinversions,sta,nwk,generation,STAMP);
-    % spit out station info
-% % %     fprintf('\n'); for j=1:40, fprintf('**'); end; fprintf('*\n');
-% % %     fprintf('STATION: %s\n',sta)
-% % %     fprintf('NETWORK: %s\n\n',nwk)
     
     % find position on section
     [d_perp(ii),d_par(ii)] = dist2line_geog( Q1,Q2,...
@@ -244,19 +164,9 @@ for ii = 1:Ngd
 
     if d_perp(ii) > offsecmax, continue; end
     
-% % %     %%% Delete this
-% % %     if ~ strcmp(nwk , 'TA'); continue ; end; 
-% % %     iKeepSta = iKeepSta + 1; 
-% % %     fprintf('\n%s %s', nwk, sta)
-% % % %     fprintf('%s\n\n',nwk)    
-% % % %     fprintf('%s\n',sta)
-% % %     continue
-% % %     %%% Delete this
-    
     % load final model and data
     load([resdir,'/par.mat'])
     load([resdir,'/posterior.mat'])
-%     load([resdir,'/prior.mat'])
     load([resdir,'/final_model.mat'])
           
     
@@ -300,11 +210,6 @@ for ii = 1:Ngd
     try
         [nvg_z(ii,1),nvg_w(ii,1),nvg_av(ii,1)] = model_NVG_info(final_model);
     end
-%     invg = (final_model.Z <= nvg_z+nvg_w/2) & (final_model.Z >= nvg_z-nvg_w/2);
-%     plot(ax1,final_model.([variable,'av'])(invg),final_model.Z(invg),'-b','Linewidth',2);
-
-    %% name station
-%     text(ax1,d_par(ii),35,sta,'fontsize',10);
 
     %% store VpVs
     VpVs_cr(ii,1) = final_model.vpvsav;
@@ -317,14 +222,9 @@ for ii = 1:Ngd
 end
 fclose(fid); % close file with station locations/names
 
-% % % gdtas = gdstas(~isnan(gdstas)); % Remove stations we decided were not good. 
-
 insection = d_perp<=offsecmax;
 
 % plot goodstas in section on map
-% % % figure(mapfig);
-% staScat = m_plot(stainfo.slons(gdstas(insection)),stainfo.slats(gdstas(insection)),'^','linewidth',3,...
-%     'MarkerFaceColor', [0,0,0], 'MarkerEdgeColor', [0,0,0]); 
 figure(mapFigNum); 
 staScat = m_plot(stainfo.slons(gdstas(insection)),stainfo.slats(gdstas(insection)),...
     '^','linewidth',0.01, 'markerSize', 14, ...
@@ -352,19 +252,7 @@ ax1Pos = get(ax1,'pos');
 axC = axes(fig,'pos',ax1Pos,'visible','off');
 hcb  = colorbar(axC); caxis(axC,vlims); colormap(axC,vcmp);
 set(hcb,'pos',[ax1Pos(1)+0.01 + ax1Pos(3), ax1Pos(2) 0.017 ax1Pos(4)],'linewidth',2)
-% title(hcb,'\textbf{V$_S$ (km/s)}','fontsize',16,'interpreter','latex','horizontalalignment','left')
 ylabel(hcb, '\textbf{V$_S$ (km/s)}','fontsize',16,'interpreter','latex'); 
-%% pretty axes
-% % moho
-% set(ax2,'fontsize',15,'xlim',[27,61],'ylim',[0 max(max(No_moho_bin))],'ytick',[],...
-%     'color','none','box','on','layer','top','linewidth',1.8);
-% xlabel(ax2,'Moho depth (km)','fontsize',15,'interp','tex','fontweight','bold')
-% anis
-
-
-%% Topo
-
-
 
 %% Axes 
 
@@ -395,15 +283,7 @@ ylabel(ax3,'$\mathbf{\xi}$ \textbf{crust}','fontsize',20,'interpreter','latex')
 ylabel(ax4,'\textbf{Sed (km)}' ,'fontsize',20,'interp','latex','fontweight','bold'); 
 ylabel(ax2,{'\textbf{Crustal}','$\mathbf{V}p/\mathbf{V}s$'},'fontsize',20,'interp','latex','fontweight','bold')
 ylabel(ax1,'\textbf{Depth (km)}','fontsize',20,'interp','latex','fontweight','bold')
-%
 xlabel(ax3,'\textbf{Longitude}','fontsize',20,'interp','latex','fontweight','bold')
-% 
-
-%%% brb2022.06.06 Not sure what is happening here. These seem to remove the
-%%% labels. 
-% % % set(get(ax1,'ylabel'),'pos',get(get(ax1,'ylabel'),'pos').*[0 1 1] -[1.7 0 0],'verticalalignment','top')
-% % % set(get(ax2,'ylabel'),'pos',get(get(ax2,'ylabel'),'pos').*[0 1 1] -[1.7 0 0],'verticalalignment','middle')
-% % % set(get(ax3,'ylabel'),'pos',get(get(ax3,'ylabel'),'pos').*[0 1 1] -[1.7 0 0],'verticalalignment','top')
 
 % brb2022.06.06. Get lat (slt) and lon (sln) of points along our
 % cross-sections line. These are used for interpolating topography. Note:
@@ -413,8 +293,6 @@ xlabel(ax3,'\textbf{Longitude}','fontsize',20,'interp','latex','fontweight','bol
 ax1Topo = copyobj(ax1, gcf);
 axes(ax1Topo); cla; 
 
-% ax1Box  = copyobj(ax1, gcf); 
-% ax1Box. Visible = 'on' ; % This one is specifically for labels and such, and goes on top. 
 ax1Topo.Visible = 'off'; % Only show what I plot here. Not labels, etc. 
 ax1.    Visible = 'on' ; 
 
@@ -430,8 +308,6 @@ topo = griddata(topox, topoy, topoz', sln, slt); % Topo as a function of longitu
 topo = -topo./1000
 topo_exaggerate = 13; 
 topo(topo<0) = topo(topo<0)*topo_exaggerate;
-% plot(ss(topo<=0),topo(topo<=0),'LineWidth',1.5, 'color', [41, 94, 0]./256);
-% plot(ss(topo>0),topo(topo>0),'blue','LineWidth',1.6);
 plot(ax1Topo, topo_par, topo, ...
     'linewidth', 2, 'color', [54, 163, 0]./256); 
 linkaxes([ax1, ax1Topo]); 
@@ -466,49 +342,6 @@ else
     pause
 end
 
-% ==================  PLOT CCP  ================== 
-% % % 
-% % % 
-% % % asdf
-% % % delete([ax2,ax3])
-% % % 
-% % % ax20 = axes; hold on
-% % % set(ax20,'pos',[x0 0.08 xw 0.24]);
-% % % 
-% % % %% Plot CCP 
-% % % contourf(ax20,ccplo,zz,-100*RFz,ccplim*[-1:0.025:1],'linestyle','none'); 
-% % % set(ax20,'ydir','reverse'); 
-% % % colormap(ax20,ccpcmp)
-% % % 
-% % % %% cbar - ccp
-% % % ax40 = axes(fig,'pos',get(ax20,'pos'),'visible','off');
-% % % hcb2  = colorbar(ax40); caxis(ax40,ccplim*[-1 1]); colormap(ax40,ccpcmp)
-% % % set(hcb2,'pos',[0.91 .08 0.017 .20],'linewidth',2,...
-% % %     'ytick',10*[-1 0 1])
-% % % title(hcb2,'\textbf{CCP (\%)}','fontsize',16,'interpreter','latex','horizontalalignment','left')
-% % % % p/n vg
-% % % text(ax40,1.05,0.65,'PVG','color','red','fontsize',18,'fontweight','bold','verticalalignment','middle')
-% % % text(ax40,1.05,0.22,'NVG','color','blue','fontsize',18,'fontweight','bold','verticalalignment','middle')
-% % % 
-% % % % limits/pretty
-% % % [~,maxlo] = reckon(Q1(1),Q1(2),max(get(ax1,'xlim')),profaz);
-% % % set(ax20,'xlim',[Q1(2), maxlo],'fontsize',16,'ylim',[20 260],...
-% % %     'color','none','box','on','layer','top','linewidth',1.8,...
-% % %     'xtick',0.9995*loprof,'xticklabels',round_level(loprof,0.1));
-% % % 
-% % % xlabel(ax20,'\textbf{Longitude}','fontsize',20,'fontweight','bold','interp','latex')
-% % % 
-% % % 
-% % % if ifsave
-% % %     save2pdf(56,ofile2);
-% % % end
-
-%% Plot of Vp/Vs against Xi
-
-% figure(57)
-% scatter(VpVs_cr(insection(:) & stainfo.slons(gdstas)<-108),Xi_cr(insection(:) & stainfo.slons(gdstas)<-108))
-
-
 %% ***********************************************************************************************************************************
 %% ***********************************************************************************************************************************
 %% ***********************************************************************************************************************************
@@ -521,9 +354,6 @@ end
 %% ***********************************************************************************************************************************
 %% ***********************************************************************************************************************************
 %% ***********************************************************************************************************************************
-
-
-
 
 function vertical_profiles(ax,final_model,variable,titlestr,clr)
 % Vertical 1D profiles

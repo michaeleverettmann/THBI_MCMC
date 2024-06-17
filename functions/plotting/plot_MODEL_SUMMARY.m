@@ -54,11 +54,6 @@ legend(num2str(model_summary.zatdep(:)),'location','northwest')
 set(gca,'fontsize',14), title('Vs at 50,100,150,...,300','fontsize',16)
 
 subplot(335)
-% Xh = linspace(par.mod.sed.hmin+par.mod.crust.hmin,par.mod.sed.hmax+par.mod.crust.hmax,30);
-% Xk = linspace(par.mod.crust.vpvsmin,par.mod.crust.vpvsmax,20);
-% N = histcounts2(model_summary.vpvs,model_summary.zmoh,Xk,Xh); 
-% N = N/maxgrid(N);
-% contourf(midpts(Xk),midpts(Xh),N',[0:0.1:1],'linestyle','none');
 plot(model_summary.vpvs,model_summary.zmoh,'.k','markersize',1)
 set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
      'xlim',[par.mod.crust.vpvsmin,par.mod.crust.vpvsmax],...
@@ -71,21 +66,19 @@ hb = bar(X,N/Nmods,1,'facecolor','none','edgecolor','r');
 set(gca,'fontsize',14), title('fractional dVs at moho (%)','fontsize',16)
 
 if isfield(model_summary,'vpvs')
-subplot(338)
-[N,X] = hist(model_summary.vpvs,20);
-hb = bar(X,N/Nmods,1,'facecolor','none','edgecolor','r');
-% xlim([1.7 1.9]);
-set(gca,'fontsize',14), title('Crust Vp/Vs ratio','fontsize',16)
+    subplot(338)
+    [N,X] = hist(model_summary.vpvs,20);
+    hb = bar(X,N/Nmods,1,'facecolor','none','edgecolor','r');
+    set(gca,'fontsize',14), title('Crust Vp/Vs ratio','fontsize',16)
 end
 
 if isfield(model_summary,'ximant')
-subplot(339)
-[N,X] = hist(model_summary.ximant,0.9:0.01:1.1);
-hb = bar(X,N/Nmods,1,'facecolor','none','edgecolor','r');
-xlim([0.95 1.05]);
-set(gca,'fontsize',14), title('Mantle xi (radial anis.)','fontsize',16)
+    subplot(339)
+    [N,X] = hist(model_summary.ximant,0.9:0.01:1.1);
+    hb = bar(X,N/Nmods,1,'facecolor','none','edgecolor','r');
+    xlim([0.95 1.05]);
+    set(gca,'fontsize',14), title('Mantle xi (radial anis.)','fontsize',16)
 end
-
 
 if ifsave
     save2pdf(90,ofile,'/');

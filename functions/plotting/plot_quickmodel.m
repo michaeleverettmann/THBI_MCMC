@@ -3,7 +3,6 @@ function plot_quickmodel(par,model,model1)
 
 global TRUEmodel
 
-% if isempty(gcp('nocreate')) && par.inv.verbose 
 if par.inv.verbose 
 
         
@@ -12,8 +11,8 @@ if par.inv.verbose
     ax2 = subplot(1,2,2); hold on, 
 
     if ~isempty(TRUEmodel)
-    plot(ax1,TRUEmodel.VS,TRUEmodel.z,'k','linewidth',1); 
-    plot(ax2,TRUEmodel.VP,TRUEmodel.z,'k','linewidth',1);
+        plot(ax1,TRUEmodel.VS,TRUEmodel.z,'k','linewidth',1); 
+        plot(ax2,TRUEmodel.VP,TRUEmodel.z,'k','linewidth',1);
     end
     
     plot(ax1,model.VS,model.z,'r','linewidth',1.5);

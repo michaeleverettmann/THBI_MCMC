@@ -13,7 +13,6 @@ ax1 = axes('pos',[0.07 0.54 0.88 0.4]); hold on
 ax2 = axes('pos',[0.07 0.08 0.88 0.4]); hold on
 
 
-
 %% loop through each chain
 if iscell(misfits_perchain),nchains = length(misfits_perchain); else nchains=1; end
 for iii = 1:nchains

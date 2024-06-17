@@ -9,7 +9,6 @@ if nargin<6 || isempty(ofile)
 end
 
 % load data
-
 if ~isfield(prior,'Npass')
     prior.Npass = prior.Nstored;
     prior.Npass = prior.Nstored;
@@ -31,56 +30,6 @@ dVsmoh_tru = 100*diff(tm.VS(tm.Z==zmoh_tru))./mean(tm.VS(tm.Z==zmoh_tru));
 %% Set up plot
 figure(23), clf, set(gcf,'pos',[43 141 1774 961]);
 cls = get(groot,'defaultAxesColorOrder');
-
-% subplots in grid
-% Nx = 4; dx = (0.9-0.03*(Nx-1))/Nx;
-% Ny = 2; dy = (0.84-0.07*(Ny-1))/Ny;
-% for iy = 1:2, for ix = 1:4;
-% ax(iy,ix) = axes(gcf,'pos',[(0.07 + (dx+0.03)*(ix-1)) (0.07 + (dy+0.07)*(iy-1)) dx dy]); hold on, 
-% end,end
-
-% %% sediment thickness
-% subplot(341), cla, hold on
-% X = midpts(linspace(par.mod.sed.hmin,par.mod.sed.hmax,20));
-% No = hist(posterior.zsed,X)/posterior.Nstored;
-% Ni = hist(prior.zsed,X)/prior.Npass;
-% bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
-% bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
-% set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top','ylim',[0 axlim(gca,4)])
-% title('Sed thickness (km)','fontsize',16)
-% plot(gca,zsed_tru*[1 1],axlim(4)*[0,1],'--','linewidth',3,'color',[0.28 0.25 0.84])
-% 
-% %% Sed velocities
-% subplot(342), cla, hold on
-% X = midpts(linspace(par.mod.sed.vsmin,par.mod.sed.vsmax,20));
-% No = hist(posterior.VSsedtop,X)/posterior.Nstored;
-% Ni = hist(prior.VSsedtop,X)/prior.Npass;
-% bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
-% bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
-% set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top','ylim',[0 axlim(gca,4)])
-% title('Vs seds top (km/s)','fontsize',16)
-% plot(gca,vss1_tru*[1 1],axlim(4)*[0,1],'--','linewidth',3,'color',[0.28 0.25 0.84])
-% 
-% subplot(343), cla, hold on
-% X = midpts(linspace(par.mod.sed.vsmin,par.mod.sed.vsmax,20));
-% No = hist(posterior.VSsedbot,X)/posterior.Nstored;
-% Ni = hist(prior.VSsedbot,X)/prior.Npass;
-% bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
-% bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
-% set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top','ylim',[0 axlim(gca,4)])
-% title('Vs seds bot (km/s)','fontsize',16)
-% plot(gca,vss2_tru*[1 1],axlim(4)*[0,1],'--','linewidth',3,'color',[0.28 0.25 0.84])
-
-% %% sed/basement dVs
-% subplot(344), cla, hold on
-% X = midpts(linspace(0,30,20));
-% No = hist(posterior.fdVSsed,X)/posterior.Nstored;
-% Ni = hist(prior.fdVSsed,X)/prior.Npass;
-% bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
-% bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
-% set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top','ylim',[0 axlim(gca,4)])
-% title('fractional dVs at sed/crust (%)','fontsize',16)
-% plot(gca,dVssed_tru*[1 1],axlim(4)*[0,1],'--','linewidth',3,'color',[0.28 0.25 0.84])
 
 %% Moho depth
 subplot(341), cla, hold on
@@ -171,43 +120,41 @@ nvgg = -0.004;
 % posterior
 Lnvg_post = zeros(posterior.Nstored,1);
 for ii = 1:posterior.Nstored
-nvind = find([diff(posterior.VSmantle(ii,:)')./diff(posterior.zatdep)<nvgg;0] & posterior.zatdep>posterior.zmoh(ii));
-if isempty(nvind), Lnvg_post(ii)=nan; continue; end
-a = diff(nvind);
-b = find([a;inf]>1);
-c = diff([0;b]);% length of sequences with nvgs
-di1 = cumsum(c); % end points of sequences with nvgs
-di0 = di1-c+1; % start points of sequences with nvgs
-nvindm = [nvind(di0(c==max(c))):nvind(di1(c==max(c)))]';
-Lnvg_post(ii) = diff(posterior.zatdep(nvindm([1,end])));
-% figure(222);clf 
-% plot(posterior.VSmantle(ii,:),posterior.zatdep,'b'); set(gca,'ydir','reverse'); hold on
-% plot(posterior.VSmantle(ii,nvindm),posterior.zatdep(nvindm),'r'); 
+    nvind = find([diff(posterior.VSmantle(ii,:)')./diff(posterior.zatdep)<nvgg;0] & posterior.zatdep>posterior.zmoh(ii));
+    if isempty(nvind), Lnvg_post(ii)=nan; continue; end
+    a = diff(nvind);
+    b = find([a;inf]>1);
+    c = diff([0;b]);% length of sequences with nvgs
+    di1 = cumsum(c); % end points of sequences with nvgs
+    di0 = di1-c+1; % start points of sequences with nvgs
+    nvindm = [nvind(di0(c==max(c))):nvind(di1(c==max(c)))]';
+    Lnvg_post(ii) = diff(posterior.zatdep(nvindm([1,end])));
 end
 % prior
 Lnvg_pri = zeros(prior.Nstored,1);
 for ii = 1:prior.Nstored
-nvind = find([diff(prior.VSmantle(ii,:)')./diff(prior.zatdep)<nvgg;0] & prior.zatdep>prior.zmoh(ii));
-if isempty(nvind), Lnvg_pri(ii)=nan; continue; end
-a = diff(nvind);
-b = find([a;inf]>1);
-c = diff([0;b]);% length of sequences with nvgs
-di1 = cumsum(c); % end points of sequences with nvgs
-di0 = di1-c+1; % start points of sequences with nvgs
-nvindm = [nvind(di0(c==max(c))):nvind(di1(c==max(c)))]';
-Lnvg_pri(ii) = diff(prior.zatdep(nvindm([1,end])));
+    nvind = find([diff(prior.VSmantle(ii,:)')./diff(prior.zatdep)<nvgg;0] & prior.zatdep>prior.zmoh(ii));
+    if isempty(nvind), Lnvg_pri(ii)=nan; continue; end
+    a = diff(nvind);
+    b = find([a;inf]>1);
+    c = diff([0;b]);% length of sequences with nvgs
+    di1 = cumsum(c); % end points of sequences with nvgs
+    di0 = di1-c+1; % start points of sequences with nvgs
+    nvindm = [nvind(di0(c==max(c))):nvind(di1(c==max(c)))]';
+    Lnvg_pri(ii) = diff(prior.zatdep(nvindm([1,end])));
 end
 % true
 nvind = find([diff(tm.VS)./diff(tm.Z)<nvgg;0] & tm.z>tm.zmoh);
 if ~isempty(nvind)
-a = diff(nvind);
-b = find([a;inf]>1);
-c = diff([0;b]);% length of sequences with nvgs
-di1 = cumsum(c); % end points of sequences with nvgs
-di0 = di1-c+1; % start points of sequences with nvgs
-nvindm = [nvind(di0(c==max(c))):nvind(di1(c==max(c)))]';
-Lnvg_tm = diff(tm.z(nvindm([1,end])));
-else Lnvg_tm=nan;
+    a = diff(nvind);
+    b = find([a;inf]>1);
+    c = diff([0;b]);% length of sequences with nvgs
+    di1 = cumsum(c); % end points of sequences with nvgs
+    di0 = di1-c+1; % start points of sequences with nvgs
+    nvindm = [nvind(di0(c==max(c))):nvind(di1(c==max(c)))]';
+    Lnvg_tm = diff(tm.z(nvindm([1,end])));
+else 
+    Lnvg_tm=nan;
 end
 
 subplot(348), cla, hold on
@@ -231,23 +178,18 @@ for iz = 1:length(zdo)
 end
 Vsz_tru = linterp(tm.z,tm.VS,posterior.zatdep(izdo));
 for iz = 1:length(zdo)
-subplot(3,8,16+iz), cla, hold on
-No = hist(posterior.VSmantle(:,izdo(iz,2)),X)/posterior.Nstored;
-Ni = hist(prior.VSmantle(:,izdo(iz,1)),X)/prior.Npass;
-bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
-bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
-% legend(num2str(model_summary.zmantle(:)),'location','northwest')
-set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
-        'xlim',[par.mod.mantle.vsmin par.mod.mantle.vsmax],'ylim',[0 axlim(gca,4)],...
-        'xtick',unique(round_level([par.mod.mantle.vsmin:0.1:par.mod.mantle.vsmax],0.3))) 
-title(sprintf('Vs at %.0f km',prior.zatdep(izdo(iz))),'fontsize',16)
-plot(gca,Vsz_tru(iz)*[1 1],axlim(gca,4)*[0,1],'--','linewidth',3,'color',[0.28 0.25 0.84])
+    subplot(3,8,16+iz), cla, hold on
+    No = hist(posterior.VSmantle(:,izdo(iz,2)),X)/posterior.Nstored;
+    Ni = hist(prior.VSmantle(:,izdo(iz,1)),X)/prior.Npass;
+    bar(X,No','facecolor',[0.9 0.1 0.1],'edgecolor','none','BarWidth',1);
+    bar(X,Ni','facecolor','none','edgecolor',[0.2 0.2 0.2],'BarWidth',1,'LineWidth',1.5);
+    % legend(num2str(model_summary.zmantle(:)),'location','northwest')
+    set(gca,'fontsize',14,'box','on','linewidth',1.5,'layer','top',...
+            'xlim',[par.mod.mantle.vsmin par.mod.mantle.vsmax],'ylim',[0 axlim(gca,4)],...
+            'xtick',unique(round_level([par.mod.mantle.vsmin:0.1:par.mod.mantle.vsmax],0.3))) 
+    title(sprintf('Vs at %.0f km',prior.zatdep(izdo(iz))),'fontsize',16)
+    plot(gca,Vsz_tru(iz)*[1 1],axlim(gca,4)*[0,1],'--','linewidth',3,'color',[0.28 0.25 0.84])
 end
-
-
-
-%% title
-% htit = title_custom([par.sta,' ',par.nwk],0.04,'fontweight','bold','fontsize',25);
 
 %% SAVE
 if ifsave

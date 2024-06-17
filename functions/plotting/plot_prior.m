@@ -9,7 +9,6 @@ Nz  = length(zz);
 
 hmps = zeros(Nz,length(Xvs));
 hmpp = zeros(Nz,length(Xvp));
-% nsaved = 0;
 
 % loop over depths, adding 
 for iz = 1:Nz
@@ -37,65 +36,3 @@ ax3 = axes(gcf,'pos',[0.91 0.11 0.02 0.815], 'linewidth', 1.5); hold on; box on;
 %% data
 contourf(ax1,Xvs,zz,hmps,[-5:0.1:-0.1],'edgecolor','none');
 contourf(ax2,Xvp,zz,hmpp,[-5:0.1:-0.1],'edgecolor','none');
-
-% % % %% from "temp_for_bellows" github branch
-% % % figure(2120); clf; hold on; 
-% % % set(gcf, 'color', 'white'); 
-% % % tiledlayout(2,2, 'TileSpacing', 'compact'); 
-% % % 
-% % % nexttile(1); 
-% % % hist(prior.VSsedtop, 20); 
-% % % title('VS sed top'); 
-% % % 
-% % % nexttile(3); 
-% % % hist(prior.VSsedbot, 20); 
-% % % title('VS sed bot'); 
-% % % 
-% % % nexttile(2); 
-% % % hist(prior.VScrusttop, 20); 
-% % % title('VS crust top'); 
-% % % 
-% % % nexttile(4); 
-% % % hist(prior.VScrustbot, 20); 
-% % % title('VS crust bot'); 
-% % % 
-% % % 
-% % % 
-% % % 
-% % % fprior = '../../ENAM/prior.mat'; 
-% % % prior_struct = load(fprior); 
-% % % 
-% % % par = prior_struct.par; 
-% % % prior = prior_struct.prior; 
-% % % 
-% % % vs = prior.VSmantle; % Just for mantle? 
-% % % zatdep = prior.zatdep; 
-% % % 
-% % % vh_vals = linspace(1.5,5.5, 100); 
-% % % 
-% % % hist_arr = zeros(length(zatdep), length(vh_vals) ); 
-% % % 
-% % % for idep = 1:length(zatdep); 
-% % %     hist_arr(idep, :) = hist(vs(:,idep), vh_vals); 
-% % % end
-% % % 
-% % % hist_arr(hist_arr < 1) = nan; 
-% % % 
-% % % % hist_arr = log(hist_arr); 
-% % % 
-% % % figure(1); clf; hold on; box on; set(gca,'LineWidth', 1.5); grid on; 
-% % % set(gca, 'ydir', 'reverse'); 
-% % % xlabel('VS ?'); 
-% % % ylabel('Depth'); 
-% % % cbar = colorbar(); 
-% % % title('PDF of prior VS (only every 5 km, so missing sediment)'); 
-% % % contourf(vh_vals, zatdep, hist_arr, 50, 'LineColor', 'none')
-% % % 
-% % % % figure(1); clf; hold on ;
-% % % % set(gca,'ydir', 'reverse'); 
-% % % % box on; grid on; 
-% % % % ylim([0, 100]); 
-% % % % for imod = 1:size(vs,1); 
-% % % %     plot(vs(imod,:)', zatdep); 
-% % % %     
-% % % % end

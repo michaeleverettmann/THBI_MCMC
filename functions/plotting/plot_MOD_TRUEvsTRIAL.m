@@ -5,7 +5,11 @@ function  plot_MOD_TRUEvsTRIAL( trumod, testmod )
 figure(85); clf; set(gcf,'pos',[1294 4 622 529])
 
 subplot(121), hold on;
-try plot(trumod.VS,trumod.z,'-k','Linewidth',2);catch, plot(trumod.vs,trumod.Z,'-k','Linewidth',2); end
+try 
+    plot(trumod.VS,trumod.z,'-k','Linewidth',2);
+catch
+    plot(trumod.vs,trumod.Z,'-k','Linewidth',2); 
+end
 plot(testmod.VS,testmod.z,'-r','Linewidth',2);
 set(gca,'ydir','reverse','fontsize',14);
 title('Vs','fontsize',20)
@@ -16,7 +20,11 @@ scatter(2.8*ones(testmod.crustmparm.Nkn,1),testmod.crustmparm.knots,70,'ro','fil
 scatter(2.8*ones(testmod.mantmparm.Nkn,1),testmod.mantmparm.knots,70,'ro','filled')
 
 subplot(122), hold on;
-try plot(trumod.VP,trumod.z,'-k','Linewidth',2);catch, plot(trumod.vp,trumod.Z,'-k','Linewidth',2); end
+try 
+    plot(trumod.VP,trumod.z,'-k','Linewidth',2);
+catch 
+    plot(trumod.vp,trumod.Z,'-k','Linewidth',2); 
+end
 plot(testmod.VP,testmod.z,'-r','Linewidth',2);
 set(gca,'ydir','reverse','fontsize',14);
 title('Vp','fontsize',20)

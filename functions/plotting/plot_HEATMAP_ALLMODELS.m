@@ -11,12 +11,6 @@ if nargin<5 || isempty(ofile)
 end
 
 %% GET TARGET MODEL for comparison
-% global TRUEmodel
-% TRvs = TRUEmodel.vs;
-% TRvp = TRUEmodel.vp;
-% TRrho = TRUEmodel.rho;
-% TRZ = TRUEmodel.Z;
-
 sm = suite_of_models;
 
 Xvs = [par.mod.sed.vsmin:0.04:par.mod.mantle.vsmax];
@@ -81,7 +75,6 @@ caxis(ax1,[-5 0])
 caxis(ax2,[-5 0])
 caxis(ax3,[-5 0])
 hcb = colorbar(ax3);
-% set(hcb,'pos',[0.89 0.71 0.02 0.215],'fontsize',14,'yaxislocation','right')
 set(hcb,'pos',[0.155 0.13 0.02 0.215],'fontsize',14,'yaxislocation','right')
 hcby = ylabel(hcb,'log_{10}(Probability)','fontweight','bold','verticalalignment','middle','HorizontalAlignment','center');
 set(hcby,'rotation',270,'pos',[3.2 -2.5 0]);
@@ -100,7 +93,6 @@ if par.inv.synthTest;
         warning('Why is TRUEmodel empty? Cant plot TRUEmodel'); 
     end
 end
-
 
 %% SAVE
 if ifsave

@@ -30,7 +30,6 @@ end
 RF = [0;RF(:);0]; % pad edges to avoid beginnning/end plot tie-line issues
 tt = [tt(1);tt(:);tt(end)]; % pad edges to avoid beginnning/end plot tie-line issues
 
-
 dt=tt(2)-tt(1); % edit by HEK May 2018
 if dt < 0
     RF = flipud(RF);
@@ -49,32 +48,6 @@ tt = [tt(1);tt(:);tt(end)]; % pad edges to avoid beginnning/end plot tie-line is
 axes(ax);hold on
 
 if iffill
-%     % positive patch
-%     [~,tt_pos] = crossing(RF,tt,level); % find crossings at positive level
-%     Npf = floor(length(tt_pos)/2); % N of positive blocks.
-%     hpos = zeros(Npf,1);
-%     for ib = 1:Npf
-%         if RF(1)>level,k=1; else k=0; end % shift if the RF starts above lev
-%         tt_b0 = tt_pos(2*ib-1 + k);
-%         tt_b1 = tt_pos(2*ib + k);
-%         tt_bl = [tt_b0;tt(tt>tt_b0 & tt<tt_b1);tt_b1];
-%         RF_bl = interp1(tt,RF,tt_bl);
-%         hpos(ib) = patch(ax,RF_bl+xshift,tt_bl,pcol,'linestyle','none','facealpha',0.6);
-%     end
-%
-%     % negative patch
-%     [~,tt_neg] = crossing(RF,tt,-level); % find crossings at negative level
-%     Nnf = floor(length(tt_neg)/2); % N of negative blocks.
-%     hneg = zeros(Nnf,1);
-%     for ib = 1:Nnf
-%         if RF(1)<-level,k=1; else k=0; end % shift if the RF starts above lev
-%         tt_b0 = tt_neg(2*ib-1 + k);
-%         tt_b1 = tt_neg(2*ib + k);
-%         tt_bl = [tt_b0;tt(tt>tt_b0 & tt<tt_b1);tt_b1];
-%         RF_bl = interp1(tt,RF,tt_bl);
-%         hold on
-%         hneg(ib) = patch(ax,RF_bl+xshift,tt_bl,ncol,'linestyle','none','facealpha',0.6);
-%     end
     RF_pos = RF;
     RF_pos(RF<level) = level;
     RF_neg = RF;
@@ -92,7 +65,5 @@ end
 hline = plot(ax,RF+xshift,tt,'-k','linewidth',1.5);
 
 h = {hline,hpos,hneg};
-
-
 
 end

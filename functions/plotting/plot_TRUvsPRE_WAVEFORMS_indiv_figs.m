@@ -43,12 +43,6 @@ end
 
 axs=[ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9,ax10,ax11];
 
-% % % 
-% % % for iaxs = [1:length(axs)]; 
-% % %     set(axs(iaxs), 'Box', 'on'); 
-% % %     set(axs(iaxs), 'linewidth', 2); 
-% % % end
-
 for id = 1:length(dtypes)
 dtype = dtypes{id};
 pdtyp = parse_dtype( dtype );
@@ -154,67 +148,3 @@ pause(0.001)
 if ifsave
     save2pdf(58,ofile,'/');
 end
-
-% %% Ps
-% if isfield(predata,'PsRF') && ~isempty(predata.PsRF(1).PSV)
-% axes(ax5), hold on, set(gca,'fontsize',13,'xticklabel',[])
-% axes(ax6), hold on, set(gca,'fontsize',13)
-% for itr = 1:length(predata.PsRF)
-% plot(trudata.PsRF.tt,trudata.PsRF.PSV(:,1),'k','linewidth',2.5), title('Ps','fontsize',22)
-% plot(predata.PsRF.tt,predata.PsRF.PSV(:,1),'r','linewidth',1.5), 
-% plot(trudata.PsRF.tt,trudata.PsRF.PSV(:,2),'k','linewidth',2.5), xlabel('Time from P arrival','fontsize',18)
-% plot(predata.PsRF.tt,predata.PsRF.PSV(:,2),'r','linewidth',1.5), 
-% end
-% xlim(ax5,ps_xlims), ylim(ax5,1.1*max(abs(trudata.PsRF.PSV(:,1)))*[-1 1])
-% xlim(ax6,ps_xlims), ylim(ax6,1.1*max(abs(trudata.PsRF.PSV(:,2)))*[-1 1])
-% else
-% delete(ax5),delete(ax6) 
-% end
-% 
-% %% Sp
-% if isfield(predata,'SpRF') && ~isempty(predata.SpRF.PSV)
-% axes(ax7), hold on, set(gca,'fontsize',13,'xticklabel',[])
-% plot(trudata.SpRF.tt,trudata.SpRF.PSV(:,1),'k','linewidth',2.5), title('Sp','fontsize',22)
-% plot(predata.SpRF.tt,predata.SpRF.PSV(:,1),'r','linewidth',1.5),
-% xlim(sp_xlims), ylim(1.1*max(abs(trudata.SpRF.PSV(:,1)))*[-1 1])
-% axes(ax8), hold on, set(gca,'fontsize',13)
-% plot(trudata.SpRF.tt,trudata.SpRF.PSV(:,2),'k','linewidth',2.5), xlabel('Time from S arrival','fontsize',18)
-% plot(predata.SpRF.tt,predata.SpRF.PSV(:,2),'r','linewidth',1.5), 
-% xlim(sp_xlims), ylim(1.1*max(abs(trudata.SpRF.PSV(:,2)))*[-1 1])
-% else
-% delete(ax7),delete(ax8) 
-% end
-% 
-% 
-% %% Ps_lo
-% if isfield(predata,'PsRF_lo') && ~isempty(predata.PsRF_lo.PSV)
-% axes(ax1), hold on, set(gca,'fontsize',13,'xticklabel',[])
-% plot(trudata.PsRF_lo.tt,trudata.PsRF_lo.PSV(:,1),'k','linewidth',2.5), title('Ps-lo','fontsize',22)
-% plot(predata.PsRF_lo.tt,predata.PsRF_lo.PSV(:,1),'r','linewidth',1.5), 
-% xlim(ps_xlims), ylim(1.1*max(abs(trudata.PsRF_lo.PSV(:,1)))*[-1 1])
-% axes(ax2), hold on, set(gca,'fontsize',13)
-% plot(trudata.PsRF_lo.tt,trudata.PsRF_lo.PSV(:,2),'k','linewidth',2.5), xlabel('Time from P arrival','fontsize',18)
-% plot(predata.PsRF_lo.tt,predata.PsRF_lo.PSV(:,2),'r','linewidth',1.5), 
-% xlim(ps_xlims), ylim(1.1*max(abs(trudata.PsRF_lo.PSV(:,2)))*[-1 1])
-% else
-% delete(ax1),delete(ax2) 
-% end
-% 
-% %% Sp_lo
-% if isfield(predata,'SpRF_lo') && ~isempty(predata.SpRF_lo.PSV)
-% axes(ax3), hold on, set(gca,'fontsize',13,'xticklabel',[])
-% plot(trudata.SpRF_lo.tt,trudata.SpRF_lo.PSV(:,1),'k','linewidth',2.5), title('Sp-lo','fontsize',22)
-% plot(predata.SpRF_lo.tt,predata.SpRF_lo.PSV(:,1),'r','linewidth',1.5),
-% xlim(sp_xlims), ylim(1.1*max(abs(trudata.SpRF_lo.PSV(:,1)))*[-1 1])
-% axes(ax4), hold on, set(gca,'fontsize',13)
-% plot(trudata.SpRF_lo.tt,trudata.SpRF_lo.PSV(:,2),'k','linewidth',2.5), xlabel('Time from S arrival','fontsize',18)
-% plot(predata.SpRF_lo.tt,predata.SpRF_lo.PSV(:,2),'r','linewidth',1.5), 
-% xlim(sp_xlims), ylim(1.1*max(abs(trudata.SpRF_lo.PSV(:,2)))*[-1 1])
-% else
-% delete(ax3),delete(ax4) 
-% end
-
-
-
-% end
-

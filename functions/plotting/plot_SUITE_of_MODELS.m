@@ -22,48 +22,44 @@ ichains = unique([sm.chain]);
 nchains = length(ichains);
 
 for iii = 1:nchains
-ic = find(sm.chain==iii);
-if isempty(ic), continue; end
-if length(ic)>=200, ic = ic(randperm(length(ic),200)); end;
-basecol = colour_get(iii,nchains+1,0,parula);
-basecol = 1 - 0.5*(1-basecol); basecol = basecol(:)';
-
-plot(ax1,sm.VS(:,ic),sm.Z,'--','Linewidth',0.05,'color',basecol); hold on
-% plot(ax1,PRmodel.vs,sm.Z,'-r','Linewidth',1.5);
-set(ax1,'ydir','reverse','fontsize',14,'ytick',[0:25:max(sm.Z)],'color','none');
-title(ax1,'Vs','fontsize',20)
-xlabel(ax1,'Vs (km/s)','fontsize',16)
-ylabel(ax1,'Depth (km)','fontsize',16)
-ylim(ax1,[0 max(sm.Z)])
-
-plot(ax2,sm.VP(:,ic),sm.Z,'--','Linewidth',0.05,'color',basecol); hold on
-% plot(ax2,PRmodel.vp,sm.Z,'-r','Linewidth',1.5);
-set(ax2,'ydir','reverse','fontsize',14,'yticklabel','','ytick',[0:25:max(sm.Z)],'color','none');
-title(ax2,'Vp','fontsize',20)
-xlabel(ax2,'Vp (km/s)','fontsize',16)
-ylim(ax2,[0 max(sm.Z)])
-% ylabel(ax2,'Depth (km)','fontsize',16)
-
-
-Zdh = midpts([0:1:sm.Z(end)]');
-nm = hist(posterior.zmoh(ic),Zdh);
-ns = hist(posterior.zsed(ic),Zdh);
-plot(ax4,nm/sum(nm),Zdh,'k')
-fill(ax4,[0,nm/sum(nm),0],[0;Zdh;sm.Z(end)],basecol,'facealpha',0.4)
-plot(ax4,ns/sum(ns),Zdh,'k')
-fill(ax4,[0,ns/sum(ns),0],[0;Zdh;sm.Z(end)],basecol,'facealpha',0.4)
-set(ax4,'ydir','reverse','fontsize',14,'yticklabel','','ytick',[0:25:max(sm.Z)],'color','none');
-title(ax4,'Disc.','fontsize',20)
-xlabel(ax4,'fraction','fontsize',16)
-ylim(ax4,[0 max(sm.Z)])
-xmx(iii) = 1.05*max(nm/sum(nm));
+    ic = find(sm.chain==iii);
+    if isempty(ic), continue; end
+    if length(ic)>=200, ic = ic(randperm(length(ic),200)); end;
+    basecol = colour_get(iii,nchains+1,0,parula);
+    basecol = 1 - 0.5*(1-basecol); basecol = basecol(:)';
+    
+    plot(ax1,sm.VS(:,ic),sm.Z,'--','Linewidth',0.05,'color',basecol); hold on
+    % plot(ax1,PRmodel.vs,sm.Z,'-r','Linewidth',1.5);
+    set(ax1,'ydir','reverse','fontsize',14,'ytick',[0:25:max(sm.Z)],'color','none');
+    title(ax1,'Vs','fontsize',20)
+    xlabel(ax1,'Vs (km/s)','fontsize',16)
+    ylabel(ax1,'Depth (km)','fontsize',16)
+    ylim(ax1,[0 max(sm.Z)])
+    
+    plot(ax2,sm.VP(:,ic),sm.Z,'--','Linewidth',0.05,'color',basecol); hold on
+    set(ax2,'ydir','reverse','fontsize',14,'yticklabel','','ytick',[0:25:max(sm.Z)],'color','none');
+    title(ax2,'Vp','fontsize',20)
+    xlabel(ax2,'Vp (km/s)','fontsize',16)
+    ylim(ax2,[0 max(sm.Z)])
+    
+    Zdh = midpts([0:1:sm.Z(end)]');
+    nm = hist(posterior.zmoh(ic),Zdh);
+    ns = hist(posterior.zsed(ic),Zdh);
+    plot(ax4,nm/sum(nm),Zdh,'k')
+    fill(ax4,[0,nm/sum(nm),0],[0;Zdh;sm.Z(end)],basecol,'facealpha',0.4)
+    plot(ax4,ns/sum(ns),Zdh,'k')
+    fill(ax4,[0,ns/sum(ns),0],[0;Zdh;sm.Z(end)],basecol,'facealpha',0.4)
+    set(ax4,'ydir','reverse','fontsize',14,'yticklabel','','ytick',[0:25:max(sm.Z)],'color','none');
+    title(ax4,'Disc.','fontsize',20)
+    xlabel(ax4,'fraction','fontsize',16)
+    ylim(ax4,[0 max(sm.Z)])
+    xmx(iii) = 1.05*max(nm/sum(nm));
 end
 
 xlim(ax4,[0,max(xmx)])
 
 
 %% GET TARGET MODEL for comparison
-% disp('plot_SUITE_of_MODELS.m - bb2021.09.28 commented code to load shen and ritzwoller 1d profile. We are using PREM profile for reference. will need to fix paths here to get shen and ritzwoller plot')
 if nargin > 4 && ~isempty(lalo)
 % read 1D profile from Shen and Ritzwoller model
     paths = getPaths(); 
@@ -94,7 +90,6 @@ plot(ax2,vp,Z,'-r','Linewidth',1.5);
 %% SAVE
 if ifsave
     fprintf('   saving fig\n')
-%     save2pdf(85,ofile,'/');
     exportgraphics(figure(85), ofile); 
 end
 
