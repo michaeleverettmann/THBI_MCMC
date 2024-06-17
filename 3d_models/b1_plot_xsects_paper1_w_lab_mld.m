@@ -1,3 +1,7 @@
+%brb20240617 Glitch - while testing today, it looks like MLD and LAB lines
+%are being covered up. The axes order maybe is wrong. Strange, because this
+%is the same script that worked and made the figure in Brunsvik et al 2024.
+
 clc; clear; 
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 addpath('/Users/brennanbrunsvik/Documents/repositories/Base_code/colormaps/redblue'); 
@@ -10,7 +14,7 @@ downsamp_model = 1; % Downsample the original model by this factor. Only use thi
 hide_text = 1; % Put the colors and stuff over the text and stuff. 
 
 % Get lab/mld results. Zach intially sent this in mid/late july. 
-lab_mld_fold = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/many_stas/zach_lithosphere_results/'; % Where Zach sent mld lab results in mid/late july 2023
+lab_mld_fold = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/3d_models/zach_lithosphere_results/'; % Where Zach sent mld lab results in mid/late july 2023
 T_lab = 1150;
 lab_file = [lab_mld_fold,'LAB_MLD/LAB_T',num2str(T_lab),'.mat']; 
 mld_file = [lab_mld_fold 'LAB_MLD/MLD_vgrads.mat']; 

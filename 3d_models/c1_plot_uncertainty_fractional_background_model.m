@@ -1,5 +1,7 @@
+% Figure S15 in Brunsvik et al 2024. 
 % This scipt should be very similar to c1_plot_uncertainty_fractional.m.
-% However, this script will plot the background model that was used. 
+% However, this script will plot the background model which is compared to
+% our model. 
 
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 

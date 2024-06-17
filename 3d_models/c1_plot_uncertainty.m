@@ -1,3 +1,6 @@
+% Figure S14 in Brunsvik et al 2024. Shows "sigma" at each station for some
+% model parameters. 
+
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 
 % Parameters to set. Taken initially from b1_plot_paper_maps_nat_geo.m
@@ -8,17 +11,14 @@ depths = [25, 60, 95, 145];
 parms_other = [];%"zsed", "zmoh"]; 
 titles = ["Moho", "Xi", "Z="+string(depths)]; 
 
-
 mdls = load(fresults).mdls; % Get station positions and uncertainties. 
 
 lat = mdls.lat; 
 lon = mdls.lon; 
 
 param_plot = [string(depths), parms_other]; 
-n_plots = 6; % length(param_plot); 
-% i_param = 1; 
+n_plots = 6; 
 
-%%
 figure(1); clf; hold on; set(gcf,'pos', [87 856 692 476*3/2]); 
 t = tiledlayout(3, 3, 'TileSpacing', 'tight');
 
@@ -92,7 +92,6 @@ for ifig = 1:n_plots;
     ytckstr = ytck; 
     xtckcel = {[], [], [], xtckstr, xtckstr, xtckstr, [],[],[]}; 
     ytckcel = {ytckstr, [], [], ytckstr, [], [], ytckstr, [],[]}; 
-    % Grid, coastlines I think, etc. Background colors. 
     m_grid('box','fancy','linestyle','none','gridcolor',.8 .*[1,1,1],...
         'backcolor',.9.*[1,1,1], 'xticklabel', xtckcel{ifig}, 'yticklabel', ytckcel{ifig},... % 'backcolor',[.3 .75 1]
         'xtick', xtck, 'ytick', ytck);
@@ -100,9 +99,6 @@ for ifig = 1:n_plots;
     % Colorbar and label
     ax = gca(); 
     cbar = colorbar('Location', 'south'); 
-%     cbar.Position(3) = ax.Position(3) * .47; 
-%     cbar.Position(1) = (ax.Position(1)+ax.Position(3)*.47) ; 
-%     cbar.Position(4) = cbar.Position(4) * 2.4; 
     cbar.Position(3) = ax.Position(3) * .4; 
     cbar.Position(1) = (ax.Position(1)+ax.Position(3)*.55) ; 
     cbar.Position(4) = cbar.Position(4) * 2.4; 
@@ -117,10 +113,8 @@ for ifig = 1:n_plots;
         'XTickLabel', [], 'YTickLabel', [] ); 
     ylabel('P(m)'); 
     disp('One plot done')
-
 end
 
 
 exportgraphics(gcf, sprintf('sage_gage/map_view_sigma.jpeg'), ...
     'Resolution',500); 
-% savefig(gcf, sprintf(fname_base, version_surf, sup_txt, 'fig')); 

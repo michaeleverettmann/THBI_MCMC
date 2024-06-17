@@ -1,6 +1,5 @@
-%%%% DANGEROUS! I don't have time to write this to a function properly. 
+% TODO this should be put into a function
 % Set up colorbar stuff for the script b1_plot_paper_maps_w_litho_mld.m
-
 
 % Colorbar and label
 ax = gca(); 

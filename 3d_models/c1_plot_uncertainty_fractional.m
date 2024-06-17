@@ -1,3 +1,6 @@
+% Figure S16 in Brunsvik et al 2024. Evaluates the statistical significance
+% of anomalies throughout the model. 
+
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 
 % Parameters to set. Taken initially from b1_plot_paper_maps_nat_geo.m
@@ -8,17 +11,14 @@ depths = [25, 60, 95, 145];
 parms_other = [];%"zsed", "zmoh"]; 
 titles = ["Moho", "Xi", "Z="+string(depths)]; 
 
-
 mdls = load(fresults).mdls; % Get station positions and uncertainties. 
 
 lat = mdls.lat; 
 lon = mdls.lon; 
 
 param_plot = [string(depths), parms_other]; 
-n_plots = 6; % length(param_plot); 
-% i_param = 1; 
+n_plots = 6; 
 
-%%
 figure(1); clf; hold on; set(gcf,'pos', [87 856 692 476*3/2]); 
 t = tiledlayout(3, 3, 'TileSpacing', 'tight');
 
@@ -36,7 +36,6 @@ for ifig = 1:n_plots;
     fig_offset = 2; 
 
     %% First, load mean values so we can make a background model. 
-
     if ifig > fig_offset; 
         dat_type = 'vs'; 
     elseif ifig == 1; 
@@ -44,7 +43,6 @@ for ifig = 1:n_plots;
     elseif ifig == 2; 
         dat_type = 'xi'; 
     end
-
 
     for i_station = 1:n_stations; 
         if strcmp(dat_type, 'vs'); 
@@ -106,7 +104,6 @@ for ifig = 1:n_plots;
         parm_all(ista) = frac_above; % For utilizing old script that used parm_all 
     end
 
-
     %%
     ax = each_ax(ifig); 
     axes(ax); 
@@ -144,7 +141,6 @@ for ifig = 1:n_plots;
     ytckstr = ytck; 
     xtckcel = {[], [], [], xtckstr, xtckstr, xtckstr, [],[],[]}; 
     ytckcel = {ytckstr, [], [], ytckstr, [], [], ytckstr, [],[]}; 
-    % Grid, coastlines I think, etc. Background colors. 
     m_grid('box','fancy','linestyle','none','gridcolor',.8 .*[1,1,1],...
         'backcolor',.9.*[1,1,1], 'xticklabel', xtckcel{ifig}, 'yticklabel', ytckcel{ifig},... % 'backcolor',[.3 .75 1]
         'xtick', xtck, 'ytick', ytck);
@@ -168,14 +164,11 @@ for ifig = 1:n_plots;
     set(ax_temp, 'Color' , 'None', ...
         'XLim', cbar.Limits, ...
         'XTickLabel', [], 'YTickLabel', [] ); 
-%     ylabel('$P(m>m_0)$', 'Interpreter', 'latex')
     ylabel('P(m>m_0)', 'FontSize',8); 
 
     disp('One plot done')
 
 end
 
-
 exportgraphics(gcf, sprintf('sage_gage/map_view_p_exceed_background.jpeg'), ...
     'Resolution',500); 
-% savefig(gcf, sprintf(fname_base, version_surf, sup_txt, 'fig')); 

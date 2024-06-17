@@ -31,13 +31,10 @@ xsect_positions = load(f_xsect_positions);
 lolim = xsect_positions.lolim; 
 lalim = xsect_positions.lalim; 
 
-
 n_contour = 30; 
-
 
 depths = [25, 95, 145]; % Try loading these depths. Probably need to type manually for now, but could save as a .mat file in future. 
 parms_other = ["zsed", "zmoh"]; 
-
 
 %% Figure out which data types are available at each station. 
 each_type = ["sig_SW_Ray_phV_eks",...
@@ -59,17 +56,14 @@ type_txt = ["Rayleigh Ekstrom ANT", ...
     "HK EARS", ...
     "HV Shen"]; % String for legend
 
-
 mdls = load(compiled_results).mdls; 
 
 nsta = length(mdls.lon); 
 ntypes = length(each_type); 
 
-
 hastype    = logical(zeros(nsta, ntypes)); 
 sigma_mu   = nan(nsta, ntypes); 
 sigma_std  = nan(nsta, ntypes); 
-
 
 for ista = 1:nsta;      
     md = mdls.model{ista}; 
@@ -114,11 +108,6 @@ end
 fid = fopen('check_each_data_type/average_sigma.txt', 'wt');
 fprintf(fid, sigma_txt);
 fclose(fid);
-%%
-
-% sfsmat = load('surface_out_example.mat'); xgrid = sfsmat.xgrid; ygrid = sfsmat.ygrid; llminmax = sfsmat.llminmax; latgrid = sfsmat.latgrid; longrid = sfsmat.longrid; 
-% mdls = load(fresults).mdls; % For sta lon and lat so we know where to and not to plot. 
-
 
 %% Any borders to plot
 %brb2023.02.21 These were copied from the 2021 ENAM paper. They were made only roughly, so I need more accurate shape files. 
@@ -128,10 +117,8 @@ gre_bord = [-82.8790832, -83.5164453, -83.6483134, -84.0878735, -84.3516096, -85
 app_bord = [flipud(app_bord')', app_bord2]; 
 
 %%
-
 ll_min_max_map = [-89  -68   26   46]; % Map view
 figure(17); clf; hold on; set(gcf,'pos', [87 856 692 476]); 
-
 m_proj('mercator', 'long',[ll_min_max_map(1), ll_min_max_map(2)],...
                    'lat',[ll_min_max_map(3), ll_min_max_map(4)]);
 
@@ -140,9 +127,6 @@ m_proj('mercator', 'long',[ll_min_max_map(1), ll_min_max_map(2)],...
 for iplace = 1:length(lonbord); 
     m_line(lonbord{iplace}, latbord{iplace}, 'LineWidth',1,'color',0.5*[1 1 1])
 end
-
-% Coast lines
-% cst = m_coast('patch',[1 1 1], 'FaceAlpha', 0); 
 
 % Cross section position, labels
 xsect_letters = ["A", "B", "C", "D", "E", "F", "G", "H"]; 
@@ -164,12 +148,10 @@ for ixsect = 1:size(lolim,1);
     m_text(lon_surf_line(end-line_shift)+0.4, lat_surf_line(end-line_shift) -0.3 , xsect_letters(ixsect)+"'", ...
         'color', color_text, 'fontweight', 'normal', 'units', 'data', ...
         'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle'); 
-
 end
 
 % Tectonic fronts. 
 m_plot(app_bord(1,:), app_bord(2,:), 'linewidth', 1.5, 'color', color_front); 
-% m_plot(gre_bord(1,:), gre_bord(2,:), 'linewidth', 3, 'color', color_front); 
 
 % Load tectonic files to plot. 
 plt_ftrs = ["grv_frt"]; % Which things to plot. Not showing thrusts because not pertinent. Those they are mislabeled as mislabeled as  "something_province" % , "MCR", "Reelfoot"
@@ -186,32 +168,15 @@ for iftr = 1:length(plt_ftrs);
     end
 end
 
-% % Label features. 
-% m_text(-83, 39, 'GF', 'color', color_text, 'fontsize', 12, ...
-%     'rotation', 75, 'horizontalalignment', 'center', 'verticalalignment', 'middle', 'fontweight', 'bold'); 
-% m_text(-83, 36, 'AF', 'color', color_text, 'fontsize', 12, ...
-%     'rotation', 45, 'horizontalalignment', 'center', 'verticalalignment', 'middle', 'fontweight', 'bold'); 
-
-% % Label the plot
-% m_text(-74, 30.5, '?????', 'Units','data', 'HorizontalAlignment', 'center',...
-%     'VerticalAlignment', 'bottom'); 
-
 % Grid, coastlines I think, etc. Background colors. 
 m_grid('box','fancy','linestyle','none','gridcolor',.5 .*[1,1,1],...
     'backcolor','none');
 
-% Now scatter stations. 
-% dtype_colors = jet(ntypes); 
-
-
 dtype_colors = [1,0,0;0,1,0;0,0,1]; 
 
-% cla; disp('clearing axis')
 hold on; 
 mkr_size = 15; 
 
-
-% has_all_types = 
 prct_stas_have = sum(hastype,1) / size(hastype, 1); 
 b_miss_type = prct_stas_have~=1; 
 type_plt_inds = find(b_miss_type); 
@@ -231,7 +196,6 @@ for itype = type_plt_inds;
     pltsta = hastype(:,itype); % Boolean, plot these stations. We have this data there. 
     slon = mdls.lon(pltsta); 
     slat = mdls.lat(pltsta); 
-%     hsct = m_scatter(slon, slat, mkr_size); 
 
     % Marker orientations.
     ang = (find(itype==type_plt_inds)-1) / (length(type_plt_inds)) * 360; 
@@ -246,7 +210,6 @@ for itype = type_plt_inds;
     prc_avail = sum(hastype(:,itype))/size(hastype,1)*100; 
     txt_leg = sprintf('%3.0f%%, %s',prc_avail, type_txt(itype)); 
 
-
     hplt=m_plot([slon, slond]', [slat, slatd]', 'Color', mkr_color, ...
         'linewidth', 2, 'DisplayName', txt_leg); 
 
@@ -256,6 +219,5 @@ end
 hnd_leg(end+1) = h_always_present; 
 
 lgd = legend(hnd_leg, 'Location', 'southeast'); 
-
 
 exportgraphics(gcf, sprintf('check_each_data_type/sta_map.pdf')); 

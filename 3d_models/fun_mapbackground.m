@@ -8,13 +8,14 @@ function [] = fun_mapbackground(lon, lat, dat, this_title, lolim, lalim, options
         lalim = []
         options.stanames = []
     end
+% Make the maps background for a few other scripts. 
 
 lolim = [-87, -71]; 
 lalim = [27 ,  46]; 
 
 nexttile; cla; hold on;
 m_proj('miller', 'long',lolim + [-2 2],'lat',lalim + [-2 2]);
-m_coast('patch',[1 1 1]); % m_coast('patch',[1 .85 .7]);
+m_coast('patch',[1 1 1]); 
 
 [latbord, lonbord] = borders('states'); % add states map
 for iplace = 1:length(lonbord); 

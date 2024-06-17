@@ -1,7 +1,7 @@
 function [pdf_terp, mm_terp, dmm_di] = p_prep_mm_to_pdf(pdfs, nmm)
 
-%%% Go from different mm at each sta to common mm at each sta through interpolation. 
-% nmm = 300; 
+%%% Go from different mm (posible model values) at each station to a common
+%%% mm basis. 
 nsta = length(pdfs); 
 
 pdf_terp = zeros(nmm, nsta); 

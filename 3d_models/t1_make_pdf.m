@@ -26,7 +26,6 @@ sigma = 0.3; % Analytical error of v.
 mean_gaus = 3.4; % Analytical mean_gaus of v. 
 smooth_window = .15; % How much to smooth final recovered pdf. In percent. 
 
-
 pdf_an = exp(-(v-mean_gaus).^2./(2.*sigma.^2)); % Analytical pdf of velocity. 
 pdf_an = pdf_an ./ trapz(v, pdf_an); % Normalize the pdf. 
 
@@ -49,9 +48,7 @@ end
 pdf_an = pdf_an ./ trapz(v, pdf_an); % Normalize the pdf. 
 
 pdf_cumulative = cumtrapz(v, pdf_an); % Cumulative pdf. 
-% v_samps = interp1(pdf_cumulative, v, linspace(0,0.9999,n_samps)'); % NON random v that follows pdf. 
 v_samps = normrnd(mean_gaus, sigma, [n_samps,1]); % Random v that follows pdf. Analogous to MCMC output. 
-% v_samps = [min(v); v_samps; max(v)]; 
 if pdf2; 
     v_samps = [v_samps; normrnd(mean_gaus2, sigma2, [n_samps,1])]; 
 end
@@ -75,20 +72,16 @@ for iv = 1:length(v);
     vi = v(iv); 
     vdiff = abs(vi - v_samps); 
     vdiff = vdiff.^2; % Square
-%     vdiff = abs(vdiff); 
     vpen(iv) = sum(vdiff); 
 end
 
 p_from_pen = 1./vpen; 
 p_from_pen = p_from_pen /  (trapz(v, p_from_pen)); 
-% p_from_pen = p_from_pen .^ (1.2); 
 p_from_pen = p_from_pen /  (trapz(v, p_from_pen)); 
-
 
 figure(3); clf; hold on; 
 plot(v, 1./p_from_pen, 'DisplayName','1/penalty')
 legend(); 
-
 
 %% Cumulative probability style of recoverying pdf. 
 % This almost works properly, and is very smooth, for a single Gaussian. It
@@ -96,18 +89,16 @@ legend();
 prob_cum_vsamp = linspace(0, 1, length(v_samps))'; 
 sort(v_samps); % SORT VSAMP!!! Is already done earlier, but left here for clarity. 
 dv_p = diff(v_samps); % DV part of derivative. 
-% newknt()
 dv_p_n = length(dv_p); 
 dv_p = [ones(size(dv_p)).*max(dv_p); dv_p; ones(size(dv_p)).*mean(dv_p(end-50:end))]; 
 dv_p = smoothdata(dv_p, 'gaussian', n_samps .* smooth_window); 
 dv_p = dv_p(dv_p_n+1:end-dv_p_n); 
 dp_p = diff(prob_cum_vsamp); % Dp part of derivative. 
 pv_recover = dp_p ./ dv_p; 
-% pv_recover = smoothdata(pv_recover, 'gaussian', n_samps .* smooth_window); 
 v_samp_recover = ( v_samps(1:end-1) + v_samps(2:end) ) ./ 2; % Because we loose one value doing derivative. 
 
 %% Kernel density estimation, from Matlab. 
-nptsksd = 100; % nptsksd = int16((max(v_samps) - min(v_samps) ) ./ .01); % Number of points to use in estimating k density. I'm spacing it for now to have a point each 0.01 km/s
+nptsksd = 100; % Number of points to use in estimating k density. I'm spacing it for now to have a point each 0.01 km/s
 width_new = (max(v_samps) - min(v_samps)) / 100; 
 % Test shows that width and numpoints are independent. Increasing num
 % points doesn't mean you should change the width. 
@@ -135,4 +126,3 @@ grid on;
 exportgraphics(gcf, [figpath 'hist_extimations.pdf']); 
 
 pdf_example = struct('v', v_k, 'p', pv_k); 
-% save('pdf_example.mat', 'pdf_example'); 

@@ -1,4 +1,4 @@
-%%%% DANGEROUS! I don't have time to write this to a function properly. 
+% TODO this should be put into a function
 % Set up map default stuff for the script b1_plot_paper_maps_w_litho_mld.m
 
 % State lines
@@ -32,10 +32,6 @@ end
 
 % Label features. 
 if ifig == 1; 
-%     m_text(-83, 39, 'GF', 'color', color_text, 'fontsize', 12, ...
-%         'rotation', 75, 'horizontalalignment', 'center', 'verticalalignment', 'middle', 'fontweight', 'bold'); 
-%     m_text(-83, 36, 'AF', 'color', color_text, 'fontsize', 12, ...
-%         'rotation', 45, 'horizontalalignment', 'center', 'verticalalignment', 'middle', 'fontweight', 'bold'); 
     m_text(-85, 39, 'GF', 'color', color_text, 'fontsize', 12, ...
         'rotation', 75, 'horizontalalignment', 'center', 'verticalalignment', 'middle', 'fontweight', 'bold'); 
     m_text(-80.8, 39, 'AF', 'color', color_text, 'fontsize', 12, ...
@@ -56,8 +52,6 @@ ytckstr = ytck;
 
 % Ticks for 3x2
 if main_paper_figure % Main paper
-%     xtckcel = {[], [], [], xtckstr, xtckstr, xtckstr}; 
-%     ytckcel = {ytckstr, [], [], ytckstr, [], []}; 
     xtckcel = {[], [], [], [], [], [], xtckstr, xtckstr, xtckstr}; 
     ytckcel = {ytckstr, [], [], ytckstr, [], [], ytckstr, [],[]}; 
 else % Supplemental figure

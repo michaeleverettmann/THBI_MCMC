@@ -1,3 +1,7 @@
+%brb20240617 This doesn't run as is and needs a little debugging. I think
+%it was a test to plot penalty in map view. It might not be needed, but I
+%am leaving it here in case a similar script is needed later. 
+
 clc; clear; 
 run('a0_parameters_setup.m'); % !!! Set up all parameters and such in a0. Because there may be many scripts here dependent on those parameters. 
 fpdfs    = sprintf('%scompiled_pdfs_%s.mat',out_dir,STAMP); % File with pdfs. a2_1...m
@@ -13,10 +17,7 @@ zmohsig       = zeros(length(mdls.nwk),1);
 zsed          = zeros(length(mdls.nwk),1);
 zsedsig       = zeros(length(mdls.nwk),1);
 xicr          = zeros(length(mdls.nwk),1); 
-% xicrboundsmaybe= zeros(length(mdls.nwk),2);
 vpvs          = zeros(length(mdls.nwk),1); 
-% vpvssig       = zeros(length(mdls.nwk),1);
-
 
 z_vs          = [0.5, 15, 50, 100, 150, 200]; 
 vs            = zeros(length(mdls.nwk),length(z_vs)); 
@@ -38,7 +39,6 @@ for imd = 1:length(mdls.nwk);
     zsed              (imd) = mdl.zsedav;     
     zsedsig           (imd) = mdl.zsedsig; 
     xicr              (imd) = mdl.xicrav;     
-%     xicrboundsmaybe   (imd,:) = mdl.xicrsig2'; 
     vpvs              (imd) = mdl.vpvsav; 
 
     % Pseudo-tomography
@@ -46,7 +46,6 @@ for imd = 1:length(mdls.nwk);
     [C,I ] = min(dist_from_z); 
     vs(imd,:) = mdl.VSav(I'); % Velocity at depths. 
 end
-
 
 %% Setting up coordinate system. 
 lonmin = min(mdls.lon); 
@@ -70,7 +69,6 @@ ny = 17;
 ivel = 4; % Temporary. Expand to a loop. 
 edge_space = 0.2; % How far to go beyond max and min stax and y, in fraction. 
 
-
 DX = max(stax) - min(stax); 
 DY = max(stay) - min(stay); 
 xline = linspace(min(stax) - edge_space * DX, max(stax) + edge_space * DX, nx)'; 
@@ -79,7 +77,6 @@ yline = linspace(min(stay) - edge_space * DY, max(stay) + edge_space * DY, ny)';
 [longrid, latgrid] = m_xy2ll(xgrid, ygrid); 
 
 vs_interp = griddata(stax, stay, vs(:,ivel), xgrid, ygrid, 'cubic'); 
-% vs_interp(isnan(vs_interp)) = nanmean(vs_interp, 'all'); 
 
 % Plot surface. 
 a3_2_plot_surface_simple(llminmax, 'stax', stax, 'stay', stay, 'stav', vs(:,ivel),...
@@ -90,12 +87,8 @@ exportgraphics(gcf, 'surface_simple_interpolation.pdf');
 
 
 %% Get PDF for stations. 
-% Use an example pdf while developing surface inversion stuff. 
-% fpdf = '~/Documents/UCSB/ENAM/THBI_ENAM/functions/plotting/many_stas/pdf_example.mat'; 
-% pdf = load(fpdf).pdf_example; 
-% Probably something like pdf(ista) = load(pdf_sta). 
 pdf_file = load(fpdfs); 
-pdfs = pdf_file.pdfs; 
+pdfs = pdf_file.pdfs_allparm; 
 
 rough_scale = 5e-8; % How much to penalize roughness. 
 
@@ -148,20 +141,11 @@ penalty = penalty + roughness;
 fhand=@(vgrid)a3_1_penalty(vgrid,...
     pdfs, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay); % Supply constants to the function handle. 
 fhand(vgrid); 
-% vgrid_start = vgrid; 
 
 fhand2=@()fhand(vgrid); 
 
-% % % %%
-% % % for iii=1:100; 
-% % %     fhand2(); 
-% % % end
-
-%%%%%%%%%% 
-
 %% Interpolate each pdf to common mm grid. 
 % Important for computational efficient when calculating penalty. 
-
 nsta = length(pdfs); 
 nmm = 300; 
 [pdf_terp, mm_terp, dmm_di] = p_prep_mm_to_pdf(pdfs, nmm); 
@@ -171,25 +155,6 @@ vsta_mod = linspace(min(mm_terp), max(mm_terp), nsta)'; % FOR TESTING Easy value
 
 pdf_mod = p_mm_to_pdf_dmdi(...
     vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); 
-% fhand_mm_to_pdf=@(vsta_mod)p_mm_to_pdf_dmdi(vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); % super simple way to call this function... 
-% fhand_mm_to_pdf(vsta_mod)
-
-% % % fhandtest = @()mm_to_pdf_dmdi(vsta_mod, pdf_terp, min(mm_terp), dmm_di, nmm, nsta); 
-% % % timeit(fhandtest)
-
-% Plot to check that we interpolated to a common mm correctly. 
-% % % % figure(12); clf; hold on; 
-% % % % tiledlayout(2,1,'TileSpacing','compact'); 
-% % % % nexttile(); hold on; title('Interpolated') 
-% % % % for ista = 1:nsta
-% % % %     plot(ista  + pdf_terp(:,ista), mm_terp ); 
-% % % % end
-% % % % scatter([1:nsta]' + pdf_mod, vsta_mod); 
-% % % % 
-% % % % nexttile(); hold on; title('Original'); 
-% % % % for ista = 1:nsta; 
-% % % %     plot(ista + pdfs(ista).pm, pdfs(ista).mm)
-% % % % end
 
 %% Interpolate mm from the grid to stations.  
 [fhand_vec, fhand_mat, grid_terp, nearesti, weighti...
@@ -214,16 +179,3 @@ fhand2=@()a3_1_penalty_efficient(vgrid,...
 for iii=1:10000; 
     fhand2(); 
 end
-
-% % % %%
-% % % fhand=@(vgrid)a3_1_penalty(vgrid,...
-% % %     pdfs, rough_scale, dx2, dy2, xgrid, ygrid, stax, stay); % Supply constants to the function handle. 
-% % % fhand(vgrid); 
-% % % % vgrid_start = vgrid; 
-% % % 
-% % % fhand2=@()fhand(vgrid); 
-% % % 
-% % % % % % %%
-% % % % % % for iii=1:100; 
-% % % % % %     fhand2(); 
-% % % % % % end
