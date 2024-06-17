@@ -9,6 +9,7 @@ SYNTHETICS/**.mat
 SYNTHETICS/**.mod
 
 data/**
+!data/readme.txt
 
 
 # Some obnoxious files I never want to keep I think
