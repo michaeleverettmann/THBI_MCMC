@@ -47,13 +47,8 @@ addpath([proj.dir,'matguts/']);
 run parms/bayes_inv_parms
 [par, inv] = update_bayes_inv_parms(par, STAMP); % Modify inversion parameters depending on your STAMP. Useful for doing various synthetic tests. 
 
-if strcmp(projname,'SYNTHETICS') || strcmp(projname, 'transition_to_russell_mineos'); 
-%     bb2021.12.07 Removing the re-definitions of sta. I want synthetic test charactaristic, not noise, to define sta. 
-%     if isfield(par.synth,'noisetype') && strcmp(par.synth.noisetype,'real'); 
-%         sta=['SYNTH_',sta]; 
-%     else
-%         sta = 'SYNTH'; 
-%     end
+if any(strcmp(projname,{'SYNTHETICS','transition_to_russell_mineos', 'example_github'})); 
+
     par.stadeets = struct('sta',sta','nwk',nwk'); 
 
 	% noise details, if "real"

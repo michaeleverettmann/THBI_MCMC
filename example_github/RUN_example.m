@@ -20,7 +20,7 @@ for istamp = 1:length(STAMP_all); % Loop over each synthetic model.
 
     run('../a0_STARTUP_BAYES.m') % Setup paths and stuff
     
-    proj = struct('name', 'SYNTHETICS'); 
+    proj = struct('name', 'example_github'); 
     paths = getPaths(); 
     proj.STAinversions = paths.STAinversions; 
     proj.dir = [fileparts(mfilename('fullpath')),'/'];
