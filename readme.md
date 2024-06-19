@@ -9,12 +9,13 @@ There are dependencies for forward modelling. What you need depends on which dat
 - We partially set up MCMC to work with telewavesim: https://github.com/paudetseis/Telewavesim. If you want to use this instead of Propmat, you will need solve a few more minor errors. There is an option to use telewavesim instead of propmat, but you should be fine to just use propmat. 
 - The anisotropic HK stack repository is available if you want HK stacks. https://github.com/brennanbrunsvik/hk_anis
 
-Some other dependencies. Look through a0_STARTUP_BAYES.m to understand these.  
-- fastBSpline
-- Seizmo. Use for the 1-D velocity models, and for Tau-p. 
+Some other dependencies. You may not need some of these, depending on what you are running. I placed each of these in my ~/MATLAB/ folder (see a0_STARTUP_BAYES.m). You can email me and I will send the whole set of dependencies. 
+- borders. https://www.mathworks.com/matlabcentral/fileexchange/50390-borders 
+- brewermap. https://github.com/DrosteEffect/BrewerMap https://www.mathworks.com/matlabcentral/fileexchange/45208-colorbrewer-attractive-and-distinctive-colormaps 
+- fastBSpline. https://www.mathworks.com/matlabcentral/fileexchange/32509-fast-b-spline-class
+- Seizmo. Use for the 1-D velocity models, and for Tau-p. https://github.com/g2e/seizmo 
 - seis_tools-master. Get most recent version from Brennan. 
 - EilonmyFUNCTIONS. Get most recent version from Brennan. 
-- Some colormaps from Matlab file exchange. 
 
 Some steps: 
 - Change your paths in a0_STARTUP_BAYES.m. Obtain any dependencies. 

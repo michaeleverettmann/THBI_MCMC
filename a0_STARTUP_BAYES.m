@@ -32,7 +32,7 @@ addpath([bayesdir,'functions/plotting/receiver_functions']);
 
 %% Path of sub functions that I got online but don't know if I can distribute. bb2021.09.14
 addpath(genpath([bayesdir, 'functions/functionsExternal'])); 
-addpath([hd '/MATLAB/fastBSpline']); % path to fast spline func. Should go to this folder and run the CompileMex something file. google "fastBSspline MATLAB" for this
+addpath([hd '/MATLAB/fastBSpline']); % https://www.mathworks.com/matlabcentral/fileexchange/32509-fast-b-spline-class. Path to fast spline func. Should go to this folder and run the CompileMex something file. google "fastBSspline MATLAB" for this. 
 addpath([bayesdir,'matlab_to_propmat']); % path to propagator matrix running dir. provided
 addpath([bayesdir,'matlab_to_mineos']); % path to mineos running dir. provided
 addpath([bayesdir,'matlab_to_hv_kernel']); % matlab wrapper for HV codes. 
@@ -42,9 +42,10 @@ addpath([hd '/MATLAB/seis_tools-master']);
 % addpath('~/Dropbox/MATLAB/lib/gaussfit'); % path to gaussfit dir brb20210804 don't think used any more
 % addpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup_alt'); % brb2021.08.04 Need taup
 addpath([hd '/MATLAB/EilonmyFUNCTIONS']); % bb2021.08.04 added to get "maxab"
-% addpath([hd '/MATLAB/integration/simps']); % For using simpsons rule integration. 
 
 %% telewavesim and it's Python environment. 
+% brb20240619 This Python environment should only be needed if you are
+% using telewavesim in stead of propmat. 
 p_tws = [bayesdir,'matlab_to_telewavesim']; 
 addpath(p_tws); 
 if count(py.sys.path, p_tws) == 0
@@ -54,8 +55,7 @@ pyenv('Version', '~/opt/anaconda3/envs/tws/bin/python', ... % Use anaconda envir
     'ExecutionMode','OutOfProcess'); % ERROR ALERT Could not import numpy if using an anconda environment. Matlab would simply crash. However, setting executionMode=OutOfProcess fixed that for me. https://www.mathworks.com/matlabcentral/answers/502458-why-can-py-numpy-array-not-be-resolved
 
 %%
-
-% Some things needed for TauP
+% Some things needed for TauP. Taup used with synthetic receiver functions.
 javaaddpath([hd '/MATLAB/seizmo/mattaup/lib/MatTauP-2.1.1.jar']); 
 javaaddpath([hd '/MATLAB/seizmo/mattaup/lib/TauP-2.1.1.jar']);
 javaaddpath([hd '/MATLAB/iris/IRIS-WS-2.0.18.jar']); % bb2021.09.27 moving this path from evdata1_database.m. Should be just for downloading station data from IRIS. So you shouldn't need it.  

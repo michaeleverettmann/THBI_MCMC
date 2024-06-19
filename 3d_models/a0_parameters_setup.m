@@ -19,7 +19,7 @@ desired_iter   = 16000;
 addpath('~/MATLAB/m_map');
 addpath('~/Documents/UCSB/ENAM/THBI_ENAM/functions'); 
 addpath('~/MATLAB/seizmo/cmap'); warning('adding cmap in seismo. Is this breaking split?'); 
-addpath('~/MATLAB/borders'); 
+addpath('~/MATLAB/borders'); % https://www.mathworks.com/matlabcentral/fileexchange/50390-borders
 addpath('~/Documents/repositories/general_data'); % For topography loading. get_z_etopo1.m
 addpath('~/Documents/repositories/Base_code/colormaps/colormaps_ander_biguri'); 
 addpath('~/Documents/repositories/Base_code/colormaps/redblue'); 

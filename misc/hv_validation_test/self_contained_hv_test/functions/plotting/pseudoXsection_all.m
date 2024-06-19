@@ -19,7 +19,7 @@ addpath('~/MATLAB/m_map');
 % addpath('~/Documents/MATLAB/BayesianJointInv/functions');
 addpath('~/Documents/UCSB/ENAM/THBI_ENAM/functions'); 
 addpath('~/MATLAB/seizmo/cmap'); warning('adding cmap in seismo. Is this breaking split?'); 
-addpath('~/MATLAB/borders'); 
+addpath('~/MATLAB/borders'); % https://www.mathworks.com/matlabcentral/fileexchange/50390-borders
 addpath('/Users/brennanbrunsvik/Documents/repositories/general_data'); % For topography loading. get_z_etopo1.m
 
 % specify details of this run

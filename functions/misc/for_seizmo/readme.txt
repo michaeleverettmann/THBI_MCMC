@@ -1,1 +1,1 @@
-These are some seizmo functions. We cannot simply add seizmo to the path, as it overwrites builtin function names and breaks Matlab. So, pick and choose just the seizmo functions we need and put them here. 
+These are some seizmo functions. We cannot simply add all of seizmo to the path, as it overwrites builtin function names and breaks Matlab. For certain functions, I just moved the seizmo functions here. 
