@@ -28,13 +28,15 @@ These are typically placed in the `~/MATLAB/` folder. Refer to `a0_STARTUP_BAYES
 - [brewermap](https://github.com/DrosteEffect/BrewerMap)
 - [fastBSpline](https://www.mathworks.com/matlabcentral/fileexchange/32509-fast-b-spline-class)
 - [Seizmo](https://github.com/g2e/seizmo) (for 1-D velocity models and Tau-p)
-- **seis_tools-master**: Obtain the most recent version from Brennan.
-- **EilonmyFUNCTIONS**: Obtain the most recent version from Brennan.
+- [seis_tools](https://github.com/eilonzach/seis_tools) (Misc tools from Zach Eilon) 
+- [myFUNCTIONS](https://github.com/eilonzach/myFUNCTIONS) (Misc tools from Zach Eilon) 
 
 ## Setup steps
 
 1. Update paths in `a0_STARTUP_BAYES.m` and obtain necessary dependencies.
-1. Compile mex code in the `fastBSpline` folder to speed up spline calculations (optional).
+1. Compile codes. 
+    1. All Fortran forward modelling codes. 
+    1. mex code in the `fastBSpline` folder to speed up spline calculations (optional).
 1. Run the synthetic test in the `example_github` folder.
 1. For real data applications, use the `ENAM` folder as a starting point. Modify "matguts" to load your data from your computer. 
 1. For station information, refer to `evdata1_database.m` (add details to the readme if found).

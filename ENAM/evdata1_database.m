@@ -121,7 +121,7 @@ stainfo = struct('stas',{{stations_IRIS.StationCode}'},...
                  'offdate_str',{{stations_IRIS.EndDate}'},...
                  'nstas',length(stations_IRIS));  
              
-[stainfo] = stainfo_unique(stainfo);
+[stainfo] = stainfo_unique_mcmc(stainfo);
 
 % parse channels             
 chans = cell(stainfo.nstas,3);
