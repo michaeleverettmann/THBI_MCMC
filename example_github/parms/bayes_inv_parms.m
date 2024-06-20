@@ -15,7 +15,7 @@ inv = struct(    'synthTest',true                ,...
                  'Nsavestate',50                 ,... % Niter per which the state of the parallel inversion is saved in .mat file
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x  
-                 'datatypes',{{'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}});
+                 'datatypes',{{'SW_Ray_phV', 'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P'}}); % 'SW_HV' brb20240620 Remove HV until Toshiro puts it on Github. 
 
 % Everything below can be copy pasted between real data runs and synthetic runs (as of 2022.08.11). brb    
 
