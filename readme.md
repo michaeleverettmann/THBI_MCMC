@@ -22,14 +22,14 @@ This code accompanies:
 
 ### Other dependencies
 
-These are typically placed in the `~/MATLAB/` folder. Refer to `a0_STARTUP_BAYES.m` for setup details.
+These were placed in the `~/MATLAB/` folder. Refer to `a0_STARTUP_BAYES.m` for setup details.
 
 - [borders](https://www.mathworks.com/matlabcentral/fileexchange/50390-borders)
 - [brewermap](https://github.com/DrosteEffect/BrewerMap)
 - [fastBSpline](https://www.mathworks.com/matlabcentral/fileexchange/32509-fast-b-spline-class)
-- [Seizmo](https://github.com/g2e/seizmo) (for 1-D velocity models and Tau-p)
-- [seis_tools](https://github.com/eilonzach/seis_tools) (Misc tools from Zach Eilon) 
-- [myFUNCTIONS](https://github.com/eilonzach/myFUNCTIONS) (Misc tools from Zach Eilon) 
+- [Seizmo](https://github.com/g2e/seizmo) 
+- [seis_tools](https://github.com/eilonzach/seis_tools) 
+- [myFUNCTIONS](https://github.com/eilonzach/myFUNCTIONS) 
 
 ## Setup steps
 
