@@ -34,7 +34,14 @@ addpath([bayesdir,'functions/plotting/receiver_functions']);
 addpath(genpath([bayesdir, 'functions/functionsExternal'])); 
 addpath([hd '/MATLAB/fastBSpline']); % https://www.mathworks.com/matlabcentral/fileexchange/32509-fast-b-spline-class. Path to fast spline func. Should go to this folder and run the CompileMex something file. google "fastBSspline MATLAB" for this. 
 addpath([bayesdir,'matlab_to_propmat']); % path to propagator matrix running dir. provided
-addpath([bayesdir,'matlab_to_mineos']); % path to mineos running dir. provided
+
+%%% brb20240621 some stuff for changing the mineos version
+% addpath([bayesdir,'matlab_to_mineos']); % path to mineos running dir. provided
+disp('brb20240621 Temporarily not adding matlab_to_mineos to path. '); 
+addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/transition_to_russell_mineos/new_code'); % Remove when ready
+addpath('/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/MINEOS_synthetics/run_MINEOS'); % Move when ready 
+%%%
+
 addpath([bayesdir,'matlab_to_hv_kernel']); % matlab wrapper for HV codes. 
 addpath([hd '/MATLAB/seizmo/models']); % path to seiz models. Google "MATLAB seizmo" for this
 addpath([hd '/MATLAB/seis_tools-master/surface_waves']); % path to Rayleigh wave dispersion curve dir. '/Users/zeilon/Dropbox/MATLAB/seis_tools/surface_waves'); % on Zach's github
