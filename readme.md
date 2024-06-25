@@ -2,9 +2,7 @@
 
 This code performs a joint inversion of receiver functions and surface wave data using a Markov Chain Monte Carlo (MCMC) inversion. This is a Trans-dimensional, Hierarchical, Bayesian Inversion (THBI). 
 
-This code accompanies:
-- Brunsvik, B., Eilon, Z., & Lynner, C. (2024). Plate‐scale imaging of eastern US reveals ancient and ongoing continental deformation. *Geophysical Research Letters, 51*(12), e2024GL109041.
-- The code was modified from Eilon et al. (2018). See also Golos et al. (2024) and Petruska and Eilon (2022).
+If you use this code, please cite Brunsvik et al. (2024) and Eilon et al. (2018). See also Golos et al. (2024) and Petruska and Eilon (2022).
 
 ## Running the examples
 
@@ -52,3 +50,11 @@ These were placed in the `~/MATLAB/` folder. Refer to `a0_STARTUP_BAYES.m` for s
 - `run_one_chain.m` is complex and hard to change because it handles many cases where Mineos fails. Test thoroughly if modified.
 
 For any further assistance or to obtain dependencies, feel free to contact the author.
+
+## References
+
+1. Brunsvik, B., Eilon, Z., & Lynner, C. (2024). Plate‐scale imaging of eastern US reveals ancient and ongoing continental deformation. *Geophysical Research Letters, 51*(12), e2024GL109041. https://doi.org/10.1029/2024GL109041 
+1. Eilon, Z., Fischer, K. M., & Dalton, C. A. (2018). An adaptive Bayesian inversion for upper-mantle structure using surface waves and scattered body waves. Geophysical Journal International, 214(1), 232–253. https://doi.org/10.1093/gji/ggy137
+1. Golos, E. M., Brunsvik, B., Eilon, Z., Fischer, K. M. (in revision). A new view of the lithosphere-asthenosphere system in the Southwestern United States. JGR: Solid Earth. 
+1. Petruska, J., & Eilon, Z. (2021). Distributed Extension across the Ethiopian Rift and Plateau Illuminated by Joint Inversion of Surface Waves and Scattered Body Waves. Geochemistry, Geophysics, Geosystems, e2021GC010179.
+
