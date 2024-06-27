@@ -70,7 +70,7 @@ SW_V_kernels = transpose(SW_V_kernels);
 % % Example
 % SW_V_kernels = targ; 
 
-ifplot = true; 
+ifplot = false; 
 if ifplot; 
     figure(1008); clf; hold on; 
     for ip = 1:n_per; 
