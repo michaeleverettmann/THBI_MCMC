@@ -65,7 +65,8 @@ tFact = (24 * 60 * 60); % Factor to convert from serial time to seconds.
     Pm_prior, par, Kbase] = ...
     initiate_model(...
         par, trudata, chainstr, fail_chain, iii); 
-    
+[~,~]=clean_ram(1,par,'clearRamInterval',1,'verbose',true); 
+
 
 %% ========================================================================
 %% ------------------------- Start iterations -----------------------------
@@ -536,6 +537,10 @@ end
 
 if resetK, delete_mineos_files(ID,'R'); end
 if resetK, delete_mineos_files(ID,'L'); end
+
+if resetK; % Remove Mineos files to keep ram available. 
+    [~,~]=clean_ram(ii,par,'clearRamInterval',1,'verbose',true); 
+end
 
 end % on iterations
 %% -------------------------- End iteration  ------------------------------

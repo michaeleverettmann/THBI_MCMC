@@ -99,7 +99,7 @@ prem_isotropic = prem;
 % parfor), we make a matlab script that will load these paths from a .mat
 % file. 
 
-ramDrive = make_ram_drive(); % Make a folder in ram for faster temporary IO. Tested on a Mac and a few Linux computers. 
+ramDrive = make_ram_drive('ramMb', feature('numcores')*768 ); % Make a folder in ram for faster temporary IO. Tested on a Mac and a few Linux computers. 
 setPaths(hd,proj,ramDrive); % Use below function to store the paths. 
 
 function setPaths(hd,proj,ramDrive); 

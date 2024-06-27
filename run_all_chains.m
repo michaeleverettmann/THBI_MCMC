@@ -234,7 +234,7 @@ fprintf('\n ============== STARTING CHAIN(S) ==============\n')
 %% ========================================================================
 
 % Probably do not run in parallel until you know it works in serial for loop. 
-for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
     par = PR.Value; 
     trudata = TD.Value; 
     [ model0_perchain{iii}, misfits_perchain{iii},...
