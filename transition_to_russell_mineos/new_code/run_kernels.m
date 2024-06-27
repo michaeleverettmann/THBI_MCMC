@@ -28,6 +28,7 @@ if nargin < 9 || isempty(ifanis)
 end
 
 %% parameters
+% This needs to be exactly the same as in run_mineos.m. TODO make a function
 % default parameters
 parm = struct('R_or_L','R',...
               'phV_or_grV','ph',...
@@ -44,6 +45,10 @@ fns = fieldnames(par_mineos);
 for ii = 1:length(fns)
     parm.(fns{ii}) = par_mineos.(fns{ii});
 end
+
+% compute max frequency (mHz) - no need to compute past the minimum period desired
+parm.fmax = 1000./min(swperiods)+1; % need to go a bit beyond ideal min period..
+% parm.fmin = 1000./max(swperiods)-1; % TODO Should we limit the min frequency?  
 
 
 % phase or group or both ([1 0] or [0 1] or [1 1] respectively)
@@ -79,4 +84,4 @@ wd = pwd;
 %% CALCULATE AND READ IN PERTURBATION KERNELS 
 %(frechet derivatves of parm perturbation)
 
-SW_V_kernels = f_mineos_kernels(parm); 
+SW_V_kernels = f_mineos_kernels(parm, swperiods); 

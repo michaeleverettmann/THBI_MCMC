@@ -43,7 +43,19 @@ for id = 1:length(par.inv.datatypes)
 
             kfld = {'Vsv','Vsh','Vpv','Vph','rho';'dvsv','dvsh','dvpv','dvph','drho'};
 
+            % disp('Temporarily flipping kernels around to understand an error. ')
+            % Kbase.(pdtyp{2}).Kph{1}.Z = 6371000 - Kbase.(pdtyp{2}).Kph{1}.Z
+
             zind = find(modptb.Z<max(Kbase.(pdtyp{2}).Kph{1}.Z/1000)); 
+
+            % % A test to see if our node direction and order is correct
+            % figure(1007); clf; hold on; 
+            % scatter(modptb.Z, ones(size(modptb.Z))  , 'DisplayName', 'modptb'); 
+            % zplt = Kbase.(pdtyp{2}).Kph{1}.Z/1000; 
+            % scatter(zplt    , ones(size(zplt    ))+1, 'DisplayName', pdtyp{2} ); 
+            % xlabel('Depth'); 
+            % ylabel('Nothing'); 
+            % legend(); 
 
             for ip = 1:Np
                 for ik = 1:size(kfld,2)
@@ -62,17 +74,17 @@ for id = 1:length(par.inv.datatypes)
             predata.(dtype).phV = (1+est_dc_c_interp).*phV_interp; % estimated model1 phase velocities
             % brb TODO Modify if including group velocity. if pdtyp{3} grV, interpolate that. Otherwise, phV. 
             
-% % %             % You can uncomment this to check that interpolated and actual phase velocities match. 
-% % %             figure(1); clf; hold on; box on; set(gca, 'linewidth', 1.5);
-% % %             set(gcf, 'pos', [-929 622 484 300], 'color', 'white'); 
-% % %             xlabel('Period (s)'); ylabel('Phase velocity (km/s)'); 
-% % %             title('Velocity (phase/group), all periods versus interpolated for this dataset', 'fontweight', 'normal'); 
-% % %             hand_full   = plot(Kbase.(pdtyp{2}).periods, Kbase.(pdtyp{2}).(pdtyp{3}), ...
-% % %                 '-o', 'color', 'k'); 
-% % %             hand_interp = plot(predata.(dtype).periods , phV_interp,                 ...
-% % %                 '-x', 'color', 'b', 'linewidth', 1.5); 
-% % %             lgd = legend([hand_full, hand_interp], 'All freq', 'Interp freq'); 
-% % %             set(lgd, 'loc', 'best'); 
+            % % You can uncomment this to check that interpolated and actual phase velocities match. 
+            % figure(1); clf; hold on; box on; set(gca, 'linewidth', 1.5);
+            % set(gcf, 'pos', [-929 622 484 300], 'color', 'white'); 
+            % xlabel('Period (s)'); ylabel('Phase velocity (km/s)'); 
+            % title('Velocity (phase/group), all periods versus interpolated for this dataset', 'fontweight', 'normal'); 
+            % hand_full   = plot(Kbase.(pdtyp{2}).periods, Kbase.(pdtyp{2}).(pdtyp{3}), ...
+            %     '-o', 'color', 'k'); 
+            % hand_interp = plot(predata.(dtype).periods , phV_interp,                 ...
+            %     '-x', 'color', 'b', 'linewidth', 1.5); 
+            % lgd = legend([hand_full, hand_interp], 'All freq', 'Interp freq'); 
+            % set(lgd, 'loc', 'best'); 
 
 %% --------------------  HV ratios  --------------------
    
