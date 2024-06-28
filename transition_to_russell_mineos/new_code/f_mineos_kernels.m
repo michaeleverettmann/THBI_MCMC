@@ -42,11 +42,17 @@ for iv = 1:length(parmso); % For each velocity-like parameter
         %     ker = flip(ker); 
         % end 
 
-        % Convert between radius and depth. Try #2. 
+        % Direction. convert between radius and depth. Try #2. 
         if strcmp(outp, "Z"); 
             ker = 6371000-ker; 
         end
         ker = flip(ker); 
+
+        % Units. Josh's kernels were 1000 times smaller than Zach's. 
+        if ~strcmp(outp, "Z"); 
+            ker = ker * 1000; 
+        end 
+        disp('Multiply kernels by 1000')
 
         % Assign input kernel to output
         SW_V_kernels{ip}.(outp) = ker; 
