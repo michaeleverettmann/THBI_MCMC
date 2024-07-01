@@ -166,7 +166,8 @@ forc = struct(      'mindV',0.075                 ,... % delta Vs for layerising
                     'synthperiod',2.5              );  % period for propmat response
                 
 %% Data processing parms
-datprocess=struct( 'normdata',true               ,... % normalise data in processing
+datprocess=struct( 'dat_version','HOPPER'     ,... % Which version of Sp data to use. 
+                   'normdata',true               ,... % normalise data in processing
                    'decdata',false               ,... % decimate data in processing
                    'clipmain',false              ,... % whether to clip the main phase with a taper
                    'clipdaughter',true           ,... % whether to clip the daughter component at the timing of the main phase (to account for improper rotation) == CHEAT
