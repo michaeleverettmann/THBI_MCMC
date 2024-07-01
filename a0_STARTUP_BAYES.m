@@ -104,6 +104,14 @@ setPaths(hd,proj,ramDrive); % Use below function to store the paths.
 
 function setPaths(hd,proj,ramDrive); 
 
+    % brb20240628 For development on a local computer, might want to store
+    % "data" on an external drive. If that external drive is found, assume
+    % that data is stored here: 
+    data_drive = '/Volumes/extDrive/offload/Users/brennanbrunsvik'; 
+    if ~ (exist(data_drive)==7); % Data drive not present. 
+        data_drive = hd; % Assume data is stored at hd. File structure from point of data_drive and hd should be the same on your local machine, if you store data on an external drive. 
+    end 
+
     % Need shell function timeout. Might be in different places depending on the computer. 
     if isfile('/usr/local/bin/timeout'); % Would be better to do system('which timeout'), but system does not have the normal $PATH, and cannot always find timeout. 
         timeoutpath = '/usr/local/bin/timeout'; 
@@ -119,7 +127,7 @@ function setPaths(hd,proj,ramDrive);
                        'timeout',         timeoutpath,...
                        'THBIpath',       [hd '/Documents/UCSB/ENAM/THBI_ENAM'],...
                        'execPath',       ramDrive,... % Working directory during inversion. Is on ram, for fast IO. 
-                       'models_seismic', [hd '/Documents/repositories/data/models_seismic'], ... % Where is your seismic data stored. 
+                       'models_seismic', [data_drive '/Documents/repositories/data/models_seismic'], ... % Where is your seismic data stored. 
                        'ramDrive',        ramDrive); 
     
     addpath(sprintf('%s/SEMum2_avg_VS',paths.models_seismic)); % brb2022.08.16 Average global velocity models. For synthetic tests.                 

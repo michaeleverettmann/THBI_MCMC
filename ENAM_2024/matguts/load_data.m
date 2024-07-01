@@ -103,7 +103,7 @@ if any(strcmp(allpdytp(:,1),'RF'))
             % grab RF(z) from CCP
             % negative P polarity means positive velocity gradient (e.g.
             % moho), consistent with the forward models
-            [RF_dz,zz_d] = load_CCP_RFz( [slat,slon],0,'version',par.datprocess.dat_version); 
+            [RF_dz,zz_d] = load_CCP_RFz( [slat,slon],0 ); 
             zz_d = double(zz_d);
             dz = unique(diff(zz_d));
             
