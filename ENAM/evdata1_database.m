@@ -6,7 +6,8 @@ ifdownloadseed = false;
 
 run('../a0_STARTUP_BAYES.m')
 paths = getPaths(); 
-proj = struct('name','ENAM');
+this_folder = split(pwd, '/'); 
+proj = struct('name',this_folder{end});
 proj.dir = [paths.THBIpath '/' proj.name];
 
 %% Station parameters

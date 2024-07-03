@@ -3,7 +3,7 @@
 % Most paths that need manual changing should be here. 
 % Don't use clear at the beginning of this script. Sometimes I run it after already having provided network/station name in RUN_one_sta.m
 
-proj = struct('name', 'ENAM'); % Subfolder that can contain things for your application of MCMC to your own data. 
+proj = struct('name', 'ENAM'); % Subfolder that can contain things for your application of MCMC to your own data. TODO not sure this matters now. 
 
 setenv('TZ','America/Los_Angeles'); % set time zone. Maybe not needed? 
 

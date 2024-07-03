@@ -1,1 +1,1 @@
-What I used to run the MCMC paper for eastern US. You can likely modify "batch" scripts to work for submitting to Slurm on your HPC. RUN_one_station.m should get you started for running one station with real data, and it will be called by the batch scripts.  brb20240614
+Modified from ENAM folder

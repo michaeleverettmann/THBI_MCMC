@@ -114,7 +114,8 @@ for istamp = [1:length(STAMP_all)];
 
     % Paths stuff
     paths = getPaths(); 
-    proj = struct('name','ENAM');
+    this_folder = split(pwd, '/'); 
+    proj = struct('name',this_folder{end});
     proj.dir = [paths.THBIpath '/' proj.name];
     wd = pwd; addpath(wd);
     cd(proj.dir);

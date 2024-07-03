@@ -6,12 +6,13 @@ ifdownloadseed = false;
 
 run('../a0_STARTUP_BAYES.m')
 paths = getPaths(); 
-proj = struct('name','ENAM');
+this_folder = split(pwd, '/'); 
+proj = struct('name',this_folder{end});
 proj.dir = [paths.THBIpath '/' proj.name];
 
 %% Station parameters
-sta_latlims = [21 48]; % [min_lat max_lat] for stations
-sta_lonlims = [-93, -63.4]; % [min_lon max_lon] for stations
+sta_latlims = [21 51]; % [min_lat max_lat] for stations
+sta_lonlims = [-127, -57]; % [min_lon max_lon] for stations
 sta_chans = 'BH*,HH*'; % channel codes to search for
 starttime = '1970-01-01 00:00:00';
 startbytime = '2030-01-01 00:00:00';
