@@ -1,8 +1,9 @@
 function [SW_V_kernels] = run_kernels(phV, grV, swperiods,par_mineos,eigfiles,ifdelete,ifplot,ifverbose,ifanis)
-% [SWV_kernels] = run_kernels(swperiods,par_mineos,eigfiles,ifdelete,ifplot,ifverbose,ifanis)
+% [SWV_kernels] = run_kernels(phV, grV, swperiods,par_mineos,eigfiles,ifdelete,ifplot,ifverbose,ifanis)
 % 
 % Function to calculate perturbational phase velocity kernels, having
 % previously run MINEOS
+% Modified from old matlab_to_mineos folder to work with Josh's Mineos. 
 
 paths = getPaths(); 
 
@@ -56,7 +57,6 @@ end
 parm.fmax = 1000./min(swperiods)+1; % need to go a bit beyond ideal min period..
 % parm.fmin = 1000./max(swperiods)-1; % TODO Should we limit the min frequency?  
 
-
 % phase or group or both ([1 0] or [0 1] or [1 1] respectively)
 ph_gr = [0 0];
 if ~isempty(regexp(parm.phV_or_grV,'ph','once')) ||...
@@ -80,7 +80,6 @@ tabfile = [ID,'.table'];
 qfile = [ID,'.q'];
 kernelfile = [ID,'.frechet'];
 
-
 % standard inputs, don't get re-written
 qmod = parm.qmodpath; % This should resolve any path problems finding qmod. bb2021.09.14
 
@@ -88,6 +87,4 @@ qmod = parm.qmodpath; % This should resolve any path problems finding qmod. bb20
 wd = pwd;
 
 %% CALCULATE AND READ IN PERTURBATION KERNELS 
-%(frechet derivatves of parm perturbation)
-
 SW_V_kernels = f_mineos_kernels(phV, grV, parm, swperiods); 

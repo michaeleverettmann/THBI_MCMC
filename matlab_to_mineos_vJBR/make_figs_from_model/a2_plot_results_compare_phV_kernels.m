@@ -3,7 +3,7 @@ clear; clc; close all;
 % versions = ["old", "new"]; 
 
 % Where we are storing figs, and pre data and kernels.
-root_dir = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/transition_to_russell_mineos/make_figs_from_model/'; 
+root_dir = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_mineos_vJBR/make_figs_from_model/'; 
 fdat = [root_dir 'fig_out_%s_mineos/%s'];
 fig_comp = [root_dir, 'fig_comparison/']; 
 

@@ -79,5 +79,5 @@ figures/xsect/stafile*.txt
 
 .vscode/*
 
-transition_to_russell_mineos/MODE
-transition_to_russell_mineos/IDAGRN
+matlab_to_mineos_vJBR/MODE
+matlab_to_mineos_vJBR/IDAGRN

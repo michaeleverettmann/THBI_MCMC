@@ -19,7 +19,7 @@ for istamp = 1:length(STAMP_all);
 
     run('../a0_STARTUP_BAYES.m')
     
-    proj = struct('name', 'transition_to_russell_mineos'); % bb2021.08.04 changed from EXAMPLE because I don't have the example data files. %,'EXAMPLE');
+    proj = struct('name', 'matlab_to_mineos_vJBR'); % bb2021.08.04 changed from EXAMPLE because I don't have the example data files. %,'EXAMPLE');
     paths = getPaths(); 
     proj.STAinversions = paths.STAinversions; 
     proj.dir = [fileparts(mfilename('fullpath')),'/'];

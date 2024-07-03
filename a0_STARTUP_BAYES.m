@@ -38,8 +38,8 @@ addpath([bayesdir,'matlab_to_propmat']); % path to propagator matrix running dir
 %%% brb20240621 some stuff for changing the mineos version
 % addpath([bayesdir,'matlab_to_mineos']); % path to mineos running dir. provided
 disp('brb20240621 Temporarily not adding matlab_to_mineos to path. '); 
-addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/transition_to_russell_mineos/new_code'); % Remove when ready
-addpath('/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/MINEOS_synthetics/run_MINEOS'); % Move when ready 
+addpath([hd '/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_mineos_vJBR/functions']); % Remove when ready
+addpath([hd '/Documents/repositories/Peoples_codes/MINEOS_synthetics/run_MINEOS']); % Move when ready 
 %%%
 
 addpath([bayesdir,'matlab_to_hv_kernel']); % matlab wrapper for HV codes. 

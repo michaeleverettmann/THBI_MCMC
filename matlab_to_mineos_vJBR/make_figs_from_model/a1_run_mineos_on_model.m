@@ -6,10 +6,10 @@ addpath('./parms')
 version = 'new'; % Old version is Zach's. New is Josh's. 
 if strcmp(version, 'old'); 
     addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_mineos'); 
-    rmpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/transition_to_russell_mineos/new_code'); 
+    rmpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_mineos_vJBR/functions'); 
     rmpath('/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/MINEOS_synthetics/run_MINEOS'); 
 elseif strcmp(version, 'new'); 
-    addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/transition_to_russell_mineos/new_code'); 
+    addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_mineos_vJBR/functions'); 
     addpath('/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/MINEOS_synthetics/run_MINEOS'); 
     rmpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_mineos'); 
 end

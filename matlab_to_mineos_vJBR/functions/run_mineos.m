@@ -16,8 +16,9 @@ function [phV,grV,eigfiles_fix] = run_mineos(model,swperiods,par_mineos,ifdelete
 % velocities at a bunch of input periods. If you keep the output files
 % around (ifdelete==false) then they can be used to calculate perturbation
 % kernels with the complementary run_kernelcalc.m script
+% 
+% Modified from old matlab_to_mineos folder to work with Josh's Mineos. 
 
-%%%%% Previous. Temporary. 
 paths = getPaths(); 
 
 tic1 = now;

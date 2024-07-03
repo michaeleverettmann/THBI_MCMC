@@ -47,7 +47,7 @@ addpath([proj.dir,'matguts/']);
 run parms/bayes_inv_parms
 [par, inv] = update_bayes_inv_parms(par, STAMP); % Modify inversion parameters depending on your STAMP. Useful for doing various synthetic tests. 
 
-if any(strcmp(projname,{'SYNTHETICS','transition_to_russell_mineos', 'example_github'})); 
+if any(strcmp(projname,{'SYNTHETICS','matlab_to_mineos_vJBR', 'example_github'})); 
 
     par.stadeets = struct('sta',sta','nwk',nwk'); 
 
@@ -234,7 +234,7 @@ fprintf('\n ============== STARTING CHAIN(S) ==============\n')
 %% ========================================================================
 
 % Probably do not run in parallel until you know it works in serial for loop. 
-parfor iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
+for iii = 1:par.inv.nchains % TODO Will need to change between for and parfor, depending on circumstance. for is needed if wanting to do debuging. 
     par = PR.Value; 
     trudata = TD.Value; 
     [ model0_perchain{iii}, misfits_perchain{iii},...

@@ -1,8 +1,11 @@
 function [SW_V_kernels] = f_mineos_kernels(phV, grV, parm, swperiods)
 
+%% Wrap modified version of Josh's Matlab wrapper to Mineos. 
 parameter_FRECHET_save(parm, swperiods); % Always re-save parameters. If we had just ran Rayleigh, and are now going to Love, then we would be loading the wrong parameters. 
 parameter_FRECHET
 a2_mk_kernels 
+
+%% Get kernels into MCMC format
 
 % Get correct frechet variable. 
 if ( TYPE == 'S') 
@@ -50,7 +53,7 @@ for iv = 1:length(parmso); % For each velocity-like parameter
 
         % Josh's version of Mineos has different units. To undo that, we
         % need to multiply kernels by model_value(z)/phase_velocity(frequency). brb20240702
-        if ~strcmp(outp, "Z"); 
+        if ~strcmp(outp, "Z"); % This block handles units. 
 
             % Model values. 
             rad_mod = mod_in.('rad'); 
