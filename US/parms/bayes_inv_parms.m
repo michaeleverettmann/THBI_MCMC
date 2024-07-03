@@ -15,8 +15,7 @@ inv = struct(    'synthTest',false                ,...
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x   
                  'datatypes',{{'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
-                        'SW_Ray_phV_lyneqhelm','SW_Ray_phV_lynant',...
-                        'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}}); 
+                        'SW_Lov_phV_eks', 'SW_Lov_phV_har', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}}); 
 %                  'datatypes',{{'HKstack_P'}}); 
 % % %              %                  'datatypes',{{'SW_HV'}}) 
 % % %                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 

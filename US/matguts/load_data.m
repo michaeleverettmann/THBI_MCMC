@@ -206,33 +206,54 @@ if any(strcmp(allpdytp(:,1),'SW'))
     end
 
     %% -------- Love waves
-	if any(strcmp(allpdytp(strcmp(allpdytp(:,1),'SW'),2),'Lov'))
-        [Lperiods,LphV]  = Lph_dispcurve_latlon( slat,slon); % 
-        % brb2022.06.27. Only have one Love wave dataset right now. But if
-        % we want multiple, we can use the Raleigh wave code strategy above
-        % to do so. 
+    if any(strcmp(allpdytp(strcmp(allpdytp(:,1),'SW'),2),'Lov'))
+        
+        % Determine which Love wave datasets to use.
+        phv_modifiers = {}; 
+        for idata = 1:size(allpdytp,1); 
+            isLovPhv = strcmp(allpdytp{idata,1},'SW') && ...
+                strcmp(allpdytp{idata,2},'Lov') && ...
+                strcmp(allpdytp{idata,3},'phV'); % Indices of data where we care about authors.  
+            if isLovPhv; 
+                phv_modifiers{end+1} = allpdytp{idata,4}; 
+            end
+        end 
+        % phv_modifiers should either be empty or have cells with modifiers.
 
-        % %!%! brb2022.06.24 Put this in Lph_dispcurve_latlon_oneauthr
-        if ~isempty(LphV)
-            [Lperiods,iT] = sort(Lperiods);
-            LphV = LphV(iT);
-            SW_Lov_phV = struct('periods',Lperiods,'phV',LphV,'sigma',[]);
-        else
-            SW_Lov_phV=[];
+        all_periods = []'; % keep track of all periods that any dataset used. 
+        for idtype = [1:length(par.inv.datatypes)]; 
+            thisdtype = par.inv.datatypes{idtype}; 
+            if contains(thisdtype, 'SW_Lov'); 
+                [Lperiods_i,LphV,SW_Lov_phV_struct]=...
+                    Lph_dispcurve_latlon_single_auth(slat,slon,'dataset',thisdtype); 
+                if isempty(SW_Lov_phV_struct); % Don't keep this dataset if there is no data for the station. 
+                    warning(['Could not get data for %s. ',...
+                        '\n Not using this datatype! ',...
+                        'Removing from par.inv.datatypes.'],thisdtype); 
+                    par.inv.datatypes{idtype} = []; % Can't keep datatype in par.inv.datatypes if we don't have that datatype. par.inv.datatypes stays same size throughout the loop. Later, we will clear the empty cells from par.inv.datatypes. 
+                    continue; 
+                end
+                all_periods = [all_periods; Lperiods_i]; 
+                SW_Lov_phV_structures(1).(thisdtype) = SW_Lov_phV_struct; 
+            end
         end
         
-        all_periods = unique(sort(Lperiods)); 
+        all_periods = unique(sort(all_periods)); 
         min_period = min([all_periods]); 
         max_period = max([all_periods]); 
-        periods_calc = all_periods; 
+        periods_calc = all_periods; % Just run calculations at the periods where authors made their measurements. Could optionally calculate at predefined periods and interpolate from those periods for individual datasets, but I don't think we gain anything. 
         n_periods_calc = length(periods_calc); 
         for_mod_info = struct('n_periods_calc', n_periods_calc,...
             'all_periods', all_periods,...
             'min_period',min_period,'max_period',max_period,...
-            'periods_calc',periods_calc); % Information on what forward modelling needs to be done. We don't want to do forward modelling once for each seperate author. Instead, forward model once, accounting for every author simultaneously. 
+            'periods_calc',periods_calc); % Information on what forward modelling needs to be done. We don't want to do forward modelling once for each separate author. Instead, forward model once, accounting for every author simultaneously. 
         
-        SW_Lov_phV.for_mod_info = for_mod_info; % Forward modelling shouldn't change for any author...
-
+        % Attach forward modelling structure to each Love wave structure. 
+        fns = fieldnames(SW_Lov_phV_structures); 
+        for ifn = [1:length(fns)]; 
+            SW_Lov_phV_structures.(fns{ifn}).for_mod_info = for_mod_info; 
+        end
+        
     end
 
     %% -------- Rayleigh HV ratios
@@ -357,6 +378,12 @@ fns = fieldnames(SW_Ray_phV_structures);
 for ifn = [1:length(fns)]; 
     thisfn = fns{ifn}; 
     trudata.(thisfn) = SW_Ray_phV_structures.(thisfn); 
+end
+
+fns = fieldnames(SW_Lov_phV_structures); 
+for ifn = [1:length(fns)]; 
+    thisfn = fns{ifn}; 
+    trudata.(thisfn) = SW_Lov_phV_structures.(thisfn); 
 end
 
 % If we could not use some datatype, clear that from par.inv.datatypes. 

@@ -361,6 +361,12 @@ try
         % fprintf('MISFITS: Sp %5.2e  Ps %5.2e  SW %5.2e\n',misfit.SpRF,misfit.PsRF,misfit.SW)
         % fprintf('CHI2S:   Sp %5.2e  Ps %5.2e  SW %5.2e\n',misfit.chi2_sp,misfit.chi2_ps,misfit.chi2_SW)
     
+        if isinf(log_likelihood1) || isinf(-log_likelihood1); 
+            fail_chain=fail_chain+1; ifpass=0;
+            fprintf('\nFailure at ii=%1.0f. log_likelihood1=%f, chi2=%1.2f\n',ii, log_likelihood1, misfit1.chi2sum)
+            break;
+        end
+
         fail_chain = 0; % This chain succeeded, so we now have 0 failed chains in a row?  
         predat_save1 = predata0;
         

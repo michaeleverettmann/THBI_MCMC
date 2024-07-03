@@ -21,8 +21,8 @@ for istamp = [1:length(STAMP_all)];
     % this Matlab script. But, you aren't running from Bash/Slurm, we can
     % use these default values. 
     if ~ (exist('network_manual', 'var') && exist('station_manual', 'var')) ; 
-        network_manual = 'TA'; 
-        station_manual = 'S57A'; 
+        network_manual = 'TA'; % This is NOT used if station_manual is already in your workspace. 
+        station_manual = 'Q13A'; % This is NOT used if station_manual is already in your workspace. 
         fprintf('\nReseting to %s.%s\n',network_manual,station_manual)
     end
     disp('Network and station') 
