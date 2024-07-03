@@ -1,8 +1,8 @@
-function [SW_V_kernels] = f_mineos_kernels(parm, swperiods)
+function [SW_V_kernels] = f_mineos_kernels(phV, grV, parm, swperiods)
 
 parameter_FRECHET_save(parm, swperiods); % Always re-save parameters. If we had just ran Rayleigh, and are now going to Love, then we would be loading the wrong parameters. 
 parameter_FRECHET
-a2_mk_kernels
+a2_mk_kernels 
 
 % Get correct frechet variable. 
 if ( TYPE == 'S') 
@@ -37,22 +37,65 @@ for iv = 1:length(parmso); % For each velocity-like parameter
             ker = frech(ip).(inp); % The kernel component we want 
         end
 
-        % % % Convert between radius and depth.      Some notes: Zach's Z and Josh's rad have the same order (0 to 6371000). But the other kernel values are backwards (radius versus depth). Flip them. Zach's Z: 6370999 is last value. Last Vsv values are 0, top are not. Josh's rad: 6371000 is last value. Last Vsv values are non zero, first are 0. 
-        % if ~ strcmp(outp, "Z"); %disp('Add back in the ~')
-        %     ker = flip(ker); 
-        % end 
-
-        % Direction. convert between radius and depth. Try #2. 
+        % Direction. convert between radius and depth. 
         if strcmp(outp, "Z"); 
             ker = 6371000-ker; 
         end
         ker = flip(ker); 
 
         % Units. Josh's kernels were 1000 times smaller than Zach's. 
-        if ~strcmp(outp, "Z"); 
+        if ~ strcmp(outp, "Z"); 
             ker = ker * 1000; 
         end 
-        disp('Multiply kernels by 1000')
+
+        % Josh's version of Mineos has different units. To undo that, we
+        % need to multiply kernels by model_value(z)/phase_velocity(frequency). brb20240702
+        if ~strcmp(outp, "Z"); 
+
+            % Model values. 
+            rad_mod = mod_in.('rad'); 
+            mod_mult = mod_in.(inp); 
+            z_mod = flip(6371000-rad_mod)./1000; 
+            mod_mult = flip(mod_mult); 
+
+            % Sensitivities. ker was made above. 
+            z_frech = flip(6371000-frech(ip).('rad'))./1000; % Get z. Process consistent with how ker was made. 
+            
+            % Fix units. eta was unitless, so leave it alone.  
+            if ~ strcmp(outp, "eta"); 
+                mod_mult = mod_mult./1000; 
+            end
+
+            % Phase velocity at this period. Will normalize sensitivity to this. 
+            phv_grv_mult = phV(ip); 
+
+            % Remove duplicate points so we can interpolate to the same z basis. Love waves are sometimes cut off at the outer core, so have less z indices. Do a moving average. This returns kernels that are virtually identifical to if there is no interpolateion. 
+            terps = [0.999998, 1-0.999998]; % Moving average weights, for interpolating. 
+            z_mod(2:end-1) = terps(1)*z_mod(2:end-1) + terps(2)*z_mod(3:end) + terps(2)*z_mod(1:end-2); 
+            z_frech(2:end-1) = terps(1)*z_frech(2:end-1) + terps(2)*z_frech(3:end) + terps(2)*z_frech(1:end-2); 
+
+            % Interpolate, to handle cases where number of Zs is different
+            mod_mult = interp1(z_mod, mod_mult, z_frech, 'linear'); 
+            
+            % % Plot kernel and model parameter to make sure their z's are consistent. 
+            % figure(1); clf; hold on; 
+            % plot(ker*max(mod_mult)/max(ker), z_frech, 'DisplayName', 'Frechet'); 
+            % plot(mod_mult, z_mod, 'DisplayName', 'Model'); 
+            % set(gca, "YDir", 'reverse'); 
+            % % ylim([0, 300]); 
+            % legend(); 
+
+            % Make sure the units are consistent between phase velocity and our model parameter. 
+            unit_check = max(mod_mult)/max(phv_grv_mult); 
+            if (unit_check < 0.1) || (unit_check > 10) % Check that mod_mult and phv_grv_mult have consistent units. Doesn't matter if we use km, m, whatever, because the units should cancel out. Just have to be consistent. brb20240702
+                sprintf('phv or grv is factor of %f different from model parameter. They should have consistent units, but seem not to. ',unit_check); % Quick unit check
+                disp(outp)
+                disp(max(mod_mult))
+            end
+
+            % Multiply kernel by model value / phase velocity for units. 
+            ker = ker .* mod_mult / phv_grv_mult; % TODO handle grV case. % Here use mod_in
+        end 
 
         % Assign input kernel to output
         SW_V_kernels{ip}.(outp) = ker; 
@@ -73,7 +116,7 @@ SW_V_kernels = transpose(SW_V_kernels);
 % plot(kn.Vsv, kn.Z, 'DisplayName', 'New'); 
 % legend(); 
 
-% % Example
+% % Can compare to an example
 % SW_V_kernels = targ; 
 
 ifplot = false; 

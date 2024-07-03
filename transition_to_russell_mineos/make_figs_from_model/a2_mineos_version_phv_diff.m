@@ -60,8 +60,8 @@ for itype = 1:2;
         ylabel(parm); 
         xlim([0, 250]); 
         for iper = round(linspace(1, length(ko.phV), 4)); % 
-            plot(ko.Kph{iper}.Z/1000, ko.Kph{iper}.(parm), '-k', 'DisplayName', 'Zach'); 
-            plot(kn.Kph{iper}.Z/1000, kn.Kph{iper}.(parm), '-b', 'DisplayName', 'Josh'); 
+            plot(ko.Kph{iper}.Z/1000, ko.Kph{iper}.(parm), '-k', 'DisplayName', 'Zach', 'linewidth', 1); 
+            plot(kn.Kph{iper}.Z/1000, kn.Kph{iper}.(parm), '--b', 'DisplayName', 'Josh', 'linewidth', 1.5); 
             % plot(ko.Kph{iper}.(parm), kn.Kph{iper}.(parm)); 
             % plot(ko.Kph{iper}.Z, kn.Kph{iper}.Z); 
         end

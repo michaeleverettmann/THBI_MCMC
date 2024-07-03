@@ -14,7 +14,7 @@ TRUEmodel.Vp = TRUEmodel.VP;
 par_mineos = struct('R_or_L', 'R', 'ID', 'test1'); 
 [phV_2,grV_2] = run_mineos(TRUEmodel,swperiods,par_mineos);
 % [phVkernels_2] = run_kernels(swperiods,'R','ph','test1',1,0);
-[phVkernels_2] = run_kernels(swperiods,par_mineos);
+[phVkernels_2] = run_kernels([], [], swperiods,par_mineos);
 
 
 % compare

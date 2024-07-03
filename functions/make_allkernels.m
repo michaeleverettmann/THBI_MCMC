@@ -44,7 +44,7 @@ for id = 1:length(par.inv.datatypes)
         for_mod_info = data.(dtype).for_mod_info; 
         periods_calc = for_mod_info.periods_calc; % This "for_mod_info" is supposed to be consistent between all versions of Rayleigh wave grv/phv, regardless of author/dataset. This way, we only do kernel forward modelling for one author, but we address all periods at once. I designed it that way in load_data.m. brb2022.06.24
         [phV,grV,eigfiles] = run_mineos(model,periods_calc,par_mineos,0,0,par.inv.verbose,options.maxrunN); %MINEOS_REPLACE
-        K = run_kernels(periods_calc,par_mineos,eigfiles,1,0,par.inv.verbose); %MINEOS_REPLACE
+        K = run_kernels(phV, grV, periods_calc,par_mineos,eigfiles,1,0,par.inv.verbose); %MINEOS_REPLACE
         Kbase = populate_Kbase( Kbase,dtype,phV,grV,{K}, periods_calc );
         
         if ~ran_ray_vel && strcmp(pdtyp{2},'Ray'); ran_ray_vel = true; end; 

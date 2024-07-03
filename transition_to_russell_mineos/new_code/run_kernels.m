@@ -1,4 +1,4 @@
-function [SW_V_kernels] = run_kernels(swperiods,par_mineos,eigfiles,ifdelete,ifplot,ifverbose,ifanis)
+function [SW_V_kernels] = run_kernels(phV, grV, swperiods,par_mineos,eigfiles,ifdelete,ifplot,ifverbose,ifanis)
 % [SWV_kernels] = run_kernels(swperiods,par_mineos,eigfiles,ifdelete,ifplot,ifverbose,ifanis)
 % 
 % Function to calculate perturbational phase velocity kernels, having
@@ -8,22 +8,28 @@ paths = getPaths();
 
 tic1 = now;
 
-if nargin < 2 || isempty(par_mineos)
+if isempty(phV); 
+    error('brb20240702 It might be fine to let this function run with phV empty if you are not using Mineos, but I have not tested it. phV was necessary here for using Josh Mineos version'); 
+end 
+if isempty(grV); 
+    error('brb20240702 It might be fine to let this function run with phV empty if you are not using Mineos, but I have not tested it. phV was necessary here for using Josh Mineos version'); 
+end
+if nargin < 4 || isempty(par_mineos)
     par_mineos = [];
 end
-if nargin < 3 || isempty(eigfiles)
+if nargin < 5 || isempty(eigfiles)
     eigfiles = {[par_mineos.ID,'_0.eig']}; % brb2021.11.03 TODO This will break if you do not provide par_mineos! Previously, it just utilized the (undefined) variable ID, which is supposed to come from par_mineos. 
 end
-if nargin < 4 || isempty(ifdelete)
+if nargin < 6 || isempty(ifdelete)
     ifdelete = true;
 end
-if nargin < 5 || isempty(ifplot)
+if nargin < 7 || isempty(ifplot)
     ifplot = false;
 end
-if nargin < 6 || isempty(ifverbose)
+if nargin < 8 || isempty(ifverbose)
     ifverbose = true;
 end
-if nargin < 9 || isempty(ifanis)
+if nargin < 11 || isempty(ifanis)
     ifanis = false;
 end
 
@@ -84,4 +90,4 @@ wd = pwd;
 %% CALCULATE AND READ IN PERTURBATION KERNELS 
 %(frechet derivatves of parm perturbation)
 
-SW_V_kernels = f_mineos_kernels(parm, swperiods); 
+SW_V_kernels = f_mineos_kernels(phV, grV, parm, swperiods); 

@@ -13,6 +13,7 @@ if ~strcmp(pdtyp{2},'HV') % R or L
         Kbase.(pdtyp{2}).grV = grV;
         Kbase.(pdtyp{2}).(['K',pdtyp{3}(1:2)]) = K{1};
     end
+
 elseif strcmp(pdtyp{2},'HV') % HV ratio
     if isempty(Kbase.(pdtyp{2})) 
         Kbase.(pdtyp{2}) = struct('HVr',phV,['K',pdtyp{3}(1:2)],K);

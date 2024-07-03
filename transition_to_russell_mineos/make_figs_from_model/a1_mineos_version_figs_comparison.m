@@ -2,6 +2,7 @@
 clc; clear; 
 run('../../a0_STARTUP_BAYES.m');
 
+addpath('./parms')
 version = 'new'; % Old version is Zach's. New is Josh's. 
 if strcmp(version, 'old'); 
     addpath('/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/matlab_to_mineos'); 
