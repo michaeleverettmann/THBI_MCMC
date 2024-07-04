@@ -28,6 +28,7 @@ These were placed in the `~/MATLAB/` folder. Refer to `a0_STARTUP_BAYES.m` for s
 - [Seizmo](https://github.com/g2e/seizmo) 
 - [seis_tools](https://github.com/eilonzach/seis_tools) 
 - [myFUNCTIONS](https://github.com/eilonzach/myFUNCTIONS) 
+- timeout: install on Mac with "brew install coreutils". Already on Linux. 
 
 ## Setup steps
 
