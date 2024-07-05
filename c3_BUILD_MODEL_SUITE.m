@@ -22,17 +22,21 @@ fprintf('  > Resolving suite of models onto common basis \n')
 VSsuite = zeros(Nz,Nm);
 VPsuite = zeros(Nz,Nm);
 rhosuite = zeros(Nz,Nm);
+Sanissuite = zeros(Nz,Nm); 
 
 for ii = 1:Nm
 VSsuite(:,ii) = linterp(am(ii).z,am(ii).VS,Zsuite);
 VPsuite(:,ii) = linterp(am(ii).z,am(ii).VP,Zsuite);
 rhosuite(:,ii) = linterp(am(ii).z,am(ii).rho,Zsuite);
+Sanissuite(:,ii) = linterp(am(ii).z,am(ii).Sanis,Zsuite);
 end
 
 suite_of_models.Z = Zsuite;
 suite_of_models.VS = VSsuite;
 suite_of_models.VP = VPsuite;
 suite_of_models.rho = rhosuite;
+suite_of_models.Sanis = Sanissuite;
+
 suite_of_models.chain = [am.chain];
 
 

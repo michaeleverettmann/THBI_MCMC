@@ -168,7 +168,7 @@ switch ptbopts{optflag} % decide what to modify
             case 'mantle'
                 
                 val2mod = {'Vs','xi','kz'}; % select whether to perturb velocity, xi value, or knot location
-                val2mod_rel_P = [5,2,2]; % relative probabilities of altering each one
+                val2mod_rel_P = [5,3,2]; % relative probabilities of altering each one
 %%      %!!!!!!!!!!!!!!!!!!!!!!!!!!!
 %%      %!!!!!!!!!!!!!!!!!!!!!!!!!!!
 %%      %!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -199,15 +199,17 @@ switch ptbopts{optflag} % decide what to modify
 %                     if V1>vma || V1<vmi, p_bd = 0; end                    
                     
                 case 'xi' % 14% chance we modify xi value
+                    n_xi_mantle = length(par.mod.mantle.xidepths); % How many xi values in mantle
+                    ind = randi([1,n_xi_mantle]); % Which xi value to perturb
                     std = temp.*par.mod.mantle.xistd; % get std of perturbation
                     if std==0, continue; end % don't perturb if no perturbation
-                    ptb = 'mantle_xi';
+                    ptb = ['mantle_xi_',num2str(ind)];
 
-                    V0 = model.mantmparm.xi;
+                    V0 = model.mantmparm.xi(ind);
                     V1 = V0 + random('norm',0,std,1); % calc. random perturbation
 
-                    model.mantmparm.xi = V1; % insert perturbed val   
-                    if par.inv.verbose, fprintf('    Changed crustal xi from %.2f to %.2f\n',V0,V1); end
+                    model.mantmparm.xi(ind) = V1; % insert perturbed val   
+                    if par.inv.verbose, fprintf('    Changed mantle xi(%.0f) from %.2f to %.2f\n',ind,V0,V1); end
                     
                     % within bounds?
                     vma = par.mod.mantle.ximax;

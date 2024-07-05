@@ -57,10 +57,41 @@ else
 end
 vp_mantle = mantle_vs2vp(vs_mantle,zm );
 rho_mantle = mantle_vs2rho(vs_mantle,zm );
-xi_mantle = mpm.xi*ones(size(zm));
-% catch e % Temporary...
-%     error(getReport(e)); 
-% end
+
+%%% Handle xi through mantle. 
+% This commented version used Gaussian interpolation. It seems worse for our purposes than pchip interpolation. 
+% % % % Handle xi. Something like splines, but not adjustable in depth. Gaussian interpolation. 
+% % % zxi = [par.mod.crust.hmax; 100; 150; 200; max(zm)]; % Depths where we know xi
+% % % xi_at_z = [mpm.xi(1); mpm.xi(1); mpm.xi(2); 1; 1]; % Xi values, corresponding to zxi
+% % % 
+% % % sigma = (zxi(end-1)-zxi(2))/length(zxi(2:end-1)) * 4/5; % Standard deviation for Gaussian weighting. Adjust by a constant at the end for... taste. 
+% % % xi_interp = zeros(size(zm)); % Initialize the interpolated xi array
+% % % for i = 1:length(zm) % Loop over each zm value to interpolate
+% % %     dist = zxi - zm(i); 
+% % %     weights = exp(-((dist).^2) / (2 * sigma^2)); % Compute Gaussian weights based on distance to each zxi
+% % %     weights = weights / sum(weights); % Normalize the weights
+% % %     xi_interp(i) = sum(weights .* xi_at_z); % Compute the weighted average of xi_at_z
+% % % end
+% % % xi_mantle = xi_interp; 
+
+%Handle xi through mantle using pchip interpolation. 
+zxi     = [model.crustmparm.h; par.mod.mantle.xidepths; 200; max(zm)]; % Depths where we know xi
+xi_at_z = [mpm.xi(1);          mpm.xi;                  1;   1      ]; % Xi values, corresponding to zxi
+
+% Interpolate to zm
+xi_mantle = interp1(zxi, xi_at_z, zm, 'pchip');
+
+% % Plotting results
+plot_interp = false; 
+if plot_interp; 
+    figure(4001); clf; hold on;
+    plot(xi_mantle, zm, 'k'); % Interpolated xi values
+    scatter(xi_at_z, zxi, 'filled'); % Known xi values at zxi
+    set(gca, 'YDir', 'reverse');
+    xlabel('Xi'); ylabel('Depth');
+    title('Xi Interpolation');
+end
+%%% Done with xi. 
 
 %% COLLATE
 zz = [zs;zc;zm];
@@ -88,8 +119,7 @@ model.mxi  = mpm.xi;
 model.fdVSsed = 100*diff(vs(zz==zsed))./mean(vs(zz==zsed)); if zsed==0, model.fdVSsed = nan; end
 model.fdVSmoh = 100*diff(vs(zz==zmoh))./mean(vs(zz==zmoh));
 model.Sanis = 100*(xi-1); % in percentage 
-% model.Panis = zeros(Nz,1); %brb_panis
-model.Panis = model.Sanis * par.mod.misc.psi_to_xi; %brb_panis
+model.Panis = model.Sanis * par.mod.misc.psi_to_xi; % brb20240705 xi psi will need to be related through some constant parameter. 
 
 % re-order fields of model structure 
 forder ={'z','z0','VS','VP','rho','Nz','zsed','zmoh','vpvs','cxi','mxi','selev',...
@@ -98,5 +128,12 @@ forder ={'z','z0','VS','VP','rho','Nz','zsed','zmoh','vpvs','cxi','mxi','selev',
      
 model = orderfields(model,forder);
 
+ifplot = false; 
+if ifplot; %brb20240704 Testing new mantle anisotropy 
+    figure(2038); clf; hold on; 
+    plot(model.Sanis, model.z, 'DisplayName','S anis');
+    plot(model.Panis, model.z, 'DisplayName','P anis'); 
+    set(gca, 'YDir', 'reverse'); 
+    legend(); 
 end
 

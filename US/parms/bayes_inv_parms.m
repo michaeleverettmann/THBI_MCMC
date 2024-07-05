@@ -72,7 +72,7 @@ modl.crust = struct(...
     ... Xi in the crust
                      'ximax',1.2                 ,...1.05 % min crust Vs radial anis value % bb2021.10.26 Changed from 1.1 because Station LSCT suggests we want wider psi bounds. 
                      'ximin',0.8                 ,...1.00 % min crust Vs radial anis value % bb2021.10.26 Changed from 0.9 to 0.75 because station LSCT wanted SUPER low psi. THIS MIGHT BE A CONSEQUENCE OF HAVING MANTLE PSI = 1. .9 to 1.1 was suggested by GLOBAL and thus lower resolution compilation of Porrit et al., 2021. 
-                     'xistd',0.01                ,... % std of crust Vs radial anis value
+                     'xistd',0.02                ,... % std of crust Vs radial anis value
     ... knots in the crust
                      'kdstd',2                   ,... % std of knot movement, for perturbation, km
                      'kmax',7                    ,... % max number of spline knots in crust (inc ends)
@@ -84,9 +84,10 @@ modl.mantle = struct(...
                      'vsmin',3.7                 ,...3.7 % min mantle spline velocity, km/s bb2021.10.26 Long et al., 2021 harrisonburg anomaly compilation shows velocities all above about 4.2 km/s... so 3.7 can definatley handle mantle anomalies like this. 
                      'vsstd',0.08                ,... % std of mantle spline velocity for perturbation, km/s
     ... Xi in the mantle
-                     'ximax',1.0                 ,...1.05 % min mantle Vs radial anis value. bb2021.10.26 I don't understand why we set this min and max to zero. I guess we need Long period Love and Rayleigh wave data to constrain it. 
-                     'ximin',1.0                 ,...1.00 % min mantle Vs radial anis value
-                     'xistd',0                   ,... % std of mantle Vs radial anis value
+                     'ximax',1.2                 ,...1.05 % min mantle Vs radial anis value. bb2021.10.26 I don't understand why we set this min and max to zero. I guess we need Long period Love and Rayleigh wave data to constrain it. 
+                     'ximin',0.8                 ,...1.00 % min mantle Vs radial anis value
+                     'xistd',0.02                ,... % std of mantle Vs radial anis value
+                     'xidepths',[75,100]'       ,... % Depths at which to solve for xi in mantle. Can have any number of depths. For now, needs to be between 71 and 150 km. 
     ... knots in the mantle
                      'kdstd',4                   ,... % std of knot movement, for perturbation, km
                      'kmax',15                   ,... % max number of spline knots in mantle (inc ends)

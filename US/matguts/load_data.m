@@ -135,6 +135,7 @@ end
 %% ------------------------------------------------------------------
 %% ----------------------  SURFACE WAVE DATA  ----------------------
 SW_Ray_phV_structures = struct(''); % capture any rayleigh phv datasets. Might want to modify to not just be phv and Rayleigh. 
+SW_Lov_phV_structures = struct(''); % capture any Love phv datasets. 
 if any(strcmp(allpdytp(:,1),'SW'))
 
     %% Phase velocity data

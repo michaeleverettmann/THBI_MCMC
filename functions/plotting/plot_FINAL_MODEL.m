@@ -17,16 +17,24 @@ Z = final_model.Z;
 
 %% PLOT FINAL MODEL
 figure(95); clf; set(gcf,'pos',[120 308 1100 780])
-ax(1) = axes('pos',[0.1300 0.1100 0.2018 0.8160]); hold on 
-ax(2) = axes('pos',[0.3593 0.1100 0.2018 0.8160]); hold on
-ax(3) = axes('pos',[0.5886 0.1100 0.2018 0.8160]); hold on
+
+% Left most plots. 
+width = 0.17; 
+pad = 0.02; 
+positions = cumsum([3*pad, pad+width, pad+width, pad+width]); 
+ax(1) = axes('pos',[positions(1) 0.1100 width 0.8160]); hold on
+ax(2) = axes('pos',[positions(2) 0.1100 width 0.8160]); hold on
+ax(3) = axes('pos',[positions(3) 0.1100 width 0.8160]); hold on
+ax(4) = axes('pos',[positions(4) 0.1100 width 0.8160]); hold on
+
+% Right plots. 
 ax2 = axes('pos',[0.8179 0.6540 0.1 0.2720]); hold on
 ax3(1) = axes('pos',[0.8179 0.382 0.15 0.210]); hold on
 ax3(2) = axes('pos',[0.8179 0.11 0.15 0.210]); hold on
 
 %% Vertical 1D profiles
-variable = {'VS','VP','rho'};
-xlims = [[3.2,4.9];[5.9 9.1];[2.6 3.7]];
+variable = {'VS','VP','rho', 'Sanis'};
+xlims = [[3.2,4.9];[5.9 9.1];[2.6 3.7];[-25 25]];
 % % % variable = {'Sanis','Panis'}; % If want to see other variables, can uncomment this. 
 % % % xlims = [[-10 10]; [-1 1]];
 for iv = 1:length(variable)

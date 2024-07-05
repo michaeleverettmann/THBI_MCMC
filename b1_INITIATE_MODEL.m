@@ -62,7 +62,9 @@ kvs_crust = random('unif',mod.crust.vsmin,mod.crust.vsmax,k_crust+1,1);
 kvs_mantle = random('unif',mod.mantle.vsmin,mod.mantle.vsmax,k_mantle+1,1);
 
 xi_crust = random('unif',mod.crust.ximin,mod.crust.ximax);
-xi_mantle = random('unif',mod.mantle.ximin,mod.mantle.ximax);
+
+n_xi_mantle = length(mod.mantle.xidepths); % Number of xi points in mantle, from parm file. 
+xi_mantle = random('unif',mod.mantle.ximin,mod.mantle.ximax, n_xi_mantle, 1); % Initialize the n_xi_mantle xi values in the mantle. 
 
 % impose monotonic increase conditions:
 vs_sed = sort(vs_sed);
@@ -116,8 +118,8 @@ end
 M = 2 + 1 + k_crust + k_mantle ...
       + double(mod.sed.hmin~=mod.sed.hmax) ...
       + double(mod.crust.vpvsmin~=mod.crust.vpvsmax) ...
-      + double(mod.crust.ximin~=mod.crust.ximax) ...
-      + double(mod.mantle.ximin~=mod.mantle.ximax);
+      + double(mod.crust.ximin~=mod.crust.ximax) ... 
+      + double(mod.mantle.ximin~=mod.mantle.ximax) * n_xi_mantle ; 
 
 %% MODEL WITH ALL PARMS
 model = struct('sedmparm',sed,'crustmparm',crust,'mantmparm',mantle,'datahparm',hparm,...

@@ -51,13 +51,11 @@ for iii = 1:nchains
         posterior.VSmanttop(inds(ii),1) = am(ii).mantmparm.VS_sp(1);
         posterior.VSmantle(inds(ii),:) = linterp(am(ii).z,am(ii).VS,posterior.zatdep);
         posterior.vpvs(inds(ii),1) = am(ii).crustmparm.vpvs;
-        posterior.xicrust(inds(ii),1) = am(ii).crustmparm.xi;
-        posterior.ximant(inds(ii),1) = am(ii).mantmparm.xi;
+        posterior.xicrust(inds(ii),1) = am(ii).crustmparm.xi; 
+        posterior.ximant(inds(ii),1) = mean(am(ii).mantmparm.xi); % brb20240704 For now, I am only taking the average mantle parameter. This might not be the average mantle anisotropy. We should keep track of the average of each mantle parameter. This will take some more modifications to the code. 
         for id = 1:length(dtypes)
             posterior.datahparm.(dtypes{id})(:,inds(ii)) = am(ii).datahparm.(dtypes{id})';
         end
-        posterior.ximant(inds(ii),1) = am(ii).mantmparm.xi;
-        posterior.ximant(inds(ii),1) = am(ii).mantmparm.xi;
         
         % nvg
         [zwa(1),zwa(2),zwa(3)] =  model_NVG_info(am(ii));

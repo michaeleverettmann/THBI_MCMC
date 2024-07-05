@@ -75,7 +75,7 @@ final_model.xicrav = vord(round(0.5*Nm));      % median value
 final_model.xicrminmax = vord(iminmax);
 final_model.xicrsig2 = vord(isig2);
 
-vord = sort(posterior.ximant);
+vord = sort(posterior.ximant); % brb20240705 Should modify to handle each xi depth. Check c2_BUILD_POSTERIOR.m. 
 final_model.ximaav = vord(round(0.5*Nm));      % median value
 final_model.ximaminmax = vord(iminmax);
 final_model.ximasig2 = vord(isig2);
