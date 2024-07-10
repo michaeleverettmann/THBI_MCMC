@@ -50,16 +50,17 @@ addpath([hd '/MATLAB/seis_tools-master']);
 % addpath('/Users/brennanbrunsvik/MATLAB/seizmo/mattaup_alt'); % brb2021.08.04 Need taup
 addpath([hd '/MATLAB/EilonmyFUNCTIONS']); % bb2021.08.04 added to get "maxab"
 
-%% telewavesim and it's Python environment. 
-% brb20240619 This Python environment should only be needed if you are
-% using telewavesim in stead of propmat. 
-p_tws = [bayesdir,'matlab_to_telewavesim']; 
-addpath(p_tws); 
-if count(py.sys.path, p_tws) == 0
-    insert(py.sys.path, int32(0), p_tws); % Telewavesim depends on Python, so we also need to modify our Python path. 
-end
-pyenv('Version', '~/opt/anaconda3/envs/tws/bin/python', ... % Use anaconda environment where telewavesim is installed. This affects the entire Matlab session. TODO define this path in somewhere more obvious. 
-    'ExecutionMode','OutOfProcess'); % ERROR ALERT Could not import numpy if using an anconda environment. Matlab would simply crash. However, setting executionMode=OutOfProcess fixed that for me. https://www.mathworks.com/matlabcentral/answers/502458-why-can-py-numpy-array-not-be-resolved
+disp('Temporarily not adding telewavesim python environment, since we arent using telewavesim')
+% % % %% telewavesim and it's Python environment. 
+% % % % brb20240619 This Python environment should only be needed if you are
+% % % % using telewavesim in stead of propmat. 
+% % % p_tws = [bayesdir,'matlab_to_telewavesim']; 
+% % % addpath(p_tws); 
+% % % if count(py.sys.path, p_tws) == 0
+% % %     insert(py.sys.path, int32(0), p_tws); % Telewavesim depends on Python, so we also need to modify our Python path. 
+% % % end
+% % % pyenv('Version', '~/opt/anaconda3/envs/tws/bin/python', ... % Use anaconda environment where telewavesim is installed. This affects the entire Matlab session. TODO define this path in somewhere more obvious. 
+% % %     'ExecutionMode','OutOfProcess'); % ERROR ALERT Could not import numpy if using an anconda environment. Matlab would simply crash. However, setting executionMode=OutOfProcess fixed that for me. https://www.mathworks.com/matlabcentral/answers/502458-why-can-py-numpy-array-not-be-resolved
 
 %%
 % Some things needed for TauP. Taup used with synthetic receiver functions.

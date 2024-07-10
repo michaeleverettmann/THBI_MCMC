@@ -15,7 +15,11 @@ inv = struct(    'synthTest',false                ,...
                  'Kweight',1                     ,... % option to weight SW misfit by fraction of kernel in model space
                  'BWclust',1                     ,... % option to use only one c x   
                  'datatypes',{{'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
-                        'SW_Lov_phV_eks', 'SW_Lov_phV_har', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}}); 
+                 'SW_Lov_phV_eks', 'SW_Lov_phV_har', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}}); 
+% 'datatypes',{{'HKstack_P'}}); 
+
+
+                 % 'datatypes',{{'HKstack_P'}}); 
 %                  'datatypes',{{'HKstack_P'}}); 
 % % %              %                  'datatypes',{{'SW_HV'}}) 
 % % %                                 % any of {{'SW_x_y' with x='Ray/Lov' and y='phV/grV'; 
@@ -87,7 +91,7 @@ modl.mantle = struct(...
                      'ximax',1.2                 ,...1.05 % min mantle Vs radial anis value. bb2021.10.26 I don't understand why we set this min and max to zero. I guess we need Long period Love and Rayleigh wave data to constrain it. 
                      'ximin',0.8                 ,...1.00 % min mantle Vs radial anis value
                      'xistd',0.02                ,... % std of mantle Vs radial anis value
-                     'xidepths',[75,100]'       ,... % Depths at which to solve for xi in mantle. Can have any number of depths. For now, needs to be between 71 and 150 km. 
+                     'xidepths',[70,110]'       ,... % Depths at which to solve for xi in mantle. Can have any number of depths. For now, needs to be between 70 and ~150 km. 
     ... knots in the mantle
                      'kdstd',4                   ,... % std of knot movement, for perturbation, km
                      'kmax',15                   ,... % max number of spline knots in mantle (inc ends)

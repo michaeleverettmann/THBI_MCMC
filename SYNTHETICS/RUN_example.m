@@ -2,15 +2,15 @@
 % clear all % Cannot clear all, because then we allways reset network_manual and station_manual below. 
 % These define what we are running. Make a list of all desired options. 
 
-% Loop over various synthetic tests. stamp defines the data used. station determines what the synthetic structure will be. 
-STAMP_all =          {'standard'       , 'all_no_hv'       , 'all_no_sp'       , 'standard'       , 'standard'         , };
-network_manual_all = {'testnwk'        , 'testwk'          , 'testnwk'         , 'testnwk'        , 'testnwk'          , }; 
-station_manual_all = {'cont_EProt-s1m1', 'cont_EProt-s1m1' , 'cont_EProt-s1m1' , 'cont_EProt-s1'  , 'cont_EProt-s1m1m2', }; %
+% % Loop over various synthetic tests. stamp defines the data used. station determines what the synthetic structure will be. 
+% STAMP_all =          {'standard'       , 'all_no_hv'       , 'all_no_sp'       , 'standard'       , 'standard'         , };
+% network_manual_all = {'testnwk'        , 'testwk'          , 'testnwk'         , 'testnwk'        , 'testnwk'          , }; 
+% station_manual_all = {'cont_EProt-s1m1', 'cont_EProt-s1m1' , 'cont_EProt-s1m1' , 'cont_EProt-s1'  , 'cont_EProt-s1m1m2', }; %
 
 
-% STAMP_all = {'standard_temp'};
-% network_manual_all = {'testnwk'}; 
-% station_manual_all = {'cont_EProt-s1m1m2'}; %
+STAMP_all = {'standard_temp'};
+network_manual_all = {'testnwk'}; 
+station_manual_all = {'cont_EProt-s1m1m2'}; %
 
 start_dir = pwd(); 
 for istamp = 1:length(STAMP_all); 

@@ -119,7 +119,7 @@ end
 disp('Starting to use alternate mineos.'); 
 mkdir('CARDS'); 
 copyfile(cardfile, sprintf('./CARDS/%s', cardfile)); 
-copyfile('/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/MINEOS_synthetics/run_MINEOS/CARDS/prem_35.qmod', sprintf('./CARDS/%s.qmod', parm.ID)); % Temporary
+copyfile('~/Documents/repositories/Peoples_codes/MINEOS_synthetics/run_MINEOS/CARDS/prem_35.qmod', sprintf('./CARDS/%s.qmod', parm.ID)); % Temporary
 
 % Try putting Joshs stuff in one function 
 [mode] = f_mineos_run_phv_grv(parm, swperiods); 

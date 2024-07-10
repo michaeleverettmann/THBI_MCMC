@@ -11,10 +11,11 @@ echo Sending to: $computer
 transferFolds=\
 '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/transfer
 /Users/brennanbrunsvik/Documents/repositories/Peoples_codes/CADMINEOS/transfer
+/Users/brennanbrunsvik/Documents/repositories/Peoples_codes/MINEOS_synthetics/transfer
 /Users/brennanbrunsvik/Documents/repositories/Peoples_codes/PropMat/transfer
 /Users/brennanbrunsvik/Documents/repositories/Peoples_codes/HV_ellipticity/transfer
 /Users/brennanbrunsvik/MATLAB/transfer
-/Users/brennanbrunsvik/Documents/repositories/data/models_seismic/transfer
+/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/repositories/data/models_seismic/transfer
 /Users/brennanbrunsvik/Documents/repositories/Base_code/transfer
 /Users/brennanbrunsvik/Documents/repositories/hk_anis/transfer
 '

@@ -78,9 +78,10 @@ modl.mantle = struct(...
                      'vsmin',3.7                 ,...3.7 % min mantle spline velocity, km/s bb2021.10.26 Long et al., 2021 harrisonburg anomaly compilation shows velocities all above about 4.2 km/s... so 3.7 can definatley handle mantle anomalies like this. 
                      'vsstd',0.08                ,... % std of mantle spline velocity for perturbation, km/s
     ... Xi in the mantle
-                     'ximax',1.0                 ,...1.05 % min mantle Vs radial anis value. bb2021.10.26 I don't understand why we set this min and max to zero. I guess we need Long period Love and Rayleigh wave data to constrain it. 
-                     'ximin',1.0                 ,...1.00 % min mantle Vs radial anis value
-                     'xistd',0                   ,... % std of mantle Vs radial anis value
+                     'ximax',1.2                 ,...1.05 % min mantle Vs radial anis value. bb2021.10.26 I don't understand why we set this min and max to zero. I guess we need Long period Love and Rayleigh wave data to constrain it. 
+                     'ximin',0.8                 ,...1.00 % min mantle Vs radial anis value
+                     'xistd',0.02                ,... % std of mantle Vs radial anis value
+                     'xidepths',[70,110]'       ,... % Depths at which to solve for xi in mantle. Can have any number of depths. For now, needs to be between 70 and ~150 km. 
     ... knots in the mantle
                      'kdstd',4                   ,... % std of knot movement, for perturbation, km
                      'kmax',15                   ,... % max number of spline knots in mantle (inc ends)
@@ -218,12 +219,17 @@ synth = struct( 'gcarcs',[70]                 ,... % average gcarc
                 'noise_sigma_RF_Ps',0.012        ,... %0.02 std for random added noise for PsRFs
                 'surf_Vp_Vs',[6.1 3.55]          ,... % [VP, VS] surface velocity values - if empty, uses True vals % bb2022.02.08 Not sure what these are. Different sets of values are used in z0_SYNTH_MODEL...
                 'SW_Ray_phV_periods',logspace(log10(6),log10(167),22)',...  % Rayleigh wave phV periods
-                'SW_Ray_grV_periods',logspace(log10(6),log10(40),10)',...  % Rayleigh wave phV periods
-                'SW_Lov_phV_periods',logspace(log10(6),log10(40),10)',...  % Love wave phV periods
-                'SW_HV_periods',[16 20 24 28 32 36 40 50 60 70 80 90]',...  % Rayleigh wave HV periods. From Shen and ritzwoller 2016. 
+                'SW_Ray_grV_periods',[5,6,8,10,12,15,20,25,30,35,40,50,60,80,100,120,140,180]',...  % Rayleigh wave phV periods
+                'SW_Lov_phV_periods',[6,8,10,12,15,20,25,30,35,40,45,50,60,75]',...  % Love wave phV periods
+                'SW_HV_periods',[20,24,28,32,36,40,50,60,70,80,90]',...  % Rayleigh wave HV periods. From Shen and ritzwoller 2016. 
                 'propmat_or_telewavesim', 'propmat', ... % propmat or telewavesim
                 'synthperiod',forc.synthperiod   ,...  % period for propmat synth
                 'nsamps',[]                      );  % number of samples. 
+
+
+
+
+
 
 %---RF parameters---%
 RFparms = struct([]);

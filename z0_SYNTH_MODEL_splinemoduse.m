@@ -312,7 +312,8 @@ if ~use_splines;
     
     %% MAKE ALL PARAMETER STRUCTURES
     crust = struct('h',max(z_c)-sed.h,'vpvs',vpvs_crust,'xi',xi_crust); % warning('Trying to crustal anisotropy'); 
-    mantle = struct('xi',1);
+    % mantle = struct('xi',1);
+    mantle = struct('xi', [0.9, 1.1]'); disp('Adding mantle anisotropy')
     model = struct('sedmparm',sed,'crustmparm',crust,'mantmparm',mantle,...
                    'M', nan, 'datahparm', nan, 'selev',0);
 
@@ -361,9 +362,23 @@ Vplay = [sed_vs2vp(Vslay(xs));...
          mantle_vs2vp(Vslay(xm),mean([zlayt(xm),zlayb(xm)],2))];
 rholay = [sed_vs2rho(Vslay([xs,xc]));...
           mantle_vs2rho(Vslay(xm),mean([zlayt(xm),zlayb(xm)],2))];
+
+%Handle xi through mantle using pchip interpolation. 
+model = TRUEmodel; 
+zm = TRUEmodel.z; 
+mpm = TRUEmodel.mantmparm; 
+zxi     = [model.crustmparm.h; par.mod.mantle.xidepths; 200; max(zm)]; % Depths where we know xi
+xi_at_z = [mpm.xi(1);          mpm.xi;                  1;   1      ]; % Xi values, corresponding to zxi
+zmant = mean([zlayt(xm),zlayb(xm)],2); zlayt(zlayt>=TRUEmodel.zmoh) ; zm(zm>=TRUEmodel.zmoh); 
+% zmant = zmant(2:end); 
+xi_mantle = interp1(zxi, xi_at_z, zmant, 'pchip');% Interpolate to zm
+
 xilay = [ones(length(xs),1);...
          TRUEmodel.cxi*ones(length(xc),1);...
-         TRUEmodel.mxi*ones(length(xm),1)]; % S radial anisotropy
+         xi_mantle]; % S radial anisotropy
+
+
+
 
 % philay = ones(nlay,1); % P radial anisotropy %brb_panis
 % warning('Changing philay')
