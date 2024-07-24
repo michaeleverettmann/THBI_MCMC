@@ -13,10 +13,14 @@ burnin_only  = 4000 ;
 cooloff_only = 3000 ; 
 nchains_only = 12   ; 
 
-niter_only   = 500; 
-burnin_only  = 30 ; 
-cooloff_only = 20 ; 
-nchains_only = 4  ; 
+% niter_only   = 500; 
+% burnin_only  = 30 ; 
+% cooloff_only = 20 ; 
+% nchains_only = 4  ; 
+niter_only   = 16000; 
+burnin_only  = 4000 ; 
+cooloff_only = 3000 ; 
+nchains_only = 4   ; 
 
 % % For testing telewavesim
 % par.synth.samprate = 60; % TODO figure this out. 
@@ -29,6 +33,13 @@ nchains_only = 4  ;
 
 if     strcmp(stamp, 'ENAM_trial'); 
     disp('Using default parameters') 
+
+elseif strcmp(stamp, 'more_anis'); 
+    par.inv.niter                     = niter_only; 
+    par.inv.burnin                    = burnin_only; 
+    par.inv.cooloff                   = cooloff_only; 
+    par.inv.nchains                   = nchains_only;  
+    par.mod.mantle.xidepths = [60, 80, 110, 150]'; 
 
 %%% First list things I'm hoping to actually put in the paper
 elseif strcmp(stamp, 'standard_temp'); 

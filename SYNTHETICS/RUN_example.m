@@ -8,7 +8,7 @@
 % station_manual_all = {'cont_EProt-s1m1', 'cont_EProt-s1m1' , 'cont_EProt-s1m1' , 'cont_EProt-s1'  , 'cont_EProt-s1m1m2', }; %
 
 
-STAMP_all = {'standard_temp'};
+STAMP_all = {'more_anis'};
 network_manual_all = {'testnwk'}; 
 station_manual_all = {'cont_EProt-s1m1m2'}; %
 

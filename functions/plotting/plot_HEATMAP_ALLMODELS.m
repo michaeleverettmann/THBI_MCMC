@@ -15,7 +15,7 @@ sm = suite_of_models;
 
 Xvs = [par.mod.sed.vsmin:0.04:par.mod.mantle.vsmax];
 Xvp = [1.3*par.mod.sed.vsmin:0.04:par.mod.mantle.vsmax*2];
-Xsa = 100*[(par.mod.crust.ximin-1):0.002:(par.mod.crust.ximax-1)]; 
+Xsa = 100*[(par.mod.crust.ximin-1):0.01:(par.mod.crust.ximax-1)]; 
 Nz  = length(sm(1).Z);
 
 hmps = zeros(Nz,length(Xvs));

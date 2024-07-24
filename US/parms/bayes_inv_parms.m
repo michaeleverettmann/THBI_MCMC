@@ -40,7 +40,8 @@ modl.dz = 2;                                        % depth spacing of model, km
 
 modl.starting.HKappa.startAtHK = true; % Starting model at maximum of hkappa stack
 
-modl.force_no_new_prior = false; % For debugging. Force not making a new emperical prior, even if we change acceptable model parameters. 
+modl.force_no_new_prior = true; % For debugging. Force not making a new emperical prior, even if we change acceptable model parameters. 
+if modl.force_no_new_prior; warning('Forcing no new prior to be built. Turn this off.'); end; 
 
 modl.misc = struct(...
     'psi_to_xi', -1 ); % Ratio of psi to xi through whole model. Only valid if xi and psi are expressed as percent (e.g. 5%, not 1.05).  
@@ -74,8 +75,8 @@ modl.crust = struct(...
                 ... gaussian prior probability for VpVs - mean=1.8, std=0.05
                      'vpvs_pprior',@(vpvs) 1,...exp(-(vpvs-1.7).^2/0.03.^2),... % prior probability 
     ... Xi in the crust
-                     'ximax',1.2                 ,...1.05 % min crust Vs radial anis value % bb2021.10.26 Changed from 1.1 because Station LSCT suggests we want wider psi bounds. 
-                     'ximin',0.8                 ,...1.00 % min crust Vs radial anis value % bb2021.10.26 Changed from 0.9 to 0.75 because station LSCT wanted SUPER low psi. THIS MIGHT BE A CONSEQUENCE OF HAVING MANTLE PSI = 1. .9 to 1.1 was suggested by GLOBAL and thus lower resolution compilation of Porrit et al., 2021. 
+                     'ximax',1.3                 ,...1.05 % min crust Vs radial anis value % bb2021.10.26 Changed from 1.1 because Station LSCT suggests we want wider psi bounds. 
+                     'ximin',0.7                 ,...1.00 % min crust Vs radial anis value % bb2021.10.26 Changed from 0.9 to 0.75 because station LSCT wanted SUPER low psi. THIS MIGHT BE A CONSEQUENCE OF HAVING MANTLE PSI = 1. .9 to 1.1 was suggested by GLOBAL and thus lower resolution compilation of Porrit et al., 2021. 
                      'xistd',0.02                ,... % std of crust Vs radial anis value
     ... knots in the crust
                      'kdstd',2                   ,... % std of knot movement, for perturbation, km
@@ -88,10 +89,10 @@ modl.mantle = struct(...
                      'vsmin',3.7                 ,...3.7 % min mantle spline velocity, km/s bb2021.10.26 Long et al., 2021 harrisonburg anomaly compilation shows velocities all above about 4.2 km/s... so 3.7 can definatley handle mantle anomalies like this. 
                      'vsstd',0.08                ,... % std of mantle spline velocity for perturbation, km/s
     ... Xi in the mantle
-                     'ximax',1.2                 ,...1.05 % min mantle Vs radial anis value. bb2021.10.26 I don't understand why we set this min and max to zero. I guess we need Long period Love and Rayleigh wave data to constrain it. 
-                     'ximin',0.8                 ,...1.00 % min mantle Vs radial anis value
+                     'ximax',1.3                 ,...1.05 % min mantle Vs radial anis value. bb2021.10.26 I don't understand why we set this min and max to zero. I guess we need Long period Love and Rayleigh wave data to constrain it. 
+                     'ximin',0.7                 ,...1.00 % min mantle Vs radial anis value
                      'xistd',0.02                ,... % std of mantle Vs radial anis value
-                     'xidepths',[70,110]'       ,... % Depths at which to solve for xi in mantle. Can have any number of depths. For now, needs to be between 70 and ~150 km. 
+                     'xidepths',[60,80,110,150]'       ,... % Depths at which to solve for xi in mantle. Can have any number of depths. For now, needs to be between 70 and ~150 km. 
     ... knots in the mantle
                      'kdstd',4                   ,... % std of knot movement, for perturbation, km
                      'kmax',15                   ,... % max number of spline knots in mantle (inc ends)

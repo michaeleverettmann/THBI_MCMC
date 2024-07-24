@@ -6,7 +6,7 @@ onesta = '';
 overwrite = true;
 
 STAMP_all = {...
-    'standard',...
+    'more_anis',...
 }; % This determines which tests we want to run now. They will run sequentially, not in parallel (each station only has one ram folder. )
 
 for istamp = [1:length(STAMP_all)]; 
@@ -22,7 +22,7 @@ for istamp = [1:length(STAMP_all)];
     % use these default values. 
     if ~ (exist('network_manual', 'var') && exist('station_manual', 'var')) ; 
         network_manual = 'TA'; % This is NOT used if station_manual is already in your workspace. 
-        station_manual = 'Q13A'; % This is NOT used if station_manual is already in your workspace. 
+        station_manual = 'Q22A'; % This is NOT used if station_manual is already in your workspace. 
         fprintf('\nReseting to %s.%s\n',network_manual,station_manual)
     end
     disp('Network and station') 

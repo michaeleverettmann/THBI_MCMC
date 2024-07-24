@@ -276,6 +276,8 @@ fprintf('  > Processing results\n')
  allmodels_collated] ...
  = c1_PROCESS_RESULTS( misfits_perchain,allmodels_perchain,par,1,[resdir,'/modMisfits']);
 
+plot_corrplot(par, allmodels_collated, [resdir,'/xi_correlation_matrix.pdf'] ); 
+
 [ hypparm_trends ] = plot_HYPERPARAMETER_TRENDS( allmodels_perchain,[resdir,'/hyperparmtrend.pdf'] );
 plot_MISFIT_TRENDS(par,allmodels_perchain,misfits_perchain_original,resdir );
 plot_KNOT_TRENDS( allmodels_perchain,par,[resdir,'/knottrends']  )

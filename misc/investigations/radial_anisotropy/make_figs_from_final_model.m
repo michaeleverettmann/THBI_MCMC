@@ -4,7 +4,10 @@ run('../../../a0_STARTUP_BAYES.m');
 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/O53A_TA_dat1/many_sw_authors'; 
 % resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/R54A_TA_dat1/add_sediment_try2'; 
-resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/Q13A_TA_dat1/standard'; % /Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/cont_EProt-s1m1m2_testnwk_dat0/low_noise_sp
+% resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/Q13A_TA_dat1/standard'; % /Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/cont_EProt-s1m1m2_testnwk_dat0/low_noise_sp
+resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/Q22A_TA_dat1/more_anis'; % /Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/cont_EProt-s1m1m2_testnwk_dat0/low_noise_sp
+% resdir_data = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv/Q13A_TA_dat1/more_anis'; 
+% resdir_data = '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_cnsi/cont_EProt-s1m1m2_testnwk_dat0/standard'; % /Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/cont_EProt-s1m1m2_testnwk_dat0/low_noise_sp
 resdir_fig = '/Users/brennanbrunsvik/Documents/temp'; 
 % resdir_fig  = resdir_data; % '/Volumes/extDrive/offload/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/data/STASinv_eri/cont_EProt-s1m1m2_testnwk_dat0/low_noise_sp'; 
 prior_path  = '/Users/brennanbrunsvik/Documents/UCSB/ENAM/THBI_ENAM/ENAM/prior.mat' ; 
@@ -24,6 +27,17 @@ for i_mat_file = 1:length(mat_files);
     fprintf('\nLoading %s\n',mat_files{i_mat_file}); 
     load(mat_files{i_mat_file}); 
 end
+
+%%% Test. Try understanding ptb. 
+f_ptb = mat_files(contains(mat_files, 'accept_info_')); 
+ptb = {}; 
+for iptb = 1:length(f_ptb); 
+    ptb{iptb} = load(f_ptb{iptb}); 
+
+    ptb_c = ptb{iptb}.ptb
+end
+%%%
+
 
 % % % par.inv.datatypes = {'SW_Ray_phV_eks', 'SW_Ray_phV_dal', ...
 % % %         'SW_Lov_phV', 'RF_Sp_ccp', 'HKstack_P', 'SW_HV'}
@@ -59,45 +73,23 @@ goodChainManual = [];
      allmodels_collated] ...
      = c1_PROCESS_RESULTS( misfits_perchain_orig,allmodels_perchain_orig,par,1,[resdir_fig,'/modMisfits'],goodChainManual)
 
-% %%% Test - look at radial anisotropy 
-% figure(4081); clf; hold on; 
-% tiledlayout(2,1,'TileSpacing','compact')
-% m = allmodels_collated; 
-% mxi = ; 
-% 
-% nexttile(); hold on; box on; 
-% scatter(mxi(:,1), mxi(:,2), 5, 'k', 'filled'); 
-% xlabel('\xi_{70}'); 
-% ylabel('\xi_{110}'); 
-% text(.1, .1, num2str(cov(mxi)), 'units', 'normalized'); 
-% 
-% nexttile(); hold on; box on;  
-% cxi = [m.cxi]'; 
-% scatter(mxi(:,1), cxi, 5, 'k', 'filled'); 
-% xlabel('\xi_{70}'); 
-% ylabel('\xi_{crust}');
-% text(.1, .1, num2str(cov([mxi(:,1), cxi])), 'units', 'normalized'); 
-
-m = allmodels_collated; 
-figure(4082); clf; hold on; 
-corrplot([[m.cxi]', [m.mxi]'], 'VarNames', ["xi crust", "xi70", "xi110"]); 
-title('Correlation of xi'); 
-exportgraphics(gcf, './xi_correlation_matrix.pdf'); 
+% plot_corrplot(par, allmodels_collated, [resdir_fig,'/xi_correlation_matrix.pdf'] ); 
+plot_corrplot(par, allmodels_collated, ['./xi_correlation_matrix.pdf'] ); 
 
 %%%
 % 
 % [ hypparm_trends ] = plot_HYPERPARAMETER_TRENDS( allmodels_perchain,[resdir_fig,'/hyperparmtrend.pdf'] );
 % plot_MISFIT_TRENDS(par,allmodels_perchain,misfits_perchain,resdir_fig );
 % 
-% posterior = c2_BUILD_POSTERIOR(allmodels_collated,par,par.res.zatdep);
-% plot_MODEL_SUMMARY(posterior,par,1,[resdir_fig,'/modMisfits.pdf']); 
-% plot_PRIORvsPOSTERIOR(prior,posterior,par,1,[resdir_fig,'/prior2posterior.pdf'])
-% fprintf('  > Plotting model suite\n')
-% [ suite_of_models ] = c3_BUILD_MODEL_SUITE(allmodels_collated,par );
-% plot_SUITE_of_MODELS( suite_of_models,posterior,1,[resdir_fig,'/suite_of_models.png'],[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
-% final_model = c4_FINAL_MODEL(posterior,allmodels_collated,par,1,[resdir_fig,'/final_model']);
-% plot_FINAL_MODEL( final_model,posterior,1,[resdir_fig,'/final_model.pdf'],true,[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
-% plot_HEATMAP_ALLMODELS(suite_of_models,final_model,par,1,[resdir_fig,'/heatmap_of_models.pdf']);
+posterior = c2_BUILD_POSTERIOR(allmodels_collated,par,par.res.zatdep);
+plot_MODEL_SUMMARY(posterior,par,1,[resdir_fig,'/modMisfits.pdf']); 
+plot_PRIORvsPOSTERIOR(prior,posterior,par,1,[resdir_fig,'/prior2posterior.pdf'])
+fprintf('  > Plotting model suite\n')
+[ suite_of_models ] = c3_BUILD_MODEL_SUITE(allmodels_collated,par );
+plot_SUITE_of_MODELS( suite_of_models,posterior,1,[resdir_fig,'/suite_of_models.png'],[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
+final_model = c4_FINAL_MODEL(posterior,allmodels_collated,par,1,[resdir_fig,'/final_model']);
+plot_FINAL_MODEL( final_model,posterior,1,[resdir_fig,'/final_model.pdf'],true,[par.data.stadeets.Latitude,par.data.stadeets.Longitude]);
+plot_HEATMAP_ALLMODELS(suite_of_models,final_model,par,1,[resdir_fig,'/heatmap_of_models.pdf']);
 % plot_HEATMAP_ALLMODELS_shallow(suite_of_models,final_model,par,1,[resdir_fig,'/heatmap_of_models_shallow.pdf']);
 
 % % % par.datprocess.HKappa = struct(              ...

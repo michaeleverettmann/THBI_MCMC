@@ -14,8 +14,10 @@ sm = suite_of_models;
 
 %% PLOT SUITE OF ACCEPTED MODEL
 figure(85); clf; set(gcf,'pos',[120 151 920 947])
-ax1 = subplot(1,7,[1:3]); hold on
-ax2 = subplot(1,7,[4:6]); hold on
+ax1 = subplot(1,7,[1:2]); hold on
+ax2 = subplot(1,7,[3:4]); hold on
+ax3 = subplot(1,7,[5:6]); hold on
+
 ax4 = subplot(1,7,7); hold on
 
 ichains = unique([sm.chain]);
@@ -41,6 +43,12 @@ for iii = 1:nchains
     title(ax2,'Vp','fontsize',20)
     xlabel(ax2,'Vp (km/s)','fontsize',16)
     ylim(ax2,[0 max(sm.Z)])
+
+    plot(ax3,sm.Sanis(:,ic),sm.Z,'--','Linewidth',0.05,'color',basecol); hold on
+    set(ax3,'ydir','reverse','fontsize',14,'yticklabel','','ytick',[0.7:.2:1.3],'color','none');
+    title(ax3,'Sanis','fontsize',20)
+    xlabel(ax3,'Sanis %','fontsize',16)
+    ylim(ax3,[0 max(sm.Z)])
     
     Zdh = midpts([0:1:sm.Z(end)]');
     nm = hist(posterior.zmoh(ic),Zdh);

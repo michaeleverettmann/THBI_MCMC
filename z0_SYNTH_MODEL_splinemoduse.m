@@ -313,7 +313,13 @@ if ~use_splines;
     %% MAKE ALL PARAMETER STRUCTURES
     crust = struct('h',max(z_c)-sed.h,'vpvs',vpvs_crust,'xi',xi_crust); % warning('Trying to crustal anisotropy'); 
     % mantle = struct('xi',1);
-    mantle = struct('xi', [0.9, 1.1]'); disp('Adding mantle anisotropy')
+
+    if length(par.mod.mantle.xidepths) ~= 4; 
+        mantle = struct('xi', [0.9, 1.1]'); disp('Adding mantle anisotropy')
+    else 
+        mantle = struct('xi', [1, 0.9, 1.1, 0.9]'); disp('Adding mantle anisotropy')
+    end
+
     model = struct('sedmparm',sed,'crustmparm',crust,'mantmparm',mantle,...
                    'M', nan, 'datahparm', nan, 'selev',0);
 
