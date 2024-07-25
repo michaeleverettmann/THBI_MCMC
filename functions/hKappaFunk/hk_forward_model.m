@@ -43,22 +43,73 @@ else % When model is within HK bounds, run this.
     nSurfRes = 1; % Multiple of surface wave kernel resets that we will also reset HK stack. If 1, we reset HK stack any time we reset surface wave kernels. 
     
     % Kind of complicated to figure out if we do full HK or just one h and k
-%     runFullHK = ...
-%         ((par.hkResetInfo.timesReset==0)                       || ...
-%         (par.hkResetInfo.timesSWKernelsReset == nSurfRes) || ...
-%         (par.ii==par.inv.niter))                          || ...
-%         (options.insistRerun); % Could put this first to avoid the if isfield code, but this will almost certainly cause me to mess up the code in a few months. 
+    % runFullHK = ...
+    %     ((par.hkResetInfo.timesReset==0)                       || ...
+    %     (par.hkResetInfo.timesSWKernelsReset == nSurfRes) || ...
+    %     (par.ii==par.inv.niter))                          || ...
+    %     (options.insistRerun); % Could put this first to avoid the if isfield code, but this will almost certainly cause me to mess up the code in a few months. 
     runFullHK = true; % 2023/05/19 I am now using the much faster HK package. Lets see if it's fast enough to always use, so that we have just one HK code instead of two sets to maintain. 
     if runFullHK; 
         par.hkResetInfo.timesReset = par.hkResetInfo.timesReset + 1; 
         par.hkResetInfo.timesSWKernelsReset = 0; % Reset our surface wave kernel counter. This only is analyzed for the HK stacks. 
         
-%         fprintf('\nResetting HK stack on iteration %1.0f (1/%1.0fx as often as surface wave kernels)\n', par.ii, nSurfRes);  
-        HK_new = zeros(size(predata.HKstack_P.Esum)); 
-        for iWave = [1:size(predata.HKstack_P.waves.rf,2)]; 
+% % %       % This commented code applies full anisotropic HK stack to each receiver function, them sums them. It is time consuming, but the most correct. 
+% % %         fprintf('\nResetting HK stack on iteration %1.0f (1/%1.0fx as often as surface wave kernels)\n', par.ii, nSurfRes);  
+% %         HK_new = zeros(size(predata.HKstack_P.Esum)); 
+% %         for iWave = [1:size(predata.HKstack_P.waves.rf,2)]; 
+% %             RF   = predata.HKstack_P.waves.rf(:,iWave); 
+% %             tt   = predata.HKstack_P.waves.tt; 
+% %             rayp = predata.HKstack_P.waves.rayParmSecDeg(iWave); 
+% % 
+% %             [HK_A, HK_H, HK_K] = HKstack_anis_wrapper(... 
+% %                 par, model, RF, tt, rayp, 'ifplot', false, ...
+% %                 'hBounds', [par.mod.crust.hmin, par.mod.crust.hmax], ...
+% %                 'kBounds', [par.mod.crust.vpvsmin, par.mod.crust.vpvsmax], ...
+% %                 'kNum', size(HK_new,1), 'hNum', size(HK_new,2),...
+% %                 'posterior', options.posterior);   
+% % 
+% %             HK_new = HK_new + HK_A; 
+% %         end
+
+        % Bin receiver functions for speed. Anisotropic HK stacks can be slow when done with many receiver functions and over many iterations. brb2024.07.25 Tested on one station which had 60 receiver functions with ray parameters from about 4 to 8.5, and found a difference in the maximum HK stack value of only 0.2 to 0.3%. So, this causes only negligable difference in results.
+        rayp_all = predata.HKstack_P.waves.rayParmSecDeg; 
+        bin_size = 0.5; % Make bins of ray parameter with this bin spacing. 
+        rayp_bins = min(rayp_all)-bin_size:bin_size:max(rayp_all)+2*bin_size; % These are the bins. Add some to the lesser and greater sides to make computations easier later. 
+        RF_all = zeros(length(predata.HKstack_P.waves.tt), length(rayp_bins)); % Receiver functions stacked in each bin. 
+        for iWave = [1:size(predata.HKstack_P.waves.rf,2)]; % For each receiver function, decide which bin to put it in. 
             RF   = predata.HKstack_P.waves.rf(:,iWave); 
-            tt   = predata.HKstack_P.waves.tt; 
             rayp = predata.HKstack_P.waves.rayParmSecDeg(iWave); 
+
+            rayp_diff = rayp-rayp_bins; % How far are we from each bin? 
+
+            less = find(rayp_diff >= 0); % These bins are less than our balue. 
+            less = less(end); % Get the last of the bins that are less than our value. 
+            great = find(rayp_diff < 0); % Same for bins greater than our value. 
+            great = great(1); 
+
+            % Determine a weight for the bins greater and less than our values. Doesn't make much of a difference if we use 1/dist or dist for weights.  
+            weightl_og = 1/(abs(rayp-rayp_bins(less))); % Use 1/dist as weight. 
+            weightg_og = 1/(abs(rayp-rayp_bins(great))); 
+            % weightl_og = 1/(abs(rayp-rayp_bins(less))); % Use 1/dist as weight. 
+            % weightg_og = 1/(abs(rayp-rayp_bins(great))); 
+            weightl_og = min([weightl_og, 100]); % Avoid infinite weights. They turn to nan and break things. 
+            weightg_og = min([weightg_og, 100]); 
+            weightl = weightl_og / (weightl_og + weightg_og); % Normalize weights. Sum to 1. 
+            weightg = weightg_og / (weightl_og + weightg_og); 
+
+            RF_all(:,less)  = RF_all(:,less) + weightl * RF; % Sum RF to each bin. Multiply by weights. 
+            RF_all(:,great) = RF_all(:,great)+ weightg * RF; 
+            % Note: do not weight the bins by how many receiver functions go into those bins. That would not be consistent with the original intent: summing each non-normalized HK stack. 
+        end
+
+        % Sum receiver function HK stacks from within each bin. 
+        HK_new = zeros(size(predata.HKstack_P.Esum)); 
+        for iWave = [1:length(rayp_bins)]; 
+            RF   = RF_all(:,iWave); 
+            tt   = predata.HKstack_P.waves.tt; 
+            rayp = rayp_bins(iWave) ; 
+
+            if all(RF==0); continue; end; % Don't waste time on HK stack if nothing in this bin. 
 
             [HK_A, HK_H, HK_K] = HKstack_anis_wrapper(... 
                 par, model, RF, tt, rayp, 'ifplot', false, ...
@@ -66,7 +117,6 @@ else % When model is within HK bounds, run this.
                 'kBounds', [par.mod.crust.vpvsmin, par.mod.crust.vpvsmax], ...
                 'kNum', size(HK_new,1), 'hNum', size(HK_new,2),...
                 'posterior', options.posterior);   
-
             HK_new = HK_new + HK_A; 
         end
         
