@@ -117,7 +117,7 @@ end
 %%% Now we have card file. Go to Josh's code to run it. 
 % Test 1. Can we simply execute his script? To start. Will be silly. 
 disp('Starting to use alternate mineos.'); 
-mkdir('CARDS'); 
+if ~exist('CARDS', 'dir'); mkdir('CARDS'); end
 copyfile(cardfile, sprintf('./CARDS/%s', cardfile)); 
 copyfile('~/Documents/repositories/Peoples_codes/MINEOS_synthetics/run_MINEOS/CARDS/prem_35.qmod', sprintf('./CARDS/%s.qmod', parm.ID)); % Temporary
 

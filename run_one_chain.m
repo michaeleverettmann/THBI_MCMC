@@ -92,7 +92,7 @@ par.hkResetInfo = struct('timesReset',0, 'timesSWKernelsReset',0); % Structure t
 
 ii_no_reverse = 0; 
 while ii < par.inv.niter
-fprintf('\nIteration ii=%1.0f\n',ii) % Temporary while debugging or adding new features. 
+fprintf('ii=%1.0f',ii) % Don't add newlines. This way, we just get one line that shows each iteration. 
 
 earlyFailNum = 100; 
 save_model_if_error = false; % Debug! Make this true, or something like (ii > earlyFailNum) if you want to get the models that are breaking the code.  
