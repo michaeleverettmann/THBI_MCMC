@@ -10,11 +10,29 @@ numFails = 0;
 % only let starting model out of the loop if it passes conditions
 while ifpass==0
     while ifpass==0 % first make sure the starting model satisfies conditions
-        model0 = b1_INITIATE_MODEL(par,[],[],tdvalue);
+
+        model0 = b1_INITIATE_MODEL_simple(par,[],[],tdvalue); % Use the simple option here, to start with same reasonable model each time. 
+        % figure(31), clf, hold on, set(gca,'ydir','reverse')
+        % plot(model0.VS,model0.z,'b',model0.VP,model0.z,'r',model0.rho,model0.z,'k')
+
+        model_start = model0; 
+        for ipert = 1:(40*model0.M); % On average, perturb each parameter some number of times. 
+            model0 = b2_PERTURB_MODEL(model0, par, 0.125); % Small temperature, so perturbations are small. 
+        end 
+
         model = model0;
         model = expand_dathparms_to_data( model,tdvalue,par );
         ifpass = a1_TEST_CONDITIONS( model, par );
         Pm_prior = calc_Pm_prior(model,par);
+        
+        % plot(model0.VS,model0.z,'b.',model0.VP,model0.z,'r.',model0.rho,model0.z,'k.')
+        % [model.crustmparm.xi; model.mantmparm.xi]; 
+
+        % If we have a bunch of knots, toss it. Too complicated for a starting model. 
+        if (model_start.crustmparm.Nsp+1 < model.crustmparm.Nsp) || ...
+            (model_start.mantmparm.Nsp+1 < model.mantmparm.Nsp); 
+            ifpass = false; 
+        end 
     end
 
     %% starting model kernel
