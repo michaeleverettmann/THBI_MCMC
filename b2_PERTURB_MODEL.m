@@ -198,7 +198,8 @@ switch ptbopts{optflag} % decide what to modify
 %                     vmi = par.mod.mantle.vsmin;
 %                     if V1>vma || V1<vmi, p_bd = 0; end                    
                     
-                case 'xi' % 14% chance we modify xi value
+                    case 'xi' % 14% chance we modify xi value
+                    if length(par.mod.mantle.xidepths)==0; error('Need to specify at least 1 mantle anisotropy depth. Can be 0.'); end % don't perturb if no mantle anisotropy depths. 
                     n_xi_mantle = length(par.mod.mantle.xidepths); % How many xi values in mantle
                     ind = randi([1,n_xi_mantle]); % Which xi value to perturb
                     std = temp.*par.mod.mantle.xistd; % get std of perturbation

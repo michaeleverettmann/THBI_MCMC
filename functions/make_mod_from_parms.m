@@ -75,14 +75,18 @@ rho_mantle = mantle_vs2rho(vs_mantle,zm );
 % % % xi_mantle = xi_interp; 
 
 %Handle xi through mantle using pchip interpolation. 
-zxi     = [model.crustmparm.h; par.mod.mantle.xidepths; 200; max(zm)]; % Depths where we know xi
-xi_at_z = [mpm.xi(1);          mpm.xi;                  1;   1      ]; % Xi values, corresponding to zxi
+xidepths = par.mod.mantle.xidepths; 
+mpmxi = mpm.xi; 
+xidepths(1) = max([xidepths(1), model.crustmparm.h]); % If our shallowest mantle xi value was in the crust, move the depth to the Moho. 
+
+zxi     = [model.crustmparm.h; xidepths+0.00001; 200; max(zm)]; % Depths where we know xi
+xi_at_z = [mpmxi(1);           mpmxi           ;      1; 1      ]; % Xi values, corresponding to zxi
 
 % Interpolate to zm
 xi_mantle = interp1(zxi, xi_at_z, zm, 'pchip');
 
-% % Plotting results
-plot_interp = false; 
+% Plotting results
+plot_interp = false;
 if plot_interp; 
     figure(4001); clf; hold on;
     plot(xi_mantle, zm, 'k'); % Interpolated xi values

@@ -18,6 +18,9 @@ staall = string(stainfo.stas);
 
 stamp = 'more_anis'; 
 
+% figname = 'heatmap_of_models.pdf'; 
+figname = 'final_true_vs_pred_data_wavs.png'; 
+
 figure(1); clf; hold on; 
 xlimits = [-130, -100]; 
 ylimits = [30, 45]; 
@@ -56,11 +59,15 @@ for i = 1:length(folds)
         lat = stalats(iallsta); 
         lon = stalons(iallsta); 
 
-        % scatter(lon, lat); 
-        fig_model = sprintf('%s/heatmap_of_models.pdf',fold); % final_true_vs_pred_data_wavs.png
-        % fig_model = sprintf('%s/final_true_vs_pred_data_wavs.png',fold);
-        % img_model = fig_model; 
-        img_model = PDFtoImg(fig_model); 
+        fig_model = sprintf('%s/%s',fold,figname); % final_true_vs_pred_data_wavs.png
+
+        if contains(figname, '.pdf'); 
+            img_model = PDFtoImg(fig_model); 
+            make_copy = true; 
+        else
+            img_model = fig_model; 
+            make_copy = false; 
+        end 
 
         if exist(img_model, 'file')
             % Insert the image at specified location
@@ -78,11 +85,10 @@ for i = 1:length(folds)
             imshow(img);
         end
 
-        delete(img_model); 
-        
-        % break 
-
+        if make_copy; 
+            delete(img_model); 
+        end 
     end
 end
 
-exportgraphics(gcf, './test.pdf', 'Resolution',2400, 'ContentType','image'); 
+exportgraphics(gcf, sprintf('./%s.pdf',figname), 'Resolution',2400, 'ContentType','image'); 

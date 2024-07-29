@@ -16,6 +16,7 @@ while ifpass==0
         % plot(model0.VS,model0.z,'b',model0.VP,model0.z,'r',model0.rho,model0.z,'k')
 
         model_start = model0; 
+        disp('Making init model')
         for ipert = 1:(40*model0.M); % On average, perturb each parameter some number of times. 
             model0 = b2_PERTURB_MODEL(model0, par, 0.125); % Small temperature, so perturbations are small. 
         end 
