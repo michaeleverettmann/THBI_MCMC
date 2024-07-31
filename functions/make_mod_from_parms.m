@@ -79,7 +79,7 @@ xidepths = par.mod.mantle.xidepths;
 mpmxi = mpm.xi; 
 xidepths(1) = max([xidepths(1), model.crustmparm.h]); % If our shallowest mantle xi value was in the crust, move the depth to the Moho. 
 
-zxi     = [model.crustmparm.h; xidepths+0.00001; 200; max(zm)]; % Depths where we know xi
+zxi     = [model.crustmparm.h; xidepths+0.00001; 150; max(zm)]; % Depths where we know xi
 xi_at_z = [mpmxi(1);           mpmxi           ;      1; 1      ]; % Xi values, corresponding to zxi
 
 % Interpolate to zm

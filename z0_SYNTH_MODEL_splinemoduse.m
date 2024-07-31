@@ -373,7 +373,7 @@ rholay = [sed_vs2rho(Vslay([xs,xc]));...
 model = TRUEmodel; 
 zm = TRUEmodel.z; 
 mpm = TRUEmodel.mantmparm; 
-zxi     = [model.crustmparm.h; par.mod.mantle.xidepths; 200; max(zm)]; % Depths where we know xi
+zxi     = [model.crustmparm.h; par.mod.mantle.xidepths; 150; max(zm)]; % Depths where we know xi
 xi_at_z = [mpm.xi(1);          mpm.xi;                  1;   1      ]; % Xi values, corresponding to zxi
 zmant = mean([zlayt(xm),zlayb(xm)],2); zlayt(zlayt>=TRUEmodel.zmoh) ; zm(zm>=TRUEmodel.zmoh); 
 % zmant = zmant(2:end); 

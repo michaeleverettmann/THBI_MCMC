@@ -16,12 +16,15 @@ stalons = stainfo.slons;
 netall = string(stainfo.nwk); 
 staall = string(stainfo.stas); 
 
-stamp = 'more_anis'; 
+% stamp = 'more_anis'; 
+stamp = 'no_anis_mant'; 
+
 
 % figname = 'heatmap_of_models.pdf'; 
 figname = 'final_true_vs_pred_data_wavs.png'; 
 
 figure(1); clf; hold on; 
+ax1 = gca(); 
 xlimits = [-130, -100]; 
 ylimits = [30, 45]; 
 xlim(xlimits); 
@@ -81,13 +84,24 @@ for i = 1:length(folds)
             img_height_scaled = (img_height / img_width) * img_width_scaled;  % Scaled height based on aspect ratio
             
             % Insert the image
-            axes('Position', [img_pos_x, img_pos_y, img_width_scaled, img_height_scaled]);
+            ax = axes('Position', [img_pos_x, img_pos_y, img_width_scaled, img_height_scaled]);
+            hold on ;
             imshow(img);
+
+            % axes(ax1); 
+            % scatter(lon, lat, 1, 'k', 'filled'); 
+            % text(lon, lat, sprintf('%1.2f, %1.2f', lon, lat), 'Units','data', 'FontSize',4); 
+
+            % scatter(ax, 0, 0, 1, 'k', 'filled', 'Units', 'normalized'); 
+            text(ax, 0, .1, sprintf('%s %s %1.3f, %1.3f', net, sta, lon, lat), 'FontSize',0.5, 'Units','normalized'); 
+            % break
         end
 
         if make_copy; 
             delete(img_model); 
         end 
+
+
     end
 end
 
